@@ -1,43 +1,36 @@
-####################################
-A first Example and General Concepts
-####################################
 .. sectionauthor:: Lloyd Connellan <l.connellan@warwick.ac.uk>, Andreas Dedner <a.s.dedner@warwick.ac.uk>, Robert Kl\ |oe|\ fkorn <robert.kloefkorn@iris.no>, Martin Nolte <nolte.mrtn@gmail.com>
 
-.. todo::
+###########################################################
+General Concepts (including how to solve a Laplace problem)
+###########################################################
 
-   In general copy more *explanations* from the `dune-fempy.pmd` file
+In the foloowing we introduce how to construct and use the basic components of
+a finite element method ending the first part with solving a simple Laplace
+problem. The required steps are:
+
+* constructing a tesselation of the computational domain
+* working with functions defined over the grid
+* setting up discrete functions
+* defining the mathematical model to solve
+* solving the (non linear) system arising from the discretization of the
+  model by the Galerkin method
+
+After that we study the more complex problem of solving a time dependent
+non linear problem.
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
+   :name: concepts
+
+   concepts_nb
+
+##########################################
+Solving a Nonlinear Time Dependent Problem
+##########################################
+.. sectionauthor:: Lloyd Connellan <l.connellan@warwick.ac.uk>, Andreas Dedner <a.s.dedner@warwick.ac.uk>, Robert Kl\ |oe|\ fkorn <robert.kloefkorn@iris.no>, Martin Nolte <nolte.mrtn@gmail.com>
+
+.. toctree::
+   :maxdepth: 1
 
    dune-fempy_nb
 
-#############################
-Using the Full Grid Interface
-#############################
-.. sectionauthor:: Andreas Dedner <a.s.dedner@warwick.ac.uk>, Martin Nolte <nolte.mrtn@gmail.com>
-
-.. todo::
-
-   Add more examples on grid construction, i.e., dgf parser with boundary ids
-
-.. todo::
-
-   In general copy more *explanations* from the `dnne-corepy.pmd` file
-
-.. toctree::
-   :maxdepth: 2
-
-   dune-corepy_nb
-
-##################
-Some More Examples
-##################
-
-.. toctree::
-   :maxdepth: 2
-
-   elasticity_nb
-   spiral_nb
-   wave_nb
-   uzawa-scipy_nb

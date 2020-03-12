@@ -5,9 +5,11 @@ FIGURES = figures/3dexample.png figures/interpolation_discrete.png figures/inter
 NBS = spiral_nb.ipynb uzawa-scipy_nb.ipynb elasticity_nb.ipynb wave_nb.ipynb \
       laplace-adaptive_nb.ipynb crystal_nb.ipynb \
 			mcf_nb.ipynb \
-			mcf-algorithm_nb.ipynb lineplot_nb.ipynb laplace-dwr_nb.ipynb \
-			dune-fempy_nb.ipynb dune-corepy_nb.ipynb \
-      twophaseflow_nb.ipynb vemdemo_nb.ipynb
+			mcf-algorithm_nb.ipynb lineplot_nb.ipynb laplace-dwr_nb.ipynb othergrids_nb.ipynb \
+			concepts_nb.ipynb dune-fempy_nb.ipynb dune-corepy_nb.ipynb discontinuousgalerkin_nb.ipynb \
+      twophaseflow_nb.ipynb vemdemo_nb.ipynb \
+			geoview_nb.ipynb geoview_nb.rst \
+			levelgridview_nb.ipynb levelgridview_nb.rst
 			# spiral_adapt_nb.ipynb
 
 # .EXPORT_ALL_VARIABLES:
@@ -25,7 +27,7 @@ linkcheck:
 
 clean:
 	@rm -f *.vtu *.pvtu *.p *.png $(FIGURES) $(NBS)
-	@rm -rf *_files
+	@rm -f geoview_nb_files/geoview_nb_1_0.png
 distclean: clean
 	@rm -f *.bbl
 	@rm -rf html
@@ -34,6 +36,9 @@ distclean: clean
 
 %_nb.ipynb: %.py
 	@python3 py2ipynb.py $< $*_nb.ipynb --image="png"
+
+%_nb.rst: %_nb.ipynb
+	@jupyter-nbconvert $< --to rst
 
 figures/3dexample.png: 3dexample.py dune-fempy_nb.ipynb
 	@pvpython 3dexample.py

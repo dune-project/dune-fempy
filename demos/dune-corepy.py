@@ -33,6 +33,8 @@
 # <codecell>
 
 import time, numpy, math, sys
+import matplotlib
+matplotlib.rc( 'image', cmap='jet' )
 import matplotlib.pyplot as pyplot
 from dune.common import FieldVector, FieldMatrix
 x = FieldVector([0.25,0.25,0.25])
@@ -71,7 +73,9 @@ aluView.hierarchicalGrid.globalRefine()
 aluView.plot()
 
 # <markdowncell>
-# The same for setting up a simplex grid
+# #### An unstructured grid
+# can be constructed by providing a dictionary containing vertex coordinate
+# and element connectivity
 # <codecell>
 
 vertices = [(0,0), (1,0), (1,0.6), (0,0.6), (-1,0.6), (-1,0), (-1,-0.6), (0,-0.6)]

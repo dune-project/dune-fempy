@@ -1,5 +1,5 @@
 # <markdowncell>
-# # Dual weighted reisdual estimate#
+# # Dual Weighted Reisdual Estimate
 #
 # In this problem we revisit the Re-entrant Corner Problem but instead of
 # a classical residual estimator we use a dual weighted residual estimator.
@@ -135,8 +135,6 @@ estimator_ufl = abs(div(grad(u)))*abs(z-zh) * v * dx +\
                 abs(inner(jump(grad(u)), n('+')))*abs(avg(z-zh)) * avg(v) * dS
 estimator = estimatorOp(estimator_ufl)
 tolerance = 1e-6
-
-#########################################################
 
 # <markdowncell>
 # Let us solve over a loop (solve,estimate,mark) and plot the solutions side by side.
