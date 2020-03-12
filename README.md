@@ -43,7 +43,7 @@ grid.writeVTK("laplace", pointdata=[ uh, l2error_gf, exact_gf ])
 See the file COPYING for full copying permissions.
 
 
-If you found this tutorial helpful for getting your own projects up and
+If you find this tutorial helpful for getting your own projects up and
 running please cite
 
 Title: Python Bindings for the DUNE-FEM module
@@ -57,20 +57,20 @@ Dependencies
 ------------
 
 dune-fempy depends on the following DUNE modules:
-- dune-common 2.7+
-- dune-geometry 2.7+
-- dune-grid 2.7+
-- dune-corepy 2.7+
-- dune-fem 2.7+
+- dune-common 2.8+
+- dune-geometry 2.8+
+- dune-grid 2.8+
+- dune-python 2.8+
+- dune-fem 2.8+
 
 In addition to the dependencies of these DUNE modules, the following software
 packages are required:
 
-- a C++14 compatible C++ compiler (e.g., GCC 4.9+, clang 3.5+)
-- Python 2.7+
+- a C++17 compatible C++ compiler
+- Python 2.7+ (although mostly tested with 3.4+)
 
-We strongly recommend installing the following Pyhton packages to make full
-use of dune-fempy:
+We strongly recommend installing the following Python packages to make full
+use of dune-fem's Python bindings:
 
 - numpy
 - mpi4py

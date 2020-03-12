@@ -6,6 +6,9 @@ Welcome to the documentation for dune-fem's python bindings
 ###########################################################
 
 This module brings python scripting support to `Dune`_.
+This version describes the bindings for the development version
+(to become 2.8). The `tutorial compatible with the 2.7 release`_ of
+the DUNE modules is also available.
 It serves three purposes:
 
 1. High level program control for solving partial differential equations
@@ -14,10 +17,10 @@ It serves three purposes:
    The unified form language `UFL`_ :cite:`UFL-Paper`
    is used to describe the mathematical
    model, all realizations of the `Dune`_ grid interface can be used to
-   work with the domain tesselation, and the finite element spaces,
+   work with the domain tessellation, and the finite element spaces,
    operator, and solvers provided by `Dune-Fem`_ for the descritizations
    and solving steps. All of this is available within to be used in python
-   scripts or through jupyter notebooks.
+   scripts or through Jupyter notebooks.
 2. Rapid prototyping of new methods or other parts of a simulation is easy
    since the interfaces provided are very similar to the `Dune`_ C++
    interface. This makes it easy to transfer a working prototype from
@@ -48,7 +51,7 @@ provided in :cite:`Dune-Python-Paper` which is part of the dune module
 
 Here is a quick summary of the different parts of this document - all of
 the code is available for download in form of both :ref:`scripts`.
-Or can be optained by cloning the git repository
+Or can be obtained by cloning the git repository
 https://gitlab.dune-project.org/dune-fem/dune-fempy
 where they can be found in the demo folder.
 
@@ -107,6 +110,7 @@ where they can be found in the demo folder.
 .. _Dune-Fem: https://www.dune-project.org/modules/dune-fem/
 .. _Dune-Python: https://www.dune-project.org/modules/dune-python/
 .. _UFL: https://bitbucket.org/fenics-project/ufl
+.. _tutorial compatible with the 2.7 release: https://dune-project.org/sphinx/content/sphinx/dune-fem-2.7/
 
 .. todo:: add more citations
 
