@@ -44,7 +44,12 @@ See the file COPYING for full copying permissions.
 
 
 If you found this tutorial helpful for getting your own projects up and
-running please cite this project using the following DOI 10.5281/zenodo.3706994
+running please cite
+
+Title: Python Bindings for the DUNE-FEM module
+*Authors: Andreas Dedner, Martin Nolte, and Robert Klöfkorn*
+Publisher: Zenodoo, 2020
+DOI 10.5281/zenodo.3706994
 
 [![DOI](https://zenodo.org/badge/246695081.svg)](https://zenodo.org/badge/latestdoi/246695081)
 
