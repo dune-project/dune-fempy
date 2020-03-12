@@ -1,6 +1,8 @@
 Python Bindings for the DUNE-FEM module
 =======================================
 
+*Authors: Andreas Dedner, Martin Nolte, and Robert Kl&ouml;fkorn*
+
 dune-fempy aims to provide Python bindings for the [dune-fem][femlink] discretization
 module. Here an example for solving Poisson's equation:
 
@@ -39,6 +41,12 @@ grid.writeVTK("laplace", pointdata=[ uh, l2error_gf, exact_gf ])
 ```
 
 See the file COPYING for full copying permissions.
+
+
+If you found this tutorial helpful for getting your own projects up and
+running please cite this project using the following DOI 10.5281/zenodo.3706994
+
+[![DOI](https://zenodo.org/badge/246695081.svg)](https://zenodo.org/badge/latestdoi/246695081)
 
 Dependencies
 ------------
