@@ -15,7 +15,7 @@ try:
   geom.extrude( poly, translation_axis=axis, rotation_axis=axis,
       point_on_axis=[0, 0, 0], angle=2.0 / 6.0 * numpy.pi)
   mesh = pygmsh.generate_mesh(geom, verbose=False)
-  points, cells = mesh.points, mesh.cells
+  points, cells = mesh.points, mesh.cells_dict
   domain3d = {"vertices":points, "simplices":cells["tetra"]}
 except ImportError: # pygmsh not installed - use a simple cartesian domain
   from dune.grid import cartesianDomain
