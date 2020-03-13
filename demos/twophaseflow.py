@@ -2,6 +2,13 @@
 # # Problem Description
 # Describe model and scheme here...
 # <codecell>
+from dune.common.checkconfiguration import assertHave, ConfigurationError
+try:
+    assertHave("HAVE_DUNE_FEM_DG")
+except ConfigurationError:
+    import sys
+    sys.exit("Module dune-fem-dg was not found!")
+
 import matplotlib
 matplotlib.rc( 'image', cmap='jet' )
 import math

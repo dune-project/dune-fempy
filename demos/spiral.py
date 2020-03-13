@@ -184,8 +184,8 @@ try:
     from IPython.display import HTML, display
     display( HTML(movie) )
 except: # ffmpeg probably missing
-    anim.save("spiral.html")
     try:
+        anim.save("spiral.html")
         from IPython.display import IFrame
         IFrame(src='./nice.html', width=700, height=600)
     except:
