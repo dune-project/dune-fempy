@@ -38,7 +38,6 @@ import matplotlib
 matplotlib.rc( 'image', cmap='jet' )
 from matplotlib import pyplot
 from dune.common import FieldVector
-from dune.fem.plotting import plotPointData as plot
 from dune.fem.function import uflFunction, gridFunction, cppFunction, integrate
 from dune.grid import structuredGrid as leafGridView
 from dune.fem.space import lagrange as solutionSpace
@@ -246,6 +245,7 @@ print("size: ", gridView.size(0), "L^2, H^1 error:",'{:0.5e}, {:0.5e}'.format(
 # system using the dune-fem bindings
 # <codecell>
 
+from dune.generator import ConfigurationError
 try:
     spacePetsc = solutionSpace(gridView, order=2, storage='petsc')
     # first we will use the petsc solver available in the `dune-fem` package
@@ -259,7 +259,7 @@ try:
     error = u_h - exact_end
     print("size: ", gridView.size(0), "L^2, H^1 error:",'{:0.5e}, {:0.5e}'.format(
       *[ sqrt(e) for e in integrate(gridView,[error**2,inner(grad(error),grad(error))], order=5) ]))
-except dune.generator.ConfigurationError:
+except ConfigurationError:
     print("petsc was not found during configuration of dune-py: skipping example")
     spacePetsc = None
     pass
