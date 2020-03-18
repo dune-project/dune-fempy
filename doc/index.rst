@@ -64,16 +64,16 @@ where they can be found in the demo folder.
    required to set up the problem, solve the system of equations, and
    visualize the results. After this introduction we discuss how to use
    different solver backends (including build in solvers, solvers and
-   preconditioners available in `dune-istl`_, `scipy`_, `petsc`_ and
+   preconditioners available in `Dune-Istl`_, `scipy`_, `petsc`_ and
    also `petsc4py`_ see also :cite:`PETSc-Paper,SciPy-Paper`).
    The introduction ends with an overview of how more complicated boundary
    conditions are defined.
 #. We then provide more detail on how to use the `Dune`_ grid interface,
    construct a grid using different formats including for
-   example `GMsh`_ but also using simple python structures like
+   example `gmsh`_ but also using simple python structures like
    dictionaries for describing general unstructured grids is available.
-   Results can be plotted using `Matplotlib`_ (for 2d) and for example
-   `Mayavi`_ (for 2d and 3d). For more advanced plotting options data can
+   Results can be plotted using `matplotlib`_ (for 2d) and for example
+   `mayavi`_ (for 2d and 3d). For more advanced plotting options data can
    be exported using `vtk` format and then analysed for example using
    `paraview`_.
    In this section we also give details of how to attach data to the grid entities
@@ -101,12 +101,17 @@ where they can be found in the demo folder.
    hear about it and would ask you to contribute to this
    chapter. Doing so is quite easy (see :ref:`contributing` for details).
 
+.. _mayavi: https://docs.enthought.com/mayavi/mayavi
+.. _paraview: https://www.paraview.org
+.. _matplotlib: https://matplotlib.org
+.. _gmsh: https://pypi.org/project/pygmsh
 .. _scipy: https://www.scipy.org
 .. _petsc: https://www.mcs.anl.gov/petsc
 .. _petsc4py: https://bitbucket.org/petsc/petsc4py
 .. _docker: https://www.docker.com
 .. _pybind11: https://github.com/pybind/pybind11
 .. _Dune: https://www.dune-project.org
+.. _Dune-Istl: https://www.dune-project.org/modules/dune-istl/
 .. _Dune-Fem: https://www.dune-project.org/modules/dune-fem/
 .. _Dune-Python: https://www.dune-project.org/modules/dune-python/
 .. _UFL: https://bitbucket.org/fenics-project/ufl
