@@ -150,7 +150,6 @@ for i,m in enumerate(methods):
           "Size: ",space.size, "L^2: ", errors[0], "H^1: ", errors[1],
           info["linear_iterations"], flush=True)
     dfs.plot(figure=(fig,figPos+i),gridLines=None, colorbar="horizontal")
-pyplot.show()
 
 # <markdowncell>
 # # Nonlinear Elliptic Problem
@@ -241,7 +240,6 @@ displacement.plot(gridLines=None, figure=(fig, 121), colorbar="horizontal")
 s = sigma(displacement) - (1./3)*tr(sigma(displacement))*Identity(2)
 von_Mises = sqrt(3./2*inner(s, s))
 plot(von_Mises, grid=polyGrid, gridLines=None, figure=(fig, 122), colorbar="horizontal")
-pyplot.show()
 
 # <markdowncell>
 # Finally we plot the deformed beam

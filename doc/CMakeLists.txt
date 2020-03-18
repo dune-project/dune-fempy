@@ -6,14 +6,14 @@ additional.rst index.rst twophaseflow_descr.rst contributions.rst
 installation.rst vemdemo_descr.rst gettingstarted.rst  nextsteps.rst topics.rst developers.rst
 3dexample.py          limit.py              spiral.py
 crystal.py            lineplot.py           svg2pdf.py
-dune-corepy.py        mcf-algorithm.py      twophaseflow.py
-concepts.py           dune-fempy.py         mcf_cmp_plot.py
+dune-corepy.py        mcf-algorithm.py      twophaseflow.py       chemical.py
+concepts.py           dune-fempy.py         mcf_cmp_plot.py       euler.py
 elasticity.py         mcf.py                uzawa-scipy.py        othergrids.py
 gitlab-formatting.py  pandoc-formatting.py  vemdemo.py            discontinuousgalerkin.py
 interpolation.py      wave.py               laplace-adaptive.py   laplace-dwr.py
 py2ipynb.py
-crystal_nb.ipynb           mcf_nb.ipynb
-dune-corepy_nb.ipynb       spiral_nb.ipynb
+crystal_nb.ipynb           mcf_nb.ipynb               chemical_nb.ipynb
+dune-corepy_nb.ipynb       spiral_nb.ipynb            euler_nb.ipynb
 concepts_nb.ipynb          dune-fempy_nb.ipynb        twophaseflow_nb.ipynb
 elasticity_nb.ipynb        uzawa-scipy_nb.ipynb       othergrids_nb.ipynb
 laplace-adaptive_nb.ipynb  vemdemo_nb.ipynb           discontinuousgalerkin_nb.ipynb

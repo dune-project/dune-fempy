@@ -85,7 +85,6 @@ displacement.plot(gridLines=None, figure=(fig, 121), colorbar="horizontal")
 s = sigma(displacement) - (1./3)*tr(sigma(displacement))*Identity(2)
 von_Mises = sqrt(3./2*inner(s, s))
 plot(von_Mises, grid=gridView, gridLines=None, figure=(fig, 122), colorbar="horizontal")
-pyplot.show()
 
 
 # <markdowncell>

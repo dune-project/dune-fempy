@@ -117,4 +117,3 @@ for m in range(100):
 fig = pyplot.figure(figsize=(20,10))
 velocity.plot(colorbar="horizontal", figure=(fig, 121))
 pressure.plot(colorbar="horizontal", figure=(fig, 122))
-pyplot.show()

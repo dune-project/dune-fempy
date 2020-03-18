@@ -182,15 +182,12 @@ while True:
     fem.loadBalance(uh)
     count += 1
 plot(uh, figure=(fig, 131+2), colorbar=False)
-pyplot.show()
-pyplot.close('all')
 
 
 # <markdowncell>
 # Let's have a look at the center of the domain:
-
-
 # <codecell>
+pyplot.close('all')
 fig = pyplot.figure(figsize=(30,20))
 plot(uh, figure=(fig, 231), xlim=(-0.5, 0.5), ylim=(-0.5, 0.5),
         gridLines="white", colorbar={"shrink": 0.75})
@@ -207,8 +204,6 @@ plot(levels, figure=(fig, 235), xlim=(-0.1, 0.1), ylim=(-0.1, 0.1),
         gridLines="white", colorbar={"shrink": 0.75})
 plot(levels, figure=(fig, 236), xlim=(-0.02, 0.02), ylim=(-0.02, 0.02),
         gridLines="white", colorbar={"shrink": 0.75})
-pyplot.show()
-pyplot.close('all')
 
 
 # <markdowncell>
@@ -217,10 +212,10 @@ pyplot.close('all')
 # estimator
 
 # <codecell>
+pyplot.close('all')
 pyplot.loglog(dofsGlobal,errorGlobal,label="H^1 error (global refine)")
 pyplot.loglog(dofs,errorVector,label=" H^1 error (adaptive)")
 pyplot.loglog(dofs,estimateVector,label="estimator (adaptive)")
 pyplot.grid(b=True, which='major', color='black', linestyle='-')
 pyplot.grid(b=True, which='minor', color='black', linestyle='--')
 pyplot.legend(frameon=True,facecolor="white",framealpha=1)
-pyplot.show()

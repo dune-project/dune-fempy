@@ -60,7 +60,6 @@ yaspView = yaspGrid(domain)
 yaspView.plot()
 yaspView.hierarchicalGrid.globalRefine()
 yaspView.plot()
-pyplot.show()
 
 # <markdowncell>
 # Let's visualize the grid and then globally refine it once

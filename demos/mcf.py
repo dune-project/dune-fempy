@@ -113,14 +113,12 @@ while t < end_time:
     if count % 4 == 0:
         plot(solution, figure=(fig, 131+count%3), colorbar=False,
              gridLines="", triplot=True)
-pyplot.show()
-pyplot.close('all')
 
 # <markdowncell>
 # By chosing an initial surface with boundary we can solve the _soap film_
 # problem, i.e., compute the surface of minimum curvature:
-
 # <codecell>
+pyplot.close('all')
 referenceView = leafGridView("soap.dgf", dimgrid=2, dimworld=3)
 referenceView.hierarchicalGrid.globalRefine(8)
 space = solutionSpace(referenceView, dimRange=referenceView.dimWorld,
@@ -209,7 +207,4 @@ while t.value < endTime:
         count += 1
         plot(uh, figure=(fig, 151+count), colorbar=False,
              gridLines="", triplot=True)
-pyplot.show()
-pyplot.close('all')
-
 plot3d(uh,2)

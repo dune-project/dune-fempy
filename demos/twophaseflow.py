@@ -473,7 +473,6 @@ for i in range(len(x)):
     x[i] = (p[i]-x0).two_norm / l
     y[i] = v[i][1]
 pyplot.plot(x,y)
-pyplot.show()
 
 
 # <markdowncell>

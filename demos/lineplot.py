@@ -64,7 +64,6 @@ for i in range(len(x)):
     x[i] = (p[i]-x0).two_norm / length
     y[i] = v[i][0]
 pyplot.plot(x,y)
-pyplot.show()
 
 # <markdowncell>
 # **Note**: the coordinates returned are always in the interval $[0,1]$ so
@@ -86,7 +85,6 @@ p,v = algorithm.run('sample', 'utility.hh', absGrad, x0, x1, 100)
 for i in range(len(x)):
     y[i] = v[i][0]
 pyplot.plot(x,y)
-pyplot.show()
 
 # <markdowncell>
 # Similar we can plot both partial derivatives of the solution over the
@@ -101,7 +99,6 @@ for i in range(len(x)):
     dy[i] = v[i][1]
 pyplot.plot(x,dx)
 pyplot.plot(x,dy)
-pyplot.show()
 
 # <markdowncell>
 # **Remark:** plotting over a line has been included as a utility function
@@ -110,4 +107,3 @@ pyplot.show()
 from dune.fem.utility import lineSample
 x,y = lineSample(uh3d,[0,0,0],[0,0,1],100)
 pyplot.plot(x,y)
-pyplot.show()
