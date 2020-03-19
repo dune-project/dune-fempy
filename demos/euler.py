@@ -126,9 +126,13 @@ pyplot.plot(res[0][0],res[0][1], res[1][0],res[1][1], res[2][0],res[2][1])
 # <markdowncell>
 # Same three schemes on a polygonal grid
 # <codecell>
-from dune.polygongrid import polygonGrid
 domain = (reader.dgf, "triangle.dgf")
-gridView = polygonGrid( domain, dualGrid=True )
+try:
+    from dune.polygongrid import polygonGrid
+    gridView = polygonGrid( domain, dualGrid=True )
+except ImportError:
+    from dune.alugrid import aluSimplexGrid as simplexGrid
+    gridView = simplexGrid( domain, dimgrid=2 )
 
 space = dgonb( gridView, order=2, dimRange=4 )
 u_h = space.interpolate( initial, name="solution")
