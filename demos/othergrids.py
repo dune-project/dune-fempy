@@ -29,6 +29,7 @@ try:
     points, cells = mesh.points, mesh.cells_dict
     domain3d = {"vertices":points, "simplices":cells["tetra"]}
 except ImportError: # pygmsh not installed - use a simple cartesian domain
+    print("pygmsh module not found using a simple Cartesian domain - ignored")
     from dune.grid import cartesianDomain
     domain3d = cartesianDomain([-0.25,-0.25,0],[0.25,0.25,1],[30,30,60])
 

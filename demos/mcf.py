@@ -183,6 +183,7 @@ try:
         s = mlab.triangular_mesh(x[:,0],x[:,1],x[:,2],triangles)
         display( s )
 except ImportError:
+    print("mayavi module not found so not showing plot - ignored")
     def plot3d(uh,level):
         pass
 

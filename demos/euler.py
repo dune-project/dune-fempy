@@ -131,6 +131,7 @@ try:
     from dune.polygongrid import polygonGrid
     gridView = polygonGrid( domain, dualGrid=True )
 except ImportError:
+    print("dune.polygongrid module not found using a simplex grid instead - ignored")
     from dune.alugrid import aluSimplexGrid as simplexGrid
     gridView = simplexGrid( domain, dimgrid=2 )
 

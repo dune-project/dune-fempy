@@ -164,7 +164,7 @@ def calculate(use_cpp, gridView):
         table = pd.DataFrame(keys, index=range(numberOfLoops),columns=['size', 'error', 'eoc', 'iterations'])
         print(table)
     except ImportError:
-        print("pandas could not be used to show table with results")
+        print("pandas module not found so not showing table - ignored")
         pass
     return gridSizes, times
 
