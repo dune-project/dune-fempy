@@ -167,9 +167,9 @@ C++. This will be demonstrated in the following examples:
    lineplot_nb
 
 
-##################
-DUNE-FEM-DG Module
-##################
+###########################################################
+Discontinuous Galerkin Methods using the DUNE-FEM-DG Module
+###########################################################
 
 The add on module `Dune-Fem-Dg`_ provides a number of DG algorithms focusing
 on solving systems of evolution equations for advection diffusion reaction equations
