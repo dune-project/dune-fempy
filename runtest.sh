@@ -32,3 +32,19 @@ docker run -it --rm --name dunepy$DUNEVERSION -v $PWD:/host -v dunepy$DUNEVERSIO
     -e userId=$USERID -e groupId=$GROUPID --hostname="dunepy" --add-host dunepy:127.0.0.1 $dockerName \
     -c /host//buildTutorial.sh
 xhost -si:localuser:$USER
+
+# add test to see if everything worked
+cd doc
+if make -q
+then
+  cd ..
+  cd build-cmake
+  make clean
+  rm -rf doc
+  cmake .
+  make doc
+else
+  cd ..
+  echo "Make failed not building documentation"
+  exit 1
+fi

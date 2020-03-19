@@ -17,8 +17,6 @@ NBS = spiral_nb.ipynb uzawa-scipy_nb.ipynb elasticity_nb.ipynb wave_nb.ipynb \
 unexport DUNE_LOG_LEVEL
 
 all: $(NBS) $(FIGURES)
-	# @rm -rf html
-	# @sphinx-build -b html . html
 
 .PHONY: clean distclean linkcheck
 
