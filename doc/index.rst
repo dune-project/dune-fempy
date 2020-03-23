@@ -140,10 +140,12 @@ where they can be found in the demo folder.
    nextsteps
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 3
    :caption: Further Topics
 
-   topics
+   gridviews
+   cpp
+   femdg
 
 .. toctree::
    :maxdepth: 1
