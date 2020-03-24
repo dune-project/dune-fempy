@@ -2,7 +2,7 @@
 # # Euler System of Gas Dynamics
 # <codecell>
 
-import math
+import math, numpy
 import matplotlib
 matplotlib.rc( 'image', cmap='jet' )
 from matplotlib import pyplot
@@ -84,7 +84,14 @@ def evolve(space, u_h, limiter="MinMod"):
             saveStep += 0.1
             c += 1
             rho.plot(gridLines="white", figure=(fig, 131+c), colorbar=False, clim=[0.125,1])
-    return lineSample(u_h,[0,0],[1,1],200)
+    # return lineSample(u_h,[0,0],[1,1],200)
+    res = numpy.zeros((2,space.grid.size(0)))
+    for i,e in enumerate(space.grid.elements):
+        x = e.geometry.center
+        res[0][i] = x.two_norm
+        res[1][i] = rho(e,e.geometry.toLocal(x))
+    pyplot.show()
+    return res
 
 # <markdowncell>
 # A radial Rieman problem
@@ -99,29 +106,29 @@ initial = conditional(dot(x,x)<0.1,as_vector([1,0,0,2.5]),
 gridView = structuredGrid([-1,-1],[1,1],[60,60])
 
 space = dgonb( gridView, order=2, dimRange=4)
-u_h = space.interpolate( initial, name="solution")
-res = [evolve(space,u_h)]
+u_h   = space.interpolate( initial, name="solution")
+res   = [evolve(space,u_h)]
 
 # <markdowncell>
 # Next with a higher order finite volume scheme
 # <codecell>
-from dune.fem.space import finiteVolume
 space = finiteVolume( gridView, dimRange=4 )
-u_h = space.interpolate( initial, name="solution")
-res += [evolve(space,u_h)]
+u_h   = space.interpolate( initial, name="solution")
+res  += [evolve(space,u_h)]
 
 # <markdowncell>
 # Finally with the first order finite volume method
 # <codecell>
-from dune.fem.space import finiteVolume
-space = finiteVolume( gridView, dimRange=4 )
-u_h = space.interpolate( initial, name="rho")
-res += [evolve(space,u_h,limiter=None)]
+u_h   = space.interpolate( initial, name="solution")
+res  += [evolve(space,u_h,limiter=None)]
 
 # <markdowncell>
 # Solutions along the diagonal
 # <codecell>
-pyplot.plot(res[0][0],res[0][1], res[1][0],res[1][1], res[2][0],res[2][1])
+pyplot.scatter(res[0][0],res[0][1])
+pyplot.scatter(res[1][0],res[1][1])
+pyplot.scatter(res[2][0],res[2][1])
+pyplot.show()
 
 # <markdowncell>
 # Same three schemes on a polygonal grid
@@ -136,18 +143,20 @@ except ImportError:
     gridView = simplexGrid( domain, dimgrid=2 )
 
 space = dgonb( gridView, order=2, dimRange=4 )
-u_h = space.interpolate( initial, name="solution")
-res = [evolve(space,u_h)]
+u_h   = space.interpolate( initial, name="solution")
+res   = [evolve(space,u_h)]
 
 space = finiteVolume( gridView, dimRange=4 )
-u_h = space.interpolate( initial, name="solution")
-res += [evolve(space,u_h)]
+u_h   = space.interpolate( initial, name="solution")
+res  += [evolve(space,u_h)]
 
-space = finiteVolume( gridView, dimRange=4 )
-u_h = space.interpolate( initial, name="rho")
-res += [evolve(space,u_h,limiter=None)]
+u_h   = space.interpolate( initial, name="solution")
+res  += [evolve(space,u_h,limiter=None)]
 
 # <markdowncell>
 # Solutions along the diagonal
 # <codecell>
-pyplot.plot(res[0][0],res[0][1], res[1][0],res[1][1], res[2][0],res[2][1])
+pyplot.scatter(res[0][0],res[0][1])
+pyplot.scatter(res[1][0],res[1][1])
+pyplot.scatter(res[2][0],res[2][1])
+pyplot.show()
