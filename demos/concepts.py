@@ -251,10 +251,12 @@ print(mass)
 
 # <markdowncell>
 # or plot using matplotlib and write a vtk file for postprocessing
+# (using binary data format to reduce size)
 # <codecell>
 
 u_h.plot(gridLines="white")
-gridView.writeVTK('uh', pointdata=[u_h])
+from dune.grid import OutputType
+gridView.writeVTK('uh', pointdata=[u_h], outputType=OutputType.appendedraw)
 
 # <markdowncell>
 # and as before a discrete function can be used as coefficient in a UFL

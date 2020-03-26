@@ -9,6 +9,7 @@ import matplotlib
 matplotlib.rc( 'image', cmap='jet' )
 from matplotlib import pyplot
 from dune.alugrid import aluSimplexGrid as leafGridView3d
+from dune.grid import OutputType
 from dune.fem.space import lagrange as solutionSpace
 from dune.fem.scheme import galerkin as solutionScheme
 from ufl import TestFunction, TrialFunction, SpatialCoordinate
@@ -46,7 +47,8 @@ scheme3d = solutionScheme((inner(grad(u),grad(v))+inner(u,v))*dx ==
 uh3d = space3d.interpolate([0],name="solution")
 scheme3d.solve(target=uh3d)
 # note: plotting with matplotlib not yet available for 3d grids
-gridView3d.writeVTK('3dexample', pointdata=[uh3d])
+gridView3d.writeVTK('3dexample', pointdata=[uh3d],
+                    outputType=OutputType.appendraw)
 
 # <markdowncell>
 # ![3d laplace problem](figures/3dexample.png)
