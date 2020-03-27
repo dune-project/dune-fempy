@@ -48,7 +48,7 @@ uh3d = space3d.interpolate([0],name="solution")
 scheme3d.solve(target=uh3d)
 # note: plotting with matplotlib not yet available for 3d grids
 gridView3d.writeVTK('3dexample', pointdata=[uh3d],
-                    outputType=OutputType.appendraw)
+                    outputType=OutputType.appendedraw)
 
 # <markdowncell>
 # ![3d laplace problem](figures/3dexample.png)

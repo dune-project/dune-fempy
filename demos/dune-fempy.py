@@ -260,7 +260,7 @@ try:
     print("size: ", gridView.size(0), "L^2, H^1 error:",'{:0.5e}, {:0.5e}'.format(
       *[ sqrt(e) for e in integrate(gridView,[error**2,inner(grad(error),grad(error))], order=5) ]))
 except ConfigurationError:
-    print("petsc was not found during configuration of dune-py: skipping example")
+    print("petsc module not found so skipping example - ignored")
     spacePetsc = None
     pass
 
@@ -274,6 +274,7 @@ try:
     from petsc4py import PETSc
 except ModuleNotFoundError:
     print("petsc4py not found: skipping example")
+    print("petsc4py module not found so skipping example - ignored")
     petsc4py = None
 
 if petsc4py is not None and spacePetsc is not None:

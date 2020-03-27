@@ -1,8 +1,8 @@
 .. sectionauthor:: Andreas Dedner <a.s.dedner@warwick.ac.uk>, Robert Kl\ |oe|\ fkorn <robert.kloefkorn@iris.no>, Martin Nolte <nolte.mrtn@gmail.com>
 
-##########
-Grid Views
-##########
+#########################################
+Grid Views: Adaptivity and Moving Domains
+#########################################
 
 When constructing a grid, the object returned to Python is always the so
 called `LeafGridView`. Without any refinement this is simply a view on all
