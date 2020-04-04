@@ -73,13 +73,14 @@ def evolve(space, u_h, limiter="MinMod"):
     stepper  = femdgStepper(order=space.order if space.order else 2, operator=operator)
     operator.applyLimiter(u_h)
     t = 0
-    saveStep = 0.1
+    saveStep = 0.01
     c = 0
     fig = pyplot.figure(figsize=(30,10))
     rho.plot(gridLines="white", figure=(fig, 131+c), colorbar=False, clim=[0.125,1])
     while t < 0.3:
         operator.setTime(t)
         t += stepper(u_h)
+        print(t)
         if t > saveStep:
             saveStep += 0.1
             c += 1
@@ -100,39 +101,6 @@ x = SpatialCoordinate(triangle)
 initial = conditional(dot(x,x)<0.1,as_vector([1,0,0,2.5]),
                                    as_vector([0.125,0,0,0.25]))
 
-# <markdowncell>
-# Evolve on a Cartesian grid using a second order dg method
-# <codecell>
-gridView = structuredGrid([-1,-1],[1,1],[60,60])
-
-space = dgonb( gridView, order=2, dimRange=4)
-u_h   = space.interpolate( initial, name="solution")
-res   = [evolve(space,u_h)]
-
-# <markdowncell>
-# Next with a higher order finite volume scheme
-# <codecell>
-space = finiteVolume( gridView, dimRange=4 )
-u_h   = space.interpolate( initial, name="solution")
-res  += [evolve(space,u_h)]
-
-# <markdowncell>
-# Finally with the first order finite volume method
-# <codecell>
-u_h   = space.interpolate( initial, name="solution")
-res  += [evolve(space,u_h,limiter=None)]
-
-# <markdowncell>
-# Solutions along the diagonal
-# <codecell>
-pyplot.scatter(res[0][0],res[0][1])
-pyplot.scatter(res[1][0],res[1][1])
-pyplot.scatter(res[2][0],res[2][1])
-pyplot.show()
-
-# <markdowncell>
-# Same three schemes on a polygonal grid
-# <codecell>
 domain = (reader.dgf, "triangle.dgf")
 try:
     from dune.polygongrid import polygonGrid
@@ -142,14 +110,15 @@ except ImportError:
     from dune.alugrid import aluSimplexGrid as simplexGrid
     gridView = simplexGrid( domain, dimgrid=2 )
 
-space = dgonb( gridView, order=2, dimRange=4 )
-u_h   = space.interpolate( initial, name="solution")
-res   = [evolve(space,u_h)]
+print("*************************************")
 
+print("POLYB", flush=True)
 space = finiteVolume( gridView, dimRange=4 )
 u_h   = space.interpolate( initial, name="solution")
-res  += [evolve(space,u_h)]
+u_h.plot()
+res   = [evolve(space,u_h)]
 
+print("POLYC", flush=True)
 u_h   = space.interpolate( initial, name="solution")
 res  += [evolve(space,u_h,limiter=None)]
 
@@ -158,5 +127,5 @@ res  += [evolve(space,u_h,limiter=None)]
 # <codecell>
 pyplot.scatter(res[0][0],res[0][1])
 pyplot.scatter(res[1][0],res[1][1])
-pyplot.scatter(res[2][0],res[2][1])
+# pyplot.scatter(res[2][0],res[2][1])
 pyplot.show()

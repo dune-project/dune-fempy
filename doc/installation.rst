@@ -135,67 +135,54 @@ Requirements
 
 The following dependencies are needed for Dune-Fem python binding:
 
-* At least C++11 compatible C++ compiler (e.g. gcc 5.3 or later)
-* python (3.4 or later - possibly also works with 2.7 but not guaranteed)
+* At least C++17 compatible C++ compiler (e.g. g++ 7 or later)
+* python (3.4 or later)
 
-  * mpi4py
-  * numpy and scipy (strongly recommended)
-  * matplotlib      (strongly recommended)
-  * ufl             (strongly recommended)
-  * petsc4py        (recommended)
+  * mpi4py and numpy
+  * ufl
+  * scipy and matplotlib (strongly recommended)
+  * petsc4py             (recommended)
 
-* Required Dune modules (release 2.6 or later)
+* Required Dune modules (release 2.8 or later)
 
   * dune-common (https://gitlab.dune-project.org/core/dune-common.git)
   * dune-geometry (https://gitlab.dune-project.org/core/dune-geometry.git)
   * dune-grid (https://gitlab.dune-project.org/core/dune-grid.git)
-  * dune-python (https://gitlab.dune-project.org/staging/dune-python.git)
   * dune-fem (https://gitlab.dune-project.org/dune-fem/dune-fem.git)
 
-* Recommended Dune modules (releases 2.6 or later)
+* Recommended Dune modules (releases 2.8 or later)
 
   * dune-istl (https://gitlab.dune-project.org/core/dune-istl.git)
   * dune-localfunctions (https://gitlab.dune-project.org/core/dune-localfunctions.git)
   * dune-alugrid  (https://gitlab.dune-project.org/extensions/dune-alugrid.git)
 
-******************************
-Building the Dune Core Modules
-******************************
+**********************************
+Building the Required Dune Modules
+**********************************
 
-.. todo:: Mention available deb packages and perhaps link to other tutorials?
+Read the instructions on how to `build Dune with Python support` which also
+links to general instructions on how to `build Dune modules`_. Note that
+the Python bindings require some additional CMake flags to be set as
+described on the pages linked above.
 
-After cloning all the repositories simply run
+.. _install and build Dune modules: https://dune-project.org/doc/installation/
+.. _build Dune with Python support: https://dune-project.org/doc/pythonbindings/
 
-.. code:: bash
-
-   ./dune-common/bin/dunecontrol --opts=config.opts all
-
-where :download:`config.opts<config.opts>` is an optional configuration
-file containing for example flags for the `cmake` process using `CMAKE_FLAGS=`.
-
-.. todo:: we need to mention `CMAKE_POSITION_INDEPENDENT_CODE=TRUE` or `BUILD_SHARED_LIBS`
-
-********************************
-Building the Dune Python Package
-********************************
-
-After the build process has terminated (hopefully successfully) run
-
-.. code:: bash
-
-   ./dune-python/bin/setup-dunepy.py --opts=config.opts install
-
-and you should be ready to go. Test the installation by opening a Python
-terminal and running
+Test your completed installation by opening a Python terminal and running
 
 .. code:: python
 
+   import math
    from dune.grid import structuredGrid
+   from dune.fem.function import gridFunction
    grid = structuredGrid([0,0],[1,1],[10,10])
-   grid.plot()
+   @gridFunction(grid,name="test",order=2)
+   def f(x):
+      return math.sin(x.two_norm*2*math.pi)
+   f.plot()
 
 If you have everything set up correctly (and have `matplotlib`) you should
-get a figure of a structured grid...
+get a colored figure and are hopefully ready to go...
 
 .. note::
    The first time you construct an object of a specific realization of one
@@ -209,7 +196,7 @@ get a figure of a structured grid...
 Troubleshooting
 ***************
 
-* The compiler version needs to be 5.3 or later. This can be checked in terminal with ::
+* The compiler version needs to be 7 or later. This can be checked in terminal with ::
 
   $ g++ --version
 
@@ -243,4 +230,3 @@ Troubleshooting
   $ cd mpi4py
   $ python setup.py build --mpicc=/path/to/openmpi/bin/mpicc
   $ python setup.py install --user
-

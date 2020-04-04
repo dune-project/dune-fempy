@@ -442,7 +442,7 @@ auto bnd() {
 }
 """
 bndCpp = cppFunction(gridView, name="bndCpp", order=2,
-                     fctName="bnd",includes=io.StringIO(code))()
+                     fctName="bnd",includes=io.StringIO(code))
 bc = DirichletBC(vecSpace,[bndCpp,None])
 vecScheme = solutionScheme( [a == f, bc, bcBottom],
         parameters={"newton.linear.tolerance": 1e-9} )

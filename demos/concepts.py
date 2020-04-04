@@ -142,7 +142,8 @@ auto aTimesExact(double a) {
 }
 """
 exactCpp = cppFunction(gridView, name="exactCpp", order=2,
-                       fctName="aTimesExact",includes=io.StringIO(code))(2.)
+                       fctName="aTimesExact",includes=io.StringIO(code),
+                       args=[2.])
 print( integrate(gridView, abs(2*exact-exactCpp), order=5) )
 exactCpp.plot()
 
@@ -171,7 +172,8 @@ auto aTimesExact(const GF &gf,Dune::FieldVector<double,1> &a) {
 from dune.common import FieldVector
 a = FieldVector([2])
 exactCpp2 = cppFunction(gridView, name="exactCpp", order=2,
-                        fctName="aTimesExact",includes=io.StringIO(code2))(exact_gf,a)
+                        fctName="aTimesExact",includes=io.StringIO(code2),
+                        args=[exact_gf,a])
 print( integrate(gridView, abs(exactCpp-exactCpp2), order=5) )
 a[0] = 4
 print( integrate(gridView, abs(2*exactCpp-exactCpp2), order=5) )
@@ -212,7 +214,8 @@ u_h = space.interpolate(exact, name='u_h')
 # <codecell>
 
 u_h.interpolate( cppFunction(gridView, name="exactCpp", order=2,
-                 fctName="aTimesExact",includes=io.StringIO(code))(2.) )
+                 fctName="aTimesExact",includes=io.StringIO(code),
+                 args=[2.]) )
 u_h.interpolate( lambda x: 1/2.*(x[0]**2+x[1]**2) - 1/3*(x[0]**3 - x[1]**3) + 1 )
 
 # <markdowncell>

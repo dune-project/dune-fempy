@@ -9,7 +9,6 @@ This module is based on DUNE-FEM
 (https://gitlab.dune-project.org/dune-fem/dune-fem)
 and provides implementation for the Virtual Element Method. The methods and
 a Python frontend based on the new Python extension to DUNE
-(https://gitlab.dune-project.org/staging/dune-python)
 is available in the
 https://gitlab.dune-project.org/dune-fem/dune-vem.
 

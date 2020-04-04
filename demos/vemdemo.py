@@ -83,7 +83,7 @@ dbc = [dune.ufl.DirichletBC(uflSpace, exact, i+1) for i in range(4)]
 
 # <codecell>
 constructor = cartesianDomain([-0.5,-0.5],[1,1],[10,10])
-polyGrid = create.grid("polygrid", voronoiCells(constructor,50,"voronoiseeds",True,lloyd=100) )
+polyGrid = create.grid("agglomerate", voronoiCells(constructor,50,"voronoiseeds",True,lloyd=100) )
 
 # <markdowncell>
 # In general we can construct a `polygrid` by providing a dictionary with
@@ -186,7 +186,7 @@ solution.plot(gridLines=None, colorbar="horizontal")
 L, W = 1, 0.2
 
 constructor = cartesianDomain([0,0],[L,W],[1,1])
-polyGrid = create.grid("polygrid", voronoiCells(constructor,120,"voronoiseeds",True) )
+polyGrid = create.grid("agglomerate", voronoiCells(constructor,120,"voronoiseeds",True) )
 @gridFunction(polyGrid, name="cells")
 def polygons(en,x):
     return polyGrid.hierarchicalGrid.agglomerate(en)
