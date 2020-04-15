@@ -2,8 +2,8 @@ Copyright holders:
 ==================
 
 2016          Matthew Collins
-2016--2019    Andreas Dedner
-2017--2019    Robert Klöfkorn
+2016--2020    Andreas Dedner
+2017--2020    Robert Klöfkorn
 2016          Lloyd
 2016--2018    Martin Nolte
 2016--2018    lloyd.connellan
