@@ -1,4 +1,5 @@
 add_subdirectory(geoview_nb_files)
+add_subdirectory(filteredgridview_nb_files)
 include(DuneSphinxDoc)
 add_sphinx_targets(sphinx)
 dune_symlink_to_source_files(FILES
@@ -25,6 +26,7 @@ figures _static dune-fempy.bib .special.rst
 soap.dgf sphere.dgf unitcube-2d.dgf wave_tank.msh
 config.opts
 levelgridview_nb.rst
+filteredgridview_nb.rst filteredgridview_nb_files/filteredgridview_nb_0_0.png  filteredgridview_nb_files/filteredgridview_nb_0_2.png  filteredgridview_nb_files/filteredgridview_nb_0_4.png
 geoview_nb.rst geoview_nb_files/geoview_nb_1_0.png
 )
 

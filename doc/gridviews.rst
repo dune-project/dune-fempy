@@ -35,6 +35,14 @@ further in this chapter:
    function. This concept makes it easy to perform simulations for example on
    complex domains or on moving grids as shown in :ref:`Evolving Domains<geomGV>`.
 
+*  `dune.fem.view.filteredGridView`: allows the user to select a subset of
+   a given grid view by providing a filter on the elements. In its simplest
+   version only the iterator is replaced with an iterator over the elements
+   in the filter but in addition it is also possible to obtain a new index
+   set with indices restricted to the elements in the filter.
+
+.. include:: filteredgridview_nb.rst
+
 ============================================
 Dynamic Local Grid Refinement and Coarsening
 ============================================
