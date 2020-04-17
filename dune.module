@@ -3,3 +3,4 @@ Version: 2.8-git
 Maintainer: a.s.dedner@warwick.ac.uk, nolte.mrtn@gmail.com
 Whitespace-Hook: Yes
 Depends: dune-fem (>= 2.8)
+Suggests: dune-fem-dg (>= 2.8)
