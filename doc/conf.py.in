@@ -295,7 +295,7 @@ apidoc_separate_modules = True
 
 
 rst_epilog = """
-.. include:: .special.rst\n"
+.. include:: .special.rst
 
 .. image:: https://zenodo.org/badge/DOI/10.5281/zenodo.3706994.svg
    :target: https://doi.org/10.5281/zenodo.3706994
