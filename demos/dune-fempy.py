@@ -33,18 +33,17 @@
 # \end{align*}
 # <codecell>
 
-import time, numpy, math, sys, io
 import matplotlib
 matplotlib.rc( 'image', cmap='jet' )
-from matplotlib import pyplot
-from dune.common import FieldVector
-from dune.fem.function import uflFunction, gridFunction, cppFunction, integrate
+import math, sys, io
+
 from dune.grid import structuredGrid as leafGridView
 from dune.fem.space import lagrange as solutionSpace
 from dune.fem.scheme import galerkin as solutionScheme
+from dune.fem.function import gridFunction, cppFunction, integrate
 from dune.ufl import DirichletBC, Constant
-from ufl import TestFunction, TrialFunction, SpatialCoordinate, triangle, FacetNormal
-from ufl import dx, ds, grad, div, grad, dot, inner, sqrt, exp, conditional
+from ufl import TestFunction, TrialFunction, SpatialCoordinate, FacetNormal, \
+                dx, ds, div, grad, dot, inner, sqrt, exp, sin
 
 gridView = leafGridView([0, 0], [1, 1], [4, 4])
 space = solutionSpace(gridView, order=2)
@@ -78,7 +77,6 @@ b = 0.5*(f(t)+f(t+dt))*v*dx + 0.5*dot(g(t)+g(t+dt),n)*v*ds
 # one time step to the next:
 # <codecell>
 
-from dune.fem.scheme import galerkin as solutionScheme
 scheme = solutionScheme(a == b, solver='cg')
 
 scheme.model.dt = 0.005
@@ -269,7 +267,7 @@ except ConfigurationError:
 # <codecell>
 
 try:
-    import petsc4py, sys
+    import petsc4py
     petsc4py.init(sys.argv)
     from petsc4py import PETSc
 except ModuleNotFoundError:
@@ -375,8 +373,6 @@ if petsc4py is not None and spacePetsc is not None:
 # condition.
 # <codecell>
 
-from ufl import sin
-from dune.ufl import DirichletBC
 from dune.fem.plotting import plotComponents
 from matplotlib import ticker
 

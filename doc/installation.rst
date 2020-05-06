@@ -160,13 +160,13 @@ The following dependencies are needed for Dune-Fem python binding:
 Building the Required Dune Modules
 **********************************
 
-Read the instructions on how to `build Dune with Python support` which also
+Read the instructions on how to `build Dune with Python support`_ which also
 links to general instructions on how to `build Dune modules`_. Note that
 the Python bindings require some additional CMake flags to be set as
 described on the pages linked above.
 
-.. _install and build Dune modules: https://dune-project.org/doc/installation/
-.. _build Dune with Python support: https://dune-project.org/doc/pythonbindings/
+.. _build Dune modules: https://dune-project.org/doc/installation
+.. _build Dune with Python support: https://dune-project.org/doc/pythonbindings
 
 Test your completed installation by opening a Python terminal and running
 

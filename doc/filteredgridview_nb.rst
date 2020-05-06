@@ -1,12 +1,13 @@
 .. code:: ipython3
 
     from ufl import SpatialCoordinate, dot
-    from dune.grid import cartesianDomain, gridFunction
+    from dune.grid import cartesianDomain
     from dune.alugrid import aluConformGrid as leafGridView
     from dune.fem.view import filteredGridView
     from dune.fem.space import lagrange
     
     gridView = leafGridView( cartesianDomain([0,0],[1,1],[16,16]) )
+    
     filteredView = filteredGridView(gridView, lambda e: e.geometry.center.two_norm > 0.5, domainId=1)
     space = lagrange(filteredView, order=2)
     x = SpatialCoordinate(space)

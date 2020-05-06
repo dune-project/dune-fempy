@@ -17,7 +17,7 @@
 
 # <codecell>
 
-import time, numpy, math, sys, io, matplotlib
+import io, math, matplotlib
 matplotlib.rc( 'image', cmap='jet' )
 from matplotlib import pyplot
 
@@ -40,6 +40,7 @@ gridView.plot()
 #    for e in grid.elements:
 #        localFunction.bind(e)
 #        value = localFunction(x)
+#        localFunction.unbind()
 # ```
 # There are multiple ways to construct grid functions. The easiest way it
 # to use UFL expression. Many methods expecting grid functions are argument
@@ -99,10 +100,12 @@ def exactGlobal(x):
     return 1/2.*(x[0]**2+x[1]**2) - 1/3*(x[0]**3 - x[1]**3) + 1
 
 lf = exactGlobal.localFunction()
+
 mass = 0
 for element in gridView.elements:
     lf.bind(element)
     mass += lf([0.5,0.5]) * element.geometry.volume
+    lf.unbind()
 print(mass)
 
 print( integrate(gridView, [exact,exactLocal,exactGlobal], order=5) )
@@ -146,6 +149,7 @@ exactCpp = cppFunction(gridView, name="exactCpp", order=2,
                        args=[2.])
 print( integrate(gridView, abs(2*exact-exactCpp), order=5) )
 exactCpp.plot()
+
 
 # <markdowncell>
 # As the above example shows it is easy to pass in parameters to the C++
@@ -250,6 +254,7 @@ mass = 0
 for element in gridView.elements:
     localUh.bind(element) # using u_h(element,[0.5,0.5]) also works
     mass += localUh([0.5,0.5]) * element.geometry.volume
+    localUh.unbind()
 print(mass)
 
 # <markdowncell>
@@ -344,7 +349,6 @@ print("Number of elements:",gridView.size(0),
 # using a suitable norm (here $h_1$ as used before):
 # <codecell>
 
-from math import log
 loops = 2
 for eocLoop in range(loops):
     error_old = error
@@ -352,14 +356,14 @@ for eocLoop in range(loops):
     u_h.interpolate(0)
     scheme.solve(target = u_h)
     error = sqrt(integrate(gridView, h1error, order=5))
-    eoc = round(log(error/error_old)/log(0.5),2)
+    eoc = round(math.log(error/error_old)/math.log(0.5),2)
     print("EOC:",eoc,
           "Number of elements:", gridView.size(0),
           "number of dofs:", space.size,"H^1 error:", error)
 
 # <markdowncell>
 # We have already seen how grid function can be used within UFL expressions
-# and forms - in the next section we will give another example for this in the
+# and forms - in the [next section](dune-fempy_nb.ipynb) we will give another example for this in the
 # context of a time dependent problems. In addition we can also use the
 # `Constant` class to add constants to UFL expressions/forms which then can
 # be changed without requiring any recompilation of the model. An example
