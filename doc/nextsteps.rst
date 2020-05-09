@@ -16,6 +16,7 @@ Some More Examples
 ##################
 
 .. todo:: Give some details on the Uzawa algorithm, add dune-fempy version and an algorithm implementation
+.. todo:: Add an example using mass lumping to show how to change quadrature
 
 .. toctree::
    :maxdepth: 1
