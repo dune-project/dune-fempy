@@ -18,6 +18,9 @@ and contains most programs needed for shell based code development.
 The easiest way to get started is to download the following
 :download:`bash script<https://gitlab.dune-project.org/dune-fem/dune-fem-dev/raw/master/rundune.sh>`.
 
+For MS Windows with recent installs of the Docker Desktop please use instead the
+:download:`batch-file<https://gitlab.dune-project.org/dune-fem/dune-fem-dev/raw/master/rundune.bat>`
+
 When executing this scripts the first time the docker image will be
 downloaded which will take some time.
 Execute this script in the folder containing your project files.
@@ -70,12 +73,20 @@ In summary (but please check the given website):
 Note for Windows users
 **********************
 
-The memory usage is restricted to 1GB by
-default for the virtual box. Open the virtual box app, stop any running
-machines and then change the setting so that at 4GB are available. At the
-same time increasing the number of CPUs could further improve performance.
-After that restart the virtual machine, restart the docker terminal and
-hopefully everything works.
+- a recent Docker Desktop on recent versions of Windows 10 uses the
+ `WSL 2<https://docs.docker.com/docker-for-windows/wsl/>` engine
+  which is also used by Windows for its virtual Ubuntu sub-system. In this case
+  you should use the batch-file `rundune.bat` directly from the powershell app.
+  It should just work.
+- older versions of Docker with older versions of Windows 10 will (perhaps) need
+  the *Docker Toolbox* installed (which now is deprecated). It may work to use
+  the `rundune.sh` script from an installed *Git-Bash*. These old Docker instals
+  are based on the VirtalBox app. In this case the memory usage is restricted to
+  1GB by default for the virtual box. Open the virtual box app, stop any running
+  machines and then change the setting so that at 4GB are available. At the
+  same time increasing the number of CPUs could further improve performance.
+  After that restart the virtual machine, restart the docker terminal and
+  hopefully everything works.
 
 To get X forwarding you will need a server running. For example
 install ``vcxsrv``, start it with ``xlaunch`` and during initial
