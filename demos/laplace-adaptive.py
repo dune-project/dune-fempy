@@ -28,6 +28,7 @@ import dune.fem as fem
 from dune.fem.view import adaptiveLeafGridView as adaptiveGridView
 from dune.fem.space import lagrange as solutionSpace
 from dune.alugrid import aluConformGrid as leafGridView
+from dune.fem.function import integrate, uflFunction
 from ufl import *
 from dune.ufl import DirichletBC
 
@@ -98,12 +99,12 @@ def setup():
 
 # <codecell>
 uh, exact, laplace = setup()
-h1error = dot(grad(uh - exact), grad(uh - exact))
+h1error = uflFunction(uh.space.grid, name="h1error", order=uh.space.order, ufl=dot(grad(uh - exact), grad(uh - exact)))
 errorGlobal = []
 dofsGlobal  = []
 for count in range(10):
     laplace.solve(target=uh)
-    error = math.sqrt(fem.function.integrate(uh.space.grid, h1error, 5))
+    error = math.sqrt(integrate(uh.space.grid, h1error, 5))
     errorGlobal += [error]
     dofsGlobal  += [uh.space.size]
     print(count, ": size=", uh.space.grid.size(0), "error=", error)
@@ -157,7 +158,7 @@ tolerance = 0.05
 # Let us solve over a loop (solve,estimate,mark) and plot the solutions side by side.
 
 # <codecell>
-h1error = dot(grad(uh - exact), grad(uh - exact))
+h1error = uflFunction(uh.space.grid, name="h1error", order=uh.space.order, ufl=dot(grad(uh - exact), grad(uh - exact)))
 fig = pyplot.figure(figsize=(10,10))
 count = 0
 errorVector    = []
@@ -167,7 +168,7 @@ while True:
     laplace.solve(target=uh)
     if count%9 == 8:
         plot(uh, figure=(fig, 131+count//9), colorbar=False)
-    error = math.sqrt(fem.function.integrate(uh.space.grid, h1error, 5))
+    error = math.sqrt(integrate(uh.space.grid, h1error, 5))
     estimator(uh, estimate)
     eta = math.sqrt( sum(estimate.dofVector) )
     dofs           += [uh.space.size]
