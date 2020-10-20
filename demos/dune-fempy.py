@@ -244,7 +244,17 @@ print("size: ", gridView.size(0), "L^2, H^1 error:",'{:0.5e}, {:0.5e}'.format(
 # <codecell>
 
 from dune.generator import ConfigurationError
+import mpi4py
 try:
+    import petsc4py
+    petsc4py.init(sys.argv)
+    from petsc4py import PETSc
+except ModuleNotFoundError:
+    print("petsc4py not found: skipping example")
+    print("petsc4py module not found so skipping example - ignored")
+    petsc4py = None
+
+if petsc4py is not None:
     spacePetsc = solutionSpace(gridView, order=2, storage='petsc')
     # first we will use the petsc solver available in the `dune-fem` package
     # (using the sor preconditioner)
@@ -257,7 +267,7 @@ try:
     error = u_h - exact_end
     print("size: ", gridView.size(0), "L^2, H^1 error:",'{:0.5e}, {:0.5e}'.format(
       *[ sqrt(e) for e in integrate(gridView,[error**2,inner(grad(error),grad(error))], order=5) ]))
-except ConfigurationError:
+else:
     print("petsc module not found so skipping example - ignored")
     spacePetsc = None
     pass
@@ -265,15 +275,6 @@ except ConfigurationError:
 # <markdowncell>
 # Implementing a Newton Krylov solver using the binding provided by petsc4py
 # <codecell>
-
-try:
-    import petsc4py
-    petsc4py.init(sys.argv)
-    from petsc4py import PETSc
-except ModuleNotFoundError:
-    print("petsc4py not found: skipping example")
-    print("petsc4py module not found so skipping example - ignored")
-    petsc4py = None
 
 if petsc4py is not None and spacePetsc is not None:
     class Scheme3:
