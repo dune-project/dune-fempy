@@ -40,7 +40,7 @@ import math, sys, io
 from dune.grid import structuredGrid as leafGridView
 from dune.fem.space import lagrange as solutionSpace
 from dune.fem.scheme import galerkin as solutionScheme
-from dune.fem.function import gridFunction, cppFunction, integrate
+from dune.fem.function import gridFunction, cppFunction, integrate, uflFunction
 from dune.ufl import DirichletBC, Constant
 from ufl import TestFunction, TrialFunction, SpatialCoordinate, FacetNormal, \
                 dx, ds, div, grad, dot, inner, sqrt, exp, sin
@@ -98,8 +98,8 @@ def evolve(scheme, u_h, u_h_n, endTime):
 # <codecell>
 endTime    = 0.25
 exact_end  = exact(endTime)
-l2error = dot(u_h - exact_end, u_h - exact_end)
-h1error = dot(grad(u_h - exact_end), grad(u_h - exact_end))
+l2error = uflFunction(gridView, name="l2error", order=u_h.space.order, ufl=dot(u_h - exact_end, u_h - exact_end))
+h1error = uflFunction(gridView, name="h1error", order=u_h.space.order, ufl=dot(grad(u_h - exact_end), grad(u_h - exact_end)))
 
 errors = 0,0
 loops = 2
@@ -113,7 +113,7 @@ for eocLoop in range(loops):
     else:
         eocs = [ round(math.log(e/e_old)/math.log(0.5),2) \
                  for e,e_old in zip(errors,errors_old) ]
-    print('step:', eocLoop, ', size:', gridView.size(0))
+    print('Forchheimer: step:', eocLoop, ', size:', gridView.size(0))
     print('\t | u_h - u | =', '{:0.5e}'.format(errors[0]), ', eoc =', eocs[0])
     print('\t | grad(uh - u) | =', '{:0.5e}'.format(errors[1]), ', eoc =', eocs[1])
     u_h.plot()
@@ -175,15 +175,17 @@ class Scheme:
           if absF < 1e-10:
               break
           scheme.jacobian(target,self.jacobian)
+          print('Create Jacobian as numpy')
           sol_coeff -= solver(self.jacobian.as_numpy, res_coeff)
           n += 1
 
 scheme_cls = Scheme(scheme)
 
 u_h.interpolate(initial)                # reset u_h to initial
+print('Forchheimer(numpy)')
 evolve(scheme_cls, u_h, u_h_n, endTime)
 error = u_h - exact_end
-print("size: ", gridView.size(0), "L^2, H^1 error:",'{:0.5e}, {:0.5e}'.format(
+print("Forchheimer(numpy) size: ", gridView.size(0), "L^2, H^1 error:",'{:0.5e}, {:0.5e}'.format(
   *[ sqrt(e) for e in integrate(gridView,[error**2,inner(grad(error),grad(error))], order=5) ]))
 
 # <markdowncell>
@@ -232,9 +234,10 @@ class Scheme2:
 
 scheme2_cls = Scheme2(scheme)
 u_h.interpolate(initial)
+print('Forchheimer(scipy)')
 evolve(scheme2_cls, u_h, u_h_n, endTime)
 error = u_h - exact_end
-print("size: ", gridView.size(0), "L^2, H^1 error:",'{:0.5e}, {:0.5e}'.format(
+print("Forchheimer(scipy) size: ", gridView.size(0), "L^2, H^1 error:",'{:0.5e}, {:0.5e}'.format(
   *[ sqrt(e) for e in integrate(gridView,[error**2,inner(grad(error),grad(error))], order=5) ]))
 
 # <markdowncell>

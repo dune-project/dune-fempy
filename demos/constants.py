@@ -74,7 +74,7 @@ if example == 2:
         print("t=",t.value, " integral = ", xarea )
         t.value += dt
 
-    # before output, make sure that all quantities are computed even after grid chan
+    # before output, make sure that all quantities are computed even after grid changed
     print("Finished, CPU time in sec: ",time.time() - startTime)
 
 #############################################################
