@@ -175,7 +175,6 @@ class Scheme:
           if absF < 1e-10:
               break
           scheme.jacobian(target,self.jacobian)
-          print('Create Jacobian as numpy')
           sol_coeff -= solver(self.jacobian.as_numpy, res_coeff)
           n += 1
 
