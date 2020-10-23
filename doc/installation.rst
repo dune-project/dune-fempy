@@ -37,11 +37,8 @@ using ``git clone``. After adding a new Dune module in ``/dunepy/DUNE`` run
 ``updateAll`` to configure the new Dune module and update the Dune Python
 package.
 
-X forwarding required for example to use ``matplotlib`` should
-directly work on most Linux based host systems,
-for Windows and MAC OS a bit more work is required as
-discussed below. Also the default allocation of memory has to be changed on
-these systems.
+The example notebooks should run on most Linux based host system.
+On MAC and Windows machines a few extra steps are needed as described below. 
 
 *********
 MAC users
@@ -74,7 +71,7 @@ Note for Windows users
 **********************
 
 - a recent Docker Desktop on recent versions of Windows 10 uses the
- `WSL 2<https://docs.docker.com/docker-for-windows/wsl/>` engine
+  `WSL 2<https://docs.docker.com/docker-for-windows/wsl/>` engine
   which is also used by Windows for its virtual Ubuntu sub-system. In this case
   you should use the batch-file `rundune.bat` directly from the powershell app.
   It should just work.

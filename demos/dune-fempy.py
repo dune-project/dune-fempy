@@ -233,7 +233,6 @@ class Scheme2:
 
 scheme2_cls = Scheme2(scheme)
 u_h.interpolate(initial)
-print('Forchheimer(scipy)')
 evolve(scheme2_cls, u_h, u_h_n, endTime)
 error = u_h - exact_end
 print("Forchheimer(scipy) size: ", gridView.size(0), "L^2, H^1 error:",'{:0.5e}, {:0.5e}'.format(
@@ -267,7 +266,7 @@ if petsc4py is not None:
     u_h_n = u_h.copy(name="previous")
     evolve(schemePetsc, u_h, u_h_n, endTime)
     error = u_h - exact_end
-    print("size: ", gridView.size(0), "L^2, H^1 error:",'{:0.5e}, {:0.5e}'.format(
+    print("[using petsc] size: ", gridView.size(0), "L^2, H^1 error:",'{:0.5e}, {:0.5e}'.format(
       *[ sqrt(e) for e in integrate(gridView,[error**2,inner(grad(error),grad(error))], order=5) ]))
 else:
     print("petsc module not found so skipping example - ignored")
@@ -310,7 +309,7 @@ if petsc4py is not None and spacePetsc is not None:
     scheme3_cls = Scheme3(schemePetsc)
     evolve(scheme3_cls, u_h, u_h_n, endTime)
     error = u_h - exact_end
-    print("size: ", gridView.size(0), "L^2, H^1 error:",'{:0.5e}, {:0.5e}'.format(
+    print("Forchheimer(petsc) size: ", gridView.size(0), "L^2, H^1 error:",'{:0.5e}, {:0.5e}'.format(
       *[ sqrt(e) for e in integrate(gridView,[error**2,inner(grad(error),grad(error))], order=5) ]))
 
 # <markdowncell>
@@ -351,7 +350,7 @@ if petsc4py is not None and spacePetsc is not None:
     scheme4_cls = Scheme4(schemePetsc)
     evolve(scheme4_cls, u_h, u_h_n, endTime)
     error = u_h - exact_end
-    print("size: ", gridView.size(0), "L^2, H^1 error:",'{:0.5e}, {:0.5e}'.format(
+    print("Forchheimer(petsc4py) size: ", gridView.size(0), "L^2, H^1 error:",'{:0.5e}, {:0.5e}'.format(
       *[ sqrt(e) for e in integrate(gridView,[error**2,inner(grad(error),grad(error))], order=5) ]))
 
 # <markdowncell>
