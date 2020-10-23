@@ -79,6 +79,15 @@ b = 0.5*(f(t)+f(t+dt))*v*dx + 0.5*dot(g(t)+g(t+dt),n)*v*ds
 
 scheme = solutionScheme(a == b, solver='cg')
 
+# <markdowncell>
+# For this example we need to increase the default quadrature orders which are
+# '2 * space.order' for element integrals and '2 * space.order + 1' for surface
+# integrals. Depending on the data this might not be enough. Then we simply
+# set the integration orders by hand like in the following example, by calling
+# the method setQuadratureOrders(interiorOrder, surfaceOrder).
+# <codecell>
+scheme.setQuadratureOrders( space.order+2, space.order+2 )
+
 scheme.model.dt = 0.005
 
 def evolve(scheme, u_h, u_h_n, endTime):
