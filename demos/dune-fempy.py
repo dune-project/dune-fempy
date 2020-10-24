@@ -296,7 +296,7 @@ if petsc4py is not None and spacePetsc is not None:
           # use conjugate gradients method
           self.ksp.setType("cg")
           # and incomplete Cholesky
-          self.ksp.getPC().setType("icc")
+          self.ksp.getPC().setType(None) # "icc")
           self.ksp.setOperators(self.jacobian.as_petsc)
           self.ksp.setFromOptions()
       def solve(self, target):

@@ -7,13 +7,17 @@ import matplotlib
 matplotlib.rc( 'image', cmap='jet' )
 from matplotlib import pyplot
 from ufl import *
-from dune.generator import path
 from dune.grid import structuredGrid, reader
 from dune.fem.space import dgonb, finiteVolume
 from dune.fem.function import gridFunction
 from dune.femdg import femDGOperator
 from dune.femdg.rk import femdgStepper
 from dune.fem.utility import lineSample
+
+# use a dg space if order>0 else a finite volume space
+def getSpace( gv, order ):
+    return finiteVolume( gridView, dimRange=4 ) if order==0 else\
+           dgonb( gridView, dimRange=4, order=order )
 
 # <markdowncell>
 # Basic model for hyperbolic conservation law
@@ -35,6 +39,7 @@ class Model:
                   [rho*v[0]*v[0] + p, rho*v[0]*v[1]],
                   [rho*v[0]*v[1], rho*v[1]*v[1] + p],
                   [(U[3]+p)*v[0], (U[3]+p)*v[1]] ] )
+
     # simple 'outflow' boundary conditions on all boundaries
     boundary = {range(1,5): lambda t,x,U: U}
 
@@ -69,29 +74,32 @@ def evolve(space, u_h, limiter="MinMod"):
     def rho(e,x):
         lu_h.bind(e)
         return lu_h(x)[0]
-    operator = femDGOperator(Model,space, limiter=limiter) # note: that u_h.space fails since not ufl_space
-    stepper  = femdgStepper(order=space.order if space.order else 2, operator=operator)
+    operator = femDGOperator(Model, space, limiter=limiter) # note: that u_h.space fails since not ufl_space
+    stepper  = femdgStepper(order=space.order+1 if space.order>0 else 2, operator=operator)
+    rho.plot()
     operator.applyLimiter(u_h)
+    rho.plot()
     t = 0
     saveStep = 0.01
     c = 0
-    fig = pyplot.figure(figsize=(30,10))
-    rho.plot(gridLines="white", figure=(fig, 131+c), colorbar=False, clim=[0.125,1])
+    # fig = pyplot.figure(figsize=(30,10))
+    # rho.plot(gridLines="white", figure=(fig, 131+c), colorbar=False, clim=[0.125,1])
     while t < 0.3:
         operator.setTime(t)
         t += stepper(u_h)
-        print(t)
         if t > saveStep:
+            print(t)
             saveStep += 0.1
             c += 1
-            rho.plot(gridLines="white", figure=(fig, 131+c), colorbar=False, clim=[0.125,1])
+            # rho.plot(gridLines="white", figure=(fig, 131+c), colorbar=False, clim=[0.125,1])
+            # rho.plot()
     # return lineSample(u_h,[0,0],[1,1],200)
     res = numpy.zeros((2,space.grid.size(0)))
     for i,e in enumerate(space.grid.elements):
         x = e.geometry.center
         res[0][i] = x.two_norm
         res[1][i] = rho(e,e.geometry.toLocal(x))
-    pyplot.show()
+    # pyplot.show()
     return res
 
 # <markdowncell>
@@ -102,30 +110,58 @@ initial = conditional(dot(x,x)<0.1,as_vector([1,0,0,2.5]),
                                    as_vector([0.125,0,0,0.25]))
 
 domain = (reader.dgf, "triangle.dgf")
+
+res = []
+
+from dune.alugrid import aluSimplexGrid as simplexGrid
 try:
     from dune.polygongrid import polygonGrid
-    gridView = polygonGrid( domain, dualGrid=True )
+    gridView = polygonGrid( domain, dualGrid=False )
+    # gridView.plot()
 except ImportError:
     print("dune.polygongrid module not found using a simplex grid instead - ignored")
-    from dune.alugrid import aluSimplexGrid as simplexGrid
     gridView = simplexGrid( domain, dimgrid=2 )
+
+# fix the order to use
+order = 1
+
+print("Triangle grid with minmod limiter", flush=True)
+space = getSpace( gridView, order )
+u_h   = space.interpolate( initial, name="solution")
+res  += [evolve(space,u_h)]
+
+print("Triangle grid without limiter", flush=True)
+u_h   = space.interpolate( initial, name="solution")
+res  += [evolve(space,u_h,limiter=None)]
 
 print("*************************************")
 
-print("POLYB", flush=True)
-space = finiteVolume( gridView, dimRange=4 )
-u_h   = space.interpolate( initial, name="solution")
-u_h.plot()
-res   = [evolve(space,u_h)]
+try:
+    from dune.polygongrid import polygonGrid
+    gridView = polygonGrid( domain, dualGrid=True )
+    # gridView.plot()
+except ImportError:
+    print("dune.polygongrid module not found using a simplex grid instead - ignored")
+    gridView = simplexGrid( domain, dimgrid=2 )
+space = getSpace( gridView, order )
 
-print("POLYC", flush=True)
+print("Dual grid with minmod limiter", flush=True)
+u_h   = space.interpolate( initial, name="solution")
+res  += [evolve(space,u_h)]
+
+print("Dual grid without limiter", flush=True)
 u_h   = space.interpolate( initial, name="solution")
 res  += [evolve(space,u_h,limiter=None)]
 
 # <markdowncell>
 # Solutions along the diagonal
 # <codecell>
-pyplot.scatter(res[0][0],res[0][1])
-pyplot.scatter(res[1][0],res[1][1])
-# pyplot.scatter(res[2][0],res[2][1])
+color = ['tab:blue', 'tab:orange', 'tab:green', 'tab:red']
+fig, ax = pyplot.subplots()
+ax.scatter(res[0][0],res[0][1], color=color[0], label='simplex (minmode)')
+ax.scatter(res[1][0],res[1][1], color=color[1], label='simplex (none)')
+ax.scatter(res[2][0],res[2][1], color=color[2], label='dual (minmod)')
+ax.scatter(res[3][0],res[3][1], color=color[3], label='dual (none)')
+ax.legend()
+ax.grid(True)
 pyplot.show()

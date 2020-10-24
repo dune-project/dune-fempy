@@ -37,8 +37,28 @@ using ``git clone``. After adding a new Dune module in ``/dunepy/DUNE`` run
 ``updateAll`` to configure the new Dune module and update the Dune Python
 package.
 
-The example notebooks should run on most Linux based host system.
-On MAC and Windows machines a few extra steps are needed as described below. 
+Most of the example notebooks should run on most Linux based host system,
+although some of them using ``mayavi`` may have issues when the docker
+image is used on hosts with accelerated graphic chips as described below.
+On MAC and Windows machines a few extra steps are needed to get the docker
+image to work.
+
+***********
+Linux users
+***********
+
+As pointed out on hosts with accelerated graphic cards the correct driver
+might not be available in the docker container. This can cause some of the
+example scripts to crash, simply commenting out code block like
+
+```
+mlab.init_notebook("png")
+mlab.figure(bgcolor = (1,1,1))
+s = mlab.triangular_mesh(...)
+display( s )
+```
+
+solves this problem.
 
 *********
 MAC users

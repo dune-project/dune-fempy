@@ -28,7 +28,7 @@ def createLimiter(domainSpace, rangeSpace=None, bounds = [1e-12,1.], limiter='sc
 
     typeName = 'Dune::Fem::ScalingLimiter< ' + domainFunctionType + ', ' + rangeFunctionType + ' >'
     # FV type limiter where FV based reconstructions are done
-    if limiter is 'fv':
+    if limiter == 'fv':
         typeName = 'Dune::Fem::Limiter< ' + domainFunctionType + ', ' + rangeFunctionType + ' >'
 
     constructor = Constructor(['const '+domainSpaceType + ' &dSpace, const '+rangeSpaceType + ' &rSpace, double lower,double upper'],

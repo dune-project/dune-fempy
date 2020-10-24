@@ -1,7 +1,7 @@
 cd /host
 
 source $HOME/dune-env/bin/activate
-python ~/DUNE/dune-python/bin/rmgenerated.py --all
+python ~/DUNE/dune-common/bin/rmgenerated.py --all
 cd doc
 
 make clean
