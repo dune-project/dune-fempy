@@ -51,12 +51,11 @@ As pointed out on hosts with accelerated graphic cards the correct driver
 might not be available in the docker container. This can cause some of the
 example scripts to crash, simply commenting out code block like
 
-```
-mlab.init_notebook("png")
-mlab.figure(bgcolor = (1,1,1))
-s = mlab.triangular_mesh(...)
-display( s )
-```
+.. code:: ipython3
+
+  mlab.figure(bgcolor = (1,1,1))
+  s = mlab.triangular_mesh(...)
+  display( s )
 
 solves this problem.
 
