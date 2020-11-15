@@ -46,7 +46,6 @@ import dune.geometry as geometry
 import dune.fem as fem
 from dune.fem.plotting import plotPointData as plot
 import matplotlib.pyplot as pyplot
-from IPython import display
 
 
 # <markdowncell>
