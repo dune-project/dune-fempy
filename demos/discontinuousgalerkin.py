@@ -40,8 +40,8 @@ hatb = (dot(b, n) + abs(dot(b, n)))/2.0
 # boundary values (for left/right boundary)
 dD   = conditional((1+x[0])*(1-x[0])<1e-10,1,0)
 g    = conditional(x[0]<0,atan(10*x[1]),0)
-# penalty parameter
-beta = 10*space.order**2
+# penalty parameter (take 1 for p=0)
+beta = 10 * space.order**2 if space.order > 0 else 1
 
 aInternal     = dot(eps*grad(u) - b*u, grad(v)) * dx
 diffSkeleton  = eps*beta/he*jump(u)*jump(v)*dS -\
