@@ -30,8 +30,8 @@ from ufl import as_vector, avg, jump, dS, CellVolume, FacetArea, atan
 parameter.append({"fem.verboserank": 0})
 
 gridView = leafGridView([-1, -1], [1, 1], [20, 20])
-# space    = dgSpace(gridView, order=2, storage="istl")
-space  = fvSpace(gridView)
+space    = dgSpace(gridView, order=0, storage="istl")
+#space  = fvSpace(gridView)
 
 u    = TrialFunction(space)
 v    = TestFunction(space)
@@ -40,13 +40,17 @@ he   = avg( CellVolume(space) ) / FacetArea(space)
 hbnd = CellVolume(space) / FacetArea(space)
 x    = SpatialCoordinate(space)
 time = Constant(0., "time")
-dt = Constant(0.01,"dt")
+dt = Constant(0.001,"dt")
 
 # diffusion factor
 eps = Constant(0.0,"eps")
 # transport direction and upwind flux
 b    = as_vector([1,1])
+
+#hatb = avg(u) + 1/2 * jump(u)
 hatb = (dot(b, n) + abs(dot(b, n)))/2.0
+flux = hatb*u
+#hatb = conditional( dot(b, n) < 0, dot(b, n), 0 )
 # boundary values (for left/right boundary)
 dD   = 1 # conditional((1+x[0])*(1-x[0])<1e-10,1,0)
 g    = 0 # conditional(x[0]<0,atan(10*x[1]),0)
@@ -54,11 +58,11 @@ eps = None
 center  = as_vector([ 0.0,0.0 ])
 
 aInternal     = dot(- b*u, grad(v)) * dx
-advSkeleton   = jump(hatb*u)*jump(v)*dS
-advSkeleton  += ( hatb*u + (dot(b,n)-hatb)*g )*v*dD*ds
+advSkeleton   = jump(flux)*jump(v)*dS
+advSkeleton  += flux*v*ds
 
 xt = x - time*b
-exact = conditional( dot(xt,xt) < 0.125, 1, 0 )
+exact = conditional( dot(xt,xt) < 0.05, 1, 0 )
 exactFct =  uflFunction(gridView, name="exact", order=1, ufl=exact)
 
 uh = space.interpolate( exactFct, name="solution")
@@ -66,7 +70,7 @@ uh_n = uh.copy()
 uh_old = uh.copy()
 
 # time derivative
-explicit = False
+explicit = True
 endTime = 0.5
 form  = dt * (aInternal + advSkeleton)
 if explicit:
@@ -74,7 +78,7 @@ if explicit:
 else:
     form += inner(u - uh_n, v) * dx
 
-scheme = molScheme(form==0, solver="gmres",
+scheme = molScheme(form==0, solver=("suitesparse","umfpack"),
                    parameters={"newton.linear.preconditioning.method":"jacobi",
                                "newton.verbose":True,
                                "newton.linear.verbose":True,
@@ -86,7 +90,6 @@ scheme = molScheme(form==0, solver="gmres",
 
 error0 = 0.
 eoc = 0
-volume = 0.1*0.1
 for i in range(2):
     time.value = 0.
     uh.interpolate( exact )
@@ -95,9 +98,6 @@ for i in range(2):
         uh_n.assign( uh )
         if explicit:
             scheme(uh_n, uh )
-            # Note: apply inverse mass
-            for d in range(len(uh.dofVector)):
-                uh.dofVector[d] /= volume
         else:
             scheme.solve(target=uh)
         time.value += dt.value
@@ -110,4 +110,3 @@ for i in range(2):
     error0 = error1
     gridView.hierarchicalGrid.globalRefine(1)
     dt.value *= 0.5
-    volume *= 0.25

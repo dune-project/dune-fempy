@@ -22,8 +22,9 @@ from ufl import TestFunction, TrialFunction, SpatialCoordinate, triangle, FacetN
 from ufl import dx, ds, grad, div, grad, dot, inner, sqrt, exp, conditional
 from ufl import as_vector, avg, jump, dS, CellVolume, FacetArea, atan
 
+order = 0
 gridView = leafGridView([-1, -1], [1, 1], [20, 20])
-space    = dgSpace(gridView, order=2)
+space    = dgSpace(gridView, order=order)
 
 u    = TrialFunction(space)
 v    = TestFunction(space)
@@ -41,10 +42,16 @@ hatb = (dot(b, n) + abs(dot(b, n)))/2.0
 dD   = conditional((1+x[0])*(1-x[0])<1e-10,1,0)
 g    = conditional(x[0]<0,atan(10*x[1]),0)
 # penalty parameter
-beta = 10*space.order**2
+beta = 1 if order == 0 else 10*space.order**2
+
+def Grad( z ):
+    if order == 0:
+        return dot(jump(z),n('+'))/he
+    else:
+        return grad(z)
 
 aInternal     = dot(eps*grad(u) - b*u, grad(v)) * dx
-diffSkeleton  = eps*beta/he*jump(u)*jump(v)*dS -\
+diffSkeleton  = eps*beta/he*jump(u)*jump(v)*dS-\
                 eps*dot(avg(grad(u)),n('+'))*jump(v)*dS -\
                 eps*jump(u)*dot(avg(grad(v)),n('+'))*dS
 diffSkeleton += eps*beta/hbnd*(u-g)*v*dD*ds -\

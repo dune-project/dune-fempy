@@ -32,6 +32,7 @@ from dune.fem.function import integrate, uflFunction
 from ufl import *
 from dune.ufl import DirichletBC
 
+# fem.parameter.append({"fem.verboserank":0})
 
 # set the angle for the corner (0<angle<=360)
 cornerAngle = 320.
@@ -150,7 +151,7 @@ hT = MaxCellEdgeLength(fvspace.cell())
 he = MaxFacetEdgeLength(fvspace.cell())('+')
 n = FacetNormal(fvspace.cell())
 estimator_ufl = hT**2 * (div(grad(u)))**2 * v * dx +        he * inner(jump(grad(u)), n('+'))**2 * avg(v) * dS
-estimator = estimatorOp(estimator_ufl)
+estimator = estimatorOp(estimator_ufl, communicate=False)
 tolerance = 0.05
 
 
