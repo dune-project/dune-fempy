@@ -5,26 +5,28 @@
 from matplotlib import pyplot
 import numpy
 try:
-  import pygmsh
-  geom = pygmsh.built_in.Geometry()
-  poly = geom.add_polygon([
-      [ 0.0,  0.5, 0.0], [-0.1,  0.1, 0.0], [-0.5,  0.0, 0.0],
-      [-0.1, -0.1, 0.0], [ 0.0, -0.5, 0.0], [ 0.1, -0.1, 0.0],
-      [ 0.5,  0.0, 0.0], [ 0.1,  0.1, 0.0] ], lcar=0.05)
-  axis = [0, 0, 1]
-  geom.extrude( poly, translation_axis=axis, rotation_axis=axis,
-      point_on_axis=[0, 0, 0], angle=2.0 / 6.0 * numpy.pi)
-  mesh = pygmsh.generate_mesh(geom, verbose=False)
-  points, cells = mesh.points, mesh.cells_dict
-  domain3d = {"vertices":points, "simplices":cells["tetra"]}
+    import pygmsh
+    with pygmsh.geo.Geometry() as geom:
+        poly = geom.add_polygon([
+              [ 0.0,  0.5, 0.0], [-0.1,  0.1, 0.0], [-0.5,  0.0, 0.0],
+              [-0.1, -0.1, 0.0], [ 0.0, -0.5, 0.0], [ 0.1, -0.1, 0.0],
+              [ 0.5,  0.0, 0.0], [ 0.1,  0.1, 0.0] ], mesh_size=0.05)
+        geom.twist(
+            poly,
+            translation_axis=[0, 0, 1], rotation_axis=[0, 0, 1], point_on_axis=[0, 0, 0],
+            angle=numpy.pi / 3,
+        )
+        mesh = geom.generate_mesh(verbose=False)
+
+    points, cells = mesh.points, mesh.cells_dict
+    domain3d = {"vertices":points.astype("float"), "simplices":cells["tetra"]}
 except ImportError: # pygmsh not installed - use a simple cartesian domain
-  print("pygmsh module not found using Carteian domain instead - ignored")
-  from dune.grid import cartesianDomain
-  domain3d = cartesianDomain([-0.25,-0.25,0],[0.25,0.25,1],[30,30,60])
+    print("pygmsh module not found using a simple Cartesian domain - ignored")
+    from dune.grid import cartesianDomain
+    domain3d = cartesianDomain([-0.25,-0.25,0],[0.25,0.25,1],[30,30,60])
 
 from dune.alugrid import aluSimplexGrid as leafGridView3d
 gridView3d  = leafGridView3d(domain3d)
-
 
 # <markdowncell>
 # As before we solve a simple Laplace problem
