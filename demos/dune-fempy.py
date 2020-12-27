@@ -254,7 +254,6 @@ print("Forchheimer(scipy) size: ", gridView.size(0), "L^2, H^1 error:",'{:0.5e},
 # <codecell>
 
 from dune.generator import ConfigurationError
-import mpi4py
 try:
     import petsc4py
     petsc4py.init(sys.argv)
