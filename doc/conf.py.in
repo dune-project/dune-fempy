@@ -45,6 +45,7 @@ extensions = [
     'sphinxcontrib.bibtex',
 #    'sphinx.ext.autosectionlabel',
 ]
+bibtex_bibfiles = ['dune-fempy.bib']
 
 html_theme_options = {
     'logo_only': True,
