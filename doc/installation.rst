@@ -1,4 +1,43 @@
+#########
+From PyPi
+#########
+
 .. _installation:
+
+By far the easiest way to get access to `Dune` is by installing into a
+virtual environment using `pip`. In some folder e.g. `Dune` setup a virtual
+environment and activate it
+
+.. code-block:: bash
+
+  python3 -m venv dune-env  
+  source dune-env/bin/activate
+
+Then download and build `Dune` (note that this takes some time to have
+coffee/tea at hand):
+
+.. code-block:: bash
+
+  pip install dune-fem
+
+To test that everything works you can download all the scripts described
+in this tutorial and try them out
+
+.. code-block:: bash
+
+  python -m dune.fem
+  cd fem_tutorial
+  python concepts.py
+
+All examples are available as Python scripts or IPython notebooks - for
+this `jupyter` is needed
+
+.. code-block:: bash
+
+  pip install jupyter
+  jupyter notebook
+
+Other approaches are described below.
 
 ############
 Using Docker
@@ -229,7 +268,9 @@ Troubleshooting
 
   If your version is out of date, you will need to upgrade your system to use Dune
 
-* It is possible that the python version may be an issue. The script uses python3.5m. If during the Dune installation you get the error
+* It is possible that the python version may be an issue. The scripts
+  require `python3` including the development package being installed.
+  If during the Dune installation you get the error
 
   .. code-block:: none
 
@@ -237,9 +278,7 @@ Troubleshooting
 
   This can probably be fixed by installing additional python3.5 libraries with e.g. ::
 
-  $ sudo apt-get install libpython3.5-dev
-
-  If python3.5 is not available on your system, you can simply change 3.5 for another appropriate version everywhere in the script (e.g. 3.4 or 2.7 (untested)). Otherwise, consider upgrading your system.
+  $ sudo apt-get install libpython3-dev
 
 * One other problem is that a default version of Open MPI may already be installed. This will lead to errors where Dune appears to be looking in the wrong directory for Open MPI (e.g. usr/lib/openmpi instead of the home directory where the script installs it). This can be solved by running ::
 
