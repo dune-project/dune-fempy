@@ -14,8 +14,11 @@ import numpy, math
 import matplotlib
 matplotlib.rc( 'image', cmap='jet' )
 from matplotlib import pyplot
-from dune.grid import structuredGrid as leafGridView
+#from dune.grid import structuredGrid as leafGridView
+from dune.alugrid import aluCubeGrid as leafGridView
+#from dune.alugrid import aluSimplexGrid as leafGridView
 from dune.common import FieldVector
+from dune.grid import reader
 from dune.fem import parameter
 from dune.fem.space import dglegendre as dgSpace
 from dune.fem.space import finiteVolume as fvSpace
@@ -29,8 +32,10 @@ from ufl import as_vector, avg, jump, dS, CellVolume, FacetArea, atan
 
 parameter.append({"fem.verboserank": 0})
 
-gridView = leafGridView([-1, -1], [1, 1], [20, 20])
-space    = dgSpace(gridView, order=0, storage="istl")
+domain = (reader.dgf, "periodic2.dgf")
+#gridView = leafGridView([-1, -1], [1, 1], [20, 20])
+gridView = leafGridView(domain, dimgrid=2 )
+space    = dgSpace(gridView, order=2, storage="fem")
 #space  = fvSpace(gridView)
 
 u    = TrialFunction(space)
@@ -59,7 +64,7 @@ center  = as_vector([ 0.0,0.0 ])
 
 aInternal     = dot(- b*u, grad(v)) * dx
 advSkeleton   = jump(flux)*jump(v)*dS
-advSkeleton  += flux*v*ds
+# advSkeleton  += flux*v*ds
 
 xt = x - time*b
 exact = conditional( dot(xt,xt) < 0.05, 1, 0 )
@@ -70,18 +75,19 @@ uh_n = uh.copy()
 uh_old = uh.copy()
 
 # time derivative
-explicit = True
-endTime = 0.5
+explicit = False
+endTime = 2
 form  = dt * (aInternal + advSkeleton)
 if explicit:
     form -= inner(u, v ) * dx
+    # form += inner(uh_n - u, v) * dx
 else:
     form += inner(u - uh_n, v) * dx
 
-scheme = molScheme(form==0, solver=("suitesparse","umfpack"),
+scheme = molScheme(form==0, solver="gmres",
                    parameters={"newton.linear.preconditioning.method":"jacobi",
-                               "newton.verbose":True,
-                               "newton.linear.verbose":True,
+                               "newton.verbose":False,
+                               "newton.linear.verbose":False,
                                "newton.tolerance":1e-4
                               })
 
@@ -94,6 +100,7 @@ for i in range(2):
     time.value = 0.
     uh.interpolate( exact )
     uh.plot()
+    gridView.writeVTK("adv",number=0,celldata=[uh])
     while time.value < endTime:
         uh_n.assign( uh )
         if explicit:
@@ -103,6 +110,7 @@ for i in range(2):
         time.value += dt.value
 
     uh.plot()
+    gridView.writeVTK("adv",number=1,celldata=[uh])
     error1= math.sqrt( integrate(gridView,dot(uh-exactFct,uh-exactFct),order=2))
     if i > 0:
         eoc = [ math.log(error1/error0) / math.log(0.5) ]

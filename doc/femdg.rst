@@ -1,4 +1,4 @@
-.. sectionauthor:: Andreas Dedner <a.s.dedner@warwick.ac.uk>, Robert Kl\ |oe|\ fkorn <robert.kloefkorn@iris.no>, Martin Nolte <nolte.mrtn@gmail.com>
+.. sectionauthor:: Andreas Dedner <a.s.dedner@warwick.ac.uk>, Robert Kl\ |oe|\ fkorn
 
 ##################################################
 Discontinuous Galerkin Methods: DUNE-FEM-DG Module
@@ -7,7 +7,9 @@ Discontinuous Galerkin Methods: DUNE-FEM-DG Module
 The add on module `Dune-Fem-Dg`_ provides a number of DG algorithms focusing
 on solving systems of evolution equations for advection diffusion reaction equations
 of the form
-$$ \partial_U + \nabla\cdot\Big( F(x,t,U) - D(x,t,U,\nabla U) \Big) = S(U)~. $$
+\begin{align*} 
+\partial_U + \nabla\cdot\Big( F(x,t,U) - D(x,t,U,\nabla U) \Big) = S(U)~. 
+\end{align*} 
 The implemented method include a wide range of methods for DG
 discretization of the diffusion term including CDG2, BR2, IP, and many
 others. The advection term can be discretized using a local Lax-Friedrichs

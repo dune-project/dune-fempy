@@ -19,6 +19,8 @@ generator.reset()
 
 .. todo:: mention fixes to `config.opts` e.g.
 
+.. todo:: mention DUNE_SAVE_BUILD (write,append,console or terminal)
+
 ```
 -DCMAKE_CXX_COMPILER=/usr/lib/ccache/g++
 -DCMAKE_POSITION_INDEPENDENT_CODE=TRUE

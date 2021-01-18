@@ -30,7 +30,7 @@ def computeArea( function, t ):
 
 dt = 1.
 
-example = 1
+example = 3
 
 #############################################################
 #   Example 1: The naive way
