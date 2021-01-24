@@ -24,7 +24,7 @@ ubuntu-20.04-clang-10-17:
   image: registry.dune-project.org/docker/ci/ubuntu:20.04
   script:
     - cd $CI_PROJECT_DIR
-    - python3 -venv fempy
+    - python3 -m venv fempy
     - source fempy/bin/activate
     - pip install nbformat nbconvert
     - cd doc
