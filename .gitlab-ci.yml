@@ -23,9 +23,10 @@ before_script:
 ubuntu-20.04-clang-10-17:
   image: registry.dune-project.org/docker/ci/ubuntu:20.04
   script:
-    - export TORTURE_TESTS=off
-    - cd /duneci/modules/dune-fempy/doc
+    - cd /duneci/dune-fempy/doc
     - make
+    - cd /duneci/modules/dune-femp
+    - make doc
   variables:
     # bug in CI clang-10-17 and clang-10-20 are mixed up
     DUNECI_TOOLCHAIN: clang-10-20
