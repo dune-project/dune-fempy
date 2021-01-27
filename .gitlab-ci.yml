@@ -1,6 +1,6 @@
 ---
 variables:
-  DUNE_CMAKE_FLAGS:  "-DCMAKE_VERBOSE_MAKEFILE:BOOL=ON -DDUNE_ENABLE_PYTHONBINDINGS=ON -DCMAKE_CXX_COMPILER=clang++-10 -DCMAKE_C_COMPILER=clang-10 -DDUNE_GRID_GRIDTYPE_SELECTOR=ON -DCMAKE_CXX_FLAGS='-std=c++17 -O2 -g -Wall -fdiagnostics-color=always' -DDUNE_MAX_TEST_CORES=4 -DBUILD_SHARED_LIBS=TRUE -DDUNE_PYTHON_INSTALL_LOCATION=none -DCMAKE_POSITION_INDEPENDENT_CODE=TRUE -DCMAKE_DISABLE_FIND_PACKAGE_LATEX=TRUE -DCMAKE_DISABLE_FIND_PACKAGE_Alberta=TRUE -DCMAKE_DISABLE_FIND_PACKAGE_Vc=TRUE -DCMAKE_DISABLE_DOCUMENTATION=TRUE"
+  DUNE_CMAKE_FLAGS:  "-DCMAKE_VERBOSE_MAKEFILE:BOOL=ON -DDUNE_ENABLE_PYTHONBINDINGS=ON -DCMAKE_CXX_COMPILER=clang++-10 -DCMAKE_C_COMPILER=clang-10 -DDUNE_GRID_GRIDTYPE_SELECTOR=ON -DCMAKE_CXX_FLAGS='-std=c++17 -O2 -g -Wall -fdiagnostics-color=always' -DDUNE_MAX_TEST_CORES=4 -DBUILD_SHARED_LIBS=TRUE -DCMAKE_POSITION_INDEPENDENT_CODE=TRUE -DCMAKE_DISABLE_FIND_PACKAGE_LATEX=TRUE -DCMAKE_DISABLE_FIND_PACKAGE_Alberta=TRUE -DCMAKE_DISABLE_FIND_PACKAGE_Vc=TRUE -DCMAKE_DISABLE_DOCUMENTATION=TRUE"
   DUNECI_CMAKE_FLAGS: $DUNE_CMAKE_FLAGS
   # adding this actually leads to the test failure seen in the core modules
   # don't know why this is required here but not for core modules - magic?
@@ -10,6 +10,8 @@ variables:
 before_script:
   - export TORTURE_TESTS=off
   - source /duneci/bin/duneci-init-job
+  - python3 -m venv --system-site-packages /duneci/modules/dune-env
+  - source /duneci/modules/dune-env/bin/activate
   - duneci-install-module https://gitlab.dune-project.org/core/dune-common.git
   - duneci-install-module https://gitlab.dune-project.org/core/dune-geometry.git
   - duneci-install-module https://gitlab.dune-project.org/core/dune-grid.git
@@ -18,6 +20,7 @@ before_script:
   - duneci-install-module https://gitlab.dune-project.org/extensions/dune-alugrid.git
   - duneci-install-module https://gitlab.dune-project.org/dune-fem/dune-fem.git
   - duneci-install-module https://gitlab.dune-project.org/dune-fem/dune-fem-dg.git
+  - CMAKE_PREFIX_PATH=/duneci/modules /duneci/modules/dune-common/bin/setup-dunepy.py install
 
 ubuntu-20.04-clang-10-17:
   image: registry.dune-project.org/docker/ci/ubuntu:20.04
@@ -29,6 +32,6 @@ ubuntu-20.04-clang-10-17:
     # bug in CI clang-10-17 and clang-10-20 are mixed up
     DUNECI_TOOLCHAIN: clang-10-20
     DUNE_CONTROL_PATH: /duneci/modules:$CI_PROJECT_DIR
-    DUNE_CMAKE_FLAGS:  "-DCMAKE_VERBOSE_MAKEFILE:BOOL=ON -DDUNE_ENABLE_PYTHONBINDINGS=ON -DCMAKE_CXX_COMPILER=clang++-10 -DCMAKE_C_COMPILER=clang-10 -DDUNE_GRID_GRIDTYPE_SELECTOR=ON -DCMAKE_CXX_FLAGS='-std=c++17 -O2 -g -Wall -fdiagnostics-color=always' -DDUNE_MAX_TEST_CORES=4 -DBUILD_SHARED_LIBS=TRUE -DDUNE_PYTHON_INSTALL_LOCATION=none -DCMAKE_POSITION_INDEPENDENT_CODE=TRUE -DCMAKE_DISABLE_FIND_PACKAGE_LATEX=TRUE -DCMAKE_DISABLE_FIND_PACKAGE_Alberta=TRUE -DCMAKE_DISABLE_FIND_PACKAGE_Vc=TRUE -DCMAKE_DISABLE_DOCUMENTATION=TRUE"
+    DUNE_CMAKE_FLAGS:  "-DCMAKE_VERBOSE_MAKEFILE:BOOL=ON -DDUNE_ENABLE_PYTHONBINDINGS=ON -DCMAKE_CXX_COMPILER=clang++-10 -DCMAKE_C_COMPILER=clang-10 -DDUNE_GRID_GRIDTYPE_SELECTOR=ON -DCMAKE_CXX_FLAGS='-std=c++17 -O2 -g -Wall -fdiagnostics-color=always' -DDUNE_MAX_TEST_CORES=4 -DBUILD_SHARED_LIBS=TRUE -DCMAKE_POSITION_INDEPENDENT_CODE=TRUE -DCMAKE_DISABLE_FIND_PACKAGE_LATEX=TRUE -DCMAKE_DISABLE_FIND_PACKAGE_Alberta=TRUE -DCMAKE_DISABLE_FIND_PACKAGE_Vc=TRUE -DCMAKE_DISABLE_DOCUMENTATION=TRUE"
     DUNECI_CMAKE_FLAGS: $DUNE_CMAKE_FLAGS
   tags: [duneci]
