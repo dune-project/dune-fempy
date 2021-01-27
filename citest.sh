@@ -14,7 +14,6 @@ export OMPI_MCA_btl_base_warn_component_unused=0
 set -x
 
 cd $CI_PROJECT_DIR
-pip install -i https://gitlab.dune-project.org/api/v4/projects/812/packages/pypi/simple -r reqCI.txt
 cd doc
 # - make
 # make -k ${parallel_opts} concepts_nb.ipynb
