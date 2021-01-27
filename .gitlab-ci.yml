@@ -20,7 +20,8 @@ before_script:
   - duneci-install-module https://gitlab.dune-project.org/extensions/dune-alugrid.git
   - duneci-install-module https://gitlab.dune-project.org/dune-fem/dune-fem.git
   - duneci-install-module https://gitlab.dune-project.org/dune-fem/dune-fem-dg.git
-  - CMAKE_PREFIX_PATH=/duneci/modules /duneci/modules/dune-common/bin/setup-dunepy.py install
+  - cd /duneci/modules
+  - ./dune-common/bin/setup-dunepy.py install
 
 ubuntu-20.04-clang-10-17:
   image: registry.dune-project.org/docker/ci/ubuntu:20.04
