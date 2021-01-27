@@ -26,10 +26,13 @@ ubuntu-20.04-clang-10-17:
     - cd $CI_PROJECT_DIR
     - python3 -m venv fempy
     - source fempy/bin/activate
-    - pip install nbformat nbconvert
+    - pip install -i https://gitlab.dune-project.org/api/v4/projects/812/packages/pypi/simple -r reqCI.txt
+    # setup-dunepy.py --opts=CI.opts install
     - cd doc
-    - make
+    # - make
+    - make concepts_nb.ipynb
     - cd ..
+    - dunecontrol --current make doc
   variables:
     # bug in CI clang-10-17 and clang-10-20 are mixed up
     DUNECI_TOOLCHAIN: clang-10-20
