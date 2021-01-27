@@ -1,10 +1,7 @@
 ipython
 jupyter
 x3d
-gmsh
-pygmsh
 triangle
-mayavi
 pandas
 pyqt5
 sphinx_rtd_theme
