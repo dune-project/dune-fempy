@@ -24,7 +24,7 @@ ubuntu-20.04-clang-10-17:
   image: registry.dune-project.org/docker/ci/ubuntu:20.04
   script:
     - cd $CI_PROJECT_DIR
-    - python3 -m venv fempy
+    - python3 -m venv --system-site-packages fempy
     - source fempy/bin/activate
     - pip install -i https://gitlab.dune-project.org/api/v4/projects/812/packages/pypi/simple -r reqCI.txt
     # setup-dunepy.py --opts=CI.opts install
