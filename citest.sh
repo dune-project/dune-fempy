@@ -20,6 +20,7 @@ pip install -i https://gitlab.dune-project.org/api/v4/projects/812/packages/pypi
 # - /duneci/modules/dune-common/bin/setup-dunepy.py install
 cd doc
 # - make
-make -k ${parallel_opts} concepts_nb.ipynb
+# make -k ${parallel_opts} concepts_nb.ipynb
+python concepts.py
 cd ..
 ${DUNECONTROL} --current make doc
