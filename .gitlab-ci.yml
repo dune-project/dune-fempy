@@ -5,7 +5,7 @@ variables:
   # adding this actually leads to the test failure seen in the core modules
   # don't know why this is required here but not for core modules - magic?
   DUNECI_PARALLEL:      "6"
-  PYTHONPATH:         "/duneci/modules/dune-common/build-cmake/python:/duneci/modules/dune-geometry/build-cmake/python:/duneci/modules/dune-grid/build-cmake/python:/duneci/modules/dune-istl/build-cmake/python:/duneci/modules/dune-alugrid/build-cmake/python:/duneci/modules/dune-fem/build-cmake/python:$CI_PROJECT_DIR/build-cmake/python"
+  # PYTHONPATH:         "/duneci/modules/dune-common/build-cmake/python:/duneci/modules/dune-geometry/build-cmake/python:/duneci/modules/dune-grid/build-cmake/python:/duneci/modules/dune-istl/build-cmake/python:/duneci/modules/dune-alugrid/build-cmake/python:/duneci/modules/dune-fem/build-cmake/python:$CI_PROJECT_DIR/build-cmake/python"
 
 before_script:
   - export TORTURE_TESTS=off
