@@ -2,7 +2,6 @@
 variables:
   DUNE_CMAKE_FLAGS:   "-DDUNE_ENABLE_PYTHONBINDINGS=ON -DDUNE_GRID_GRIDTYPE_SELECTOR=ON -DDUNE_MAX_TEST_CORES=4 -DBUILD_SHARED_LIBS=TRUE -DDUNE_PYTHON_INSTALL_LOCATION=none -DCMAKE_POSITION_INDEPENDENT_CODE=TRUE -DCMAKE_DISABLE_FIND_PACKAGE_LATEX=TRUE -DCMAKE_DISABLE_FIND_PACKAGE_Alberta=TRUE -DCMAKE_DISABLE_FIND_PACKAGE_Vc=TRUE -DCMAKE_DISABLE_DOCUMENTATION=TRUE"
   DUNECI_CMAKE_FLAGS: $DUNE_CMAKE_FLAGS
-  DUNE_PY_DIR:        /duneci/modules/dune-py
   # adding this actually leads to the test failure seen in the core modules
   # don't know why this is required here but not for core modules - magic?
   DUNECI_PARALLEL:      "6"
@@ -24,17 +23,8 @@ ubuntu-20.04-clang-10-17:
   image: registry.dune-project.org/docker/ci/ubuntu:20.04
   script:
     - export TORTURE_TESTS=off
-    - set -- --opts="/duneci/dune.opts" "${@}"
     - cd $CI_PROJECT_DIR
-    - python3 -m venv --system-site-packages fempy
-    - source fempy/bin/activate
-    - pip install -i https://gitlab.dune-project.org/api/v4/projects/812/packages/pypi/simple -r reqCI.txt
-    # - /duneci/modules/dune-common/bin/setup-dunepy.py install
-    - cd doc
-    # - make
-    - make concepts_nb.ipynb
-    - cd ..
-    - dunecontrol --current make doc
+    - bash ./citest.sh
   variables:
     # bug in CI clang-10-17 and clang-10-20 are mixed up
     DUNECI_TOOLCHAIN: clang-10-20
