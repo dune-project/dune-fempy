@@ -21,6 +21,6 @@ set -x
 
 duneci-standard-test
 cd doc
-make -k ${parallel_opts} concepts_nb.ipynb
+# make -k ${parallel_opts} concepts_nb.ipynb
 cd ..
 ${DUNECONTROL} --current make doc
