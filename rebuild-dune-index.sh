@@ -50,7 +50,8 @@ pip2pi packages \
   sphinxcontrib-bibtex\
   nbsphinx\
   sphinx-autobuild\
-  sparkmonitor
+  sparkmonitor\
+  pandoc
 
 
 # Upload all the packages

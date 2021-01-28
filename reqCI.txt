@@ -9,3 +9,4 @@ sphinxcontrib-bibtex
 nbsphinx
 sphinx-autobuild
 sparkmonitor
+pandoc
