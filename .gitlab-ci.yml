@@ -30,7 +30,12 @@ ubuntu-20.04-clang-10-17:
     - cd /duneci/modules
     - ./dune-common/bin/setup-dunepy.py
     - cd $CI_PROJECT_DIR
-    - bash ./citest.sh
+    - duneci-standard-test
+    # - bash ./citest.sh
+    - cd doc
+    - make -k ${parallel_opts} concepts_nb.ipynb
+    - cd ..
+    ${DUNECONTROL} --current make doc
   variables:
     # bug in CI clang-10-17 and clang-10-20 are mixed up
     DUNECI_TOOLCHAIN: clang-10-20
