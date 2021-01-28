@@ -5,7 +5,6 @@ triangle
 pandas
 pyqt5
 sphinx_rtd_theme
-apidoc
 sphinxcontrib-bibtex
 nbsphinx
 sphinx-autobuild
