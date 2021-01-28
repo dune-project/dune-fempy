@@ -4,7 +4,7 @@ set -u
 set -- --opts="/duneci/dune.opts" "${@}"
 DUNECONTROL=dunecontrol
 
-pip install -i https://gitlab.dune-project.org/api/v4/projects/812/packages/pypi/simple -r reqCI.txt
+pip install -i https://gitlab.dune-project.org/api/v4/projects/812/packages/pypi/simple --no-build-isolation -r reqCI.txt
 cd /duneci/modules
 ./dune-common/bin/setup-dunepy.py
 cd $CI_PROJECT_DIR
