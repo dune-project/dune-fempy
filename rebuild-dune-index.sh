@@ -1,6 +1,7 @@
 #!/bin/bash
 
 rm -rf env
+rm -rf package
 python3 -m virtualenv -p $(which python3) env
 source env/bin/activate
 python -m pip install -r requirements.txt
@@ -34,6 +35,9 @@ pip2pi packages importlib-metadata typing-extensions
 # Additional packages needed to build the tutorial
 # There is an issue with the correct jinja package so it is included here
 # with specific lower version
+pip2pi packages Pygments==2.7.3
+pip2pi packages jupyterlab-pygments==0.1.2
+pip2pi packages UFL==2017.1.0
 pip2pi packages \
   apidoc\
   gmsh\

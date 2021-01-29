@@ -10,4 +10,5 @@ sphinx-autobuild
 sphinx_rtd_theme
 sphinxcontrib-bibtex
 triangle
+UFL
 x3d
