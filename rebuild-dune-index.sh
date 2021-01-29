@@ -35,23 +35,24 @@ pip2pi packages importlib-metadata typing-extensions
 # There is an issue with the correct jinja package so it is included here
 # with specific lower version
 pip2pi packages \
-  jinja2\
-  ipython\
-  jupyter\
-  x3d\
-  gmsh\
-  pygmsh\
-  triangle\
-  mayavi\
-  pandas\
-  pyqt5\
-  sphinx_rtd_theme\
   apidoc\
-  sphinxcontrib-bibtex\
+  gmsh\
+  ipython\
+  jinja2\
+  jupyter\
+  mayavi\
   nbsphinx\
-  sphinx-autobuild\
+  pandas\
+  pandoc\
+  pygmsh\
+  pyqt5\
   sparkmonitor\
-  pandoc
+  sphinx-autobuild\
+  sphinx_rtd_theme\
+  sphinxcontrib-bibtex\
+  triangle\
+  wheel\
+  x3d
 
 
 # Upload all the packages
