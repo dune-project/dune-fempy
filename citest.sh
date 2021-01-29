@@ -22,6 +22,9 @@ set -x
 
 duneci-standard-test
 cd doc
-# make -k ${parallel_opts} concepts_nb.ipynb
+make clean
+make -k ${parallel_opts}
 cd ..
 ${DUNECONTROL} --current make doc
+git commit -a -m "nightly build"
+git push
