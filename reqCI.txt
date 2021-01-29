@@ -1,9 +1,5 @@
-ipython
-jinja2
-jupyter
 nbsphinx
 pandas
-pandoc
 pyqt5
 sparkmonitor
 sphinx-autobuild

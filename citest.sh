@@ -4,7 +4,7 @@ set -u
 set -- --opts="/duneci/dune.opts" "${@}"
 DUNECONTROL=dunecontrol
 
-pip install -i https://gitlab.dune-project.org/api/v4/projects/812/packages/pypi/simple --no-build-isolation wheel
+pip install -i https://gitlab.dune-project.org/api/v4/projects/812/packages/pypi/simple --no-build-isolation wheel Pygments
 pip install -i https://gitlab.dune-project.org/api/v4/projects/812/packages/pypi/simple --no-build-isolation -r reqCI.txt
 cd /duneci/modules
 ./dune-common/bin/setup-dunepy.py
@@ -23,8 +23,8 @@ set -x
 duneci-standard-test
 cd doc
 make clean
-make -k ${parallel_opts}
+make -ki ${parallel_opts}
 cd ..
 ${DUNECONTROL} --current make doc
-git commit -a -m "nightly build"
-git push
+# git commit -a -m "nightly build"
+# git push
