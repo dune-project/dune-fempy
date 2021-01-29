@@ -4,7 +4,8 @@ set -u
 set -- --opts="/duneci/dune.opts" "${@}"
 DUNECONTROL=dunecontrol
 
-pip install -i https://gitlab.dune-project.org/api/v4/projects/812/packages/pypi/simple --no-build-isolation wheel Pygments
+pip install -i https://gitlab.dune-project.org/api/v4/projects/812/packages/pypi/simple --no-build-isolation wheel
+pip install -i https://gitlab.dune-project.org/api/v4/projects/812/packages/pypi/simple --no-build-isolation --upgrade Pygments
 pip install -i https://gitlab.dune-project.org/api/v4/projects/812/packages/pypi/simple --no-build-isolation -r reqCI.txt
 cd /duneci/modules
 ./dune-common/bin/setup-dunepy.py
@@ -21,10 +22,16 @@ export OMPI_MCA_btl_base_warn_component_unused=0
 set -x
 
 duneci-standard-test
-cd doc
-make clean
-make -ki ${parallel_opts}
-cd ..
+if [[ $REBUILD == "on" ]]; then
+  cd doc
+  make clean
+  make -ki ${parallel_opts}
+  cd ..
+else
+  cd doc
+  touch concepts.py
+  make concepts_nb.ipynb
+fi
 ${DUNECONTROL} --current make doc
 # git commit -a -m "nightly build"
 # git push
