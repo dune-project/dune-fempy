@@ -6,6 +6,7 @@ variables:
   # don't know why this is required here but not for core modules - magic?
   DUNECI_PARALLEL:      "6"
   PYTHONPATH:         "/duneci/modules/dune-common/build-cmake/python:/duneci/modules/dune-geometry/build-cmake/python:/duneci/modules/dune-grid/build-cmake/python:/duneci/modules/dune-istl/build-cmake/python:/duneci/modules/dune-alugrid/build-cmake/python:/duneci/modules/dune-fem/build-cmake/python:/duneci/modules/dune-fem-dg/build-cmake/python"
+  REBUILD:            "off"
 
 before_script:
   - export TORTURE_TESTS=off
@@ -24,7 +25,6 @@ before_script:
 ubuntu-20.04-clang-10-17:
   image: registry.dune-project.org/docker/ci/ubuntu:20.04
   script:
-    - export TORTURE_TESTS=off
     - cd $CI_PROJECT_DIR
     - ./citest.sh
   variables:
