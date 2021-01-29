@@ -1,11 +1,9 @@
-gmsh
 ipython
 jinja2
 jupyter
 nbsphinx
 pandas
 pandoc
-pygmsh
 pyqt5
 sparkmonitor
 sphinx-autobuild
