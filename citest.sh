@@ -34,7 +34,8 @@ if [[ $REBUILD == "on" ]]; then
 else
   cd doc
   touch concepts.py
-  make concepts_nb.ipynb
+  # make concepts_nb.ipynb
+  cd ..
 fi
 ${DUNECONTROL} --current make doc
 # git commit -a -m "nightly build"
