@@ -28,7 +28,7 @@ ubuntu-20.04-clang-10-17:
   script:
     - cd $CI_PROJECT_DIR
     - ./citest.sh
-    - 'curl --header "JOB-TOKEN: $CI_JOB_TOKEN" --upload-file $CI_PROJECT_DIR/doc.tar.gz $REGURL/tutorials/0.0.1/tutorial.tar.gz"'
+    - 'curl --header "JOB-TOKEN: $CI_JOB_TOKEN" --upload-file $CI_PROJECT_DIR/doc.tar.gz $REGURL/tutorials/0.0.1/tutorial.tar.gz'
   variables:
     # bug in CI clang-10-17 and clang-10-20 are mixed up
     DUNECI_TOOLCHAIN: clang-10-20
