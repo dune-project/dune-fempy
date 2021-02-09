@@ -11,6 +11,10 @@ cd /duneci/modules
 ./dune-common/bin/setup-dunepy.py
 cd $CI_PROJECT_DIR
 
+echo "*******************************"
+pip list
+echo "*******************************"
+
 parallel_opts=
 if [[ -v DUNECI_PARALLEL ]]; then
   echo "Parallel run with ${DUNECI_PARALLEL} processes"
