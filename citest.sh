@@ -39,3 +39,4 @@ fi
 ${DUNECONTROL} --current make doc
 # git commit -a -m "nightly build"
 # git push
+tar cvzf doc.tar.gz doc
