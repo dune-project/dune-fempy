@@ -37,7 +37,7 @@ pip2pi packages importlib-metadata typing-extensions
 # with specific lower version
 pip2pi packages Pygments==2.7.3
 pip2pi packages jupyterlab-pygments==0.1.2
-pip2pi packages fenics-ufl # UFL==2017.1.0
+pip2pi packages fenics-ufl
 pip2pi packages \
   apidoc\
   gmsh\
@@ -57,7 +57,9 @@ pip2pi packages \
   sphinxcontrib-bibtex\
   triangle\
   wheel\
-  x3d
+  x3d\
+  petsc4py\
+  pygmsh
 
 
 # Upload all the packages
