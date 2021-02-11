@@ -6,9 +6,6 @@ DUNECONTROL=dunecontrol
 
 pip install -i https://gitlab.dune-project.org/api/v4/projects/812/packages/pypi/simple --no-build-isolation wheel
 pip install -i https://gitlab.dune-project.org/api/v4/projects/812/packages/pypi/simple --no-build-isolation --upgrade Pygments
-# gmsh
-# pygmsh
-# pip install -i https://gitlab.dune-project.org/api/v4/projects/812/packages/pypi/simple --no-build-isolation gmsh
 pip install -i https://gitlab.dune-project.org/api/v4/projects/812/packages/pypi/simple --no-build-isolation -r reqCI.txt
 cd /duneci/modules
 ./dune-common/bin/setup-dunepy.py

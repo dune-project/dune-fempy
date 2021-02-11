@@ -1,13 +1,4 @@
-Pygments==2.7.3
-jupyterlab-pygments==0.1.2
-fenics-ufl
-apidoc
-ipython
-jinja2
-jupyter
-mayavi
 nbsphinx
-portalocker
 pandas
 pandoc
 pyqt5
@@ -16,7 +7,8 @@ sphinx-autobuild
 sphinx_rtd_theme
 sphinxcontrib-bibtex
 triangle
-wheel
+fenics-ufl
+mayavi
 x3d
 petsc4py
 pygmsh
