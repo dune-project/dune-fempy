@@ -38,6 +38,7 @@ else
   cd ..
 fi
 ${DUNECONTROL} --current make doc
-# git commit -a -m "nightly build"
-# git push
-tar cvzf doc.tar.gz doc
+if [[ $REBUILD == "on" ]]; then
+  tar cvzf doc.tar.gz doc
+  curl --header "JOB-TOKEN: $CI_JOB_TOKEN" --upload-file $CI_PROJECT_DIR/doc.tar.gz $REGURL/tutorials/0.0.1/tutorial.tar.gz
+fi
