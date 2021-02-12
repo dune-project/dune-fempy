@@ -8,7 +8,7 @@ pip install -i https://gitlab.dune-project.org/api/v4/projects/812/packages/pypi
 pip install -i https://gitlab.dune-project.org/api/v4/projects/812/packages/pypi/simple --no-build-isolation --upgrade Pygments
 pip install -i https://gitlab.dune-project.org/api/v4/projects/812/packages/pypi/simple --no-build-isolation -r reqCI.txt
 # check including portalocker
-pip install -i https://gitlab.dune-project.org/api/v4/projects/812/packages/pypi/simple --no-build-isolation portalocker
+# pip install -i https://gitlab.dune-project.org/api/v4/projects/812/packages/pypi/simple --no-build-isolation portalocker
 cd /duneci/modules
 ./dune-common/bin/setup-dunepy.py
 cd $CI_PROJECT_DIR
