@@ -27,6 +27,7 @@ ubuntu-20.04-clang-10-17:
   image: registry.dune-project.org/docker/ci/ubuntu:20.04
   script:
     - cd $CI_PROJECT_DIR
+    - source /duneci/modules/dune-env/bin/activate
     - ./citest.sh
   variables:
     # bug in CI clang-10-17 and clang-10-20 are mixed up
