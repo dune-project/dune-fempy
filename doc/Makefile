@@ -16,7 +16,7 @@ NBS = spiral_nb.ipynb uzawa-scipy_nb.ipynb elasticity_nb.ipynb wave_nb.ipynb \
 
 # .EXPORT_ALL_VARIABLES:
 
-unexport DUNE_LOG_LEVEL
+export DUNE_LOG_LEVEL=WARNING
 
 all: $(NBS) $(FIGURES)
 
