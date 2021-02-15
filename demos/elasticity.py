@@ -47,7 +47,7 @@ g = 9.8
 # Next we define the strain and stress
 # \begin{align*}
 # \epsilon(u) &= \frac{1}{2}(\nabla u + \nabla u^T) \\
-# \sigma(u)   &= 2\mu\epsilon + \lambda\nabla\cdot u I
+# \sigma(u)   &= 2\mu\epsilon(u) + \lambda\nabla\cdot u I
 # \end{align*}
 # where $I$ is the identity matrix.
 
