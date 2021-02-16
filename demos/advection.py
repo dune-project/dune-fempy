@@ -44,39 +44,55 @@ n    = FacetNormal(space)
 he   = avg( CellVolume(space) ) / FacetArea(space)
 hbnd = CellVolume(space) / FacetArea(space)
 x    = SpatialCoordinate(space)
-time = Constant(0., "time")
+t  = Constant(0., "time")
 dt = Constant(0.001,"dt")
+
+
+center  = as_vector([ 0.5,0.5 ])
+x0 = x[0] - center[0]
+x1 = x[1] - center[1]
+
+ux = -4.0*x1
+uy =  4.0*x0
 
 # diffusion factor
 eps = Constant(0.0,"eps")
-# transport direction and upwind flux
-b    = as_vector([1,1])
 
-#hatb = avg(u) + 1/2 * jump(u)
+# transport direction and upwind flux
+b    = as_vector([ux,uy])
+
+def u0(x,t):
+    sig2 = 0.004
+    if eps is None:
+        sig2PlusDt4 = sig2
+    else:
+        sig2PlusDt4 = sig2+(4.0*eps*t)
+    xq = ( x0*cos(4.0*t) + x1*sin(4.0*t)) + 0.25
+    yq = (-x0*sin(4.0*t) + x1*cos(4.0*t))
+    return (sig2/ (sig2PlusDt4) ) * exp (-( xq*xq + yq*yq ) / sig2PlusDt4 )
+
+# upwind (same as LLF in this case)
 hatb = (dot(b, n) + abs(dot(b, n)))/2.0
 flux = hatb*u
+
 #hatb = conditional( dot(b, n) < 0, dot(b, n), 0 )
 # boundary values (for left/right boundary)
 dD   = 1 # conditional((1+x[0])*(1-x[0])<1e-10,1,0)
 g    = 0 # conditional(x[0]<0,atan(10*x[1]),0)
-eps = None
-center  = as_vector([ 0.0,0.0 ])
 
 aInternal     = dot(- b*u, grad(v)) * dx
-advSkeleton   = jump(flux)*jump(v)*dS
-# advSkeleton  += flux*v*ds
+advSkeleton   = jump(flux)*jump(v) * dS
+advSkeleton  += flux*v*ds
 
-xt = x - time*b
-exact = conditional( dot(xt,xt) < 0.05, 1, 0 )
-exactFct =  uflFunction(gridView, name="exact", order=1, ufl=exact)
+exact = uflFunction(gridView, name="exact", order=1, ufl=u0(x,t))
 
-uh = space.interpolate( exactFct, name="solution")
+uh = space.interpolate( exact, name="solution")
 uh_n = uh.copy()
 uh_old = uh.copy()
 
 # time derivative
-explicit = False
-endTime = 2
+explicit = True
+endTime = 0.5
 form  = dt * (aInternal + advSkeleton)
 if explicit:
     form -= inner(u, v ) * dx
@@ -91,27 +107,34 @@ scheme = molScheme(form==0, solver="gmres",
                                "newton.tolerance":1e-4
                               })
 
+#scheme = molScheme(form==0, solver="gmres",
+#                   parameters={"newton.linear.preconditioning.method":"jacobi",
+#                               "newton.verbose":False,
+#                               "newton.linear.verbose":False,
+#                               "newton.tolerance":1e-4
+#                              })
+
 # <markdowncell>
 # <codecell>
 
 error0 = 0.
 eoc = 0
 for i in range(2):
-    time.value = 0.
+    t.value = 0.
     uh.interpolate( exact )
     uh.plot()
     gridView.writeVTK("adv",number=0,celldata=[uh])
-    while time.value < endTime:
+    while t.value < endTime:
         uh_n.assign( uh )
         if explicit:
             scheme(uh_n, uh )
         else:
             scheme.solve(target=uh)
-        time.value += dt.value
+        t.value += dt.value
 
     uh.plot()
     gridView.writeVTK("adv",number=1,celldata=[uh])
-    error1= math.sqrt( integrate(gridView,dot(uh-exactFct,uh-exactFct),order=2))
+    error1= math.sqrt( integrate(gridView,dot(uh-exact,uh-exact),order=2))
     if i > 0:
         eoc = [ math.log(error1/error0) / math.log(0.5) ]
     print(i,error1, eoc)
