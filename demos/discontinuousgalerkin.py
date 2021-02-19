@@ -42,7 +42,7 @@ hatb = (dot(b, n) + abs(dot(b, n)))/2.0
 dD   = conditional((1+x[0])*(1-x[0])<1e-10,1,0)
 g    = conditional(x[0]<0,atan(10*x[1]),0)
 # penalty parameter
-beta = 1 if order == 0 else 10*space.order**2
+beta = 1 if space.order == 0 else 10*space.order**2
 
 def Grad( z ):
     if order == 0:

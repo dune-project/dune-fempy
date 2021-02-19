@@ -32,12 +32,36 @@ from ufl import dx, ds, grad, div, grad, dot, inner, sqrt, exp, conditional, sin
 from ufl import as_vector, as_tensor, avg, jump, dS, CellVolume, FacetArea, atan
 from dune.femdg.rk import ssp3
 
+Stepper = ssp3(4)
+
+class MolOp:
+    def __init__(self,form,space,cfl=0.45):
+        self._op = molGalerkin( form )
+        self.cfl = cfl
+        self.space = space
+        self.localTimeStepEstimate = [dt.value/self.cfl]
+    def __call__(self,u,v):
+        self._op(u,v)
+        self.localTimeStepEstimate = [dt.value/self.cfl]
+        return
+    def stepTime(self,t0, dt0):
+        # set time to model time if available
+        # since time is not in the form we don't need this here
+        pass
+        #if hasattr(self._op.model,"time"):
+        #    print("Model has time")
+        #elif hasattr(self._op.model,"t"):
+        #    print("Model has t")
+
+    def applyLimiter(self, u):
+        pass
+
 parameter.append({"fem.verboserank": 0})
 
 domain = (reader.dgf, "periodic2.dgf")
 #gridView = leafGridView([0, 0], [1, 1], [20, 20])
 gridView = leafGridView(domain, dimgrid=2 )
-space    = dgSpace(gridView, order=2, storage="istl")
+space    = dgSpace(gridView, order=2, storage="fem")
 #space  = fvSpace(gridView)
 
 u    = TrialFunction(space)
@@ -58,7 +82,7 @@ ux = -4.0*x1
 uy =  4.0*x0
 
 # diffusion factor
-epsilon = 0.0
+epsilon = 0.001
 
 # transport direction and upwind flux
 b =  as_vector([ux,uy])
@@ -73,20 +97,12 @@ def u0(x,t):
 # upwind (same as LLF in this case)
 hatb = (dot(b, n) + abs(dot(b, n)))/2.0
 
-# advective flux
-#def F_c(U):
-#    return as_tensor([[ *(b*U) ]])
-
-#def LLF(ul, ur, n):
-#    return 0.5*(dot(b,n)*ul + dot(b,n)*ur) - 0.5*dot(b,n)*(ur - ul)
-
 # boundary values (for left/right boundary)
 dD   = 1 # conditional((1+x[0])*(1-x[0])<1e-10,1,0)
 g    = 0 # conditional(x[0]<0,atan(10*x[1]),0)
 
 # diffusion factor
 eps = Constant(epsilon,"eps")
-# transport direction and upwind flux
 # characteristic function for left/right boundary
 dD   = 1
 # conditional((1+x[0])*(1-x[0])<1e-10,1,0)
@@ -101,59 +117,35 @@ diffSkeleton  = eps*dot(avg(grad(v)),jump(u,n))*dS \
 diffSkeleton -= eps*beta/hbnd*(u-exact)*v*dD*ds -\
                 eps*dot(grad(exact),n)*v*dD*ds
 advSkeleton   = jump(hatb*u)*jump(v)*dS
-advSkeleton  += ( hatb*u + (dot(b,n)-hatb)*exact )*v*ds
+advSkeleton  += hatb*u*v*ds
 
-form          = aInternal + advSkeleton - diffSkeleton
+# minus since we are solving d_t u = L[u]
+# which leads in the simplest form to
+# unew = uold + dt * L[uold]
+# However, in dune-fem we assume that L is on the left hand side
+# therefore we implement -L[u]
+form = -(aInternal + advSkeleton)
+if abs(epsilon) > 1e-12:
+    form += diffSkeleton
+
+op = MolOp(form,space,cfl=0.25)
+stepper = Stepper(op, cfl=op.cfl)
 
 uh = space.interpolate( exact, name="solution")
 uh_n = uh.copy()
 
 # time derivative
-explicit = False
+explicit = True
 endTime = 0.75
 if not explicit:
-    form += inner(u - uh_n, v)/dt * dx
-else:
-    form -= inner(u, v)/dt * dx
-
-scheme = scheme(form==0, solver="gmres",
-                parameters={"newton.linear.preconditioning.method":"ilu",
-                            "newton.verbose":False,
-                            "newton.linear.verbose":False,
-                            "newton.linear.tolerance": 1e-12,
-                            "newton.tolerance":1e-8
-                           })
-
-mop = molGalerkin( form==0 )
-
-Stepper = ssp3(4)
-
-class MolOp:
-    def __init__(self,form,space):
-        self._op=molGalerkin( form==0 )
-        self.space = space
-        self.localTimeStepEstimate = [0.001]
-    def __call__(self,u,v):
-        self._op(u,v)
-        return
-    def stepTime(self,t0, dt0):
-        if hasattr(self._op.model,"time"):
-            print("Model has time")
-        elif hasattr(self._op.model,"t"):
-            print("Model has t")
-
-    def applyLimiter(self, u):
-        pass
-
-op = MolOp(form,space)
-stepper = Stepper(op, 0.5)
-
-#scheme = molScheme(form==0, solver="gmres",
-#                   parameters={"newton.linear.preconditioning.method":"jacobi",
-#                               "newton.verbose":False,
-#                               "newton.linear.verbose":False,
-#                               "newton.tolerance":1e-4
-#                              })
+    form -= inner(u - uh_n, v)/dt * dx
+    scheme = scheme(form==0, solver="gmres",
+                    parameters={"newton.linear.preconditioning.method":"jacobi",
+                                "newton.verbose":False,
+                                "newton.linear.verbose":False,
+                                "newton.linear.tolerance": 1e-12,
+                                "newton.tolerance":1e-8
+                               })
 
 # <markdowncell>
 # <codecell>
@@ -166,11 +158,10 @@ for i in range(2):
     uh.plot()
     gridView.writeVTK("adv",number=0,celldata=[uh],pointdata=[uh,exact])
     while time.value < endTime:
-        uh_n.assign( uh )
         if explicit:
-            stepper( uh )
-            #mop( uh_n, uh )
+            stepper( uh, dt.value )
         else:
+            uh_n.assign( uh )
             scheme.solve(target=uh)
         time.value += dt.value
 
