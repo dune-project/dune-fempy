@@ -10,7 +10,7 @@
 # constant and $b$ a given vector.
 # <codecell>
 
-import numpy, math
+import numpy
 import matplotlib
 matplotlib.rc( 'image', cmap='jet' )
 from matplotlib import pyplot
@@ -22,13 +22,15 @@ from dune.grid import reader
 from dune.fem import parameter
 from dune.fem.space import dglegendre as dgSpace
 from dune.fem.space import finiteVolume as fvSpace
-from dune.fem.scheme import molGalerkin as molScheme
-from dune.fem.scheme import galerkin as galerkinScheme
+from dune.fem.operator import molGalerkin as molGalerkin
+#from dune.fem.scheme import galerkin as galerkinScheme
+from dune.fem.scheme import molGalerkin as scheme
 from dune.fem.function import uflFunction, integrate
 from dune.ufl import Constant
 from ufl import TestFunction, TrialFunction, SpatialCoordinate, triangle, FacetNormal
 from ufl import dx, ds, grad, div, grad, dot, inner, sqrt, exp, conditional, sin, cos
 from ufl import as_vector, avg, jump, dS, CellVolume, FacetArea, atan
+from dune.femdg.rk import ssp3
 
 parameter.append({"fem.verboserank": 0})
 
@@ -63,10 +65,7 @@ b    = as_vector([ux,uy])
 
 def u0(x,t):
     sig2 = 0.004
-    if eps is None:
-        sig2PlusDt4 = sig2
-    else:
-        sig2PlusDt4 = sig2+(4.0*eps*t)
+    sig2PlusDt4 = sig2+(4.0*eps*t)
     xq = ( x0*cos(4.0*t) + x1*sin(4.0*t)) + 0.25
     yq = (-x0*sin(4.0*t) + x1*cos(4.0*t))
     return (sig2/ (sig2PlusDt4) ) * exp (-( xq*xq + yq*yq ) / sig2PlusDt4 )
@@ -83,36 +82,50 @@ g    = 0 # conditional(x[0]<0,atan(10*x[1]),0)
 aInternal     = dot(- b*u, grad(v)) * dx
 advSkeleton   = jump(flux)*jump(v) * dS
 advSkeleton  += flux*v*ds
+form  = -(aInternal + advSkeleton)
 
-exact = uflFunction(gridView, name="exact", order=1, ufl=u0(x,t))
+exact = uflFunction(gridView, name="exact", order=3, ufl=u0(x,t))
 
 uh = space.interpolate( exact, name="solution")
 uh_n = uh.copy()
-uh_old = uh.copy()
+update = uh.copy()
 
 # time derivative
 explicit = True
-endTime = 0.5
-form  = dt * (aInternal + advSkeleton)
-if explicit:
-    form -= inner(u, v ) * dx
-    # form += inner(uh_n - u, v) * dx
-else:
-    form += inner(u - uh_n, v) * dx
+endTime = 0.75
+if not explicit:
+    form -= inner(u - uh_n, v)/dt * dx
 
-scheme = molScheme(form==0, solver="gmres",
-                   parameters={"newton.linear.preconditioning.method":"jacobi",
-                               "newton.verbose":False,
-                               "newton.linear.verbose":False,
-                               "newton.tolerance":1e-4
-                              })
+scheme = scheme(form==0, solver="gmres",
+                parameters={"newton.linear.preconditioning.method":"jacobi",
+                            "newton.verbose":False,
+                            "newton.linear.verbose":False,
+                            "newton.tolerance":1e-4
+                           })
 
-#scheme = molScheme(form==0, solver="gmres",
-#                   parameters={"newton.linear.preconditioning.method":"jacobi",
-#                               "newton.verbose":False,
-#                               "newton.linear.verbose":False,
-#                               "newton.tolerance":1e-4
-#                              })
+Stepper = ssp3(4)
+
+class MolOp:
+    def __init__(self,form,space,cfl=0.45):
+        self._op = molGalerkin( form )
+        self.cfl = cfl
+        self.space = space
+        self.localTimeStepEstimate = [dt.value/self.cfl]
+    def __call__(self,u,v):
+        self._op(u,v)
+        self.localTimeStepEstimate = [dt.value/self.cfl]
+        return
+    def stepTime(self,t0, dt0):
+        if hasattr(self._op.model,"time"):
+            print("Model has time")
+        elif hasattr(self._op.model,"t"):
+            print("Model has t")
+
+    def applyLimiter(self, u):
+        pass
+
+op = MolOp(form,space,cfl=0.25)
+stepper = Stepper(op, cfl=op.cfl)
 
 # <markdowncell>
 # <codecell>
@@ -127,16 +140,17 @@ for i in range(2):
     while t.value < endTime:
         uh_n.assign( uh )
         if explicit:
-            scheme(uh_n, uh )
+            # call stepper with fixed dt
+            stepper( uh, dt.value )
         else:
             scheme.solve(target=uh)
         t.value += dt.value
 
     uh.plot()
     gridView.writeVTK("adv",number=1,celldata=[uh])
-    error1= math.sqrt( integrate(gridView,dot(uh-exact,uh-exact),order=2))
+    error1= numpy.sqrt( integrate(gridView,dot(uh-exact,uh-exact),order=6))
     if i > 0:
-        eoc = [ math.log(error1/error0) / math.log(0.5) ]
+        eoc = [ numpy.log(error1/error0) / numpy.log(0.5) ]
     print(i,error1, eoc)
     error0 = error1
     gridView.hierarchicalGrid.globalRefine(1)
