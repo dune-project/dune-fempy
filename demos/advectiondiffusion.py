@@ -15,6 +15,7 @@ import matplotlib
 matplotlib.rc( 'image', cmap='jet' )
 from matplotlib import pyplot
 #from dune.grid import structuredGrid as leafGridView
+from dune.grid import cartesianDomain
 from dune.alugrid import aluCubeGrid as leafGridView
 #from dune.alugrid import aluSimplexGrid as leafGridView
 from dune.common import FieldVector
@@ -32,11 +33,15 @@ from ufl import dx, ds, grad, div, grad, dot, inner, sqrt, exp, conditional, sin
 from ufl import as_vector, as_tensor, avg, jump, dS, CellVolume, FacetArea, atan
 from dune.femdg.rk import ssp3
 
-Stepper = ssp3(4)
+explicit = True
+#explicit = False
+Stepper = ssp3(4,explicit=explicit)
 
 class MolOp:
     def __init__(self,form,space,cfl=0.45):
-        self._op = molGalerkin( form )
+        #self._op = molGalerkin( form )
+        # bug fix for Lea (otherwise update dune-fem)
+        self._op = scheme( form==0 )
         self.cfl = cfl
         self.space = space
         self.localTimeStepEstimate = [dt.value/self.cfl]
@@ -58,8 +63,8 @@ class MolOp:
 
 parameter.append({"fem.verboserank": 0})
 
-domain = (reader.dgf, "periodic2.dgf")
-#gridView = leafGridView([0, 0], [1, 1], [20, 20])
+#domain = (reader.dgf, "periodic2.dgf")
+domain = cartesianDomain([0, 0], [1, 1], [20, 20])
 gridView = leafGridView(domain, dimgrid=2 )
 space    = dgSpace(gridView, order=2, storage="fem")
 #space  = fvSpace(gridView)
@@ -135,17 +140,17 @@ uh = space.interpolate( exact, name="solution")
 uh_n = uh.copy()
 
 # time derivative
-explicit = True
 endTime = 0.75
-if not explicit:
-    form -= inner(u - uh_n, v)/dt * dx
-    scheme = scheme(form==0, solver="gmres",
-                    parameters={"newton.linear.preconditioning.method":"jacobi",
-                                "newton.verbose":False,
-                                "newton.linear.verbose":False,
-                                "newton.linear.tolerance": 1e-12,
-                                "newton.tolerance":1e-8
-                               })
+# simple implicit euler
+#if not explicit:
+#    form -= inner(u - uh_n, v)/dt * dx
+#    scheme = scheme(form==0, solver="gmres",
+#                    parameters={"newton.linear.preconditioning.method":"jacobi",
+#                                "newton.verbose":False,
+#                                "newton.linear.verbose":False,
+#                                "newton.linear.tolerance": 1e-12,
+#                                "newton.tolerance":1e-8
+#                               })
 
 # <markdowncell>
 # <codecell>
@@ -158,12 +163,12 @@ for i in range(2):
     uh.plot()
     gridView.writeVTK("adv",number=0,celldata=[uh],pointdata=[uh,exact])
     while time.value < endTime:
-        if explicit:
-            stepper( uh, dt.value )
-        else:
-            uh_n.assign( uh )
-            scheme.solve(target=uh)
+        stepper( uh, dt.value )
+        #else:
+        #    uh_n.assign( uh )
+        #    scheme.solve(target=uh)
         time.value += dt.value
+        print(f"time = {time.value}, dt = {dt.value}")
 
     gridView.writeVTK("adv",number=1,celldata=[uh],pointdata=[uh,exact])
     error1= numpy.sqrt( integrate(gridView,dot(uh-exact,uh-exact),order=6))
