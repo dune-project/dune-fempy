@@ -14,7 +14,7 @@ before_script:
   - python3 -m venv --system-site-packages /duneci/modules/dune-env
   - source /duneci/modules/dune-env/bin/activate
   - source /duneci/bin/duneci-init-job
-  - duneci-install-module -b features/combinedPythonMRs https://gitlab.dune-project.org/core/dune-common.git
+  - duneci-install-module https://gitlab.dune-project.org/core/dune-common.git
   - duneci-install-module https://gitlab.dune-project.org/core/dune-geometry.git
   - duneci-install-module https://gitlab.dune-project.org/core/dune-grid.git
   - duneci-install-module https://gitlab.dune-project.org/core/dune-istl.git
