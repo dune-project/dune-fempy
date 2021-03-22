@@ -1,4 +1,4 @@
-# <markdowncell>
+# %% [markdown]
 # # Discontinuous Galerkin Methods
 # So far we have been using Lagrange spaces of different order to solve our
 # PDE. In the following we show how to use Discontinuous Galerkin method to
@@ -8,7 +8,7 @@
 # \end{align*}
 # with Dirichlet boundary conditions. Here $\varepsilon$ is a small
 # constant and $b$ a given vector.
-# <codecell>
+# %%
 
 import numpy, math
 import dune.plotting
@@ -62,20 +62,20 @@ uh = space.interpolate(0, name="solution")
 scheme.solve(target=uh)
 uh.plot()
 
-# <markdowncell>
+# %% [markdown]
 # So far the example was not really advection dominated so we now
 # repeat the experiment but set $\varepsilon=1e-5$
-# <codecell>
+# %%
 
 eps.value = 1e-5 # could also use scheme.model.eps = 1e-5
 scheme.solve(target=uh)
 uh.plot()
 
-# <markdowncell>
+# %% [markdown]
 # # A 3D Example Using a GMesh File
 # In this example we use pygmsh to construct a tetrahedral mesh and olve a
 # simple laplace problem
-# <codecell>
+# %%
 
 # The following code is taken from the `pygmsh` homepage
 from dune.fem.space import lagrange as solutionSpace
@@ -113,13 +113,13 @@ scheme3d.solve(target=uh3d)
 # note: plotting with matplotlib not yet available for 3d grids
 gridView3d.writeVTK('3dexample', pointdata=[uh3d])
 
-# <markdowncell>
+# %% [markdown]
 # ![3d laplace problem](figures/3dexample.png)
-# <codecell>
+# %%
 
-# <markdowncell>
+# %% [markdown]
 # # We Can Also Do 1D
-# <codecell>
+# %%
 
 from dune.grid import onedGrid
 from ufl import sin

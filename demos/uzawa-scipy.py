@@ -1,6 +1,6 @@
-# <markdowncell>
+# %% [markdown]
 # # Saddle Point Solver (using Scipy)
-# <codecell>
+# %%
 import matplotlib
 matplotlib.rc( 'image', cmap='jet' )
 from matplotlib import pyplot
@@ -111,9 +111,9 @@ for m in range(100):
     gamma = delta/oldDelta
     d *= gamma
     d += r
-# <markdowncell>
+# %% [markdown]
 # Now we can easily plot the velocity magnitude and pressure
-# <codecell>
+# %%
 fig = pyplot.figure(figsize=(20,10))
 velocity.plot(colorbar="horizontal", figure=(fig, 121))
 pressure.plot(colorbar="horizontal", figure=(fig, 122))

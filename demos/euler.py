@@ -1,6 +1,6 @@
-# <markdowncell>
+# %% [markdown]
 # # Euler System of Gas Dynamics
-# <codecell>
+# %%
 
 import math, numpy
 import matplotlib
@@ -19,9 +19,9 @@ def getSpace( gv, order ):
     return finiteVolume( gridView, dimRange=4 ) if order==0 else\
            dgonb( gridView, dimRange=4, order=order )
 
-# <markdowncell>
+# %% [markdown]
 # Basic model for hyperbolic conservation law
-# <codecell>
+# %%
 class Model:
     gamma = 1.4
     # helper function
@@ -48,9 +48,9 @@ class Model:
         rho, v, p = Model.toPrim(U)
         return abs(dot(v,n)) + sqrt(Model.gamma*p/rho)
 
-# <markdowncell>
+# %% [markdown]
 # Add methods for limiting
-# <codecell>
+# %%
 def velocity(t,x,U):
     _, v ,_ = Model.toPrim(U)
     return v
@@ -65,9 +65,9 @@ Model.velocity = velocity
 Model.physical = physical
 Model.jump     = jump
 
-# <markdowncell>
+# %% [markdown]
 # Method to evolve the solution in time
-# <codecell>
+# %%
 def evolve(space, u_h, limiter="MinMod"):
     lu_h = u_h.localFunction()
     @gridFunction(space.grid,name="rho",order=space.order)
@@ -102,9 +102,9 @@ def evolve(space, u_h, limiter="MinMod"):
     # pyplot.show()
     return res
 
-# <markdowncell>
+# %% [markdown]
 # A radial Rieman problem
-# <codecell>
+# %%
 x = SpatialCoordinate(triangle)
 initial = conditional(dot(x,x)<0.1,as_vector([1,0,0,2.5]),
                                    as_vector([0.125,0,0,0.25]))
@@ -153,9 +153,9 @@ print("Dual grid without limiter", flush=True)
 u_h   = space.interpolate( initial, name="solution")
 res  += [evolve(space,u_h,limiter=None)]
 
-# <markdowncell>
+# %% [markdown]
 # Solutions along the diagonal
-# <codecell>
+# %%
 color = ['tab:blue', 'tab:orange', 'tab:green', 'tab:red']
 fig, ax = pyplot.subplots()
 ax.scatter(res[0][0],res[0][1], color=color[0], label='simplex (minmode)')

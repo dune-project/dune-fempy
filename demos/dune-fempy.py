@@ -1,4 +1,4 @@
-# <markdowncell>
+# %% [markdown]
 # # Setting up and Solving the Problem
 # Now we can set up our PDE model
 # As an example we will study the Forchheimer problem
@@ -31,8 +31,8 @@
 # \begin{align*}
 # u(x,t) = e^{-2t}\left(\frac{1}{2}(x^2 + y^2) - \frac{1}{3}(x^3 - y^3)\right) + 1
 # \end{align*}
-# <codecell>
 
+# %%
 import matplotlib
 matplotlib.rc( 'image', cmap='jet' )
 import math, sys, io
@@ -71,23 +71,23 @@ g = lambda s: K(exact(s))*grad(exact(s))
 n = FacetNormal(space)
 b = 0.5*(f(t)+f(t+dt))*v*dx + 0.5*dot(g(t)+g(t+dt),n)*v*ds
 
-# <markdowncell>
+# %% [markdown]
 # With the model described as a ufl form, we can construct a scheme class
 # that provides the solve method which we can use to evolve the solution from
 # one time step to the next:
-# <codecell>
 
+# %%
 scheme = solutionScheme(a == b, solver='cg')
 
-# <markdowncell>
+# %% [markdown]
 # Optionally, we may want to increase the default quadrature orders which are
 # '2 * space.order' for element integrals and '2 * space.order + 1' for surface
 # integrals. Depending on the data this might not be enough. Then we simply
 # set the integration orders by hand like in the following example, by calling
 # the method setQuadratureOrders(interiorOrder, surfaceOrder).
-# <codecell>
-#scheme.setQuadratureOrders( 2*space.order, 2*space.order+1 )
 
+# %%
+#scheme.setQuadratureOrders( 2*space.order, 2*space.order+1 )
 scheme.model.dt = 0.005
 
 def evolve(scheme, u_h, u_h_n, endTime):
@@ -98,13 +98,14 @@ def evolve(scheme, u_h, u_h_n, endTime):
         scheme.solve(target=u_h)
         time += scheme.model.dt
 
-# <markdowncell>
+# %% [markdown]
 # Since we have forced the system towards a given solution, we can compute
 # the discretization error. First we define ufl expressions for the $L^2$
 # and $H^1$ norms and will use those to compute the experimental order of
 # convergence of the scheme by computing the time evolution on different grid
 # levels. We first reset the grid to start computing on the coarsest level:
-# <codecell>
+
+# %%
 endTime    = 0.25
 exact_end  = exact(endTime)
 l2error = uflFunction(gridView, name="l2error", order=u_h.space.order, ufl=dot(u_h - exact_end, u_h - exact_end))
@@ -132,7 +133,7 @@ for eocLoop in range(loops):
         gridView.hierarchicalGrid.globalRefine(1)
         scheme.model.dt /= 2
 
-# <markdowncell>
+# %% [markdown]
 # # Alternate Solve Methods (Scipy and Petsc)
 # Here we look at different ways of solving PDEs using external
 # packages and python functionality.
@@ -149,9 +150,8 @@ for eocLoop in range(loops):
 # for the other storages, i.e., `as_istl,as_petsc`. The same methods are
 # also available to retrieve the underlying matrix structures of linear
 # operators.
-# <codecell>
 
-# <markdowncell>
+# %% [markdown]
 # ## Using Scipy
 # We implement a simple Newton Krylov solver using a linear solver from
 # Scipy. We can use the `as_numpy` method to access the degrees of freedom as
@@ -159,8 +159,8 @@ for eocLoop in range(loops):
 # and changes to the dofs made on the python side are automatically carried
 # over to the C++ side.
 # from Scipy.
-# <codecell>
 
+# %%
 from dune.fem.operator import linear as linearOperator
 import numpy as np
 from scipy.sparse.linalg import spsolve as solver
@@ -196,10 +196,10 @@ error = u_h - exact_end
 print("Forchheimer(numpy) size: ", gridView.size(0), "L^2, H^1 error:",'{:0.5e}, {:0.5e}'.format(
   *[ sqrt(e) for e in integrate(gridView,[error**2,inner(grad(error),grad(error))], order=5) ]))
 
-# <markdowncell>
+# %% [markdown]
 # Using a non linear solver from the Scipy package
-# <codecell>
 
+# %%
 from scipy.optimize import newton_krylov
 from scipy.sparse.linalg import LinearOperator
 from scipy.sparse.linalg import cg as solver
@@ -247,12 +247,12 @@ error = u_h - exact_end
 print("Forchheimer(scipy) size: ", gridView.size(0), "L^2, H^1 error:",'{:0.5e}, {:0.5e}'.format(
   *[ sqrt(e) for e in integrate(gridView,[error**2,inner(grad(error),grad(error))], order=5) ]))
 
-# <markdowncell>
+# %% [markdown]
 # ## Using Petsc and Petsc4Py
 # Switching to a storage based on the PETSc solver package and solving the
 # system using the dune-fem bindings
-# <codecell>
 
+# %%
 from dune.generator import ConfigurationError
 try:
     import petsc4py
@@ -281,11 +281,13 @@ else:
     spacePetsc = None
     pass
 
-# <markdowncell>
+# %% [markdown]
 # Implementing a Newton Krylov solver using the binding provided by petsc4py
-# <codecell>
 
-if petsc4py is not None and spacePetsc is not None:
+# __Note__: this is not working at the moment!
+
+# %%
+if 0: # petsc4py is not None and spacePetsc is not None:
     class Scheme3:
       def __init__(self, scheme):
           self.model = scheme.model
@@ -320,11 +322,12 @@ if petsc4py is not None and spacePetsc is not None:
     print("Forchheimer(petsc) size: ", gridView.size(0), "L^2, H^1 error:",'{:0.5e}, {:0.5e}'.format(
       *[ sqrt(e) for e in integrate(gridView,[error**2,inner(grad(error),grad(error))], order=5) ]))
 
-# <markdowncell>
+# %% [markdown]
 # Using the petsc4py bindings for the non linear KSP solvers from PETSc
-# <codecell>
+# __Note__: this is not working at the moment!
 
-if petsc4py is not None and spacePetsc is not None:
+# %%
+if 0: # petsc4py is not None and spacePetsc is not None:
     class Scheme4:
         def __init__(self, scheme):
             self.model = scheme.model
@@ -361,7 +364,7 @@ if petsc4py is not None and spacePetsc is not None:
     print("Forchheimer(petsc4py) size: ", gridView.size(0), "L^2, H^1 error:",'{:0.5e}, {:0.5e}'.format(
       *[ sqrt(e) for e in integrate(gridView,[error**2,inner(grad(error),grad(error))], order=5) ]))
 
-# <markdowncell>
+# %% [markdown]
 # # More General Boundary Conditions
 # So far we only used natural boundary conditions. Here we discuss how to
 # set Dirichlet boundary conditions and use different conditions for
@@ -381,8 +384,8 @@ if petsc4py is not None and spacePetsc is not None:
 # vector or a list. In the later case a component of `None` can be used to
 # describe components which are not to be constrained by the boundary
 # condition.
-# <codecell>
 
+# %%
 from dune.fem.plotting import plotComponents
 from matplotlib import ticker
 
@@ -403,12 +406,12 @@ vecScheme.solve(target=vec)
 plotComponents(vec, gridLines=None, level=2,
                colorbar={"orientation":"horizontal", "ticks":ticker.MaxNLocator(nbins=4)})
 
-# <markdowncell>
+# %% [markdown]
 # To prescribe $u_2=0$ at the bottom boundary is also straightforward - the
 # Neuman boundary flux added to the right hand side `f` previously will
 # still be used on the top and vertical boundaries:
-# <codecell>
 
+# %%
 bcBottom = DirichletBC(vecSpace,[sin(4*(x[0]+x[1])),0],x[1]<1e-10)
 vecScheme = solutionScheme( [a == f, bc, bcBottom],
         parameters={"newton.linear.tolerance": 1e-9} )
@@ -416,13 +419,13 @@ vecScheme.solve(target=vec)
 plotComponents(vec, gridLines=None, level=2,
                colorbar={"orientation":"horizontal", "ticks":ticker.MaxNLocator(nbins=4)})
 
-# <markdowncell>
+# %% [markdown]
 # We can also use general grid functions (including discrete functions)
 # for the boundary conditions in the same way we could use grid functions
 # anywhere within the UFL forms. So the following code leads to the same
 # results as above:
-# <codecell>
 
+# %%
 test = vec.copy()
 test.clear()
 bc = DirichletBC(vecSpace,[vec[0],None])

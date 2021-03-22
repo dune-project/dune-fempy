@@ -1,4 +1,4 @@
-# <markdowncell>
+# %% [markdown]
 # # Advection-Diffusion: Discontinuous Galerkin Method with Upwinding
 # So far we have been using Lagrange spaces of different order to solve our
 # PDE. In the following we show how to use Discontinuous Galerkin method to
@@ -8,7 +8,7 @@
 # \end{align*}
 # with Dirichlet boundary conditions. Here $\varepsilon$ is a small
 # constant and $b$ a given vector.
-# <codecell>
+# %%
 
 import numpy, math
 import matplotlib
@@ -56,17 +56,17 @@ form          = aInternal + diffSkeleton + advSkeleton
 scheme = solutionScheme(form==0, solver="gmres",
             parameters={"newton.linear.preconditioning.method":"jacobi"})
 
-# <markdowncell>
-# <codecell>
+# %% [markdown]
+# %%
 
 uh = space.interpolate(0, name="solution")
 info = scheme.solve(target=uh)
 uh.plot()
 
-# <markdowncell>
+# %% [markdown]
 # So far the example was not really advection dominated so we now
 # repeat the experiment but set $\varepsilon=1e-5$
-# <codecell>
+# %%
 
 eps.value = 1e-5 # could also use scheme.model.eps = 1e-5
 uh.interpolate(0)

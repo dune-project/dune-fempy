@@ -1,4 +1,4 @@
-# <markdowncell>
+# %% [markdown]
 # # Mean Curvature Flow
 #
 # Mean curvature flow is a specific example of a geometric evolution
@@ -34,7 +34,7 @@
 # time step and $\theta\in[0,1]$ is a discretization parameter.
 # <img src="mcf.gif" style="height:228px;">
 
-# <codecell>
+# %%
 import matplotlib
 matplotlib.rc( 'image', cmap='jet' )
 import math
@@ -48,20 +48,20 @@ from dune.fem.plotting import plotPointData as plot
 import matplotlib.pyplot as pyplot
 
 
-# <markdowncell>
+# %% [markdown]
 # set up polynomial order and radius of reference surface
 
 
-# <codecell>
+# %%
 order = 2
 R0 = 2.
 
 
-# <markdowncell>
+# %% [markdown]
 # We begin by setting up reference domain $\Gamma_0$ (```grid```), and the space on $\Gamma_0$ that describes $\Gamma(t)$ (```space```). From this we interpolate the non-spherical initial surface ```positions```, and, then reconstruct ```space``` for the discrete solution on $\Gamma(t)$.
 
 
-# <codecell>
+# %%
 from dune.fem.view import geometryGridView
 from dune.fem.space import lagrange as solutionSpace
 from dune.alugrid import aluConformGrid as leafGridView
@@ -77,11 +77,11 @@ space = solutionSpace(surface, dimRange=surface.dimWorld, order=order)
 solution = space.interpolate(x, name="solution")
 
 
-# <markdowncell>
+# %% [markdown]
 # We set up the theta scheme with $\theta = 0.5$ (Crank-Nicholson).
 
 
-# <codecell>
+# %%
 from dune.fem.scheme import galerkin as solutionScheme
 theta = 0.5
 I = Identity(3)
@@ -91,10 +91,10 @@ a = (inner(u - x, v) + dt * inner(theta*grad(u) + (1 - theta)*I, grad(v))) * dx
 scheme = solutionScheme(a == 0, space, solver="cg")
 
 
-# <markdowncell>
+# %% [markdown]
 # Now we solve the scheme in time. We first set up the initial time variables, then we plot the initial figure's mesh, and finally we begin the loop, updating ```positions``` on each step and plotting the results side-by-side.
 
-# <codecell>
+# %%
 count = 0
 t = 0.
 end_time = 0.05
@@ -113,10 +113,10 @@ while t < end_time:
         plot(solution, figure=(fig, 131+count%3), colorbar=False,
              gridLines="", triplot=True)
 
-# <markdowncell>
+# %% [markdown]
 # By chosing an initial surface with boundary we can solve the _soap film_
 # problem, i.e., compute the surface of minimum curvature:
-# <codecell>
+# %%
 pyplot.close('all')
 referenceView = leafGridView("soap.dgf", dimgrid=2, dimworld=3)
 referenceView.hierarchicalGrid.globalRefine(8)
@@ -165,13 +165,13 @@ scheme = solutionScheme([form == 0, bc], space, solver="cg",
 nextSaveTime = saveInterval
 count = 0
 
-# <markdowncell>
+# %% [markdown]
 # So far we can only plot x/y coordinates using matplotlib which does not
 # give a good impression of the surface (we use it nevertheless for showing
 # the evolution). To get a 3d view we can use mayavi (and that can even be
 # interactive within a jupyter notebook):
 
-# <codecell>
+# %%
 try:
     from mayavi import mlab
     from mayavi.tools.notebook import display
@@ -188,9 +188,9 @@ except ImportError:
 
 plot3d(uh,2)
 
-# <markdowncell>
+# %% [markdown]
 # Now the time loop
-# <codecell>
+# %%
 
 fig = pyplot.figure(figsize=(50, 10))
 plot(solution, figure=(fig, 151+count), colorbar=False,

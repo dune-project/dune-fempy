@@ -1,11 +1,11 @@
-# <markdowncell>
+# %% [markdown]
 # # Crystal Growth
 # Here we demonstrate crystallisation on the surface of a liquid due to cooling from [@Guyer].
 #
 # Let us first set up the grid and the function space. We use the default DoF storage available in ```dune-fem``` - this can be changed for example to ```istl``` or ```petsc```.
 
 
-# <codecell>
+# %%
 import matplotlib
 matplotlib.rc( 'image', cmap='jet' )
 
@@ -23,7 +23,7 @@ gridView  = adaptiveGridView( leafGridView( domain ) )
 space = solutionSpace(gridView, dimRange=dimRange, order=order, storage="fem")
 
 
-# <markdowncell>
+# %% [markdown]
 # We want to solve the following system of equations of variables $\phi$ (phase field) and $T$ (temperature field)
 #
 # \begin{equation}
@@ -53,7 +53,7 @@ space = solutionSpace(gridView, dimRange=dimRange, order=order, storage="fem")
 # Let us first set up the parameters for the problem.
 
 
-# <codecell>
+# %%
 alpha        = 0.015
 tau          = 3.e-4
 kappa1       = 0.9
@@ -62,11 +62,11 @@ c            = 0.02
 N            = 6.
 
 
-# <markdowncell>
+# %% [markdown]
 # We define the initial data and create a function from it. We use this value to set up our solution.
 
 
-# <codecell>
+# %%
 from dune.fem.function import globalFunction
 from ufl import dot,sqrt,conditional,as_vector, SpatialCoordinate
 x = SpatialCoordinate(space)
@@ -76,11 +76,11 @@ u_h = space.interpolate(initial, name="solution")
 u_h_n = u_h.copy()
 
 
-# <markdowncell>
+# %% [markdown]
 # As we will be discretising in time, we define the unknown data as $u = (\phi_1, \Delta T_1)$, while given data (from the previous time step) is $u_n = (\phi_0, \Delta T_0)$ and test function $v = (v_0, v_1)$.
 
 
-# <codecell>
+# %%
 from ufl import TestFunction, TrialFunction
 from dune.ufl import Constant
 u = TrialFunction(space)
@@ -88,7 +88,7 @@ v = TestFunction(space)
 dt = Constant(0, "dt")    # time step
 
 
-# <markdowncell>
+# %% [markdown]
 # For the numerical scheme, we discretise the time derivatives in the usual way, and we obtain the weak form by multiplying by a test function and integrating by parts. We also express the system using vectors.
 #
 # This gets us the following equation.
@@ -112,16 +112,16 @@ dt = Constant(0, "dt")    # time step
 # First we put in the right hand side which only contains explicit data.
 
 
-# <codecell>
+# %%
 from ufl import inner, dx
 a_ex = (inner(u_h_n, v) - inner(u_h_n[0], v[1])) * dx
 
 
-# <markdowncell>
+# %% [markdown]
 # For the left hand side we have the spatial derivatives and the implicit parts.
 
 
-# <codecell>
+# %%
 from ufl import pi, atan, atan_2, tan, grad, inner
 psi        = pi/8.0 + atan_2(grad(u_h_n[0])[1], (grad(u_h_n[0])[0]))
 Phi        = tan(N / 2.0 * psi)
@@ -140,11 +140,11 @@ a_im = (alpha*alpha*dt / tau * (inner(dot(d0, grad(u[0])),
         + inner(u,v) - inner(s,v)) * dx
 
 
-# <markdowncell>
+# %% [markdown]
 # We set up the scheme with some parameters.
 
 
-# <codecell>
+# %%
 from dune.fem.scheme import galerkin as solutionScheme
 solverParameters = {
         "newton.tolerance": 1e-8,
@@ -155,15 +155,15 @@ solverParameters = {
 scheme = solutionScheme(a_im == a_ex, space, solver="gmres", parameters=solverParameters)
 
 
-# <markdowncell>
+# %% [markdown]
 # We set up the adaptive method. We start with a marking strategy based on the value of the gradient of the phase field variable.
 
-# <codecell>
+# %%
 indicator = dot(grad(u_h[0]),grad(u_h[0]))
-# <markdowncell>
+# %% [markdown]
 # We perform the initial refinement of the grid using the general form of the `mark' method
 
-# <codecell>
+# %%
 maxLevel = 11
 startLevel = 5
 gridView.hierarchicalGrid.globalRefine(startLevel)
@@ -177,11 +177,11 @@ for i in range(startLevel, maxLevel):
 print()
 
 
-# <markdowncell>
+# %% [markdown]
 # Let us start by plotting the initial state of the material, which is just a small circle in the centre.
 
 
-# <codecell>
+# %%
 from dune.fem.plotting import plotComponents
 import matplotlib.pyplot as pyplot
 from dune.fem.function import levelFunction, partitionFunction
@@ -195,22 +195,22 @@ matplotlib.rcParams['figure.figsize'] = [10, 5]
 plotComponents(u_h, cmap=pyplot.cm.jet, show=[0], contours=[0.5],contourWidth=3)
 
 
-# <markdowncell>
+# %% [markdown]
 # We set ```dt``` and the initial time t=0.
 
 
-# <codecell>
+# %%
 scheme.model.dt = 0.0005
 t = 0.0
 
 
-# <markdowncell>
+# %% [markdown]
 # Finally we set up the time loop and solve the problem - each time this cell is run the simulation will progress to the given ```endTime``` and then the result is shown. The simulation can be progressed further by rerunning the cell while increasing the ```endTime```.
 
 
 from dune.fem.plotting import plotPointData
 u_h[0].plot(onlyContours=True,contours=[0.5], contourWidth=1, contourColor="black")
-# <codecell>
+# %%
 endTime = 0.1
 while t < endTime:
     u_h_n.assign(u_h)

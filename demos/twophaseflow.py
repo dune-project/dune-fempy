@@ -1,7 +1,7 @@
-# <markdowncell>
+# %% [markdown]
 # # Problem Description
 # Describe model and scheme here...
-# <codecell>
+# %%
 from dune.common.checkconfiguration import assertHave, ConfigurationError
 try:
     assertHave("HAVE_DUNE_FEM_DG")
@@ -27,11 +27,11 @@ from dune.plotting import plotPointData as plot
 from limit import createOrderRedcution, createLimiter
 
 
-# <markdowncell>
+# %% [markdown]
 # Some parameters
 
 
-# <codecell>
+# %%
 maxLevel  = 3
 maxOrder  = 3
 dt        = 5.
@@ -44,12 +44,12 @@ newtonParameters = {"tolerance": tolerance,
                     "linabstol": 1e-8, "reduction": 1e-8}
 
 
-# <markdowncell>
+# %% [markdown]
 # # Defining the model
 # using a Broks Corey pressure law
 
 
-# <codecell>
+# %%
 def brooksCorey(P,s_n):
     s_w = 1-s_n
     s_we = (s_w-P.s_wr)/(1.-P.s_wr-P.s_nr)
@@ -67,11 +67,11 @@ def brooksCorey(P,s_n):
     return p_c,dp_c,l_n,l_w
 
 
-# <markdowncell>
+# %% [markdown]
 # Constants and domain description for anisotropic lens test
 
 
-# <codecell>
+# %%
 class AnisotropicLens:
     dimWorld = 2
     domain   = cartesianDomain([0,0.39],[0.9,0.65],[15,4])
@@ -117,11 +117,11 @@ class AnisotropicLens:
 P = AnisotropicLens()
 
 
-# <markdowncell>
+# %% [markdown]
 # Setup grid, discrete spaces and functions
 
 
-# <codecell>
+# %%
 grid = create.view("adaptive", "ALUCube", P.domain, dimgrid=2)
 
 if coupled:
@@ -141,10 +141,10 @@ estimate     = fvspc.interpolate([0], name="estimate")
 estimate_pm1 = fvspc.interpolate([0], name="estimate-pm1")
 
 
-# <markdowncell>
+# %% [markdown]
 
 
-# <codecell>
+# %%
 uflSpace = Space((P.dimWorld,P.dimWorld),2)
 u        = TrialFunction(uflSpace)
 v        = TestFunction(uflSpace)
@@ -159,11 +159,11 @@ s_n  = u[1]
 p_c,dp_c,l_n,l_w = P.p_c(s_n=intermediate[1])
 
 
-# <markdowncell>
+# %% [markdown]
 # Bulk terms
 
 
-# <codecell>
+# %%
 dBulk_p  = P.K*( (l_n+l_w)*grad(p_w) + l_n*dp_c*grad(s_n) )
 dBulk_p += -P.K*( (P.r_n*l_n+P.r_w*l_w)*P.g )
 bulk_p   = -(P.q_w+P.q_n)
@@ -172,39 +172,39 @@ dBulk_s += P.K*l_n*(grad(p_w)-P.r_n*P.g)
 bulk_s   = -P.q_n
 
 
-# <markdowncell>
+# %% [markdown]
 # Boundary and initial conditions
 
 
-# <codecell>
+# %%
 p_D, s_D = P.p_wD, P.s_nD,
 p_N, s_N = P.J_w+P.J_n, P.J_n
 p_0, s_0 = P.p_w0, P.s_n0
 
 
-# <markdowncell>
+# %% [markdown]
 # Bulk integrals
 
 
-# <codecell>
+# %%
 form_p = ( inner(dBulk_p,grad(v[0])) + bulk_p*v[0] ) * dx
 form_s = ( inner(dBulk_s,grad(v[1])) + bulk_s*v[1] ) * dx
 
 
-# <markdowncell>
+# %% [markdown]
 # Boundary fluxes
 
 
-# <codecell>
+# %%
 form_p += p_N * v[0] * P.inflow * ds
 form_s += s_N * v[1] * P.inflow * ds
 
 
-# <markdowncell>
+# %% [markdown]
 # DG terms
 
 
-# <codecell>
+# %%
 def sMax(a): return max_value(a('+'), a('-'))
 n         = FacetNormal(cell)
 hT        = MaxCellEdgeLength(cell)
@@ -215,11 +215,11 @@ lambdaMax = k('+')*k('-')/avg(k)
 def wavg(z): return (k('-')*z('+')+k('+')*z('-'))/(k('+')+k('-'))
 
 
-# <markdowncell>
+# %% [markdown]
 # Penalty terms (including dirichlet boundary treatment)
 
 
-# <codecell>
+# %%
 p_c0,dp_c0,l_n0,l_w0 = P.p_c(0.5)
 penalty_p = [beta*lambdaMax*sMax(l_n0+l_w0),
              beta*k*(l_n0+l_w0)]
@@ -231,30 +231,30 @@ form_p += penalty_p[1]/heBnd * (u[0]-p_D) * v[0] * P.dirichlet * ds
 form_s += penalty_s[1]/heBnd * (u[1]-s_D) * v[1] * P.dirichlet * ds
 
 
-# <markdowncell>
+# %% [markdown]
 # Consistency terms
 
 
-# <codecell>
+# %%
 form_p -= inner(wavg(dBulk_p),n('+')) * jump(v[0]) * dS
 form_s -= inner(wavg(dBulk_s),n('+')) * jump(v[1]) * dS
 form_p -= inner(dBulk_p,n) * v[0] * P.dirichlet * ds
 form_s -= inner(dBulk_s,n) * v[1] * P.dirichlet * ds
 
 
-# <markdowncell>
+# %% [markdown]
 # # Time discretization
 
 
-# <codecell>
+# %%
 form_s = P.Phi*(u[1]-solution_old[1])*v[1] * dx + tau*form_s
 
 
-# <markdowncell>
+# %% [markdown]
 # # Stabilization (Limiter)
 
 
-# <codecell>
+# %%
 limiter = createLimiter( spc, limiter="scaling" )
 tmp = solution.copy()
 def limit(target):
@@ -262,12 +262,12 @@ def limit(target):
     limiter(tmp,target)
 
 
-# <markdowncell>
+# %% [markdown]
 # Time stepping
 # Converting UFL forms to scheme
 
 
-# <codecell>
+# %%
 if coupled:
     form = form_s + form_p
     tpModel = create.model( "integrands", grid, form == 0)
@@ -295,21 +295,21 @@ else:
                 for m,s in zip(tpModel,spc.components)]
 
 
-# <markdowncell>
+# %% [markdown]
 # Stopping condition for iterative approaches
 
 
-# <codecell>
+# %%
 def errorMeasure(w,dw):
     rel = integrate(grid, [w[1]**2,dw[1]**2], 5)
     return math.sqrt(rel[1]) < tolerance * math.sqrt(rel[0])
 
 
-# <markdowncell>
+# %% [markdown]
 # # Iterative schemes (iterative or impes-iterative)
 
 
-# <codecell>
+# %%
 def step():
     n = 0
     solution_old.assign(solution)
@@ -327,13 +327,13 @@ def step():
             break
 
 
-# <markdowncell>
+# %% [markdown]
 # # HP Adpativity
 
 # Setting up residual indicator
 
 
-# <codecell>
+# %%
 uflSpace0 = Space((P.dimWorld,P.dimWorld),1)
 v0        = TestFunction(uflSpace0)
 
@@ -347,11 +347,11 @@ estimatorModel = create.model("integrands", grid, estimator == 0)
 estimator = create.operator("galerkin", estimatorModel, spc, fvspc)
 
 
-# <markdowncell>
+# %% [markdown]
 # # Marker for grid adaptivity (h)
 
 
-# <codecell>
+# %%
 hTol = 1e-16                           # changed later
 def markh(element):
     center = element.geometry.referenceElement.center
@@ -364,11 +364,11 @@ def markh(element):
       return Marker.keep
 
 
-# <markdowncell>
+# %% [markdown]
 # # Marker for space adaptivity (p)
 
 
-# <codecell>
+# %%
 pTol = 1e-16
 def markp(element):
     center = element.geometry.referenceElement.center
@@ -384,21 +384,21 @@ def markp(element):
         return polorder
 
 
-# <markdowncell>
+# %% [markdown]
 # Operator for projecting into space with a reduced order on every element
 
 
-# <codecell>
+# %%
 orderreduce  = createOrderRedcution( spc )
 
 
-# <markdowncell>
+# %% [markdown]
 # # Main program
 
 # Pre adapt the grid
 
 
-# <codecell>
+# %%
 hgrid = grid.hierarchicalGrid
 hgrid.globalRefine(1)
 for i in range(maxLevel):
@@ -413,11 +413,11 @@ for i in range(maxLevel):
 print("final pre adaptive (",i,"): ",dt,grid.size(0),end="\n")
 
 
-# <markdowncell>
+# %% [markdown]
 # Define the constant for the h adaptivity
 
 
-# <codecell>
+# %%
 solution.interpolate( as_vector([p_0,s_0]) )
 limit(solution)
 estimator(solution, estimate)
@@ -425,11 +425,11 @@ timeTol = sum(estimate.dofVector) / endTime
 print('Using timeTol = ',timeTol, end='\n')
 
 
-# <markdowncell>
+# %% [markdown]
 # Time loop
 
 
-# <codecell>
+# %%
 t = 0
 saveStep = 0
 while t < endTime:
@@ -454,12 +454,12 @@ while t < endTime:
         saveStep += 100
 
 
-# <markdowncell>
+# %% [markdown]
 # Postprocessing
 # Show solution along a given line
 
 
-# <codecell>
+# %%
 x0 = FieldVector([0.25,  0.65])
 x1 = FieldVector([0.775, 0.39])
 p,v = algorithm.run('sample', 'utility.hh', solution, x0, x1, 1000)
@@ -475,10 +475,10 @@ for i in range(len(x)):
 pyplot.plot(x,y)
 
 
-# <markdowncell>
+# %% [markdown]
 
 
-# <codecell>
+# %%
 from dune.grid import gridFunction
 from dune.fem.function import levelFunction
 @gridFunction(grid,name="polOrder")

@@ -1,4 +1,4 @@
-# <markdowncell>
+# %% [markdown]
 # # Re-entrant Corner Problem
 #
 # Here we will consider the classic _re-entrant corner_ problem,
@@ -16,7 +16,7 @@
 # \end{gather*}
 
 
-# <codecell>
+# %%
 import matplotlib
 matplotlib.rc( 'image', cmap='jet' )
 import math
@@ -40,7 +40,7 @@ cornerAngle = 320.
 order = 2
 
 
-# <markdowncell>
+# %% [markdown]
 # We first define the domain and set up the grid and space.
 # We need this twice - once for a computation on a globally refined grid
 # and once for an adaptive one so we put the setup into a function:
@@ -53,7 +53,7 @@ order = 2
 
 
 
-# <codecell>
+# %%
 def setup():
     vertices = numpy.zeros((8, 2))
     vertices[0] = [0, 0]
@@ -85,7 +85,7 @@ def setup():
     return uh, exact, laplace
 
 
-# <markdowncell>
+# %% [markdown]
 # We will start with computing the $H^1$ error on a sequence of globally
 # refined grids
 #
@@ -97,7 +97,7 @@ def setup():
 
 
 
-# <codecell>
+# %%
 uh, exact, laplace = setup()
 h1error = uflFunction(uh.space.grid, name="h1error", order=uh.space.order, ufl=dot(grad(uh - exact), grad(uh - exact)))
 errorGlobal = []
@@ -111,7 +111,7 @@ for count in range(10):
     fem.globalRefine(1,uh)
 
 
-# <markdowncell>
+# %% [markdown]
 # Theory tells us that
 # \begin{align*}
 # \int_\Omega |\nabla(u-u_h)|^2 \leq \sum_K \eta_K,
@@ -135,7 +135,7 @@ for count in range(10):
 # we have $L[u_h]|_{K} = \eta_K$.
 
 
-# <codecell>
+# %%
 uh, exact, laplace = setup()
 
 from dune.fem.space import finiteVolume as estimatorSpace
@@ -154,10 +154,10 @@ estimator = estimatorOp(estimator_ufl)
 tolerance = 0.05
 
 
-# <markdowncell>
+# %% [markdown]
 # Let us solve over a loop (solve,estimate,mark) and plot the solutions side by side.
 
-# <codecell>
+# %%
 h1error = uflFunction(uh.space.grid, name="h1error", order=uh.space.order, ufl=dot(grad(uh - exact), grad(uh - exact)))
 fig = pyplot.figure(figsize=(10,10))
 count = 0
@@ -185,9 +185,9 @@ while True:
 plot(uh, figure=(fig, 131+2), colorbar=False)
 
 
-# <markdowncell>
+# %% [markdown]
 # Let's have a look at the center of the domain:
-# <codecell>
+# %%
 pyplot.close('all')
 fig = pyplot.figure(figsize=(30,20))
 plot(uh, figure=(fig, 231), xlim=(-0.5, 0.5), ylim=(-0.5, 0.5),
@@ -207,12 +207,12 @@ plot(levels, figure=(fig, 236), xlim=(-0.02, 0.02), ylim=(-0.02, 0.02),
         gridLines="white", colorbar={"shrink": 0.75})
 
 
-# <markdowncell>
+# %% [markdown]
 # Finally, let us compare the globally refined solution and the adaptive
 # one plotting number of degrees of freedom versus the error and the
 # estimator
 
-# <codecell>
+# %%
 pyplot.close('all')
 pyplot.loglog(dofsGlobal,errorGlobal,label="H^1 error (global refine)")
 pyplot.loglog(dofs,errorVector,label=" H^1 error (adaptive)")

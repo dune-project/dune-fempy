@@ -1,4 +1,4 @@
-# <markdowncell>
+# %% [markdown]
 # In this example we revisit the Barkley model for spiral waves and as before
 # we have two sets of model parameters to choose from. We want to add
 # dynamic grid adaptivity for different grid structures based on a residual
@@ -7,7 +7,7 @@
 # refinement (i.e. to handle hanging nodes) we use a DG type stabilization
 # approach. Note that since we will be using a Lagrange space these
 # skeleton terms evaluate to zero over conforming intersections.
-# <codecell>
+# %%
 
 import sys
 import math
@@ -21,14 +21,14 @@ import dune.alugrid
 from dune.grid import cartesianDomain, gridFunction
 from dune.fem import parameter
 
-# <markdowncell>
+# %% [markdown]
 # We can choose between a 2d and a 3d setup and use both conforming and
 # non-conforming refinement (in the first case a bisection simplex grid is
 # used in the second case a simplex grid with quartering/subdivision into
 # eight children will be used. We can also fix the order (default is 2).
 # As in the non adaptive example we have two possible choices for the right
 # hand side function $h$ to choose from.
-# <codecell>
+# %%
 
 dim = 3
 if len(sys.argv) > 1:
@@ -43,9 +43,9 @@ print("Using order = ",order)
 
 linearSpiral = True
 
-# <markdowncell>
+# %% [markdown]
 # Next we setup the constant used in the model and for the discretization:
-# <codecell>
+# %%
 
 maxLevel     = 5 if dim == 2 else 4
 startLevel   = 2 if dim == 2 else 1
@@ -68,10 +68,10 @@ else:
     def spiral_h(u,v): return u**3 - v
 
 
-# <markdowncell>
+# %% [markdown]
 # Now we set up the reference domain, the Lagrange finite element space, and discrete functions for $(u^n,v^n($, $(u^{n+1},v^{n+1})$:
 # Note: for the adaptive simulations we need to use the `adaptiveLeafGridView`
-# <codecell>
+# %%
 
 domain   = dune.grid.cartesianDomain([0,]*dim,[2.5,]*dim,[5,]*dim)
 if nonConforming:
@@ -118,10 +118,10 @@ source         = lambda u1,u2,u3,v: -1/spiral_eps * u1*(1-u2)*(u3-ustar(v))
 xForm  = inner(diffusiveFlux(u,grad(u)), grad(phi)) * dx
 xForm += ufl.conditional(uh_n<ustar(vh_n), source(u,uh_n,uh_n,vh_n), source(uh_n,u,uh_n,vh_n)) * phi * dx
 
-# <markdowncell>
+# %% [markdown]
 # To handle the possible non conforming intersection we add DG type
 # skeleton terms:
-# <codecell>
+# %%
 
 penalty = 5 * (order * ( order + 1 )) * spiral_D
 if nonConforming:
@@ -129,10 +129,10 @@ if nonConforming:
                inner( avg(diffusiveFlux(u,grad(u))), outer(jump(phi), n('+'))) ) * dS
     xForm += penalty/hS * inner(jump(u), jump(phi)) * dS
 
-# <markdowncell>
+# %% [markdown]
 # After adding the time discretization (a simple backward Euler scheme),
 # the model is now completely implemented and the scheme can be created:
-# <codecell>
+# %%
 
 form   = ( inner(u,phi) - inner(uh_n, phi) ) * dx + dt*xForm
 solverParameters =\
@@ -144,10 +144,10 @@ solverParameters =\
         "newton.linear.verbose": True}
 scheme = dune.fem.scheme.galerkin( form==0, solver="cg", parameters=solverParameters)
 
-# <markdowncell>
+# %% [markdown]
 # Next we define the error estimator based on a residual type indicator
 # similar to the one used for the Laplace problem:
-# <codecell>
+# %%
 
 fvspace = dune.fem.space.finiteVolume(uh.space.grid)
 estimate = fvspace.interpolate([0], name="estimate")
@@ -161,11 +161,11 @@ estimator_ufl = hT**2 * residual**2 * chi * dx +\
                 1/hS * jump(u)**2 * avg(chi) * dS
 estimator = dune.fem.operator.galerkin(estimator_ufl)
 
-# <markdowncell>
+# %% [markdown]
 # Now the time loop - note that we wait until the spiral has developed from
 # the initial conditions before the adaptive refinement/coarsening kicks
 # off:
-# <codecell>
+# %%
 nextSaveTime = saveInterval
 levelFunction = dune.fem.function.levelFunction(gridView)
 subSampling = 1 if order < 3 else 2

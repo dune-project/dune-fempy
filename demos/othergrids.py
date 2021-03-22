@@ -1,8 +1,8 @@
-# <markdowncell>
+# %% [markdown]
 # # A 3D Example Using a GMesh File
 # In this example we use pygmsh to construct a tetrahedral mesh and olve a
 # simple laplace problem
-# <codecell>
+# %%
 
 import numpy, math
 import matplotlib
@@ -53,13 +53,13 @@ scheme3d.solve(target=uh3d)
 gridView3d.writeVTK('3dexample', pointdata=[uh3d],
                     outputType=OutputType.appendedraw)
 
-# <markdowncell>
+# %% [markdown]
 # ![3d laplace problem](figures/3dexample.png)
-# <codecell>
+# %%
 
-# <markdowncell>
+# %% [markdown]
 # # We Can Also Do 1D
-# <codecell>
+# %%
 
 from dune.grid import onedGrid
 v = [math.log(i) for i in range(1,100)]
@@ -68,4 +68,8 @@ g = onedGrid(constructor={"vertices":v, "simplices":e})
 s = solutionSpace(g)
 x = SpatialCoordinate(s)
 u = s.interpolate(sin(x[0]), name="u")
-pyplot.plot(g.tesselate()[0], u.pointData(), '-p')
+u.plot()
+
+# %% [markdown]
+# pyplot can very easily be used in 1d:
+# pyplot.plot(g.tesselate()[0], u.pointData(), '-p')

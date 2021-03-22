@@ -1,4 +1,4 @@
-# <markdowncell>
+# %% [markdown]
 # # Dense Vectors and the Geometry Classes
 # A quick survey of Dune-Common and Dune-Geometry
 # The core module Dune-Common provides some classes for dense linear algebra.
@@ -6,7 +6,7 @@
 # geometry realizations. The conceptional basis for these geometries is
 # provided by Dune-Geometry, providing, for example, reference elements and
 # quadrature rules.
-# <codecell>
+# %%
 
 import numpy as np
 import pylab

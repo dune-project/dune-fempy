@@ -35,7 +35,7 @@ distclean: clean
 .SECONDARY:
 
 %_nb.ipynb: %.py
-	@python3 py2ipynb.py $< $*_nb.ipynb --image="png"
+	@jupytext $< --execute --set-kernel python3 --update --output $*_nb.ipynb
 
 %_nb.rst: %_nb.ipynb
 	@jupyter-nbconvert $< --to rst

@@ -1,6 +1,6 @@
-# <markdowncell>
+# %% [markdown]
 # # A Advection-Diffusion-Reaction System: Chemical Reaction Problem
-# <codecell>
+# %%
 
 import math
 import matplotlib
@@ -17,9 +17,9 @@ from dune.femdg.rk import femdgStepper
 
 gridView = structuredGrid([0,0],[2*math.pi,2*math.pi],[20,20])
 
-# <markdowncell>
+# %% [markdown]
 # Method to conpute the velocity based on a scalar elliptic equation
-# <codecell>
+# %%
 def computeVelocity():
     streamSpace = lagrange(gridView, order=1, dimRange=1)
     Psi  = streamSpace.interpolate(0,name="streamFunction")
@@ -30,9 +30,9 @@ def computeVelocity():
     streamScheme.solve(target=Psi)
     return as_vector([-Psi[0].dx(1),Psi[0].dx(0)])
 
-# <markdowncell>
+# %% [markdown]
 # Chemical reaction model
-# <codecell>
+# %%
 class Model:
     transportVelocity = computeVelocity()
     def S_e(t,x,U,DU):
@@ -58,9 +58,9 @@ class Model:
 
 plot(Model.transportVelocity, grid=gridView, gridLines=None, vectors=[0,1])
 
-# <markdowncell>
+# %% [markdown]
 # Time evolution scheme
-# <codecell>
+# %%
 space    = dgonb( gridView, order=3, dimRange=3)
 u_h      = space.interpolate([0,0,0], name='u_h')
 operator = femDGOperator(Model, space, limiter="scaling")
@@ -80,9 +80,9 @@ while t < 9:
         u_h.plot(gridLines=None, figure=(fig, 231+c), colorbar=False)
         c += 1
 
-# <markdowncell>
+# %% [markdown]
 # All three components
-# <codecell>
+# %%
 from dune.fem.plotting import plotComponents
 from matplotlib import ticker
 plotComponents(u_h, gridLines=None, level=1,

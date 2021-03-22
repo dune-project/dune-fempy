@@ -1,4 +1,4 @@
-# <markdowncell>
+# %% [markdown]
 # # Spiral Wave
 #
 # This demonstrates the simulation of spiral waves in an excitable media. It consists of system of reaction diffusion equations with two components. Both the model parameters and the approach for discretizing the system are taken from http://www.scholarpedia.org/article/Barkley_model.
@@ -55,18 +55,18 @@
 # $v^n + \tau h(u^n,v^n)$.
 #
 # Let's get started by importing some standard python packages, ufl, and some part of the dune-fempy package:
-# <codecell>
 
+# %%
 import math
 import ufl
 import dune.ufl
 import dune.grid
 import dune.fem
 
-# <markdowncell>
+# %% [markdown]
 # In our attempt we will discretize the model as a 2x2 system. Here are some possible model parameters and initial conditions (we even have two sets of model parameters to choose from):
-# <codecell>
 
+# %%
 dimRange   = 1
 dt         = 0.25
 linearSpiral = True
@@ -88,10 +88,10 @@ initial_u = ufl.conditional(x[1]>1.25,1,0)
 initial_v = ufl.conditional(x[0]<1.25,0.5,0)
 
 
-# <markdowncell>
+# %% [markdown]
 # Now we set up the reference domain, the Lagrange finite element space (second order), and discrete functions for $(u^n,v^n($, $(u^{n+1},v^{n+1})$:
-# <codecell>
 
+# %%
 gridView = dune.grid.structuredGrid([0,0],[2.5,2.5],[30,30])
 space    = dune.fem.space.lagrange( gridView, dimRange=dimRange, order=1 )
 
@@ -101,11 +101,11 @@ vh   = space.interpolate( initial_v, name="v" )
 vh_n = vh.copy()
 
 
-# <markdowncell>
+# %% [markdown]
 # We define the model in two steps:
 # - first we define the standard parts, not involving $f_E,f_I$:
 # - then we add the missing parts with the required _if_ statement directly using C++ code
-# <codecell>
+# %%
 
 u   = ufl.TrialFunction(space)
 phi = ufl.TestFunction(space)
@@ -124,9 +124,9 @@ equation   = a_im == a_ex
 ode_update = ufl.as_vector([ vh_n[0] + dt*spiral_h(uh_n[0], vh_n[0]) ])
 
 
-# <markdowncell>
+# %% [markdown]
 # The model is now completely implemented and can be created, together with the corresponding scheme:
-# <codecell>
+# %%
 
 solverParameters =\
        {"newton.tolerance": 1e-3,
@@ -136,10 +136,10 @@ solverParameters =\
         "newton.linear.verbose": False}
 scheme = dune.fem.scheme.galerkin( equation, space, solver="cg", parameters=solverParameters)
 
-# <markdowncell>
+# %% [markdown]
 # To show the solution we make use of the _animate_ module of _matplotlib_.
 # Here is the `stepping` functions:
-# <codecell>
+# %%
 
 def init():
     data = uh.pointData(1)
@@ -161,9 +161,9 @@ def animate(count):
     # gridView.writeVTK("spiral", pointdata=[uh], number=count)
     return C.collections
 
-# <markdowncell>
+# %% [markdown]
 # And generate the movie:
-# <codecell>
+# %%
 import matplotlib.pyplot as plt
 from matplotlib import animation, rc
 
@@ -190,6 +190,5 @@ except: # ffmpeg probably missing
         IFrame(src='./nice.html', width=700, height=600)
     except:
         pass
-# <markdowncell>
+# %% [markdown]
 # ... if the movie is not showing you might have to rerun the notebook ...
-# <codecell>

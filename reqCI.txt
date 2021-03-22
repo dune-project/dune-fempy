@@ -1,4 +1,5 @@
 nbsphinx
+jupytext
 pandas
 pandoc
 pyqt5

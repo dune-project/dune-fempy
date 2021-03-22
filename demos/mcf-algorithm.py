@@ -1,4 +1,4 @@
-# <markdowncell>
+# %% [markdown]
 # # Mean Curvature Flow (revisited)
 #
 # [As discussed before](mcf_nb.ipynb)
@@ -34,7 +34,7 @@
 # pure python implementation with a hybrid approach where computing $R_h^n$
 # is implemented in C++ using the `dune.generator.algorithm` functionality.
 
-# <codecell>
+# %%
 import math, time, io
 import pickle
 import numpy as np
@@ -56,12 +56,12 @@ R0 = 2.
 endTime = 0.1
 
 
-# <markdowncell>
+# %% [markdown]
 # Main function for calculating the mean curvature flow of a given surface.
 # If first argument is `True` the radius of the computed surface is
 # computed using an algorithm implemented in C++ otherwise the computation
 # is done in Python.
-# <codecell>
+# %%
 def calcRadius(surface):
     R,vol = 0, 0
     for e in surface.elements:
@@ -94,9 +94,9 @@ switchCalcRadius = lambda use_cpp,surface: \
              algorithm.load('calcRadius', io.StringIO(code), surface) \
              if use_cpp else calcRadius
 
-# <markdowncell>
+# %% [markdown]
 # Timings for a number of different grid refinements is dumped to disk
-# <codecell>
+# %%
 from dune.fem.view import geometryGridView as geoGridView
 from dune.fem.space import lagrange as solutionSpace
 from dune.fem.scheme import galerkin as solutionScheme
@@ -169,13 +169,13 @@ def calculate(use_cpp, gridView):
     return gridSizes, times
 
 
-# <markdowncell>
+# %% [markdown]
 # Compute the mean curvature flow evolution of a spherical surface. Compare
 # computational time of a pure Python implementation and using a C++
 # algorithm to compute the radius of the surface for verifying the
 # algorithm.
 
-# <codecell>
+# %%
 # set up reference domain Gamma_0
 results = []
 from dune.alugrid import aluConformGrid as leafGridView
@@ -185,8 +185,8 @@ results += [calculate(True, gridView)]
 gridView = leafGridView("sphere.dgf", dimgrid=2, dimworld=3)
 results += [calculate(False, gridView)]
 
-# <markdowncell>
+# %% [markdown]
 # Compare the hybrid and pure Python versions
 
-# <codecell>
+# %%
 plot(results[0],results[1])

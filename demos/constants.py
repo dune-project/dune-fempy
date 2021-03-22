@@ -1,8 +1,8 @@
-# <markdowncell>
+# %% [markdown]
 
 # TODO document the problem here
 
-# <codecell>
+# %%
 
 import os
 # ensure some compilation output for this example

@@ -1,4 +1,4 @@
-# <markdowncell>
+# %% [markdown]
 # # Overview
 # To facilitate rapid prototyping, the Dune Python bindings
 # provid Python classes for all the core interfaces of Dune. This makes
@@ -29,7 +29,7 @@
 # geometry realizations. The conceptional basis for these geometries is
 # provided by Dune-Geometry, providing, for example, reference elements and
 # quadrature rules.
-# <codecell>
+# %%
 
 import time, numpy, math, sys
 import matplotlib
@@ -46,11 +46,11 @@ print("\t".join(str(c) for c in referenceElement.corners))
 for p in dune.geometry.quadratureRule(geometryType, 3):
     print(p.position, p.weight)
 
-# <markdowncell>
+# %% [markdown]
 # # Grid Construction and Basic Interface
 # We now move on to the Dune-Grid module. First let us discuss different
 # possibilities of constructing a grid.
-# <codecell>
+# %%
 
 from dune.grid import cartesianDomain, yaspGrid
 domain = cartesianDomain([0, 0], [1, 0.25], [15, 4])
@@ -60,9 +60,9 @@ yaspView.plot()
 yaspView.hierarchicalGrid.globalRefine()
 yaspView.plot()
 
-# <markdowncell>
+# %% [markdown]
 # Let's visualize the grid and then globally refine it once
-# <codecell>
+# %%
 
 from dune.alugrid import aluConformGrid
 aluView = aluConformGrid(domain)
@@ -70,11 +70,11 @@ aluView.plot()
 aluView.hierarchicalGrid.globalRefine()
 aluView.plot()
 
-# <markdowncell>
+# %% [markdown]
 # #### An unstructured grid
 # can be constructed by providing a dictionary containing vertex coordinate
 # and element connectivity
-# <codecell>
+# %%
 
 vertices = [(0,0), (1,0), (1,0.6), (0,0.6), (-1,0.6), (-1,0), (-1,-0.6), (0,-0.6)]
 triangles = [(2,0,1), (0,2,3), (4,0,3), (0,4,5), (6,0,5), (0,6,7)]
@@ -83,10 +83,10 @@ aluView.plot(figsize=(5,5))
 aluView.hierarchicalGrid.globalRefine(2)
 aluView.plot(figsize=(5,5))
 
-# <markdowncell>
+# %% [markdown]
 # In addition to global refinement we can also pre process the grid by
 # marking a subset of elements for local refinement.
-# <codecell>
+# %%
 
 from dune.grid import Marker
 aluView.plot(figsize=(5,5))
@@ -102,10 +102,10 @@ vertices = aluView.coordinates()
 triangles = [aluView.indexSet.subIndices(e, 2) for e in aluView.elements]
 aluView = aluSimplexGrid({"vertices": vertices, "simplices": triangles})
 
-# <markdowncell>
+# %% [markdown]
 # We next discuss how to retrieve basic information from a constructed grid
 # and iterate over its entities (i.e., elements, faces, edges, vertices, etc.).
-# <codecell>
+# %%
 
 vertices = [(0,0), (1,0), (1,1), (0,1)]
 triangles = [(2,0,1), (0,2,3)]
@@ -119,12 +119,12 @@ for codim in range(0, unitSquare.dimension+1):
 for edge in unitSquare.edges:
     print(", ".join(str(c) for c in edge.geometry.corners))
 
-# <markdowncell>
+# %% [markdown]
 # # Attaching Data to the Grid and Defining Grid Functions
 # This is a fundamental concept in any grid based discretization package.
 # These are functions that can be evaluated given an entity in the grid and
 # a local coordinate within the reference element of that entity.
-# <codecell>
+# %%
 
 @dune.grid.gridFunction(aluView)
 def f(x):
@@ -142,7 +142,7 @@ maxValue = max(f(e.geometry.toGlobal(hatx)) for e in f.grid.elements)
 f.plot()
 hat0.plot()
 
-# <markdowncell>
+# %% [markdown]
 # To attach data to the entities in a grid, each Dune grid has an
 # `IndexSet` which provides a consecutive, zero starting integer for the
 # set of entities of a given geometry type, i.e., entities sharing the same
@@ -152,7 +152,7 @@ hat0.plot()
 # which is initialized with the data layout, i.e., the number of degrees of
 # freedom that is supposed to be attached to every entity with a given
 # geometry type.
-# <codecell>
+# %%
 
 mapper = unitSquare.mapper([2, 0, 3])
 
@@ -179,12 +179,12 @@ def error(e, x):
 hatx = FieldVector([1./3., 1./3.])
 print(max(error(e, hatx) for e in aluView.elements))
 
-# <markdowncell>
+# %% [markdown]
 # # Output of Grid and Visualization of Data
 # We already used `matplotlib` to plot the grid and grid functions. For more
 # flexible plotting Dune relies on `vtk` and Dune-Python makes it easy to
 # write suitable files.
-# <codecell>
+# %%
 
 p12dEvaluate.plot(figsize=(9,9), gridLines=None)
 p12dEvaluate.plot(figsize=(9,9), gridLines='black',
@@ -196,20 +196,20 @@ aluView.writeVTK("interpolation", pointdata=pd)
 
 aluView.writeVTK("interpolation_subsampled", subsampling=2, pointdata=pd)
 
-# <markdowncell>
+# %% [markdown]
 # ![interpolation](figures/interpolation_discrete.png)
 # ![exact solution](figures/interpolation_exact.png)
 # ![interpolation error](figures/interpolation_error.png)
-# <codecell>
+# %%
 
-# <markdowncell>
+# %% [markdown]
 # Mayavi can also be used to plot grid function in Python. This approach
 # relies on methods to extract `numpy` representations of the grid data
 # structure and values of a given grid function.
 #
 # __Note__: mayavi is not installed in the Docker image and, therefore,
 # this feature is not available the Docker container.
-# <codecell>
+# %%
 
 level = 3
 triangulation = f.grid.triangulation(level)

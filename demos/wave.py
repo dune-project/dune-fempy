@@ -1,4 +1,4 @@
-# <markdowncell>
+# %% [markdown]
 # # Wave Equation in a Slit Domain
 #
 # In the following we will consider the wave equation
@@ -49,7 +49,7 @@
 # The following test case is taken from
 # https://firedrakeproject.org/demos/linear_wave_equation.py.html
 
-# <codecell>
+# %%
 import matplotlib
 matplotlib.rc( 'image', cmap='jet' )
 import math
@@ -65,7 +65,7 @@ dt = 0.005
 t = 0
 
 
-# <markdowncell>
+# %% [markdown]
 # We use *gmsh* to define the domain and then set up a first order
 # scalar Lagrange space which we will use both for $\psi$ and $p$. We can
 # construct general grids by either defining the grids directly in Python
@@ -73,7 +73,7 @@ t = 0
 # files using readers provided by Dune, e.g., Dune Grid Format (dgf) files
 # or Gmsh files.
 
-# <codecell>
+# %%
 domain = (reader.gmsh, "wave_tank.msh")
 gridView  = leafGridView( domain, dimgrid=2 )
 gridView.hierarchicalGrid.loadBalance()
@@ -85,7 +85,7 @@ pVec   = p.as_numpy
 phiVec = phi.as_numpy
 
 
-# <markdowncell>
+# %% [markdown]
 # Next we define an operator for the stiffness matrix including the
 # boundary condition which are time dependent so we use a `Constant` for
 # this. We use the `BoxDirichletBC` class which is derived from the more
@@ -99,7 +99,7 @@ phiVec = phi.as_numpy
 # assemble the matrix once and extract the corresponding sscipy*
 # sparse matrix.
 
-# <codecell>
+# %%
 u    = TrialFunction(V)
 v    = TestFunction(V)
 p_in = Constant(0.0, name="g")
@@ -115,14 +115,14 @@ lapPhi    = V.interpolate(1,name="e")
 lapPhiVec = lapPhi.as_numpy
 
 
-# <markdowncell>
+# %% [markdown]
 # Next we multiply the inverse lumped mass matrix to $S$, i.e., we form the
 # matrix $\Delta t M^{-1}S$ where $M$ is a diagonal matrix with entries
 # $m_{ii} = \int_\Omega\varphi_i$. To compute these values we construct the
 # mass operator $<L[u],\varphi_i> = \int_\Omega u\varphi_i$ and apply it to
 # $u\equiv 1$
 
-# <codecell>
+# %%
 from scipy.sparse import dia_matrix
 lumping = galerkin(u*v*dx)
 lumped = lapPhi.copy()
@@ -132,7 +132,7 @@ M = dia_matrix(([dt/lumped.as_numpy],[0]),shape=(N,N) )
 S = M*S
 
 
-# <markdowncell>
+# %% [markdown]
 # We can now set up the time loop and perform our explicit time stepping
 # algorithm. Note that the computation is carried out completely using
 # *numpy* and *scipy* algorithms we the exception of setting the
@@ -141,7 +141,7 @@ S = M*S
 # conditions. At the time of writing it is not yet possible to extract a
 # sparse matrix and vector encoding the boundary constraint.
 
-# <codecell>
+# %%
 step = 0
 while t <= T:
     step += 1

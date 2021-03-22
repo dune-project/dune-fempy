@@ -1,4 +1,4 @@
-# <markdowncell>
+# %% [markdown]
 # # Laplace Problem
 #
 # We first consider a simple Laplace problem with Dirichlet boundary conditions
@@ -13,7 +13,7 @@
 # \end{align*}
 
 # First some setup code:
-# <codecell>
+# %%
 try:
     import dune.vem
 except:
@@ -37,11 +37,11 @@ order = 3
 
 dune.fem.parameter.append({"fem.verboserank": 0})
 
-# <markdowncell>
+# %% [markdown]
 # we can compare different method, e.g., a lagrange space (on the # subtriangulation),
 # a bounding box dg space and a conforming/non conforming VEM space
 
-# <codecell>
+# %%
 uflSpace = dune.ufl.Space(2, dimRange=1)
 x = SpatialCoordinate(uflSpace)
 exact = as_vector( [x[0]*x[1] * cos(pi*x[0]*x[1])] )
@@ -66,10 +66,10 @@ parameters = {"newton.linear.tolerance": 1e-12,
               "newton.verbose": False
               }
 
-# <markdowncell>
+# %% [markdown]
 # Now we define the model starting with the exact solution:
 
-# <codecell>
+# %%
 u = TrialFunction(uflSpace)
 v = TestFunction(uflSpace)
 a = (diffCoeff*inner(grad(u),grad(v)) + massCoeff*dot(u,v) ) * dx
@@ -78,14 +78,14 @@ a = (diffCoeff*inner(grad(u),grad(v)) + massCoeff*dot(u,v) ) * dx
 b = (-div(diffCoeff*grad(exact[0])) + massCoeff*exact[0] ) * v[0] * dx
 dbc = [dune.ufl.DirichletBC(uflSpace, exact, i+1) for i in range(4)]
 
-# <markdowncell>
+# %% [markdown]
 # Now we define a grid build up of voronoi cells around $50$ random points
 
-# <codecell>
+# %%
 constructor = cartesianDomain([-0.5,-0.5],[1,1],[10,10])
 polyGrid = create.grid("agglomerate", voronoiCells(constructor,50,"voronoiseeds",True,lloyd=100) )
 
-# <markdowncell>
+# %% [markdown]
 # In general we can construct a `polygrid` by providing a dictionary with
 # the `vertices` and the `polygons`. The `voronoiCells` function creates
 # such a dictonary using random seeds to generate voronoi cells which are
@@ -110,17 +110,17 @@ polyGrid = create.grid("agglomerate", voronoiCells(constructor,50,"voronoiseeds"
 #
 # Let's take a look at the grid with the 50 polygons triangulated
 
-# <codecell>
+# %%
 @gridFunction(polyGrid, name="cells")
 def polygons(en,x):
     return polyGrid.hierarchicalGrid.agglomerate(en)
 polygons.plot(colorbar="horizontal")
 
-# <markdowncell>
+# %% [markdown]
 # We now define a function to compute the solution and the $L^2,H^1$ error
 # given a grid and a space
 
-# <codecell>
+# %%
 def compute(grid, space, schemeName, schemeArgs):
     # solve the pde
     df = space.interpolate([0],name="solution")
@@ -137,10 +137,10 @@ def compute(grid, space, schemeName, schemeArgs):
 
     return df, errors, info
 
-# <markdowncell>
+# %% [markdown]
 # Finally we iterate over the requested methods and solve the problems
 
-# <codecell>
+# %%
 fig = pyplot.figure(figsize=(10*len(methods),10))
 figPos = 100+10*len(methods)+1
 for i,m in enumerate(methods):
@@ -151,11 +151,11 @@ for i,m in enumerate(methods):
           info["linear_iterations"], flush=True)
     dfs.plot(figure=(fig,figPos+i),gridLines=None, colorbar="horizontal")
 
-# <markdowncell>
+# %% [markdown]
 # # Nonlinear Elliptic Problem
 # We can easily set up a non linear problem
 
-# <codecell>
+# %%
 space = create.space("vem", polyGrid, order=1, dimRange=1, storage="istl",
                      conforming=True)
 u = TrialFunction(space)
@@ -176,13 +176,13 @@ errors = [ math.sqrt(e) for e in
            integrate(polyGrid, [inner(edf,edf),inner(grad(edf),grad(edf))], order=5) ]
 print( errors )
 solution.plot(gridLines=None, colorbar="horizontal")
-# <markdowncell>
+# %% [markdown]
 # # Linear Elasticity
 # As final example we solve a linear elasticity equation usign a
 # conforming VEM space:
 
 # First we setup the domain
-# <codecell>
+# %%
 L, W = 1, 0.2
 
 constructor = cartesianDomain([0,0],[L,W],[1,1])
@@ -195,9 +195,9 @@ polygons.plot(colorbar="horizontal")
 space = create.space("vem", polyGrid, order=2, dimRange=2, storage="istl",
                      conforming=True)
 
-# <markdowncell>
+# %% [markdown]
 
-# <codecell>
+# %%
 # some model constants
 mu = 1
 rho = 1
@@ -231,20 +231,20 @@ scheme = create.scheme("vem", [a==b, dbc], space,
         solver="cg", parameters=parameters)
 info = scheme.solve(target=displacement)
 
-# <markdowncell>
+# %% [markdown]
 # Show the magnitude of the displacement field, stress and the deformed beam
 
-# <codecell>
+# %%
 fig = pyplot.figure(figsize=(20,10))
 displacement.plot(gridLines=None, figure=(fig, 121), colorbar="horizontal")
 s = sigma(displacement) - (1./3)*tr(sigma(displacement))*Identity(2)
 von_Mises = sqrt(3./2*inner(s, s))
 plot(von_Mises, grid=polyGrid, gridLines=None, figure=(fig, 122), colorbar="horizontal")
 
-# <markdowncell>
+# %% [markdown]
 # Finally we plot the deformed beam
 
-# <codecell>
+# %%
 from dune.fem.view import geometryGridView
 position = space.interpolate( x+displacement, name="position" )
 beam = geometryGridView( position )

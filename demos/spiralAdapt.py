@@ -22,9 +22,9 @@ if len(sys.argv) > 2:
     maxOrder = int(sys.argv[2])
 print("Using max-order = ",maxOrder)
 
-# <markdowncell>
+# %% [markdown]
 # In our attempt we will discretize the model as a 2x2 system. Here are some possible model parameters and initial conditions (we even have two sets of model parameters to choose from):
-# <codecell>
+# %%
 
 nonConforming = False
 usePAdapt = False
@@ -52,9 +52,9 @@ else:
     def spiral_h(u,v): return u**3 - v
 
 
-# <markdowncell>
+# %% [markdown]
 # Now we set up the reference domain, the Lagrange finite element space (second order), and discrete functions for $(u^n,v^n($, $(u^{n+1},v^{n+1})$:
-# <codecell>
+# %%
 
 if dim == 3:
     domain   = dune.grid.cartesianDomain([0,0,0],[2.5,2.5,2.5],[5,5,5])
@@ -102,9 +102,9 @@ vh   = space.interpolate( initial_v, name="v" )
 vh_n = vh.copy()
 
 
-# <markdowncell>
+# %% [markdown]
 # Setting up the model
-# <codecell>
+# %%
 
 u   = ufl.TrialFunction(space)
 phi = ufl.TestFunction(space)
@@ -143,9 +143,9 @@ def markpm1(element):
     return space.localOrder( element ) - 1
 
 
-# <markdowncell>
+# %% [markdown]
 # The model is now completely implemented and can be created, together with the corresponding scheme:
-# <codecell>
+# %%
 
 solverParameters =\
        {"newton.tolerance": 1e-8,
@@ -156,9 +156,9 @@ solverParameters =\
         "newton.linear.verbose": True}
 scheme = dune.fem.scheme.galerkin( equation, solver="gmres", parameters=solverParameters)
 
-# <markdowncell>
+# %% [markdown]
 # Error estimator
-# <codecell>
+# %%
 
 fvspace = dune.fem.space.finiteVolume(uh.space.grid)
 estimate = fvspace.interpolate([0], name="estimate")
@@ -173,9 +173,9 @@ estimator_ufl = hT**2 * residual**2 * chi * dx +\
                 1/hS * jump(u)**2 * avg(chi) * dS
 estimator = dune.fem.operator.galerkin(estimator_ufl)
 
-# <markdowncell>
+# %% [markdown]
 # Time loop
-# <codecell>
+# %%
 @gridFunction(gridView,"pDegree")
 def pDegree(element,x):
     return space.localOrder(element)

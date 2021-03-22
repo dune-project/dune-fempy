@@ -1,44 +1,42 @@
 #!/bin/bash
 
-rm -rf env
-rm -rf package
-python3 -m virtualenv -p $(which python3) env
+#
+# This script builds a Python package index on gitlab.dune-project.org. Such an
+# index is necessary as a drop-in replacement for PyPI in continuous integration,
+# when runners operate with restricted network access.
+#
+
+# This script exits upon errors
+set -e
+
+# Create a temporary directory as workspace for this script
+TMPDIR=$(mktemp -d)
+pushd $TMPDIR
+
+python3 -m venv env
 source env/bin/activate
-python -m pip install -r requirements.txt
+python -m pip install pip-download twine
 
-getDune () {
-  # Clone the Dune modules that we need
-  rm -rf dune
-  mkdir dune
-  cd dune
-  git clone https://gitlab.dune-project.org/core/dune-common.git
-  git clone https://gitlab.dune-project.org/core/dune-geometry.git
-  git clone https://gitlab.dune-project.org/core/dune-grid.git
-  git clone https://gitlab.dune-project.org/core/dune-istl.git
-  git clone https://gitlab.dune-project.org/core/dune-localfunctions.git
-  cd ..
-  # Add packages from these Dune modules
-  pip2pi packages ./dune/dune-common
-  pip2pi packages ./dune/dune-geometry
-  pip2pi packages ./dune/dune-grid
-  pip2pi packages ./dune/dune-istl
-  pip2pi packages ./dune/dune-localfunctions
-}
+# pip-download -d $(pwd)/downloads \
+#  dune-common \
+#  dune-geometry \
+#  dune-grid \
+#  dune-alugrid \
+#  dune-istl \
+#  dune-localfunctions \
+#  dune-fem \
+#  dune-vem \
+#  dune-fem-dg
 
-# getDune
+pip-download -d $(pwd)/downloads \
+  pyparsing \
+  mpi4py
 
-# Add some packages that are needed for Python 3.7, but not 3.8
-# This is not really a satisfactory way of solving the problem
-# that the index depends on the platform+Python version it was built on.
-pip2pi packages importlib-metadata typing-extensions
-
-# Additional packages needed to build the tutorial
-# There is an issue with the correct jinja package so it is included here
-# with specific lower version
-pip2pi packages Pygments==2.7.3
-pip2pi packages jupyterlab-pygments==0.1.2
-pip2pi packages fenics-ufl
-pip2pi packages \
+pip-download -d $(pwd)/downloads \
+  Pygments==2.7.3 \
+  jupyterlab-pygments==0.1.2 \
+  fenics-ufl
+pip-download -d $(pwd)/downloads \
   apidoc\
   gmsh\
   ipython\
@@ -46,7 +44,7 @@ pip2pi packages \
   jupyter\
   mayavi\
   nbsphinx\
-  portalocker\
+  jupytext\
   pandas\
   pandoc\
   pygmsh\
@@ -61,12 +59,13 @@ pip2pi packages \
   petsc4py\
   pygmsh
 
-
-# Upload all the packages
-# export TWINE_USERNAME=__token__
-rm -rf ./packages/simple
-for filename in packages/*
+# Upload the packages to the index
+for filename in downloads/*
 do
   python -m twine upload --verbose --repository gitlab $filename
   echo upload $filename
 done
+
+# Clean up the temporary directory
+popd
+rm -rf $TMPDIR

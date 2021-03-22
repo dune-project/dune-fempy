@@ -1,4 +1,4 @@
-# <markdowncell>
+# %% [markdown]
 # # Dual Weighted Reisdual Estimate
 #
 # In this problem we revisit the Re-entrant Corner Problem but instead of
@@ -20,7 +20,7 @@
 # \end{gather*}
 
 
-# <codecell>
+# %%
 import matplotlib
 matplotlib.rc( 'image', cmap='jet' )
 import math
@@ -45,7 +45,7 @@ cornerAngle = 320.
 order = 2
 
 
-# <markdowncell>
+# %% [markdown]
 # We first define the domain and set up the grid and space.
 # We need this twice - once for a computation on a globally refined grid
 # and once for an adaptive one so we put the setup into a function:
@@ -58,7 +58,7 @@ order = 2
 
 
 
-# <codecell>
+# %%
 def setup():
     vertices = numpy.zeros((8, 2))
     vertices[0] = [0, 0]
@@ -91,7 +91,7 @@ def setup():
 
 uh, exact, laplace = setup()
 
-# <markdowncell>
+# %% [markdown]
 # Now we can setup the functional which will be $J(v)=v(P)$ where
 # $P=(0.4,0.4)$ is some point in the computational domain at which we want
 # to minimize the error. To compute the dwr estimator we need the solution
@@ -102,7 +102,7 @@ uh, exact, laplace = setup()
 #
 # .. literalinclude:: laplace-dwr.hh
 #
-# <codecell>
+# %%
 
 from dune.fem.scheme import galerkin as solutionScheme
 spaceZ = solutionSpace(uh.space.grid, order=order+1)
@@ -119,8 +119,8 @@ eh = expression2GF( uh.space.grid, abs(exact-uh), order=order+1 )
 computeFunctional = algorithm.load("pointFunctional", "laplace-dwr.hh",
             point, pointFunctional, eh)
 
-# <markdowncell>
-# <codecell>
+# %% [markdown]
+# %%
 
 from dune.fem.space import finiteVolume as estimatorSpace
 from dune.fem.operator import galerkin as estimatorOp
@@ -136,10 +136,10 @@ estimator_ufl = abs(div(grad(u)))*abs(z-zh) * v * dx +\
 estimator = estimatorOp(estimator_ufl)
 tolerance = 1e-6
 
-# <markdowncell>
+# %% [markdown]
 # Let us solve over a loop (solve,estimate,mark) and plot the solutions side by side.
 
-# <codecell>
+# %%
 h1error = dot(grad(uh - exact), grad(uh - exact))
 fig = pyplot.figure(figsize=(10,10))
 count = 0
@@ -170,10 +170,10 @@ while True:
 plot(uh, figure=(fig, 131+2), colorbar=False)
 
 
-# <markdowncell>
+# %% [markdown]
 # Let's take a close up look of the refined region around the point of
 # interest and the origin:
-# <codecell>
+# %%
 pyplot.close('all')
 fig = pyplot.figure(figsize=(30,20))
 plot(uh, figure=(fig, 231), xlim=(-0.5, 0.5), ylim=(-0.5, 0.5),
