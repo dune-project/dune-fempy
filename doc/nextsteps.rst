@@ -22,6 +22,7 @@ Some More Examples
    :maxdepth: 1
 
    othergrids_nb
+   backuprestore_nb
    discontinuousgalerkin_nb
    elasticity_nb
    spiral_nb

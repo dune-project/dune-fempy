@@ -27,20 +27,29 @@ export OMPI_MCA_mpi_yield_when_idle=1
 export OMPI_MCA_btl_base_warn_component_unused=0
 set -x
 
+ret = 0
 duneci-standard-test
+
+cd doc
 if [[ $REBUILD == "on" ]]; then
-  cd doc
   make clean
   make -ki ${parallel_opts}
-  cd ..
+  makeResult = `make -n`
+  if [ -z "$makeResult" ]; then
+    ret = 1
+  fi
 else
-  cd doc
   touch concepts.py
   make concepts_nb.ipynb
-  cd ..
+  ret = "$?"
 fi
+cd ..
+
 ${DUNECONTROL} --current make doc
+
 if [[ $REBUILD == "on" ]]; then
   tar cvzf doc.tar.gz doc
   curl --header "JOB-TOKEN: $CI_JOB_TOKEN" --upload-file $CI_PROJECT_DIR/doc.tar.gz $REGURL/tutorials/0.0.1/tutorial.tar.gz
 fi
+
+exit "$ret"
