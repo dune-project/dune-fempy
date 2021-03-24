@@ -57,31 +57,36 @@ Or can be obtained by cloning the git repository
 https://gitlab.dune-project.org/dune-fem/dune-fempy
 where they can be found in the demo folder.
 
-#. First off some remarks on getting the package to work: an easy way of testing
-   but also developing code within the `Dune`_ python framework is to use
-   `docker`_. Working from the git sources is also discussed.
+#. First off some remarks on getting the package to work: the simplest
+   approach is to use the Python package index (pip) to install the software
+   into a new virtual environment.
+   Docker and working from the git sources is also discussed.
 #. A scalar Laplace problem and a simple scalar, non linear time dependent partial
    differential equation
    is used to describe the basic concepts. This leads through the steps
    required to set up the problem, solve the system of equations, and
-   visualize the results. After this introduction we discuss how to use
-   different solver backends (including build in solvers, solvers and
-   preconditioners available in `Dune-Istl`_, `scipy`_, `petsc`_ and
-   also `petsc4py`_ see also :cite:`PETSc-Paper,SciPy-Paper`).
-   The introduction ends with an overview of how more complicated boundary
-   conditions are defined.
-#. We then provide more detail on how to use the `Dune`_ grid interface,
-   construct a grid using different formats including for
-   example `gmsh`_ but also using simple python structures like
-   dictionaries for describing general unstructured grids is available.
-   Results can be plotted using `matplotlib`_ (for 2d) and for example
-   `mayavi`_ (for 2d and 3d). For more advanced plotting options data can
-   be exported using `vtk` format and then analysed for example using
-   `paraview`_.
-   In this section we also give details of how to attach data to the grid entities
-   and define general grid functions.
-#. Some more examples building up on the general concepts described
-   in the first part are presented.
+   visualize the results.
+#. After the introduction to the underlying concepts and how to get a
+   simple problem up and running, we discuss:
+
+   * how to use different solver backends (including build in solvers, solvers and
+     preconditioners available in `Dune-Istl`_, `scipy`_, `petsc`_ and
+     also `petsc4py`_ see also :cite:`PETSc-Paper,SciPy-Paper`).
+   * how to add more complicated boundary conditions to the problem formulation.
+   * how to backup and restore data including discrete functions and the
+     grid hierarchy as is useful for example to checkpoint a simulation.
+   * more details on constructing a grid using different formats including for
+     example `gmsh`_ but also using simple python structures like
+     dictionaries for describing general unstructured grids is available.
+     Results can be plotted using `matplotlib`_ (for 2d) and for example
+     `mayavi`_ (for 2d and 3d). For more advanced plotting options data can
+     be exported using `vtk` format and then analysed for example using
+     `paraview`_. All of this is demonstrated in the provided examples.
+   * discuss the grid interface in more details, i.e., how to iterate over
+     the grid, access geometrical information, and attach data to elements
+     of the grid.
+#. Building upon the general concepts described in the first part, we
+   provide scripts showing how to solve far more complex PDEs.
    The :ref:`scripts`
    used for each of these and the following examples can be downloaded
    and are hopefully useful as starting point for new projects.
