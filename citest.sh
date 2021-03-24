@@ -27,21 +27,21 @@ export OMPI_MCA_mpi_yield_when_idle=1
 export OMPI_MCA_btl_base_warn_component_unused=0
 set -x
 
-ret = 0
 duneci-standard-test
 
+ret=0
 cd doc
 if [[ $REBUILD == "on" ]]; then
   make clean
   make -ki ${parallel_opts}
-  makeResult = `make -n`
+  makeResult=`make -n`
   if [ -z "$makeResult" ]; then
-    ret = 1
+    ret=1
   fi
 else
   touch concepts.py
   make concepts_nb.ipynb
-  ret = "$?"
+  ret="$?"
 fi
 cd ..
 
