@@ -139,6 +139,9 @@ where they can be found in the demo folder.
    :maxdepth: 2
    :caption: Next Steps
 
+   othergrids_nb
+   boundary_nb
+   backuprestore_nb
    nextsteps
 
 .. toctree::

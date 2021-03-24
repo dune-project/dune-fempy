@@ -1,20 +1,5 @@
 .. sectionauthor:: Andreas Dedner <a.s.dedner@warwick.ac.uk>, Martin Nolte <nolte.mrtn@gmail.com>
 
-#########
-3D and 1D
-#########
-othergrids_nb
-
-###################
-Boundary Conditions
-###################
-boundary_nb
-
-#############################
-Backing up and Restoring Data
-#############################
-backuprestore_nb
-
 
 #############################
 Using the Full Grid Interface
