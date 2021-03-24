@@ -141,8 +141,15 @@ where they can be found in the demo folder.
 
    othergrids_nb
    boundary_nb
+   solvers_nb
    backuprestore_nb
-   nextsteps
+   corepy
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Further examples
+
+   furtherexamples
 
 .. toctree::
    :maxdepth: 3
