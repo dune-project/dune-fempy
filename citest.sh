@@ -4,6 +4,8 @@ set -u
 set -- --opts="/duneci/dune.opts" "${@}"
 DUNECONTROL=dunecontrol
 
+PETSC_DIR=/usr/lib/petsc
+
 pip install -i https://gitlab.dune-project.org/api/v4/projects/812/packages/pypi/simple --no-build-isolation wheel
 pip install -i https://gitlab.dune-project.org/api/v4/projects/812/packages/pypi/simple --no-build-isolation --upgrade Pygments
 pip install -i https://gitlab.dune-project.org/api/v4/projects/812/packages/pypi/simple --no-build-isolation -r reqCI.txt
@@ -29,6 +31,7 @@ set -x
 
 duneci-standard-test
 
+export DUNE_LOG_LEVEL=DEBUG
 ret=0
 cd doc
 if [[ $REBUILD == "on" ]]; then
