@@ -20,8 +20,10 @@
 # condition.
 
 # %%
-from dune.fem.plotting import plotComponents
+import matplotlib
+matplotlib.rc( 'image', cmap='jet' )
 from matplotlib import ticker
+from dune.fem.plotting import plotComponents
 
 import math, io
 from dune.grid import structuredGrid as leafGridView
