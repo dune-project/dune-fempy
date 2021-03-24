@@ -4,7 +4,7 @@ PATH := bin:$(PATH)
 FIGURES = figures/3dexample.png figures/interpolation_discrete.png figures/interpolation_exact.png figures/interpolation_error.png
 NBS = spiral_nb.ipynb uzawa-scipy_nb.ipynb elasticity_nb.ipynb wave_nb.ipynb \
       laplace-adaptive_nb.ipynb crystal_nb.ipynb \
-			mcf_nb.ipynb \
+			mcf_nb.ipynb boundary_nb.ipynb \
 			mcf-algorithm_nb.ipynb lineplot_nb.ipynb laplace-dwr_nb.ipynb othergrids_nb.ipynb \
 			concepts_nb.ipynb dune-fempy_nb.ipynb backuprestore_nb.ipynb \
       dune-corepy_nb.ipynb discontinuousgalerkin_nb.ipynb \

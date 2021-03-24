@@ -24,9 +24,9 @@ non linear problem.
 
    concepts_nb
 
-##########################################
-Solving a Nonlinear Time Dependent Problem
-##########################################
+########################################################################
+A Nonlinear Time Dependent Problem (using build-in and external solvers)
+########################################################################
 .. sectionauthor:: Lloyd Connellan <l.connellan@warwick.ac.uk>, Andreas Dedner <a.s.dedner@warwick.ac.uk>, Robert Kl\ |oe|\ fkorn <robert.kloefkorn@iris.no>, Martin Nolte <nolte.mrtn@gmail.com>
 
 .. toctree::

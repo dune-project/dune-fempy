@@ -1,5 +1,29 @@
 .. sectionauthor:: Andreas Dedner <a.s.dedner@warwick.ac.uk>, Martin Nolte <nolte.mrtn@gmail.com>
 
+#########
+3D and 1D
+#########
+.. toctree::
+   :maxdepth: 1
+
+   othergrids_nb
+
+###################
+Boundary Conditions
+###################
+.. toctree::
+   :maxdepth: 1
+
+   boundary_nb
+
+#############################
+Backing up and Restoring Data
+#############################
+.. toctree::
+   :maxdepth: 1
+
+   backuprestore_nb
+
 #############################
 Using the Full Grid Interface
 #############################
@@ -21,8 +45,6 @@ Some More Examples
 .. toctree::
    :maxdepth: 1
 
-   othergrids_nb
-   backuprestore_nb
    discontinuousgalerkin_nb
    elasticity_nb
    spiral_nb
