@@ -3,26 +3,18 @@
 #########
 3D and 1D
 #########
-.. toctree::
-   :maxdepth: 1
-
-   othergrids_nb
+othergrids_nb
 
 ###################
 Boundary Conditions
 ###################
-.. toctree::
-   :maxdepth: 1
-
-   boundary_nb
+boundary_nb
 
 #############################
 Backing up and Restoring Data
 #############################
-.. toctree::
-   :maxdepth: 1
+backuprestore_nb
 
-   backuprestore_nb
 
 #############################
 Using the Full Grid Interface
