@@ -23,14 +23,3 @@ non linear problem.
    :name: concepts
 
    concepts_nb
-
-########################################################################
-A Nonlinear Time Dependent Problem (using build-in and external solvers)
-########################################################################
-.. sectionauthor:: Lloyd Connellan <l.connellan@warwick.ac.uk>, Andreas Dedner <a.s.dedner@warwick.ac.uk>, Robert Kl\ |oe|\ fkorn <robert.kloefkorn@iris.no>, Martin Nolte <nolte.mrtn@gmail.com>
-
-.. toctree::
-   :maxdepth: 1
-
-   dune-fempy_nb
-

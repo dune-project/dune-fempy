@@ -1,14 +1,14 @@
-import matplotlib
-matplotlib.rc( 'image', cmap='jet' )
-
 # %% [markdown]
-# # Checkointing: Backup and restore
+# # Checkointing: backup and restore
 # We show here how the state of a simulation can be stored and restored
 # using pickle. This is still work in progress:
 # We implement a class that stores a hierarchical grid and some discrete
 # functions and other information.
 
 # %%
+import matplotlib
+matplotlib.rc( 'image', cmap='jet' )
+
 import pickle, numpy
 class CheckPointer:
     # if 'hgrid=None' then restore hierarchical grid using given file name

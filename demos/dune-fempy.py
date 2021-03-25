@@ -1,5 +1,5 @@
 # %% [markdown]
-# # Setting up and Solving the Problem
+# # A Nonlinear Time Dependent Problem
 # Now we can set up our PDE model
 # As an example we will study the Forchheimer problem
 # <cite data-cite="Kieu"></cite>
@@ -45,7 +45,7 @@ from dune.ufl import DirichletBC, Constant
 from ufl import TestFunction, TrialFunction, SpatialCoordinate, FacetNormal, \
                 dx, ds, div, grad, dot, inner, sqrt, exp, sin
 
-gridView = leafGridView([0, 0], [1, 1], [4, 4])
+gridView = leafGridView([0, 0], [1, 1], [10, 10])
 space = solutionSpace(gridView, order=2)
 
 x = SpatialCoordinate(space)
@@ -103,37 +103,26 @@ l2error = uflFunction(gridView, name="l2error", order=u_h.space.order, ufl=dot(u
 h1error = uflFunction(gridView, name="h1error", order=u_h.space.order, ufl=dot(grad(u_h - exact_end), grad(u_h - exact_end)))
 
 # %% [markdown]
-# Now we evolve the solution on two grid levels, compute the errors, and
-# the experimental order of convergence:
+# Now we evolve the solution from time $t=0$ to $t=T$ in a loop. Since the
+# PDE model has time dependent coefficient (through the forcing term), we
+# need to update the `t` constant used to define the model before each step.
+# A second constant we used to define the model was `dt` which defines the
+# time step. We keep this constant and set it to $0.002$ at the beginning
+# of the simulation. This value could be changed in each time step:
 
 # %%
-scheme.model.dt = 0.005
+scheme.model.dt = 0.002
+u_h.interpolate(initial)
+time = 0
+while time < (endTime - 1e-6):
+    scheme.model.t = time
+    u_h_n.assign(u_h)
+    scheme.solve(target=u_h)
+    time += scheme.model.dt
 
-errors = 0,0
-loops = 2
-for eocLoop in range(loops):
-    u_h.interpolate(initial)
-
-    time = 0
-    while time < (endTime - 1e-6):
-        scheme.model.t = time
-        u_h_n.assign(u_h)
-        scheme.solve(target=u_h)
-        time += scheme.model.dt
-
-    errors_old = errors
-    errors = [sqrt(e) for e in integrate(gridView, [l2error,h1error], order=5)]
-    if eocLoop == 0:
-        eocs = ['-','-']
-    else:
-        eocs = [ round(math.log(e/e_old)/math.log(0.5),2) \
-                 for e,e_old in zip(errors,errors_old) ]
-    print('Forchheimer: step:', eocLoop, ', size:', gridView.size(0))
-    print('\t | u_h - u | =', '{:0.5e}'.format(errors[0]), ', eoc =', eocs[0])
-    print('\t | grad(uh - u) | =', '{:0.5e}'.format(errors[1]), ', eoc =', eocs[1])
-    u_h.plot()
-    gridView.writeVTK('forchheimer', pointdata={'u': u_h, 'l2error':
-                  l2error, 'h1error': h1error}, number=eocLoop)
-    if eocLoop < loops-1:
-        gridView.hierarchicalGrid.globalRefine(1)
-        scheme.model.dt /= 2
+errors = [sqrt(e) for e in integrate(gridView, [l2error,h1error], order=5)]
+print('grid size:', gridView.size(0))
+print('\t | u_h - u | =', '{:0.5e}'.format(errors[0]))
+print('\t | grad(uh - u) | =', '{:0.5e}'.format(errors[1]))
+u_h.plot()
+gridView.writeVTK('forchheimer', pointdata={'u': u_h, 'l2error': l2error, 'h1error': h1error})

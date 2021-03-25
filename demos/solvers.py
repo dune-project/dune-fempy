@@ -49,7 +49,6 @@ from ufl import TestFunction, TrialFunction, SpatialCoordinate, FacetNormal, \
                 dx, ds, div, grad, dot, inner, sqrt, exp, sin
 
 gridView = leafGridView([0, 0], [1, 1], [4, 4])
-gridView.hierarchicalGrid.globalRefine(1)
 space = solutionSpace(gridView, order=2)
 
 x = SpatialCoordinate(space)
@@ -76,7 +75,6 @@ n = FacetNormal(space)
 b = 0.5*(f(t)+f(t+dt))*v*dx + 0.5*dot(g(t)+g(t+dt),n)*v*ds
 
 scheme = solutionScheme(a == b, solver='cg')
-scheme.model.dt = 0.0025
 
 endTime    = 0.25
 exact_end  = exact(endTime)
@@ -100,14 +98,31 @@ def evolve(scheme, u_h, u_h_n, endTime):
 
 # %% [markdown]
 # We can simply use the `scheme` in this function to produce the solution
-# at the final time
+# at the final time. We combine this with a loop to compute the error over
+# two grids and estimate the convergence rate:
 
 # %%
-u_h.interpolate(initial)                # reset u_h to initial
-evolve(scheme, u_h, u_h_n, endTime)
-error = u_h - exact_end
-print("Forchheimer(build-in) size: ", gridView.size(0), "L^2, H^1 error:",'{:0.5e}, {:0.5e}'.format(
-  *[ sqrt(e) for e in integrate(gridView,[error**2,inner(grad(error),grad(error))], order=5) ]))
+scheme.model.dt = 0.005
+
+errors = 0,0
+loops = 2
+for eocLoop in range(loops):
+    u_h.interpolate(initial)
+    evolve(scheme, u_h, u_h_n, endTime)
+    errors_old = errors
+    errors = [sqrt(e) for e in integrate(gridView, [l2error,h1error], order=5)]
+    if eocLoop == 0:
+        eocs = ['-','-']
+    else:
+        eocs = [ round(math.log(e/e_old)/math.log(0.5),2) \
+                 for e,e_old in zip(errors,errors_old) ]
+    print('Forchheimer: step:', eocLoop, ', size:', gridView.size(0))
+    print('\t | u_h - u | =', '{:0.5e}'.format(errors[0]), ', eoc =', eocs[0])
+    print('\t | grad(uh - u) | =', '{:0.5e}'.format(errors[1]), ', eoc =', eocs[1])
+    u_h.plot()
+    if eocLoop < loops-1:
+        gridView.hierarchicalGrid.globalRefine(1)
+        scheme.model.dt /= 2
 
 # %% [markdown]
 # ## Using Scipy

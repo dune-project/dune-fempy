@@ -7,9 +7,7 @@ Welcome to the documentation for dune-fem's python bindings
 
 This module brings python scripting support to `Dune`_.
 This version describes the bindings for the development version
-(to become 2.8). The `tutorial compatible with the 2.7 release`_ of
-the DUNE modules is also available.
-It serves three purposes:
+(to become 2.8). It serves three purposes:
 
 1. High level program control for solving partial differential equations
    using classes from the `Dune`_ core and from `Dune-Fem`_
@@ -139,14 +137,15 @@ where they can be found in the demo folder.
    :caption: Getting Started
 
    gettingstarted
+   dune-fempy_nb
 
 .. toctree::
    :maxdepth: 2
    :caption: Next Steps
 
-   othergrids_nb
-   boundary_nb
    solvers_nb
+   boundary_nb
+   othergrids_nb
    backuprestore_nb
    corepy
 

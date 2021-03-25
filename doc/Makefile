@@ -43,5 +43,6 @@ distclean: clean
 
 figures/3dexample.png: 3dexample.py dune-fempy_nb.ipynb
 	@pvpython 3dexample.py
-figures/interpolation_discrete.png figures/interpolation_exact.png figures/interpolation_error.png: interpolation.py dune-corepy_nb.ipynb
+
+figures/interpolation_discrete.png figures/interpolation_exact.png figures/interpolation_error.png &: interpolation.py dune-corepy_nb.ipynb
 	@pvpython interpolation.py
