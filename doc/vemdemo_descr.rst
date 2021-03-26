@@ -20,3 +20,4 @@ problems but second order problems are also discussed).
    :maxdepth: 3
 
    vemdemo_nb
+   chimpl_nb

@@ -4,11 +4,11 @@
 # where we focus on the forth order problems but the second order problems
 # are discussed there as well.
 
-# # Laplace Problem
+# # Elliptic Problems
 #
-# We first consider a simple Laplace problem with Dirichlet boundary conditions
+# We first consider an elliptic problem with varying coefficients and Dirichlet boundary conditions
 # \begin{align*}
-# -\Delta u &= f, && \text{in } \Omega, \\
+# -\nabla D(x)\nabla u + \mu(x) u &= f, && \text{in } \Omega, \\
 # u &= g, && \text{on } \partial\Omega,
 # \end{align*}
 # with $\Omega=[-\frac{1}{2},1]^2$ and choosing the forcing and the boundary conditions
@@ -45,7 +45,7 @@ dune.fem.parameter.append({"fem.verboserank": 0})
 # iterations of Lloyd's algorithm to improve the quality of the grid.
 
 # %%
-polyGrid = dune.vem.polyGrid( dune.vem.voronoiCells([[-0.5,-0.5],[1,1]], 150, lloyd=100) )
+polyGrid = dune.vem.polyGrid( dune.vem.voronoiCells([[-0.5,-0.5],[1,1]], 50, lloyd=100) )
 
 # %% [markdown]
 # One can also use a standard simplex or cube grid, e.g.,
@@ -106,7 +106,6 @@ u = TrialFunction(space)
 v = TestFunction(space)
 
 exact = as_vector( [x[0]*x[1] * cos(pi*x[0]*x[1])] )
-# exact = as_vector( [(x[0]+0.5)*(x[0]-1)*(x[1]+0.5)*(x[1]-1)] )
 
 massCoeff = 1+sin(dot(x,x))       # factor for mass term
 diffCoeff = 1-0.9*cos(dot(x,x))   # factor for diffusion term
@@ -181,8 +180,7 @@ methods = [ ### "[legend,space,scheme,spaceKwargs,schemeKwargs]"
 # %%
 def compute(grid, space,spaceArgs, schemeName,schemeArgs):
     space = space( polyGrid, order=order, dimRange=1, storage="istl", **spaceArgs )
-    # space.interpolate([0],name="solution") # issue here for C^1 spaces
-    df = discreteFunction(space, name="solution")
+    df = space.interpolate([0],name="solution")
     scheme = schemeName( [a==b, *dbc], space, solver="cg", **schemeArgs,
                          parameters=parameters )
     info = scheme.solve(target=df)
@@ -200,10 +198,10 @@ def compute(grid, space,spaceArgs, schemeName,schemeArgs):
 
 # %%
 fig = pyplot.figure(figsize=(5*len(methods),10))
-figPos = 100+10*len(methods)+11
+figPos = 111+10*len(methods)
 for i,m in enumerate(methods):
     dfs,errors,info = compute(polyGrid, m[1],m[3], m[2],m[4])
-    print("method (",i,"): (",m[0],")",
+    print("method (",m[0],"):",
           "Size: ",dfs.space.size, "L^2: ", errors[0], "H^1: ", errors[1],
           info["linear_iterations"], flush=True)
     dfs.plot(figure=(fig,figPos+i), gridLines=None, colorbar="horizontal")
@@ -229,8 +227,8 @@ info = scheme.solve(target=solution)
 edf = exact-solution
 errors = [ math.sqrt(e) for e in
            integrate(polyGrid, [inner(edf,edf),inner(grad(edf),grad(edf))], order=5) ]
-print( errors )
-solution.plot(gridLines=None) # , colorbar="horizontal")
+print("non linear problem:", errors )
+solution.plot(gridLines=None)
 
 # %% [markdown]
 # # Linear Elasticity
@@ -306,19 +304,22 @@ beam.plot()
 
 # %% [markdown]
 # # Forth order problem
-# As final example we solve a forth order PDE usign a non-conforming VEM
-# space for H^2 functions. We can use the same 'compute' method used above
-# but now use a moment vector for a suitable space for H^2 problems.
+# As final example we solve some forth order PDEs usign a non-conforming VEM
+# space for H^2 functions. To construct the space we just need to define
+# a suitable 'moments' vector to construct a suitable space for H^2 problems.
 #
 # __Note__: at the moment a H^2-conforming space is not implemented.
 
 # %%
-method = ["nc-C^1", dune.vem.vemSpace,    dune.vem.vemScheme,
-          {"testSpaces":[ [0], [order-3,order-2], [order-4] ] },
-          {"hessStabilization":1, "gradStabilization":0, "massStabilization":0}]
+ncC1testSpaces = [ [0], [order-3,order-2], [order-4] ]
 
 # %% [markdown]
 # We test the method using a biharmonic problem.
+# \begin{align*}
+# -\Delta^2 u &= f, && \text{in } \Omega, \\
+# u &= g, && \text{on } \partial\Omega, \\
+# \nabla u.n &= 0, && \text{on } \partial\Omega,
+# \end{align*}
 #
 # __Note__:
 #       for function which continuous derivatives we have
@@ -333,22 +334,31 @@ method = ["nc-C^1", dune.vem.vemSpace,    dune.vem.vemScheme,
 #       'exact' is smooth enough.
 
 # %%
-uflSpace = dune.ufl.Space(2, dimRange=1)
-x = SpatialCoordinate(uflSpace)
+polyGrid = dune.vem.polyGrid( dune.vem.voronoiCells([[0,0],[1,1]], 50, lloyd=100) )
+space = dune.vem.vemSpace( polyGrid, order=order, dimRange=1, storage="istl",
+                           testSpaces=ncC1testSpaces)
+
+x = SpatialCoordinate(space)
 exact = as_vector( [sin(2*pi*x[0])**2*sin(2*pi*x[1])**2] )
 
 laplace = lambda w: div(grad(w))
 H = lambda w: grad(grad(w))
-u = TrialFunction(uflSpace)
-v = TestFunction(uflSpace)
+u = TrialFunction(space)
+v = TestFunction(space)
 a = ( inner(H(u[0]),H(v[0])) ) * dx
 
 # finally the right hand side and the boundary conditions
 b = laplace(laplace(exact[0])) * v[0] * dx
-dbc = [dune.ufl.DirichletBC(uflSpace, [0], i+1) for i in range(4)]
+dbc = [dune.ufl.DirichletBC(space, [0], i+1) for i in range(4)]
 
-dfs,errors,info = compute(polyGrid, method[1],method[3], method[2],method[4])
-print("method: (",method[0],")",
-      "Size: ",dfs.space.size, "L^2: ", errors[0], "H^1: ", errors[1],
-      info["linear_iterations"], flush=True)
-dfs.plot(gridLines=None)
+scheme = dune.vem.vemScheme( [a==b, *dbcs], space, hessStabilization=1,
+                             solver="cg", parameters=parameters )
+
+# solution = space.interpolate([0], name="solution") # issue here for C^1 spaces
+solution = discreteFunction(space, name="solution")
+info = scheme.solve(target=solution)
+edf = exact-solution
+errors = [ math.sqrt(e) for e in
+           integrate(polyGrid, [inner(edf,edf),inner(grad(edf),grad(edf))], order=5) ]
+print("bi-laplace errors:", errors )
+solution.plot(gridLines=None)
