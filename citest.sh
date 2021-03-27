@@ -11,6 +11,9 @@ pip install -i https://gitlab.dune-project.org/api/v4/projects/812/packages/pypi
 pip install -i https://gitlab.dune-project.org/api/v4/projects/812/packages/pypi/simple --no-build-isolation -r reqCI.txt
 # check including portalocker
 # pip install -i https://gitlab.dune-project.org/api/v4/projects/812/packages/pypi/simple --no-build-isolation portalocker
+
+python -c "from sortedcontainers import SortedDict"
+
 cd /duneci/modules
 ./dune-common/bin/setup-dunepy.py
 cd $CI_PROJECT_DIR

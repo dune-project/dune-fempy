@@ -32,7 +32,6 @@ from dune.grid import cartesianDomain, gridFunction
 from dune.fem.plotting import plotPointData as plot
 from dune.fem.function import integrate, discreteFunction
 import dune.fem
-import dune.vem
 
 from ufl import *
 import dune.ufl
