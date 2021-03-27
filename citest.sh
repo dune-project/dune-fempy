@@ -12,8 +12,6 @@ pip install -i https://gitlab.dune-project.org/api/v4/projects/812/packages/pypi
 # check including portalocker
 # pip install -i https://gitlab.dune-project.org/api/v4/projects/812/packages/pypi/simple --no-build-isolation portalocker
 
-python -c "from sortedcontainers import SortedDict ; print(SortedDict)"
-
 cd /duneci/modules
 ./dune-common/bin/setup-dunepy.py
 cd $CI_PROJECT_DIR
@@ -45,6 +43,10 @@ if [[ $REBUILD == "on" ]]; then
     ret=1
   fi
 else
+  python -c "from sortedcontainers import SortedDict ; print(SortedDict)"
+  python -c "import dune.vem ; print(dune.vem)"
+  touch vemdemo.py
+  make vemdemo_nb.ipynb
   touch concepts.py
   make concepts_nb.ipynb
   ret="$?"
