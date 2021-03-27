@@ -36,6 +36,7 @@ pip-download -d $(pwd)/downloads \
   Pygments==2.7.3 \
   jupyterlab-pygments==0.1.2 \
   fenics-ufl
+
 pip-download -d $(pwd)/downloads \
   apidoc\
   gmsh\
@@ -53,6 +54,7 @@ pip-download -d $(pwd)/downloads \
   sphinx-autobuild\
   sphinx_rtd_theme\
   sphinxcontrib-bibtex\
+  sortedcontainers\
   triangle\
   wheel\
   x3d\
