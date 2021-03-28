@@ -1,3 +1,7 @@
+import sys
+print("sys.version, sys.version_info, sys.prefix, sys.platform, sys.path, sys.exec_prefix, sys.base_prefix")
+print(sys.version, sys.version_info, sys.prefix, sys.platform, sys.path, sys.exec_prefix, sys.base_prefix)
+
 # %% [markdown]
 # The main concepts of our virtual element implementation is provided in
 # <cite data-cite="VEM"></cite>
