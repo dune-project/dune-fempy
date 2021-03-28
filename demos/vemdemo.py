@@ -94,8 +94,10 @@ polygons.plot(colorbar="horizontal")
 
 # %%
 order = 3
+print("setting up space",flush=True)
 space = dune.vem.vemSpace( polyGrid, order=order, dimRange=1, storage="istl",
                            testSpaces=[-1,order-1,order-2])
+print("finished space",flush=True)
 
 # %% [markdown]
 # Now we define the model starting with the exact solution:
