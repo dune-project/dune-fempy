@@ -52,6 +52,7 @@ if [[ $REBUILD == "on" ]]; then
     ret=1
   fi
 else
+  python vemdemo.py
   touch vemdemo.py
   rm vemdemo_nb.ipynb
   make vemdemo_nb.ipynb
