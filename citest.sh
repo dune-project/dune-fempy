@@ -35,6 +35,15 @@ duneci-standard-test
 export DUNE_LOG_LEVEL=DEBUG
 ret=0
 cd doc
+echo "*******************************"
+echo "*******************************"
+python -c "from sortedcontainers import SortedDict ; print(SortedDict)"
+python -c "import dune.vem ; print(dune.vem)"
+echo "*******************************"
+python3 -c "from sortedcontainers import SortedDict ; print(SortedDict)"
+python3 -c "import dune.vem ; print(dune.vem)"
+echo "*******************************"
+echo "*******************************"
 if [[ $REBUILD == "on" ]]; then
   make clean
   make -ki ${parallel_opts}
@@ -43,9 +52,8 @@ if [[ $REBUILD == "on" ]]; then
     ret=1
   fi
 else
-  python -c "from sortedcontainers import SortedDict ; print(SortedDict)"
-  python -c "import dune.vem ; print(dune.vem)"
   touch vemdemo.py
+  rm vemdemo_nb.ipynb
   make vemdemo_nb.ipynb
   touch concepts.py
   make concepts_nb.ipynb

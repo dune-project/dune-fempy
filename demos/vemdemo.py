@@ -19,6 +19,7 @@
 
 # First some setup code:
 # %%
+import dune.vem
 try:
     import dune.vem
 except:
