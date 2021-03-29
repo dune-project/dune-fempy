@@ -1,6 +1,8 @@
 numpy>=1.20
 scipy
 nbsphinx
+ipython
+jupyter
 jupytext
 pandas
 pandoc
