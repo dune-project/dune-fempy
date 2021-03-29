@@ -11,7 +11,8 @@ variables:
 
 before_script:
   - export TORTURE_TESTS=off
-  - python3 -m venv --system-site-packages /duneci/modules/dune-env
+  # python3 -m venv --system-site-packages /duneci/modules/dune-env
+  - python3 -m venv /duneci/modules/dune-env
   - source /duneci/modules/dune-env/bin/activate
   - source /duneci/bin/duneci-init-job
   - duneci-install-module https://gitlab.dune-project.org/core/dune-common.git
