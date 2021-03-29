@@ -1,3 +1,4 @@
+# %%
 import sys
 print("sys.version, sys.version_info, sys.prefix, sys.platform, sys.path, sys.exec_prefix, sys.base_prefix")
 print(sys.version, sys.version_info, sys.prefix, sys.platform, sys.path, sys.exec_prefix, sys.base_prefix)
