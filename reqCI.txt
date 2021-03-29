@@ -5,6 +5,7 @@ ipython
 jupyter
 jupytext
 pandas
+matplotlib
 pandoc
 pyqt5
 sparkmonitor

@@ -45,6 +45,7 @@ pip-download -d $(pwd)/downloads \
   jupyter\
   mayavi\
   nbsphinx\
+  matplotlib\
   jupytext\
   pandas\
   pandoc\
