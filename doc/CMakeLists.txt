@@ -23,7 +23,7 @@ discontinuousgalerkin_nb.ipynb
 laplace-dwr_nb.ipynb       lineplot_nb.ipynb          wave_nb.ipynb
 mcf-algorithm_nb.ipynb     backuprestore_nb.ipynb     boundary_nb.ipynb
 solvers_nb.ipynb
-nbscript2rst.sh            laplace-dwr.hh             utility.hh        uzawa.hh
+laplace-dwr.hh             utility.hh        uzawa.hh
 figures _static dune-fempy.bib .special.rst
 soap.dgf sphere.dgf unitcube-2d.dgf wave_tank.msh
 config.opts
