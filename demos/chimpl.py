@@ -5,13 +5,17 @@
 # scheme here. You can find more details in <cite data-cite="VEM"></cite>
 
 # %%
+try:
+    import dune.vem
+except:
+    import sys
+    sys.exit(0)
 import matplotlib
 matplotlib.rc( 'image', cmap='jet' )
 from matplotlib import pyplot
 import math, random
 from dune.grid import cartesianDomain, gridFunction
 import dune.fem
-import dune.vem
 from dune.fem.plotting import plotPointData as plot
 from dune.fem.function import integrate, discreteFunction
 

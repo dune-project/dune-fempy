@@ -1,16 +1,3 @@
-# %%
-import sys
-sys.stdout = open('/dev/stdout', 'w')
-print("***************************************",flush=True)
-print("sys.version, sys.version_info, sys.prefix, sys.platform, sys.path, sys.exec_prefix, sys.base_prefix")
-print(sys.version, sys.version_info, sys.prefix, sys.platform, sys.path, sys.exec_prefix, sys.base_prefix)
-print("***************************************",flush=True)
-import numpy
-numpy.set_printoptions(precision=None,floatmode="unique")
-
-# %%
-import triangle
-
 # %% [markdown]
 # The main concepts of our virtual element implementation is provided in
 # <cite data-cite="VEM"></cite>
@@ -32,7 +19,6 @@ import triangle
 
 # First some setup code:
 # %%
-import dune.vem
 try:
     import dune.vem
 except:
@@ -107,10 +93,8 @@ polygons.plot(colorbar="horizontal")
 
 # %%
 order = 3
-print("setting up space",flush=True)
 space = dune.vem.vemSpace( polyGrid, order=order, dimRange=1, storage="istl",
                            testSpaces=[-1,order-1,order-2])
-print("finished space",flush=True)
 
 # %% [markdown]
 # Now we define the model starting with the exact solution:
