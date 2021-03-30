@@ -1,5 +1,21 @@
 # %% [markdown]
-# # Setting up the Mesh
+# # General Concepts (including how to solve a Laplace problem)
+# In the foloowing we introduce how to construct and use the basic components of
+# a finite element method ending the first part with solving a simple Laplace
+# problem. The required steps are:
+#
+# - constructing a tesselation of the computational domain
+# - working with functions defined over the grid
+# - setting up discrete functions
+# - defining the mathematical model to solve
+# - solving the (non linear) system arising from the discretization of the
+#   model by the Galerkin method
+#
+# After that we study the more complex problem of solving a time dependent
+# non linear problem.
+
+# %% [markdown]
+# ## Setting up the Mesh
 # After some general import statements we start our tutorial by setting up
 # a simple Cartesian grid over the domain $[0,1]^2$ subdivided into four
 # intervals in each dimension. We can then show the grid using the `plot`
@@ -25,7 +41,7 @@ gridView = leafGridView([0, 0], [1, 1], [4, 4])
 gridView.plot()
 
 # %% [markdown]
-# # Grid Functions
+# ## Grid Functions
 # These are function that are defined over a given grid and are evaluated
 # by using an element of the grid and local coordinated within that
 # element:
@@ -66,7 +82,8 @@ gridView.writeVTK('exact', pointdata={'exact': exact})
 # %% [markdown]
 # In some cases it can be necessary to convert a UFL expression into a grid
 # function explicitly - for example to be able to evaluate it over each
-# element in the grid:
+# element in the grid [(in a later section)](dune-corepy_nb.ipynb)
+# we provide more detail on how to access the grid interface).
 
 # %%
 from dune.fem.function import uflFunction
@@ -193,7 +210,7 @@ print( integrate(gridView, abs(2*exactCpp-exactCpp2), order=5) )
 # alternative.
 
 # %% [markdown]
-# # Discrete Function Spaces
+# ## Discrete Functions
 # Note that the grid functions set up so far did not involve any
 # discretization, they are exactly evaluated at the given point.
 # A special type of grid functions are discrete functions living in a
@@ -265,19 +282,30 @@ from dune.grid import OutputType
 gridView.writeVTK('uh', pointdata=[u_h], outputType=OutputType.appendedraw)
 
 # %% [markdown]
-# and as before a discrete function can be used as coefficient in a UFL
-# expression
+# Note: the discrete function `u_h` already has a `name` attribute given in
+# the `interpolate` call. This is used by default in the vtk file. An
+# alternative name can be given by using a dictionary as shown previously.
+#
+# Of course a discrete function can also be used as a coefficient in a UFL expression
 
 # %%
 print( integrate(gridView, abs(exact-u_h), order=5) )
 
 # %% [markdown]
-# Note: the discrete function `u_h` already has a `name` attribute given in
-# the `interpolate` call. This is used by default in the vtk file. An
-# alternative name can be given by using a dictionary as shown previously.
+# The main difference between a grid function and a discrete function is
+# that the latter has a `dofVector` attached to it. We can iterate over
+# that easily
+# %%
+for d in u_h.dofVector:
+    print(d,end=", ")
+print()
 
 # %% [markdown]
-# # Models and Schemes
+# [In a later section](solvers_nb.ipynb)
+# we will see how to extract the underlying dof vector # in the form of a `numpy` or a `petsc` vector.
+
+# %% [markdown]
+# ## Models and Schemes
 # We consider a scalar boundary value problem
 # \begin{align*}
 # -\triangle u &= f & \text{in}\;\Omega:=(0,1)^2 \\
@@ -300,6 +328,8 @@ print( integrate(gridView, abs(exact-u_h), order=5) )
 # \begin{align*}
 # u(x) = \left(\frac{1}{2}(x^2 + y^2) - \frac{1}{3}(x^3 - y^3)\right) + 1
 # \end{align*}
+# Note: [in a later section](boundary_nb.ipynb) we discuss more general boundary
+# conditions.
 
 # %%
 from ufl import TestFunction, TrialFunction
@@ -402,7 +432,7 @@ print("Number of elements:",gridView.size(0),
       "number of dofs:",space.size,"H^1 error:", error)
 
 # %% [markdown]
-# # Listing Available Dune Components
+# ## Listing Available Dune Components
 # The available realization of a given interface, i.e., the available
 # grid implementations, depends on the modules found during configuration.
 # Getting access to all available components is straightforward:

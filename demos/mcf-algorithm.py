@@ -144,7 +144,7 @@ def calculate(use_cpp, gridView):
         while t < endTime:
             info = scheme.solve(target=solution)
             # move the surface
-            positions.dofVector.assign(solution.dofVector)
+            positions.assign(solution)
             # store some information about the solution process
             iterations += int( info["linear_iterations"] )
             t          += scheme.model.dt

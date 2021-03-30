@@ -93,7 +93,7 @@ polygons.plot(colorbar="horizontal")
 
 # %%
 order = 3
-space = dune.vem.vemSpace( polyGrid, order=order, dimRange=1, storage="istl",
+space = dune.vem.vemSpace( polyGrid, order=order, dimRange=1, storage="fem",
                            testSpaces=[-1,order-1,order-2])
 
 # %% [markdown]

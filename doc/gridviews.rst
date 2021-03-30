@@ -123,8 +123,9 @@ As mentioned above DUNE-FEM provides a grid view that makes it easy to
 exchange the geometry of each entity in the grid. To setup such a grid view
 one first needs to construct a standard grid view, i.e., a `leafGridView`
 and define a grid function over this view using for example a discrete
-function, a UFL function, or one of the concepts described in the grid function section of
-:ref:`General Concepts<concepts>` chapter. Note that the topology of the
+function, a UFL function, or one of the concepts described in the section
+:ref:`Grid Function</concepts_nb.ipynb#Grid-Functions>`.
+Note that the topology of the
 grid does not change, i.e., how entities are connected with each other.
 The following shows an example of how to change a grid of the unit square
 into a grid of a diamond shape:

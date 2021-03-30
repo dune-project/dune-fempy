@@ -108,7 +108,7 @@ while t < end_time:
     scheme.solve(target=solution)
     t += scheme.model.dt
     count += 1
-    positions.dofVector.assign(solution.dofVector)
+    positions.assign(solution)
     if count % 4 == 0:
         plot(solution, figure=(fig, 131+count%3), colorbar=False,
              gridLines="", triplot=True)
@@ -200,7 +200,7 @@ while t.value < endTime:
     info = scheme.solve(target=uh)
     t.value += dt.value
 
-    positions.dofVector.assign(uh.dofVector)
+    positions.assign(uh)
 
     if t.value >= nextSaveTime or t.value >= endTime:
         nextSaveTime += saveInterval
