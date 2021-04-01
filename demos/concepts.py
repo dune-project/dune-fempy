@@ -28,7 +28,8 @@
 # (unstructured) grids can be constructed using a dictionary containing the
 # vertices and the element connectivity or by for example providing a
 # `gmsh` file. This will be discussed in later section, see for example
-# here for [a 3d gmsh file](othergrids_nb.ipynb#A-3D-Example-Using-a-GMesh-File)
+# here for [a 3d gmsh file](othergrids_nb.ipynb).
+
 # or here [for a simple example using a dictonary](dune-corepy_nb.ipynb#An-unstructured-grid)
 
 # %%

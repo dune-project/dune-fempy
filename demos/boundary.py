@@ -48,7 +48,9 @@ f  = f + uVec[0]*uVec[0] * vVec[1] * ds
 bc = DirichletBC(vecSpace,[sin(4*(x[0]+x[1])),None])
 vecScheme = solutionScheme( [a == f, bc],
         parameters={"newton.linear.tolerance": 1e-9} )
+
 vecScheme.solve(target=vec)
+
 plotComponents(vec, gridLines=None, level=2,
                colorbar={"orientation":"horizontal", "ticks":ticker.MaxNLocator(nbins=4)})
 
@@ -58,7 +60,7 @@ plotComponents(vec, gridLines=None, level=2,
 # still be used on the top and vertical boundaries:
 
 # %%
-bcBottom = DirichletBC(vecSpace,[sin(4*(x[0]+x[1])),0],x[1]<1e-10)
+bcBottom = DirichletBC(vecSpace,[sin(4*(x[0]+x[1])),1],x[1]<1e-10)
 vecScheme = solutionScheme( [a == f, bc, bcBottom],
         parameters={"newton.linear.tolerance": 1e-9} )
 vecScheme.solve(target=vec)
@@ -77,11 +79,13 @@ test.clear()
 bc = DirichletBC(vecSpace,[vec[0],None])
 @gridFunction(gridView ,name="bnd",order=2)
 def bnd(x):
-    return math.sin(4*(x[0]+x[1]))
-bcBottom = DirichletBC(vecSpace,[bnd, 0],x[1]<1e-10)
+    return [math.sin(4*(x[0]+x[1])),1]
+bcBottom = DirichletBC(vecSpace,bnd,x[1]<1e-10)
 vecScheme = solutionScheme( [a == f, bc, bcBottom],
         parameters={"newton.linear.tolerance": 1e-9} )
 vecScheme.solve(target=test)
+plotComponents(test, gridLines=None, level=2,
+               colorbar={"orientation":"horizontal", "ticks":ticker.MaxNLocator(nbins=4)})
 assert sum([ abs(td-vd) for td,vd in zip(test.dofVector, vec.dofVector)] ) /\
        len(vec.dofVector) < 1e-7
 
@@ -102,5 +106,23 @@ bc = DirichletBC(vecSpace,[bndCpp,None])
 vecScheme = solutionScheme( [a == f, bc, bcBottom],
         parameters={"newton.linear.tolerance": 1e-9} )
 vecScheme.solve(target=test)
+plotComponents(test, gridLines=None, level=2,
+               colorbar={"orientation":"horizontal", "ticks":ticker.MaxNLocator(nbins=4)})
 assert sum([ abs(td-vd) for td,vd in zip(test.dofVector, vec.dofVector)] ) /\
        len(vec.dofVector) < 1e-7
+
+# %% [markdown]
+# We provide a few method, to apply or otherwise access information about
+# the dirichlet constraints from an existing  scheme.
+
+# The following shows how to set all degrees of freedom on the Dirichlet
+# boundary to zero.
+
+# %%
+dc = vecScheme.dirichletBlocks
+for i,block in enumerate(dc):
+    for j,b in enumerate(block):
+        if b > 0:
+            vec.dofVector[i*len(block)+j] = 0
+plotComponents(vec, gridLines=None, level=2,
+               colorbar={"orientation":"horizontal", "ticks":ticker.MaxNLocator(nbins=4)})

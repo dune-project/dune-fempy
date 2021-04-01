@@ -46,8 +46,8 @@ The Python bindings are based on `pybind11`_ :cite:`Pybind11-Paper` and a detail
 description on how we export the polymorphic interfaces in `Dune`_ is
 provided in :cite:`Dune-Python-Paper` which describes the dune module
 `Dune-Python`_ which after the Dune 2.7 release has been directly
-integrated into the Dune core modules. If you have a version prior to 2.8
-then note that the `Dune-Python_` module is not obsolete.
+integrated into the Dune core modules. If you have a version newer then 2.8
+then note that the `Dune-Python_` module is obsolete.
 
 Here is a quick summary of the different parts of this document - all of
 the code is available for download in form of both :ref:`scripts`.
@@ -151,7 +151,7 @@ where they can be found in the demo folder.
 
 .. toctree::
    :maxdepth: 2
-   :caption: Further examples
+   :caption: Further Examples
 
    furtherexamples
 
