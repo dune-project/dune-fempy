@@ -46,8 +46,6 @@ if [[ $REBUILD == "on" ]]; then
     ret=1
   fi
 else
-  touch vemdemo.py
-  make vemdemo_nb.ipynb
   touch concepts.py
   make concepts_nb.ipynb
   ret="$?"
