@@ -1,6 +1,5 @@
 # %% [markdown]
-# 1D and 3D examples (using GMesh files)
-# ## A 3D Example Using a GMesh File
+# # 1D and 3D examples (using GMesh files)
 # In this example we use pygmsh to construct a tetrahedral mesh and olve a
 # simple laplace problem
 # %%
@@ -59,7 +58,7 @@ gridView3d.writeVTK('3dexample', pointdata=[uh3d],
 # %%
 
 # %% [markdown]
-# ## We Can Also Do 1D
+# We can also do 1D
 # %%
 
 from dune.grid import onedGrid
