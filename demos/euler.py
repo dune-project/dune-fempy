@@ -1,7 +1,6 @@
 # %% [markdown]
 # # Euler System of Gas Dynamics
 # %%
-
 import math, numpy
 import matplotlib
 matplotlib.rc( 'image', cmap='jet' )
@@ -14,7 +13,14 @@ from dune.femdg import femDGOperator
 from dune.femdg.rk import femdgStepper
 from dune.fem.utility import lineSample
 
-# use a dg space if order>0 else a finite volume space
+# %% [markdown]
+# The dune-fem-dg module can either used stabilizer DG methods to solve
+# this type of problem or higher order FV methods based on linear
+# reconstruction. The following function uses a finite-volume space when
+# order=0 and a dg space with orthonormal polynomials otherwise.
+# Note that when a limiter is then used in the scheme, the finite-volume
+# scheme will use linear reconstruction:
+# %%
 def getSpace( gv, order ):
     return finiteVolume( gridView, dimRange=4 ) if order==0 else\
            dgonb( gridView, dimRange=4, order=order )
@@ -77,20 +83,21 @@ def evolve(space, u_h, limiter="MinMod"):
     operator = femDGOperator(Model, space, limiter=limiter) # note: that u_h.space fails since not ufl_space
     stepper  = femdgStepper(order=space.order+1 if space.order>0 else 2, operator=operator)
     operator.applyLimiter(u_h)
+
     t = 0
     saveStep = 0.1
-    c = 0
     fig = pyplot.figure(figsize=(30,10))
-    rho.plot(gridLines="white", figure=(fig, 131+c), colorbar=False, clim=[0.125,1])
-    while t < 0.3:
+    rho.plot(gridLines="white", figure=(fig, 131), colorbar=False, clim=[0.125,1])
+    c = 1
+    while t <= 0.3:
         operator.setTime(t)
         t += stepper(u_h)
         if t > saveStep:
             print(t)
             saveStep += 0.1
-            c += 1
             rho.plot(gridLines="white", figure=(fig, 131+c), colorbar=False, clim=[0.125,1])
-    rho.plot(gridLines="white", figure=(fig, 131+c), colorbar=False, clim=[0.125,1])
+            c += 1
+
     res = numpy.zeros((2,space.grid.size(0)))
     for i,e in enumerate(space.grid.elements):
         x = e.geometry.center
@@ -107,8 +114,9 @@ initial = conditional(dot(x,x)<0.1,as_vector([1,0,0,2.5]),
 
 domain = (reader.dgf, "triangle.dgf")
 
-res = []
-
+# %% [markdown]
+# We start with a triangular grid
+# %%
 try:
     from dune.polygongrid import polygonGrid
     gridView = polygonGrid( domain, dualGrid=False )
@@ -118,8 +126,10 @@ except ImportError:
     gridView = simplexGrid( domain, dimgrid=2 )
 gridView.plot()
 
-# fix the order to use
+# fix the order to use and storage structure for results
+res = {}
 order = 1
+space = getSpace( gridView, order )
 
 # %% [markdown]
 # Initial conditions for a radial Rieman problem
@@ -127,18 +137,31 @@ order = 1
 # First solved on a triangle grid and minmod limiter
 
 # %%
-space = getSpace( gridView, order )
 u_h   = space.interpolate( initial, name="solution")
-res  += [evolve(space,u_h)]
+res["simplex (minmod)"] = evolve(space,u_h)
 
 # %% [markdown]
-# Now a triangle grid without limiter
+# Now a triangle grid without limiter (which of course fails)
 # %%
 u_h   = space.interpolate( initial, name="solution")
-res  += [evolve(space,u_h,limiter=None)]
+evolve(space,u_h,limiter=None)
 
 # %% [markdown]
-# Using a polygonal grid (dual grid) with limiter
+# Now a finite volume method first without reconstruction on the triangle grid
+# %%
+fvspace = getSpace( gridView, 0 )
+u_h   = fvspace.interpolate( initial, name="solution")
+res["simplex (fv)"] = evolve(fvspace,u_h,limiter="minmod")
+
+# %% [markdown]
+# and a finite volume method with reconstruction
+# %%
+fvspace = getSpace( gridView, 0 )
+u_h   = fvspace.interpolate( initial, name="solution")
+res["simplex (higher order fv)"] = evolve(fvspace,u_h,limiter=None)
+
+# %% [markdown]
+# Using a polygonal grid (dual grid of previous grid)
 # %%
 try:
     from dune.polygongrid import polygonGrid
@@ -147,27 +170,22 @@ except ImportError:
     print("dune.polygongrid module not found using a simplex grid instead - ignored")
     gridView = simplexGrid( domain, dimgrid=2 )
 gridView.plot()
-
 space = getSpace( gridView, order )
 
-u_h   = space.interpolate( initial, name="solution")
-res  += [evolve(space,u_h)]
-
 # %% [markdown]
-# and without limiter
+# Solution with limiter - fails as above without
 # %%
 u_h   = space.interpolate( initial, name="solution")
-res  += [evolve(space,u_h,limiter=None)]
+res["polygons (minmod)"] = evolve(space,u_h)
 
 # %% [markdown]
 # Solutions along the diagonal
 # %%
 color = ['tab:blue', 'tab:orange', 'tab:green', 'tab:red']
-fig, ax = pyplot.subplots()
-ax.scatter(res[0][0],res[0][1], color=color[0], label='simplex (minmod)')
-ax.scatter(res[1][0],res[1][1], color=color[1], label='simplex (none)')
-ax.scatter(res[2][0],res[2][1], color=color[2], label='dual (minmod)')
-ax.scatter(res[3][0],res[3][1], color=color[3], label='dual (none)')
-ax.legend()
-ax.grid(True)
+figure = pyplot.figure(figsize=(20,20))
+for i,(k,x) in enumerate(res.items()):
+    ax = pyplot.subplot(221+i)
+    ax.scatter(x[0],x[1], color=color[i], label=k)
+    ax.legend()
+    ax.grid(True)
 pyplot.show()
