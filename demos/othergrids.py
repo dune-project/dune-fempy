@@ -2,8 +2,10 @@
 # # 1D and 3D examples (using GMesh files)
 # In this example we use pygmsh to construct a tetrahedral mesh and olve a
 # simple laplace problem
-# %%
+# %% [raw] raw_mimetype="text/restructuredtext"
+# .. index:: grid construction; pygmsh
 
+# %%
 import numpy, math
 import matplotlib
 matplotlib.rc( 'image', cmap='jet' )
@@ -55,12 +57,11 @@ gridView3d.writeVTK('3dexample', pointdata=[uh3d],
 
 # %% [markdown]
 # ![3d laplace problem](figures/3dexample.png)
-# %%
 
 # %% [markdown]
 # We can also do 1D
-# %%
 
+# %%
 from dune.grid import onedGrid
 v = [math.log(i) for i in range(1,100)]
 e = [(i,i+1) for i in range(1,len(v))]

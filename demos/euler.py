@@ -44,7 +44,7 @@ class Model:
     boundary = {range(1,5): lambda t,x,U: U}
 
     # interface method needed for LLF and time step control
-    def maxLambda(t,x,U,n):
+    def maxWaveSpeed(t,x,U,n):
         rho, v, p = Model.toPrim(U)
         return abs(dot(v,n)) + sqrt(Model.gamma*p/rho)
 
@@ -76,14 +76,12 @@ def evolve(space, u_h, limiter="MinMod"):
         return lu_h(x)[0]
     operator = femDGOperator(Model, space, limiter=limiter) # note: that u_h.space fails since not ufl_space
     stepper  = femdgStepper(order=space.order+1 if space.order>0 else 2, operator=operator)
-    rho.plot()
     operator.applyLimiter(u_h)
-    rho.plot()
     t = 0
-    saveStep = 0.01
+    saveStep = 0.1
     c = 0
-    # fig = pyplot.figure(figsize=(30,10))
-    # rho.plot(gridLines="white", figure=(fig, 131+c), colorbar=False, clim=[0.125,1])
+    fig = pyplot.figure(figsize=(30,10))
+    rho.plot(gridLines="white", figure=(fig, 131+c), colorbar=False, clim=[0.125,1])
     while t < 0.3:
         operator.setTime(t)
         t += stepper(u_h)
@@ -91,15 +89,13 @@ def evolve(space, u_h, limiter="MinMod"):
             print(t)
             saveStep += 0.1
             c += 1
-            # rho.plot(gridLines="white", figure=(fig, 131+c), colorbar=False, clim=[0.125,1])
-            # rho.plot()
-    # return lineSample(u_h,[0,0],[1,1],200)
+            rho.plot(gridLines="white", figure=(fig, 131+c), colorbar=False, clim=[0.125,1])
+    rho.plot(gridLines="white", figure=(fig, 131+c), colorbar=False, clim=[0.125,1])
     res = numpy.zeros((2,space.grid.size(0)))
     for i,e in enumerate(space.grid.elements):
         x = e.geometry.center
         res[0][i] = x.two_norm
         res[1][i] = rho(e,e.geometry.toLocal(x))
-    # pyplot.show()
     return res
 
 # %% [markdown]
@@ -113,43 +109,53 @@ domain = (reader.dgf, "triangle.dgf")
 
 res = []
 
-from dune.alugrid import aluSimplexGrid as simplexGrid
 try:
     from dune.polygongrid import polygonGrid
     gridView = polygonGrid( domain, dualGrid=False )
-    # gridView.plot()
 except ImportError:
     print("dune.polygongrid module not found using a simplex grid instead - ignored")
+    from dune.alugrid import aluSimplexGrid as simplexGrid
     gridView = simplexGrid( domain, dimgrid=2 )
+gridView.plot()
 
 # fix the order to use
 order = 1
 
-print("Triangle grid with minmod limiter", flush=True)
+# %% [markdown]
+# Initial conditions for a radial Rieman problem
+#
+# First solved on a triangle grid and minmod limiter
+
+# %%
 space = getSpace( gridView, order )
 u_h   = space.interpolate( initial, name="solution")
 res  += [evolve(space,u_h)]
 
-print("Triangle grid without limiter", flush=True)
+# %% [markdown]
+# Now a triangle grid without limiter
+# %%
 u_h   = space.interpolate( initial, name="solution")
 res  += [evolve(space,u_h,limiter=None)]
 
-print("*************************************")
-
+# %% [markdown]
+# Using a polygonal grid (dual grid) with limiter
+# %%
 try:
     from dune.polygongrid import polygonGrid
     gridView = polygonGrid( domain, dualGrid=True )
-    # gridView.plot()
 except ImportError:
     print("dune.polygongrid module not found using a simplex grid instead - ignored")
     gridView = simplexGrid( domain, dimgrid=2 )
+gridView.plot()
+
 space = getSpace( gridView, order )
 
-print("Dual grid with minmod limiter", flush=True)
 u_h   = space.interpolate( initial, name="solution")
 res  += [evolve(space,u_h)]
 
-print("Dual grid without limiter", flush=True)
+# %% [markdown]
+# and without limiter
+# %%
 u_h   = space.interpolate( initial, name="solution")
 res  += [evolve(space,u_h,limiter=None)]
 
@@ -158,7 +164,7 @@ res  += [evolve(space,u_h,limiter=None)]
 # %%
 color = ['tab:blue', 'tab:orange', 'tab:green', 'tab:red']
 fig, ax = pyplot.subplots()
-ax.scatter(res[0][0],res[0][1], color=color[0], label='simplex (minmode)')
+ax.scatter(res[0][0],res[0][1], color=color[0], label='simplex (minmod)')
 ax.scatter(res[1][0],res[1][1], color=color[1], label='simplex (none)')
 ax.scatter(res[2][0],res[2][1], color=color[2], label='dual (minmod)')
 ax.scatter(res[3][0],res[3][1], color=color[3], label='dual (none)')

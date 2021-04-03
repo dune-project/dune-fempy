@@ -50,8 +50,10 @@ for p in dune.geometry.quadratureRule(geometryType, 3):
 # # Grid Construction and Basic Interface
 # We now move on to the Dune-Grid module. First let us discuss different
 # possibilities of constructing a grid.
-# %%
+# %% [raw] raw_mimetype="text/restructuredtext"
+# .. index:: grid construction; structured grids
 
+# %%
 from dune.grid import cartesianDomain, yaspGrid
 domain = cartesianDomain([0, 0], [1, 0.25], [15, 4])
 yaspView = yaspGrid(domain)
@@ -74,8 +76,10 @@ aluView.plot()
 # #### An unstructured grid
 # can be constructed by providing a dictionary containing vertex coordinate
 # and element connectivity
-# %%
+# %% [raw] raw_mimetype="text/restructuredtext"
+# .. index:: grid construction; dictionaries
 
+# %%
 vertices = [(0,0), (1,0), (1,0.6), (0,0.6), (-1,0.6), (-1,0), (-1,-0.6), (0,-0.6)]
 triangles = [(2,0,1), (0,2,3), (4,0,3), (0,4,5), (6,0,5), (0,6,7)]
 aluView = aluConformGrid({"vertices": vertices, "simplices": triangles})

@@ -72,6 +72,8 @@ t = 0
 # (as demonstrated in the following example) or by reading the grid from
 # files using readers provided by Dune, e.g., Dune Grid Format (dgf) files
 # or Gmsh files.
+# %% [raw] raw_mimetype="text/restructuredtext"
+# :index:`grid construction; gmsh file`
 
 # %%
 domain = (reader.gmsh, "wave_tank.msh")
