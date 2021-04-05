@@ -1,15 +1,22 @@
 # %% [markdown]
 # # Checkointing: backup and restore
 # We show here how the state of a simulation can be stored and restored
-# using pickle. This is still work in progress:
-# We implement a class that stores a hierarchical grid and some discrete
-# functions and other information.
+# using pickle. This is still work in progress.
+
+# %% [markdown]
+# In the code below, we implement a class that stores a hierarchical grid and some discrete
+# functions and other information and can serve a starting point for
+# pickling data for complex simulations:
 
 # %%
 import matplotlib
 matplotlib.rc( 'image', cmap='jet' )
+import math, pickle, numpy
+from dune.alugrid import aluConformGrid as view
+from dune.grid import gridFunction, cartesianDomain, Marker
+from dune.fem.space import lagrange
+from dune.fem import adapt
 
-import pickle, numpy
 class CheckPointer:
     # if 'hgrid=None' then restore hierarchical grid using given file name
     # otherwise backup 'hgrid' to given file
@@ -28,42 +35,21 @@ class CheckPointer:
 
     # add a item to picke when backup is called (or restored)
     def add(self,item):
+        assert hasattr(item,"write") and hasattr(item,"read")
         self.items += [item]
 
     def backup(self):
         for i in self.items:
-            if hasattr(i,"read"):
-                pickle.dump(i.write(),self.file)
-            else:
-                pickle.dump(i,self.file)
+            pickle.dump(i.write(),self.file)
     def restore(self):
         for i in self.items:
-            if hasattr(i,"read"):
-                i.read( pickle.load(self.file) )
-            else:
-                i = pickle.load( self.file ) # this doesn't work
+            i.read( pickle.load(self.file) )
 
 # %% [markdown]
-# Construct a grid, do some local adaptivity based on gradient of discrete
-# function, and store to file.
+# First test: construct the grid, some discrete function, and refine the mesh.
+# The result is then store in a file.
 
 # %%
-import math
-from dune.alugrid import aluConformGrid as view
-from dune.grid import gridFunction, cartesianDomain, Marker
-from dune.fem.space import lagrange
-from dune.fem import adapt
-
-def markh(element):
-    center = element.geometry.referenceElement.center
-    eta    = estimate.localFunction(element).evaluate(center)[0]
-    if eta > hTol and element.level < maxLevel:
-      return Marker.refine
-    elif eta < 0.01*hTol:
-      return Marker.coarsen
-    else:
-      return Marker.keep
-
 def test1(fileName):
     grid = view( cartesianDomain([-2,-2],[2,2],[10,10]) )
 
@@ -99,6 +85,5 @@ print("size of restored grid:", grid.size(0))
 space = lagrange(grid)
 df = space.interpolate([0],name="test")
 checkPointer.add(df)
-
 checkPointer.restore()
 df.plot()
