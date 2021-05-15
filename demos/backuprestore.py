@@ -1,5 +1,5 @@
 # %% [markdown]
-# # Checkointing: backup and restore
+# # Checkpointing: backup and restore
 # We show here how the state of a simulation can be stored and restored
 # using pickle. This is still work in progress.
 

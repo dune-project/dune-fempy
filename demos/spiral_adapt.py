@@ -7,8 +7,8 @@
 # refinement (i.e. to handle hanging nodes) we use a DG type stabilization
 # approach. Note that since we will be using a Lagrange space these
 # skeleton terms evaluate to zero over conforming intersections.
-# %%
 
+# %%
 import sys
 import math
 import ufl
@@ -28,8 +28,8 @@ from dune.fem import parameter
 # eight children will be used. We can also fix the order (default is 2).
 # As in the non adaptive example we have two possible choices for the right
 # hand side function $h$ to choose from.
-# %%
 
+# %%
 dim = 3
 if len(sys.argv) > 1:
     dim = int(sys.argv[1])
@@ -46,7 +46,6 @@ linearSpiral = True
 # %% [markdown]
 # Next we setup the constant used in the model and for the discretization:
 # %%
-
 maxLevel     = 5 if dim == 2 else 4
 startLevel   = 2 if dim == 2 else 1
 dt           = dune.ufl.Constant(0.1,"dt")
@@ -72,7 +71,6 @@ else:
 # Now we set up the reference domain, the Lagrange finite element space, and discrete functions for $(u^n,v^n($, $(u^{n+1},v^{n+1})$:
 # Note: for the adaptive simulations we need to use the `adaptiveLeafGridView`
 # %%
-
 domain   = dune.grid.cartesianDomain([0,]*dim,[2.5,]*dim,[5,]*dim)
 if nonConforming:
     baseView = dune.alugrid.aluSimplexGrid(domain)
@@ -122,7 +120,6 @@ xForm += ufl.conditional(uh_n<ustar(vh_n), source(u,uh_n,uh_n,vh_n), source(uh_n
 # To handle the possible non conforming intersection we add DG type
 # skeleton terms:
 # %%
-
 penalty = 5 * (order * ( order + 1 )) * spiral_D
 if nonConforming:
     xForm -= ( inner( outer(jump(u), n('+')), avg(diffusiveFlux(u,grad(phi)))) +\
@@ -133,7 +130,6 @@ if nonConforming:
 # After adding the time discretization (a simple backward Euler scheme),
 # the model is now completely implemented and the scheme can be created:
 # %%
-
 form   = ( inner(u,phi) - inner(uh_n, phi) ) * dx + dt*xForm
 solverParameters =\
        {"newton.tolerance": 1e-8,
@@ -148,7 +144,6 @@ scheme = dune.fem.scheme.galerkin( form==0, solver="cg", parameters=solverParame
 # Next we define the error estimator based on a residual type indicator
 # similar to the one used for the Laplace problem:
 # %%
-
 fvspace = dune.fem.space.finiteVolume(uh.space.grid)
 estimate = fvspace.interpolate([0], name="estimate")
 

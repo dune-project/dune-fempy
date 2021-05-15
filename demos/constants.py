@@ -3,7 +3,6 @@
 # TODO document the problem here
 
 # %%
-
 import os
 # ensure some compilation output for this example
 os.environ['DUNE_LOG_LEVEL'] = 'info'

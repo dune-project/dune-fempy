@@ -230,13 +230,17 @@ try:
     import petsc4py
     petsc4py.init(sys.argv)
     from petsc4py import PETSc
+    spacePetsc = solutionSpace(gridView, order=2, storage='petsc')
 except ModuleNotFoundError:
     print("petsc4py not found: skipping example")
     print("petsc4py module not found so skipping example - ignored")
     petsc4py = None
+except ConfigurationError:
+    print("petsc4py found but petsc was not found during configuration of dune")
+    petsc4py = None
+    pass
 
 if petsc4py is not None:
-    spacePetsc = solutionSpace(gridView, order=2, storage='petsc')
     # first we will use the petsc solver available in the `dune-fem` package
     # (using the sor preconditioner)
     schemePetsc = solutionScheme(a == b, space=spacePetsc,

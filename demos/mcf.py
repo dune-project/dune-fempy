@@ -192,7 +192,6 @@ plot3d(uh,2)
 # %% [markdown]
 # Now the time loop
 # %%
-
 fig = pyplot.figure(figsize=(50, 10))
 plot(solution, figure=(fig, 151+count), colorbar=False,
      gridLines="", triplot=True)

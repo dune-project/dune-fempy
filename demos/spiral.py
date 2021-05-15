@@ -106,7 +106,6 @@ vh_n = vh.copy()
 # - first we define the standard parts, not involving $f_E,f_I$:
 # - then we add the missing parts with the required _if_ statement directly using C++ code
 # %%
-
 u   = ufl.TrialFunction(space)
 phi = ufl.TestFunction(space)
 
@@ -127,7 +126,6 @@ ode_update = ufl.as_vector([ vh_n[0] + dt*spiral_h(uh_n[0], vh_n[0]) ])
 # %% [markdown]
 # The model is now completely implemented and can be created, together with the corresponding scheme:
 # %%
-
 solverParameters =\
        {"newton.tolerance": 1e-3,
         "newton.verbose": False,
@@ -140,7 +138,6 @@ scheme = dune.fem.scheme.galerkin( equation, space, solver="cg", parameters=solv
 # To show the solution we make use of the _animate_ module of _matplotlib_.
 # Here is the `stepping` functions:
 # %%
-
 def init():
     data = uh.pointData(1)
     C = plt.tricontourf(triangulation, data[:,0], cmap=plt.cm.rainbow, levels=levels)

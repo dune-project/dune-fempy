@@ -25,7 +25,6 @@ print("Using max-order = ",maxOrder)
 # %% [markdown]
 # In our attempt we will discretize the model as a 2x2 system. Here are some possible model parameters and initial conditions (we even have two sets of model parameters to choose from):
 # %%
-
 nonConforming = False
 usePAdapt = False
 linearSpiral = True
@@ -55,7 +54,6 @@ else:
 # %% [markdown]
 # Now we set up the reference domain, the Lagrange finite element space (second order), and discrete functions for $(u^n,v^n($, $(u^{n+1},v^{n+1})$:
 # %%
-
 if dim == 3:
     domain   = dune.grid.cartesianDomain([0,0,0],[2.5,2.5,2.5],[5,5,5])
 else:
@@ -105,7 +103,6 @@ vh_n = vh.copy()
 # %% [markdown]
 # Setting up the model
 # %%
-
 u   = ufl.TrialFunction(space)
 phi = ufl.TestFunction(space)
 hT  = ufl.MaxCellEdgeLength(space.cell())
@@ -146,7 +143,6 @@ def markpm1(element):
 # %% [markdown]
 # The model is now completely implemented and can be created, together with the corresponding scheme:
 # %%
-
 solverParameters =\
        {"newton.tolerance": 1e-8,
         "newton.linear.tolerance": 1e-12,
@@ -159,7 +155,6 @@ scheme = dune.fem.scheme.galerkin( equation, solver="gmres", parameters=solverPa
 # %% [markdown]
 # Error estimator
 # %%
-
 fvspace = dune.fem.space.finiteVolume(uh.space.grid)
 estimate = fvspace.interpolate([0], name="estimate")
 estimate_pm1 = fvspace.interpolate([0], name="estimate_pm1")

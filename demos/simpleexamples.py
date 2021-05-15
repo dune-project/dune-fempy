@@ -9,7 +9,6 @@
 # with Dirichlet boundary conditions. Here $\varepsilon$ is a small
 # constant and $b$ a given vector.
 # %%
-
 import numpy, math
 import dune.plotting
 dune.plotting.block = True
@@ -66,7 +65,6 @@ uh.plot()
 # So far the example was not really advection dominated so we now
 # repeat the experiment but set $\varepsilon=1e-5$
 # %%
-
 eps.value = 1e-5 # could also use scheme.model.eps = 1e-5
 scheme.solve(target=uh)
 uh.plot()
@@ -76,7 +74,6 @@ uh.plot()
 # In this example we use pygmsh to construct a tetrahedral mesh and olve a
 # simple laplace problem
 # %%
-
 # The following code is taken from the `pygmsh` homepage
 from dune.fem.space import lagrange as solutionSpace
 try:
@@ -115,12 +112,10 @@ gridView3d.writeVTK('3dexample', pointdata=[uh3d])
 
 # %% [markdown]
 # ![3d laplace problem](figures/3dexample.png)
-# %%
 
 # %% [markdown]
 # # We Can Also Do 1D
 # %%
-
 from dune.grid import onedGrid
 from ufl import sin
 v = [math.log(i) for i in range(1,100)]

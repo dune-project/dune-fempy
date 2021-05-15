@@ -15,7 +15,6 @@
 # u(r,\varphi) = r^{\frac{\pi}{\Phi}} \sin\big(\frac{\pi}{\Phi} \varphi \big)
 # \end{gather*}
 
-
 # %%
 import matplotlib
 matplotlib.rc( 'image', cmap='jet' )
@@ -94,8 +93,6 @@ def setup():
 # to the next level. The second argument can also be a list/tuple
 # of discrete functions to prolong. With this approach we optain a good
 # initial guess for solving the problem on the refined grid.
-
-
 
 # %%
 uh, exact, laplace = setup()
@@ -184,27 +181,30 @@ while True:
     count += 1
 plot(uh, figure=(fig, 131+2), colorbar=False)
 
-
 # %% [markdown]
 # Let's have a look at the center of the domain:
 # %%
 pyplot.close('all')
-fig = pyplot.figure(figsize=(30,20))
-plot(uh, figure=(fig, 231), xlim=(-0.5, 0.5), ylim=(-0.5, 0.5),
-        gridLines="white", colorbar={"shrink": 0.75})
-plot(uh, figure=(fig, 232), xlim=(-0.1, 0.1), ylim=(-0.1, 0.1),
-        gridLines="white", colorbar={"shrink": 0.75})
-plot(uh, figure=(fig, 233), xlim=(-0.02, 0.02), ylim=(-0.02, 0.02),
-        gridLines="white", colorbar={"shrink": 0.75})
+fig = pyplot.figure(figsize=(35,15))
+plot(uh, figure=(fig, 131), xlim=(-0.5, 0.5), ylim=(-0.5, 0.5),
+        gridLines="white", colorbar={"shrink": 0.75}, linewidth=2)
+plot(uh, figure=(fig, 132), xlim=(-0.1, 0.1), ylim=(-0.1, 0.1),
+        gridLines="white", colorbar={"shrink": 0.75}, linewidth=2)
+plot(uh, figure=(fig, 133), xlim=(-0.02, 0.02), ylim=(-0.02, 0.02),
+        gridLines="white", colorbar={"shrink": 0.75}, linewidth=2)
 
+# %% [markdown]
+# We can also visualize the grid levels used
+# %%
+fig = pyplot.figure(figsize=(35,15))
 from dune.fem.function import levelFunction
 levels = levelFunction(uh.space.grid)
-plot(levels, figure=(fig, 234), xlim=(-0.5, 0.5), ylim=(-0.5, 0.5),
-        gridLines="white", colorbar={"shrink": 0.75})
-plot(levels, figure=(fig, 235), xlim=(-0.1, 0.1), ylim=(-0.1, 0.1),
-        gridLines="white", colorbar={"shrink": 0.75})
-plot(levels, figure=(fig, 236), xlim=(-0.02, 0.02), ylim=(-0.02, 0.02),
-        gridLines="white", colorbar={"shrink": 0.75})
+plot(levels, figure=(fig, 131), xlim=(-0.5, 0.5), ylim=(-0.5, 0.5),
+        gridLines="white", colorbar={"shrink": 0.75}, linewidth=0.5)
+plot(levels, figure=(fig, 132), xlim=(-0.1, 0.1), ylim=(-0.1, 0.1),
+        gridLines="white", colorbar={"shrink": 0.75}, linewidth=0.5)
+plot(levels, figure=(fig, 133), xlim=(-0.02, 0.02), ylim=(-0.02, 0.02),
+        gridLines="white", colorbar={"shrink": 0.75}, linewidth=0.5)
 
 
 # %% [markdown]

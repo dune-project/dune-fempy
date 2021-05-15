@@ -30,7 +30,6 @@
 # provided by Dune-Geometry, providing, for example, reference elements and
 # quadrature rules.
 # %%
-
 import time, numpy, math, sys
 import matplotlib
 matplotlib.rc( 'image', cmap='jet' )
@@ -91,7 +90,6 @@ aluView.plot(figsize=(5,5))
 # In addition to global refinement we can also pre process the grid by
 # marking a subset of elements for local refinement.
 # %%
-
 from dune.grid import Marker
 aluView.plot(figsize=(5,5))
 for i in range(1,4):
@@ -110,7 +108,6 @@ aluView = aluSimplexGrid({"vertices": vertices, "simplices": triangles})
 # We next discuss how to retrieve basic information from a constructed grid
 # and iterate over its entities (i.e., elements, faces, edges, vertices, etc.).
 # %%
-
 vertices = [(0,0), (1,0), (1,1), (0,1)]
 triangles = [(2,0,1), (0,2,3)]
 unitSquare = aluSimplexGrid({"vertices": vertices, "simplices": triangles})
@@ -129,7 +126,6 @@ for edge in unitSquare.edges:
 # These are functions that can be evaluated given an entity in the grid and
 # a local coordinate within the reference element of that entity.
 # %%
-
 @dune.grid.gridFunction(aluView)
 def f(x):
     return math.cos(2.*math.pi/(0.3+abs(x[0]*x[1])))
@@ -157,7 +153,6 @@ hat0.plot()
 # freedom that is supposed to be attached to every entity with a given
 # geometry type.
 # %%
-
 mapper = unitSquare.mapper([2, 0, 3])
 
 layout = {dune.geometry.quadrilateral: 4, dune.geometry.triangle: 1}
@@ -189,7 +184,6 @@ print(max(error(e, hatx) for e in aluView.elements))
 # flexible plotting Dune relies on `vtk` and Dune-Python makes it easy to
 # write suitable files.
 # %%
-
 p12dEvaluate.plot(figsize=(9,9), gridLines=None)
 p12dEvaluate.plot(figsize=(9,9), gridLines='black',
              xlim=[0,0.4], ylim=[0,0.4])
@@ -204,7 +198,6 @@ aluView.writeVTK("interpolation_subsampled", subsampling=2, pointdata=pd)
 # ![interpolation](figures/interpolation_discrete.png)
 # ![exact solution](figures/interpolation_exact.png)
 # ![interpolation error](figures/interpolation_error.png)
-# %%
 
 # %% [markdown]
 # Mayavi can also be used to plot grid function in Python. This approach
@@ -214,7 +207,6 @@ aluView.writeVTK("interpolation_subsampled", subsampling=2, pointdata=pd)
 # __Note__: mayavi is not installed in the Docker image and, therefore,
 # this feature is not available the Docker container.
 # %%
-
 level = 3
 triangulation = f.grid.triangulation(level)
 z = f.pointData(level)[:,0]

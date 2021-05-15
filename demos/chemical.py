@@ -1,7 +1,6 @@
 # %% [markdown]
 # # A Advection-Diffusion-Reaction System: Chemical Reaction Problem
 # %%
-
 import math
 import matplotlib
 matplotlib.rc( 'image', cmap='jet' )

@@ -17,4 +17,5 @@ triangle
 fenics-ufl
 x3d
 petsc4py
+gmsh
 pygmsh

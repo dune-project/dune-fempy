@@ -4,12 +4,12 @@
 # a finite element method ending the first part with solving a simple Laplace
 # problem. The required steps are:
 #
-# - constructing a tesselation of the computational domain
-# - working with functions defined over the grid
-# - setting up discrete functions
-# - defining the mathematical model to solve
-# - solving the (non linear) system arising from the discretization of the
-#   model by the Galerkin method
+# *  constructing a tesselation of the computational domain
+# *  working with functions defined over the grid
+# *  setting up discrete functions
+# *  defining the mathematical model to solve
+# *  solving the (non linear) system arising from the discretization of the
+#    model by the Galerkin method
 #
 # After that we study the more complex problem of solving a time dependent
 # non linear problem.
@@ -28,9 +28,8 @@
 # (unstructured) grids can be constructed using a dictionary containing the
 # vertices and the element connectivity or by for example providing a
 # `gmsh` file. This will be discussed in later section, see for example
-# here for [a 3d gmsh file](othergrids_nb.ipynb).
-
-# or here [for a simple example using a dictonary](dune-corepy_nb.ipynb#An-unstructured-grid)
+# here for [a 3d gmsh file](othergrids_nb.ipynb)
+# or here [for a simple example using a dictonary](dune-corepy_nb.ipynb#An-unstructured-grid).
 
 # %%
 import io, math, matplotlib
@@ -303,7 +302,7 @@ print()
 
 # %% [markdown]
 # [In a later section](solvers_nb.ipynb)
-# we will see how to extract the underlying dof vector # in the form of a `numpy` or a `petsc` vector.
+# we will see how to extract the underlying dof vector in the form of a `numpy` or a `petsc` vector.
 
 # %% [markdown]
 # ## Models and Schemes
@@ -377,10 +376,12 @@ print("Number of elements:",gridView.size(0),
 # using a suitable norm (here $h_1$ as used before):
 
 # %%
+import dune.fem
 loops = 2
 for eocLoop in range(loops):
     error_old = error
-    gridView.hierarchicalGrid.globalRefine(1)
+    # gridView.hierarchicalGrid.globalRefine(1)
+    dune.fem.globalRefine(1,gridView.hierarchicalGrid)
     u_h.interpolate(0)
     scheme.solve(target = u_h)
     error = sqrt(integrate(gridView, h1error, order=5))

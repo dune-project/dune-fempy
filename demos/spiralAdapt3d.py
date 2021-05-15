@@ -10,8 +10,8 @@ from dune.grid import cartesianDomain, gridFunction
 
 # %% [markdown]
 # In our attempt we will discretize the model as a 2x2 system. Here are some possible model parameters and initial conditions (we even have two sets of model parameters to choose from):
-# %%
 
+# %%
 linearSpiral = True
 maxLevel     = 5
 startLevel   = 2
@@ -36,8 +36,8 @@ else:
 
 # %% [markdown]
 # Now we set up the reference domain, the Lagrange finite element space (second order), and discrete functions for $(u^n,v^n($, $(u^{n+1},v^{n+1})$:
-# %%
 
+# %%
 #domain   = dune.grid.cartesianDomain([0,0],[2.5,2.5],[5,5])
 domain   = dune.grid.cartesianDomain([0,0,0],[2.5,2.5,2.5],[5,5,5])
 #baseView = dune.alugrid.aluConformGrid(domain)
@@ -69,8 +69,8 @@ vh_n = vh.copy()
 
 # %% [markdown]
 # Setting up the model
-# %%
 
+# %%
 u   = ufl.TrialFunction(space)
 phi = ufl.TestFunction(space)
 hT  = ufl.MaxCellEdgeLength(space.cell())
@@ -109,7 +109,6 @@ def markpm1(element):
 # %% [markdown]
 # The model is now completely implemented and can be created, together with the corresponding scheme:
 # %%
-
 solverParameters =\
        {"newton.tolerance": 1e-8,
         "newton.linear.tolerance": 1e-10,
@@ -121,7 +120,6 @@ scheme = dune.fem.scheme.galerkin( equation, solver="cg", parameters=solverParam
 # %% [markdown]
 # Error estimator
 # %%
-
 fvspace = dune.fem.space.finiteVolume(uh.space.grid)
 estimate = fvspace.interpolate([0], name="estimate")
 estimate_pm1 = fvspace.interpolate([0], name="estimate_pm1")
@@ -138,7 +136,6 @@ estimator = dune.fem.operator.galerkin(estimator_ufl)
 # %% [markdown]
 # Time loop
 # %%
-
 nextSaveTime = saveInterval
 count = 0
 levelFunction = dune.fem.function.levelFunction(gridView)

@@ -8,8 +8,8 @@
 # \end{align*}
 # with Dirichlet boundary conditions. Here $\varepsilon$ is a small
 # constant and $b$ a given vector.
-# %%
 
+# %%
 import numpy, math
 import matplotlib
 matplotlib.rc( 'image', cmap='jet' )
@@ -53,12 +53,12 @@ advSkeleton   = jump(hatb*u)*jump(v)*dS
 advSkeleton  += ( hatb*u + (dot(b,n)-hatb)*g )*v*dD*ds
 form          = aInternal + diffSkeleton + advSkeleton
 
+# %% [markdown]
+# We solve the problem as in previous examples
+
+# %%
 scheme = solutionScheme(form==0, solver="gmres",
             parameters={"newton.linear.preconditioning.method":"jacobi"})
-
-# %% [markdown]
-# %%
-
 uh = space.interpolate(0, name="solution")
 info = scheme.solve(target=uh)
 uh.plot()
@@ -66,8 +66,8 @@ uh.plot()
 # %% [markdown]
 # So far the example was not really advection dominated so we now
 # repeat the experiment but set $\varepsilon=1e-5$
-# %%
 
+# %%
 eps.value = 1e-5 # could also use scheme.model.eps = 1e-5
 uh.interpolate(0)
 scheme.solve(target=uh)

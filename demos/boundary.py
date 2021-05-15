@@ -104,7 +104,7 @@ bndCpp = cppFunction(gridView, name="bndCpp", order=2,
                      fctName="bnd",includes=io.StringIO(code))
 bc = DirichletBC(vecSpace,[bndCpp,None])
 vecScheme = solutionScheme( [a == f, bc, bcBottom],
-        parameters={"newton.linear.tolerance": 1e-9} )
+                            parameters={"newton.linear.tolerance": 1e-9} )
 vecScheme.solve(target=test)
 plotComponents(test, gridLines=None, level=2,
                colorbar={"orientation":"horizontal", "ticks":ticker.MaxNLocator(nbins=4)})

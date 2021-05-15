@@ -6,8 +6,8 @@
 # geometry realizations. The conceptional basis for these geometries is
 # provided by Dune-Geometry, providing, for example, reference elements and
 # quadrature rules.
-# %%
 
+# %%
 import numpy as np
 import pylab
 import multiprocessing

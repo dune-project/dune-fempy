@@ -19,7 +19,6 @@
 # u(r,\varphi) = r^{\frac{\pi}{\Phi}} \sin\big(\frac{\pi}{\Phi} \varphi \big)
 # \end{gather*}
 
-
 # %%
 import matplotlib
 matplotlib.rc( 'image', cmap='jet' )
@@ -55,8 +54,6 @@ order = 2
 # ending at (cos(cornerAngle), sin(cornerAngle))
 #
 # Next we define the model together with the exact solution.
-
-
 
 # %%
 def setup():
@@ -101,9 +98,8 @@ uh, exact, laplace = setup()
 # to Python:
 #
 # .. literalinclude:: laplace-dwr.hh
-#
-# %%
 
+# %%
 from dune.fem.scheme import galerkin as solutionScheme
 spaceZ = solutionSpace(uh.space.grid, order=order+1)
 u = TrialFunction(spaceZ)
@@ -121,7 +117,6 @@ computeFunctional = algorithm.load("pointFunctional", "laplace-dwr.hh",
 
 # %% [markdown]
 # %%
-
 from dune.fem.space import finiteVolume as estimatorSpace
 from dune.fem.operator import galerkin as estimatorOp
 
@@ -138,7 +133,6 @@ tolerance = 1e-6
 
 # %% [markdown]
 # Let us solve over a loop (solve,estimate,mark) and plot the solutions side by side.
-
 # %%
 h1error = dot(grad(uh - exact), grad(uh - exact))
 fig = pyplot.figure(figsize=(10,10))
@@ -175,19 +169,20 @@ plot(uh, figure=(fig, 131+2), colorbar=False)
 # interest and the origin:
 # %%
 pyplot.close('all')
-fig = pyplot.figure(figsize=(30,20))
-plot(uh, figure=(fig, 231), xlim=(-0.5, 0.5), ylim=(-0.5, 0.5),
-        gridLines="white", colorbar={"shrink": 0.75})
-plot(uh, figure=(fig, 232), xlim=(-0.1, 0.5), ylim=(-0.1, 0.5),
-        gridLines="white", colorbar={"shrink": 0.75})
-plot(uh, figure=(fig, 233), xlim=(-0.02, 0.5), ylim=(-0.02, 0.5),
-        gridLines="white", colorbar={"shrink": 0.75})
+fig = pyplot.figure(figsize=(30,10))
+plot(uh, figure=(fig, 131), xlim=(-0.5, 0.5), ylim=(-0.5, 0.5),
+        gridLines="white", colorbar={"shrink": 0.75}, linewidth=2)
+plot(uh, figure=(fig, 132), xlim=(-0.1, 0.5), ylim=(-0.1, 0.5),
+        gridLines="white", colorbar={"shrink": 0.75}, linewidth=2)
+plot(uh, figure=(fig, 133), xlim=(-0.02, 0.5), ylim=(-0.02, 0.5),
+        gridLines="white", colorbar={"shrink": 0.75}, linewidth=2)
 
+fig = pyplot.figure(figsize=(30,10))
 from dune.fem.function import levelFunction
 levels = levelFunction(uh.space.grid)
-plot(levels, figure=(fig, 234), xlim=(-0.5, 0.5), ylim=(-0.5, 0.5),
+plot(levels, figure=(fig, 131), xlim=(-0.5, 0.5), ylim=(-0.5, 0.5),
         gridLines="white", colorbar={"shrink": 0.75})
-plot(levels, figure=(fig, 235), xlim=(-0.1, 0.5), ylim=(-0.1, 0.5),
+plot(levels, figure=(fig, 132), xlim=(-0.1, 0.5), ylim=(-0.1, 0.5),
         gridLines="white", colorbar={"shrink": 0.75})
-plot(levels, figure=(fig, 236), xlim=(-0.02, 0.5), ylim=(-0.02, 0.5),
+plot(levels, figure=(fig, 133), xlim=(-0.02, 0.5), ylim=(-0.02, 0.5),
         gridLines="white", colorbar={"shrink": 0.75})
