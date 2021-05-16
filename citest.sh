@@ -21,6 +21,7 @@ cd $CI_PROJECT_DIR
 
 echo "*******************************"
 pip list
+which pandoc
 echo "*******************************"
 
 parallel_opts=

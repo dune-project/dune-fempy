@@ -17,5 +17,6 @@ triangle
 fenics-ufl
 x3d
 petsc4py
-gmsh
 pygmsh
+# gmsh - fails in CI for some reason
+

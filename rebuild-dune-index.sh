@@ -28,40 +28,40 @@ python -m pip install pip-download twine
 #  dune-vem \
 #  dune-fem-dg
 
-pip-download -d $(pwd)/downloads \
-  pyparsing \
-  mpi4py
+# pip-download -d $(pwd)/downloads \
+#  pyparsing \
+#  mpi4py
 
-pip-download -d $(pwd)/downloads \
-  Pygments==2.7.3 \
-  jupyterlab-pygments==0.1.2 \
-  fenics-ufl
+# pip-download -d $(pwd)/downloads \
+#  Pygments==2.7.3 \
+#  jupyterlab-pygments==0.1.2 \
+#  fenics-ufl
 
-pip-download -d $(pwd)/downloads \
-  apidoc\
-  gmsh\
-  ipython\
-  jinja2\
-  jupyter\
-  mayavi\
-  nbsphinx\
-  matplotlib\
-  jupytext\
-  pandas\
-  pandoc\
-  pygmsh\
-  pyqt5\
-  sparkmonitor\
-  sphinx-autobuild\
-  sphinx_rtd_theme\
-  sphinxcontrib-bibtex\
-  sortedcontainers\
-  triangle\
-  wheel\
-  x3d\
-  petsc4py\
-  pygmsh
+# pip-download -d $(pwd)/downloads \
+#   apidoc\
+#   gmsh\
+#   ipython\
+#   jinja2\
+#   jupyter\
+#   mayavi\
+#   nbsphinx\
+#   matplotlib\
+ #  jupytext\
+#   pandas\
+#   pandoc\
+#   pygmsh\
+#   pyqt5\
+#   sparkmonitor\
+#   sphinx-autobuild\
+#   sphinx_rtd_theme\
+#   sphinxcontrib-bibtex\
+#   sortedcontainers\
+#   triangle\
+#   wheel\
+#   x3d\
+#   petsc4py
 
+pip-download -d $(pwd)/downloads gmsh
 # Upload the packages to the index
 for filename in downloads/*
 do
