@@ -15,13 +15,11 @@
 # are very close to the original Dune C++ interfaces, transferring a Python
 # prototype of the algorithm to C++ is mostly straightforward. A just in
 # time compilation utility available in Dune-Python makes it then very easy
-# to use these C++ algorithms_ from within Python.
+# to use these [C++ algorithms](cpp.rst) from within Python.
 #
 # In the following we briefly introduce the most important parts of the
 # Dune core interface
 #
-# .. _algorithms: topics.rst
-
 # # Dense Vectors and the Geometry Classes
 # A quick survey of Dune-Common and Dune-Geometry
 # The core module Dune-Common provides some classes for dense linear algebra.
@@ -44,6 +42,14 @@ print("\t".join(str(c) for c in referenceElement.corners))
 
 for p in dune.geometry.quadratureRule(geometryType, 3):
     print(p.position, p.weight)
+
+# %% [markdown]
+# We can also obtain all weights and points stored in numpy arrays which
+# can be useful to vectorize the computation of quadratures:
+# %%
+points,weights = dune.geometry.quadratureRule(geometryType, 3).get()
+print("quadrature points:",points)
+print("quadrature weights:",weights)
 
 # %% [markdown]
 # # Grid Construction and Basic Interface
@@ -121,14 +127,23 @@ for edge in unitSquare.edges:
     print(", ".join(str(c) for c in edge.geometry.corners))
 
 # %% [markdown]
-# # Attaching Data to the Grid and Defining Grid Functions
+# In the above we have used the geometry method on the entity which
+# provides the geometric mapping between the reference element of the
+# entity and it's position in physical space. We have used the corners
+# method to retrieve corners of the entity. Other properties and methods
+# are available to provide volume or the integration element needed to
+# compute quadratures of a grid function over the element -
+# which is discussed in the next section.
+
+# %% [markdown]
+# # Using grid functions
 # This is a fundamental concept in any grid based discretization package.
 # These are functions that can be evaluated given an entity in the grid and
 # a local coordinate within the reference element of that entity.
 # %%
 @dune.grid.gridFunction(aluView)
 def f(x):
-    return math.cos(2.*math.pi/(0.3+abs(x[0]*x[1])))
+    return numpy.cos(2.*math.pi/(0.3+abs(x[0]*x[1])))
 
 @dune.grid.gridFunction(aluView)
 def hat0(element,hatx):
@@ -143,6 +158,68 @@ f.plot()
 hat0.plot()
 
 # %% [markdown]
+# We can now use the quadrature rules discuss at the beginning of this
+# chapter to compute the integral over each element of the grid function.
+# %%
+from dune.geometry import quadratureRules
+rules = quadratureRules(5)
+integral = 0
+for e in aluView.elements:
+    geo = e.geometry
+    for qp in rules(e.type):
+        x,w = qp.position, qp.weight
+        integral += f(e,x)*w*geo.integrationElement(x)
+print("integral of function 'f':",integral)
+
+# %% [markdown]
+# There are some approach available to improve the efficiency of the
+# computation of integrals since this is an important component of many
+# grid based schemes. Especially, using vectorization can greatly reduce
+# the complexity of the above loop:
+# %%
+integral = 0
+for e in aluView.elements:
+    # obtain numpy arrays containing the points and weights and then call
+    # required functions using these vectors with requiring a loop
+    points, weights = rules(e.type).get()
+    ies = e.geometry.integrationElement(points)
+    values = f(e,points)
+    integral += numpy.sum(values*ies*weights,axis=-1)
+print("integral of function 'f':",integral)
+
+# %% [markdown]
+# Now a vector valued function
+# %%
+# an easy case
+dimR = 2
+@dune.grid.gridFunction(aluView)
+def g(x):
+    return [numpy.cos(2.*math.pi/(0.3+abs(x[0]*x[1])))]*dimR
+# bit more complex to code
+@dune.grid.gridFunction(aluView)
+def g(x):
+    if type(x[0]) is float:
+        return [numpy.cos(2.*math.pi/(0.3+abs(x[0]*x[1]))),1]
+    else:
+        return [numpy.cos(2.*math.pi/(0.3+abs(x[0]*x[1]))),[1]*len(x[0])]
+integral = g.dimRange*[0]
+for e in aluView.elements:
+    # obtain numpy arrays containing the points and weights and then call
+    # required functions using these vectors with requiring a loop
+    points, weights = rules(e.type).get()
+    ies = e.geometry.integrationElement(points)
+    values = g(e,points)
+    integral += numpy.sum(values*ies*weights,axis=-1)
+print("integral of function 'g':",integral)
+
+# %% [markdown]
+# Final remark: to achieve close to native efficiency the Python prototype
+# can be easily reimplemented as a C++ function and the `algorithm` module
+# used for just in time compilation. This is discussed in a later section
+# based on [some examples](cpp.rst).
+
+# %% [markdown]
+# # Attaching Data to the Grid
 # To attach data to the entities in a grid, each Dune grid has an
 # `IndexSet` which provides a consecutive, zero starting integer for the
 # set of entities of a given geometry type, i.e., entities sharing the same
