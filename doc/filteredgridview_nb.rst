@@ -48,7 +48,7 @@
 
 .. parsed-literal::
 
-    number of dofs: 239 integral over filtered domain 0.025365193684895825
+    number of dofs: 239 integral over filtered domain 0.02536519368489583
 
 
 .. code:: ipython3
