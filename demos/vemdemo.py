@@ -77,9 +77,10 @@ polyGrid = dune.vem.polyGrid( dune.vem.voronoiCells([[-0.5,-0.5],[1,1]], 50, llo
 # Let's take a look at the grid with the 50 polygons triangulated
 
 # %%
+indexSet = polyGrid.indexSet
 @gridFunction(polyGrid, name="cells")
 def polygons(en,x):
-    return polyGrid.hierarchicalGrid.agglomerate(en)
+    return polyGrid.hierarchicalGrid.agglomerate(indexSet.index(en))
 polygons.plot(colorbar="horizontal")
 
 # %% [markdown]
@@ -179,7 +180,7 @@ methods = [ ### "[legend,space,scheme,spaceKwargs,schemeKwargs]"
 
 # %%
 def compute(grid, space,spaceArgs, schemeName,schemeArgs):
-    space = space( polyGrid, order=order, dimRange=1, storage="istl", **spaceArgs )
+    space = space( grid, order=order, dimRange=1, storage="istl", **spaceArgs )
     df = space.interpolate([0],name="solution")
     scheme = schemeName( [a==b, *dbc], space, solver="cg", **schemeArgs,
                          parameters=parameters )
@@ -239,9 +240,10 @@ solution.plot(gridLines=None)
 L, W = 1, 0.2
 
 beamGrid = dune.vem.polyGrid( dune.vem.voronoiCells([[0,0],[L,W]], 120) )
+indexSet = beamGrid.indexSet
 @gridFunction(beamGrid, name="cells")
 def polygons(en,x):
-    return beamGrid.hierarchicalGrid.agglomerate(en)
+    return beamGrid.hierarchicalGrid.agglomerate(indexSet.index(en))
 polygons.plot(colorbar="horizontal")
 
 # instead of providing the moments we can simply add a parameter 'conforming' to construct the H^1-conforming space
