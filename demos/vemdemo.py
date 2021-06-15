@@ -351,7 +351,7 @@ a = ( inner(H(u[0]),H(v[0])) ) * dx
 
 # finally the right hand side and the boundary conditions
 b = laplace(laplace(exact[0])) * v[0] * dx
-dbc = [dune.ufl.DirichletBC(space, [0], i+1) for i in range(4)]
+dbcs = [dune.ufl.DirichletBC(space, [0], i+1) for i in range(4)]
 
 scheme = dune.vem.vemScheme( [a==b, *dbcs], space, hessStabilization=1,
                              solver="cg", parameters=parameters )
