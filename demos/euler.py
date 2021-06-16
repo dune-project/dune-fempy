@@ -151,14 +151,14 @@ evolve(space,u_h,limiter=None)
 # %%
 fvspace = getSpace( gridView, 0 )
 u_h   = fvspace.interpolate( initial, name="solution")
-res["simplex (fv)"] = evolve(fvspace,u_h,limiter="minmod")
+res["simplex (fv)"] = evolve(fvspace,u_h,limiter=None)
 
 # %% [markdown]
 # and a finite volume method with reconstruction
 # %%
 fvspace = getSpace( gridView, 0 )
 u_h   = fvspace.interpolate( initial, name="solution")
-res["simplex (higher order fv)"] = evolve(fvspace,u_h,limiter=None)
+res["simplex (higher order fv)"] = evolve(fvspace,u_h,limiter="minmod")
 
 # %% [markdown]
 # Using a polygonal grid (dual grid of previous grid)

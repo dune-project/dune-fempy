@@ -17,7 +17,7 @@ Time Dependent Problem                            :download:`notebook <dune-femp
 Using different linear solver packages            :download:`notebook <solvers_nb.ipynb>`               :download:`script <solvers.py>`
 Adding boundary data                              :download:`notebook <boundary_nb.ipynb>`              :download:`script <boundary.py>`
 Discontinuous Galerkin method                     :download:`notebook <discontinuousgalerkin_nb.ipynb>` :download:`script <discontinuousgalerkin.py>`
-One and three dimensional grids                   :downlaod:`notebook <othergrids_nb.ipynb>`            :download:`script <othergrids.py>`
+One and three dimensional grids                   :download:`notebook <othergrids_nb.ipynb>`            :download:`script <othergrids.py>`
 Checkpointing                                     :download:`notebook <backuprestore_nb.ipynb>`         :download:`script <backuprestore.py>`
 Full Grid Interface                               :download:`notebook <dune-corepy_nb.ipynb>`           :download:`script <dune-corepy.py>`
 Bending beam (linear elasticity)                  :download:`notebook <elasticity_nb.ipynb>`            :download:`script <elasticity.py>`
