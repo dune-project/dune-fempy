@@ -1,3 +1,7 @@
+#import os
+## set number of threads to be used for thread parallel version
+#os.environ['OMP_NUM_THREADS'] = '4'
+
 import sys
 import math
 import ufl
@@ -9,6 +13,7 @@ import dune.alugrid
 
 from dune.grid import cartesianDomain, gridFunction
 from dune.fem import parameter
+from dune.fem.function import levelFunction, partitionFunction
 
 parameter.append({"fem.verboserank": 0})
 
@@ -22,16 +27,16 @@ if len(sys.argv) > 2:
     maxOrder = int(sys.argv[2])
 print("Using max-order = ",maxOrder)
 
-# %% [markdown]
+# <markdowncell>
 # In our attempt we will discretize the model as a 2x2 system. Here are some possible model parameters and initial conditions (we even have two sets of model parameters to choose from):
-# %%
+# <codecell>
+
 nonConforming = False
 usePAdapt = False
 linearSpiral = True
 # maxLevel = 5 for 2d and 4 for 3d
 maxLevel     = 5
-# startLevel = 2 for 2d and 1 for 3d
-startLevel   = 2 # 1 if dim == 3 else 2
+startLevel = 4 - dim #  2 for 2d and 1 for 3d
 dt           = dune.ufl.Constant(0.1,"dt")
 t            = dune.ufl.Constant(0,"time")
 endTime      = 15.
@@ -51,13 +56,11 @@ else:
     def spiral_h(u,v): return u**3 - v
 
 
-# %% [markdown]
+# <markdowncell>
 # Now we set up the reference domain, the Lagrange finite element space (second order), and discrete functions for $(u^n,v^n($, $(u^{n+1},v^{n+1})$:
-# %%
-if dim == 3:
-    domain   = dune.grid.cartesianDomain([0,0,0],[2.5,2.5,2.5],[5,5,5])
-else:
-    domain   = dune.grid.cartesianDomain([0,0],[2.5,2.5],[5,5])
+# <codecell>
+
+domain = dune.grid.cartesianDomain([0]*dim, [2.5]*dim, [5]*dim )
 
 if nonConforming:
     baseView = dune.alugrid.aluCubeGrid(domain)
@@ -87,7 +90,6 @@ if dim == 3:
     top = ufl.conditional( x[2] > 1.25,1,0)
 
 initial_u = iu(x[1])*top + iu(2.5-x[1])*(1.0 - top)
-#initial_u = ufl.conditional( x[2] > 1.25, iu(x[1]), iu(2.5 - x[1]))
 initial_v = ufl.conditional(x[0]<1.25,0.5,0)
 
 uh     = space.interpolate( initial_u, name="u" )
@@ -100,9 +102,10 @@ vh   = space.interpolate( initial_v, name="v" )
 vh_n = vh.copy()
 
 
-# %% [markdown]
+# <markdowncell>
 # Setting up the model
-# %%
+# <codecell>
+
 u   = ufl.TrialFunction(space)
 phi = ufl.TestFunction(space)
 hT  = ufl.MaxCellEdgeLength(space.cell())
@@ -140,21 +143,26 @@ def markpm1(element):
     return space.localOrder( element ) - 1
 
 
-# %% [markdown]
+# <markdowncell>
 # The model is now completely implemented and can be created, together with the corresponding scheme:
-# %%
+# <codecell>
+
+# TODO: fix amg preconditioner for parallel runs
+preconditioner = "jacobi" if gridView.comm.size > 1 else "amg-ilu"
+
 solverParameters =\
        {"newton.tolerance": 1e-8,
         "newton.linear.tolerance": 1e-12,
-        "newton.linear.preconditioning.method": "amg-ilu",
+        "newton.linear.preconditioning.method": preconditioner,
         "newton.linear.maxiterations":1000,
         "newton.verbose": False,
         "newton.linear.verbose": True}
 scheme = dune.fem.scheme.galerkin( equation, solver="gmres", parameters=solverParameters)
 
-# %% [markdown]
+# <markdowncell>
 # Error estimator
-# %%
+# <codecell>
+
 fvspace = dune.fem.space.finiteVolume(uh.space.grid)
 estimate = fvspace.interpolate([0], name="estimate")
 estimate_pm1 = fvspace.interpolate([0], name="estimate_pm1")
@@ -166,11 +174,11 @@ residual = (u-uh_n)/dt - div(diffusiveFlux(u,grad(u))) + source(u,u,u,vh)
 estimator_ufl = hT**2 * residual**2 * chi * dx +\
                 hS * inner( jump(diffusiveFlux(u,grad(u))), n('+'))**2 * avg(chi) * dS +\
                 1/hS * jump(u)**2 * avg(chi) * dS
-estimator = dune.fem.operator.galerkin(estimator_ufl)
+estimator = dune.fem.operator.galerkin(estimator_ufl, communicate=False)
 
-# %% [markdown]
+# <markdowncell>
 # Time loop
-# %%
+# <codecell>
 @gridFunction(gridView,"pDegree")
 def pDegree(element,x):
     return space.localOrder(element)
@@ -179,8 +187,8 @@ nextSaveTime = saveInterval
 count = 0
 levelFunction = dune.fem.function.levelFunction(gridView)
 subSampling = 1 if maxOrder < 3 else 2
-gridView.writeVTK("spiral", pointdata=[uh,vh], number=count, celldata=[estimate,levelFunction,pDegree], subsampling=subSampling)
-gridView.writeVTK("spiral-grid", pointdata=[uh,vh], number=count, celldata=[estimate,levelFunction,pDegree])
+gridView.writeVTK("spiral", pointdata=[uh,vh], number=count, celldata=[estimate,levelFunction,partitionFunction(gridView),pDegree], subsampling=subSampling)
+gridView.writeVTK("spiral-grid", pointdata=[uh,vh], number=count, celldata=[estimate,levelFunction,partitionFunction(gridView),pDegree])
 count += 1
 
 @gridFunction(gridView,name="pEstimate")
@@ -210,23 +218,32 @@ def markpDiff(element):
 
     return newPolorder
 
+mainRank = gridView.comm.rank == 0
+
 while t.value < endTime:
     uh_n.assign(uh)
     vh_n.assign(vh)
     info = scheme.solve(target=uh)
     t.value += dt.value
-    print("Computed solution at time", t.value,
-          "iterations: ", info["linear_iterations"],
-          "#Ent: ", gridView.size(0) )
     vh.interpolate( vh_n + dt*spiral_h(uh_n, vh_n) )
 
     estimator(uh, estimate)
-    maxEst = max(estimate.dofVector)
-    print("max est: ", maxEst)
+    nele = gridView.comm.sum( estimator.gridSizeInterior() )
+
+    if mainRank:
+        print("Computed solution at time", t.value,
+              "iterations: ", info["linear_iterations"],
+              "#Ent: ", nele )
+
+    maxEst = gridView.comm.max( max(estimate.dofVector) )
+
+    if mainRank:
+        print("max est: ", maxEst)
     if t.value >= nextSaveTime-0.01 or t.value >= endTime:
-        print("Writing vtu at time ", t.value," count = ", count )
+        if mainRank:
+            print("Writing vtu at time ", t.value," count = ", count )
         gridView.writeVTK("spiral", pointdata=[uh,vh], number=count, subsampling=subSampling)
-        gridView.writeVTK("spiral-grid", pointdata=[uh,vh], number=count, celldata=[levelFunction,pDegree])
+        gridView.writeVTK("spiral-grid", pointdata=[uh,vh], number=count, celldata=[levelFunction,partitionFunction(gridView),pDegree])
         nextSaveTime = t.value + saveInterval
         count += 1
     if t.value > 5:
@@ -239,5 +256,5 @@ while t.value < endTime:
             estimator(uh_pm1, estimate_pm1)
             estimator(uh, estimate)
             dune.fem.spaceAdapt(space,markpDiff, [uh])
-        else:
-            print("P-Adaptation is disabled!")
+        #else:
+        #    print("P-Adaptation is disabled!")
