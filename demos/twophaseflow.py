@@ -30,6 +30,7 @@ from limit import createOrderRedcution, createLimiter
 # %% [markdown]
 # Some parameters
 
+fem.threading.use = 4
 
 # %%
 maxLevel  = 3

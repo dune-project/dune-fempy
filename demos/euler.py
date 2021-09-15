@@ -143,8 +143,12 @@ res["simplex (minmod)"] = evolve(space,u_h)
 # %% [markdown]
 # Now a triangle grid without limiter (which of course fails)
 # %%
-u_h   = space.interpolate( initial, name="solution")
-evolve(space,u_h,limiter=None)
+try:
+    u_h   = space.interpolate( initial, name="solution")
+    evolve(space,u_h,limiter=None)
+except ValueError:
+    print("SOLUTION NOT VALID")
+
 
 # %% [markdown]
 # Now a finite volume method first without reconstruction on the triangle grid

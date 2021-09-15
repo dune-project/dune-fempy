@@ -10,6 +10,23 @@
 
     gridView = leafGridView( cartesianDomain([0,0],[1,1],[16,16]) )
 
+
+.. parsed-literal::
+
+    
+    Created parallel ALUGrid<2,2,simplex,conforming> from input stream. 
+    
+
+
+.. parsed-literal::
+
+    GridParameterBlock: Parameter 'refinementedge' not specified, defaulting to 'ARBITRARY'.
+    WARNING (ignored): Could not open file 'alugrid.cfg', using default values 0 < [balance] < 1.2, partitioning method 'ALUGRID_SpaceFillingCurve(9)'.
+    
+    You are using DUNE-ALUGrid, please don't forget to cite the paper:
+    Alkaemper, Dedner, Kloefkorn, Nolte. The DUNE-ALUGrid Module, 2016.
+
+
 .. code:: ipython3
 
     filteredView = filteredGridView(gridView, lambda e: e.geometry.center.two_norm > 0.5, domainId=1)
