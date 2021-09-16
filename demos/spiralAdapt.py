@@ -14,6 +14,16 @@ import dune.alugrid
 from dune.grid import cartesianDomain, gridFunction
 from dune.fem import parameter
 from dune.fem.function import levelFunction, partitionFunction
+from dune.fem import threading
+
+import os
+# set number of threads to be used for thread parallel version
+os.environ['OMP_NUM_THREADS'] = '2'
+
+# time with 2 threads
+threading.use = 2
+
+
 
 parameter.append({"fem.verboserank": 0})
 
@@ -148,12 +158,16 @@ def markpm1(element):
 # <codecell>
 
 # TODO: fix amg preconditioner for parallel runs
-preconditioner = "jacobi" if gridView.comm.size > 1 else "amg-ilu"
+#preconditioner = "ssor" if gridView.comm.size > 1 else "amg-ilu"
+#preconditioner = "ssor"
+preconditioner = "jacobi"
 
 solverParameters =\
        {"newton.tolerance": 1e-8,
         "newton.linear.tolerance": 1e-12,
         "newton.linear.preconditioning.method": preconditioner,
+        "newton.linear.preconditioning.relaxation:": 2.0,
+        "newton.linear.preconditioning.iterations:": 10,
         "newton.linear.maxiterations":1000,
         "newton.verbose": False,
         "newton.linear.verbose": True}
