@@ -18,10 +18,10 @@ from dune.fem import threading
 
 import os
 # set number of threads to be used for thread parallel version
-os.environ['OMP_NUM_THREADS'] = '2'
+#os.environ['OMP_NUM_THREADS'] = '2'
 
 # time with 2 threads
-threading.use = 2
+#threading.use = 2
 
 
 
@@ -88,10 +88,14 @@ maxLevel *= gridView.hierarchicalGrid.refineStepsForHalf
 startLevel *= gridView.hierarchicalGrid.refineStepsForHalf
 gridView.hierarchicalGrid.globalRefine(startLevel)
 
+storage = 'istl'
+storage = 'fem'
+storage = 'petsc'
+
 if nonConforming:
-    space = dune.fem.space.lagrangehp( gridView, order=maxOrder, storage="istl" )
+    space = dune.fem.space.lagrangehp( gridView, order=maxOrder, storage=storage )
 else:
-    space = dune.fem.space.lagrange( gridView, order=maxOrder, storage="istl" )
+    space = dune.fem.space.lagrange( gridView, order=maxOrder, storage=storage )
 
 x = ufl.SpatialCoordinate(space)
 iu = lambda s: ufl.conditional(s > 1.25, 1, 0 )
@@ -105,7 +109,7 @@ initial_v = ufl.conditional(x[0]<1.25,0.5,0)
 uh     = space.interpolate( initial_u, name="u" )
 if usePAdapt:
     maxOrderpm1 = maxOrder-1 if maxOrder > 1 else maxOrder
-    spcpm = dune.fem.space.lagrangehp( gridView, order=maxOrderpm1, storage="istl" )
+    spcpm = dune.fem.space.lagrangehp( gridView, order=maxOrderpm1, storage=storage )
     uh_pm1 = spcpm.interpolate( initial_u, name="u_p-1" )
 uh_n = uh.copy()
 vh   = space.interpolate( initial_v, name="v" )
