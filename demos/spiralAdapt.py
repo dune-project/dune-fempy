@@ -1,4 +1,4 @@
-#import os
+import os
 ## set number of threads to be used for thread parallel version
 #os.environ['OMP_NUM_THREADS'] = '4'
 
@@ -10,32 +10,25 @@ import dune.ufl
 import dune.grid
 import dune.fem
 import dune.alugrid
+from dune.grid import PartitionType
 
 from dune.grid import cartesianDomain, gridFunction
 from dune.fem import parameter
 from dune.fem.function import levelFunction, partitionFunction
 from dune.fem import threading
 
-import os
-# set number of threads to be used for thread parallel version
-#os.environ['OMP_NUM_THREADS'] = '2'
-
 # time with 2 threads
-#threading.use = 2
-
-
+#threading.use = 3
 
 parameter.append({"fem.verboserank": 0})
 
 dim = 2
 if len(sys.argv) > 1:
     dim = int(sys.argv[1])
-print("Using dim = ",dim)
 
 maxOrder = 1
 if len(sys.argv) > 2:
     maxOrder = int(sys.argv[2])
-print("Using max-order = ",maxOrder)
 
 # <markdowncell>
 # In our attempt we will discretize the model as a 2x2 system. Here are some possible model parameters and initial conditions (we even have two sets of model parameters to choose from):
@@ -84,19 +77,35 @@ gridView = dune.fem.view.adaptiveLeafGridView( baseView )
 
 print("Initial grid: n-element = ",gridView.size( 0 ))
 
+if gridView.comm.rank == 0:
+    print("Using dim = ",dim)
+    print("Using max-order = ",maxOrder)
+
 maxLevel *= gridView.hierarchicalGrid.refineStepsForHalf
 startLevel *= gridView.hierarchicalGrid.refineStepsForHalf
 gridView.hierarchicalGrid.globalRefine(startLevel)
 
 storage = 'istl'
-storage = 'fem'
-storage = 'petsc'
+#storage = 'fem'
+#storage = 'petsc'
 
 if nonConforming:
     space = dune.fem.space.lagrangehp( gridView, order=maxOrder, storage=storage )
 else:
     space = dune.fem.space.lagrange( gridView, order=maxOrder, storage=storage )
 
+# count all interior elements
+def gridSizeInterior( gv ):
+    nElem = 0
+    for e in gv.elements:
+        if e.partitionType == PartitionType.Interior:
+            nElem += 1
+    return gv.comm.sum( nElem )
+
+
+nElem = gridSizeInterior( gridView )
+if gridView.comm.rank == 0:
+    print("Initial grid: n-element = ",nElem)
 x = ufl.SpatialCoordinate(space)
 iu = lambda s: ufl.conditional(s > 1.25, 1, 0 )
 top = 1.0
@@ -163,8 +172,8 @@ def markpm1(element):
 
 # TODO: fix amg preconditioner for parallel runs
 #preconditioner = "ssor" if gridView.comm.size > 1 else "amg-ilu"
-#preconditioner = "ssor"
 preconditioner = "jacobi"
+#preconditioner = "none"
 
 solverParameters =\
        {"newton.tolerance": 1e-8,
@@ -174,8 +183,8 @@ solverParameters =\
         "newton.linear.preconditioning.iterations:": 10,
         "newton.linear.maxiterations":1000,
         "newton.verbose": False,
-        "newton.linear.verbose": True}
-scheme = dune.fem.scheme.galerkin( equation, solver="gmres", parameters=solverParameters)
+        "newton.linear.verbose": False}
+scheme = dune.fem.scheme.galerkin( equation, solver="cg", parameters=solverParameters)
 
 # <markdowncell>
 # Error estimator
@@ -246,7 +255,7 @@ while t.value < endTime:
     vh.interpolate( vh_n + dt*spiral_h(uh_n, vh_n) )
 
     estimator(uh, estimate)
-    nele = gridView.comm.sum( estimator.gridSizeInterior() )
+    nele = gridSizeInterior( gridView )
 
     if mainRank:
         print("Computed solution at time", t.value,
