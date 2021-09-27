@@ -15,10 +15,13 @@
 # u(r,\varphi) = r^{\frac{\pi}{\Phi}} \sin\big(\frac{\pi}{\Phi} \varphi \big)
 # \end{gather*}
 
+import os
+# set number of threads to be used for thread parallel version
+os.environ['OMP_NUM_THREADS'] = '2'
+
 # %%
 import matplotlib
 matplotlib.rc( 'image', cmap='jet' )
-import math
 import numpy
 import matplotlib.pyplot as pyplot
 from dune.fem.plotting import plotPointData as plot
@@ -30,6 +33,11 @@ from dune.alugrid import aluConformGrid as leafGridView
 from dune.fem.function import integrate, uflFunction
 from ufl import *
 from dune.ufl import DirichletBC
+
+from dune.fem import threading
+
+# time with 2 threads
+fem.threading.use = 2
 
 
 # set the angle for the corner (0<angle<=360)
@@ -57,13 +65,16 @@ def setup():
     vertices = numpy.zeros((8, 2))
     vertices[0] = [0, 0]
     for i in range(0, 7):
-        vertices[i+1] = [math.cos(cornerAngle/6*math.pi/180*i),
-                         math.sin(cornerAngle/6*math.pi/180*i)]
+        vertices[i+1] = [numpy.cos(cornerAngle/6*numpy.pi/180*i),
+                         numpy.sin(cornerAngle/6*numpy.pi/180*i)]
     triangles = numpy.array([[2,1,0], [0,3,2], [4,3,0],
                              [0,5,4], [6,5,0], [0,7,6]])
     domain = {"vertices": vertices, "simplices": triangles}
     gridView = adaptiveGridView( leafGridView(domain) )
+
     gridView.hierarchicalGrid.globalRefine(2)
+    gridView.hierarchicalGrid.loadBalance()
+
     space = solutionSpace(gridView, order=order, storage="istl")
 
     from dune.fem.scheme import galerkin as solutionScheme
@@ -75,11 +86,12 @@ def setup():
     Phi = cornerAngle / 180 * pi
     phi = atan_2(x[1], x[0]) + conditional(x[1] < 0, 2*pi, 0)
     exact = dot(x, x)**(pi/2/Phi) * sin(pi/Phi * phi)
+
     a = dot(grad(u), grad(v)) * dx
 
     # set up the scheme
     laplace = solutionScheme([a==0, DirichletBC(space, exact, 1)], solver="cg",
-                parameters={"newton.linear.preconditioning.method":"amg-ilu"})
+                parameters={"newton.linear.preconditioning.method":"jacobi"})
     uh = space.interpolate([0], name="solution")
     return uh, exact, laplace
 
@@ -101,7 +113,7 @@ errorGlobal = []
 dofsGlobal  = []
 for count in range(10):
     laplace.solve(target=uh)
-    error = math.sqrt(integrate(uh.space.grid, h1error, 5))
+    error = numpy.sqrt(integrate(uh.space.grid, h1error, 5))
     errorGlobal += [error]
     dofsGlobal  += [uh.space.size]
     print(count, ": size=", uh.space.grid.size(0), "error=", error)
@@ -147,8 +159,8 @@ hT = MaxCellEdgeLength(fvspace.cell())
 he = MaxFacetEdgeLength(fvspace.cell())('+')
 n = FacetNormal(fvspace.cell())
 estimator_ufl = hT**2 * (div(grad(u)))**2 * v * dx +        he * inner(jump(grad(u)), n('+'))**2 * avg(v) * dS
-estimator = estimatorOp(estimator_ufl)
-tolerance = 0.05
+estimator = estimatorOp(estimator_ufl, communicate=False)
+tolerance = 0.005
 
 
 # %% [markdown]
@@ -161,18 +173,22 @@ count = 0
 errorVector    = []
 estimateVector = []
 dofs           = []
+
+print("Starting Adaptive computation\n")
 while True:
     laplace.solve(target=uh)
     if count%9 == 8:
         plot(uh, figure=(fig, 131+count//9), colorbar=False)
-    error = math.sqrt(integrate(uh.space.grid, h1error, 5))
+    error = numpy.sqrt(integrate(uh.space.grid, h1error, 5))
+    estimate.clear()
     estimator(uh, estimate)
-    eta = math.sqrt( sum(estimate.dofVector) )
+    eta = numpy.sqrt( uh.space.grid.comm.sum( sum(estimate.dofVector)) )
     dofs           += [uh.space.size]
     errorVector    += [error]
     estimateVector += [eta]
-    if count%3 == 2:
-        print(count, ": size=", uh.space.grid.size(0), "estimate=", eta, "error=", error)
+    gridSizeInterior = uh.space.grid.comm.sum(estimator.gridSizeInterior())
+    if uh.space.grid.comm.rank == 0:
+        print(count, ": size=", gridSizeInterior, "estimate=", eta, "error=", error)
     if eta < tolerance:
         break
     marked = fem.doerflerMark(estimate,0.6,layered=0.1)

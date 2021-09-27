@@ -67,7 +67,7 @@ def setup():
     domain = {"vertices": vertices, "simplices": triangles}
     gridView = adaptiveGridView( leafGridView(domain) )
     gridView.hierarchicalGrid.globalRefine(2)
-    space = solutionSpace(gridView, order=order)
+    space = solutionSpace(gridView, order=order, storage='istl')
 
     from dune.fem.scheme import galerkin as solutionScheme
     u = TrialFunction(space)
@@ -128,7 +128,7 @@ v = TestFunction(fvspace)
 n = FacetNormal(fvspace.cell())
 estimator_ufl = abs(div(grad(u)))*abs(z-zh) * v * dx +\
                 abs(inner(jump(grad(u)), n('+')))*abs(avg(z-zh)) * avg(v) * dS
-estimator = estimatorOp(estimator_ufl)
+estimator = estimatorOp(estimator_ufl, communicate=False)
 tolerance = 1e-6
 
 # %% [markdown]

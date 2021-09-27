@@ -2,6 +2,10 @@
 # # Problem Description
 # Describe model and scheme here...
 # %%
+import os
+# set number of threads to be used for thread parallel version
+os.environ['OMP_NUM_THREADS'] = '6'
+
 from dune.common.checkconfiguration import assertHave, ConfigurationError
 try:
     assertHave("HAVE_DUNE_FEM_DG")
@@ -25,6 +29,9 @@ from dune.fem.function import levelFunction, integrate
 from dune.plotting import plotPointData as plot
 
 from limit import createOrderRedcution, createLimiter
+
+from dune.fem import threading
+threading.useMax()
 
 
 # %% [markdown]

@@ -39,6 +39,12 @@ from ufl import as_vector, as_tensor, avg, jump, dS, CellVolume, FacetArea, atan
 from dune.femdg.rk import ssp3, ssp2, euler
 #from newrk import ssp3, ssp2, euler
 
+import time as systime
+
+from dune.fem import threading
+threading.useMax()
+#threading.use = 4
+
 parameter.append({"fem.verboserank":0})
 parameter.append({"fem.threads.verbose": True})
 
@@ -90,7 +96,7 @@ class MolOp:
 #domain = (reader.dgf, "cubedsphere2d.dgf")
 domain = cartesianDomain([0, 0], [1, 1], [20, 20])
 gridView = leafGridView(domain, dimgrid=2 )
-space    = dgSpace(gridView, order=2, storage="fem")
+space    = dgSpace(gridView, order=2, storage="istl")
 #space  = fvSpace(gridView)
 
 u    = TrialFunction(space)
@@ -236,8 +242,14 @@ for i in range(3):
     uh.interpolate( exact )
     #uh.plot()
     gridView.writeVTK("adv",number=0,celldata=[uh],pointdata=[uh])
+    count = 0
+    cputime = 0.
     while t < endTime:
+        start = systime.time()
         stepper( uh, dt.value )
+        cputime += (systime.time() - start)
+        count += 1
+
         #else:
         #uh_n.assign( uh )
         #scheme.solve(target=uh)
@@ -251,6 +263,8 @@ for i in range(3):
     error1= numpy.sqrt( integrate(gridView,dot(uh-exact,uh-exact),order=6))
     #uh.plot()
     #exact.plot()
+
+    print("Finished with average operator evaluation = ", cputime/count)
 
     if i > 0:
         eoc = [ numpy.log(error1/error0) / numpy.log(0.5) ]
