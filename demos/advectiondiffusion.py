@@ -36,7 +36,7 @@ from dune.ufl import Constant
 from ufl import TestFunction, TrialFunction, SpatialCoordinate, triangle, FacetNormal
 from ufl import dx, ds, grad, div, grad, dot, inner, sqrt, exp, conditional, sin, cos
 from ufl import as_vector, as_tensor, avg, jump, dS, CellVolume, FacetArea, atan, pi
-from dune.femdg.rk import ssp3, ssp2, euler
+from dune.femdg.rk import ssp3, ssp2, euler, Midpoint
 #from newrk import ssp3, ssp2, euler
 
 import time as systime
@@ -49,14 +49,15 @@ parameter.append({"fem.verboserank":0})
 parameter.append({"fem.threads.verbose": True})
 
 
-explicit = True
-#explicit = False
-Stepper = ssp3(4,explicit=explicit)
-#Stepper = ssp2(2,explicit=explicit)
+#explicit = True
+explicit = False
+#Stepper = ssp3(4,explicit=explicit)
+Stepper = ssp2(2,explicit=explicit)
 #Stepper = euler(explicit=explicit)
+#Stepper = lambda op, cfl=None: Midpoint(op, cfl=cfl)
 
 time = Constant(0., "time")
-dt   = Constant(0.005,"dt")
+dt   = Constant(0.01,"dt")
 
 class MolOp:
     def __init__(self,form,space,cfl=0.45):
@@ -96,7 +97,7 @@ class MolOp:
 #domain = (reader.dgf, "cubedsphere2d.dgf")
 domain = cartesianDomain([0, 0], [1, 1], [20, 20])
 gridView = leafGridView(domain, dimgrid=2 )
-space    = dgSpace(gridView, order=2, storage="istl")
+space    = dgSpace(gridView, order=2, storage="fem")
 #space  = fvSpace(gridView)
 
 u    = TrialFunction(space)
@@ -198,7 +199,7 @@ uh = space.interpolate( exact, name="solution")
 uh_n = uh.copy()
 
 # time derivative
-endTime = 0.25
+endTime = 0.5
 # simple implicit euler
 #if not explicit:
 #    form -= inner(u - uh_n, v)/dt * dx
@@ -232,9 +233,9 @@ for i in range(3):
     op.setTime( t )
     time.value = t
 
-    pts = printCurve( gridView )
-    pyplot.plot(pts[0],pts[1])
-    pyplot.show()
+    #pts = printCurve( gridView )
+    #pyplot.plot(pts[0],pts[1])
+    #pyplot.show()
 
     savestep = endTime / 10.
     savetime = t
@@ -261,7 +262,7 @@ for i in range(3):
 
     gridView.writeVTK("adv",number=1,celldata=[uh],pointdata=[uh])
     error1= numpy.sqrt( integrate(gridView,dot(uh-exact,uh-exact),order=6))
-    #uh.plot()
+    uh.plot()
     #exact.plot()
 
     print("Finished with average operator evaluation = ", cputime/count)
