@@ -8,14 +8,11 @@ from matplotlib import pyplot
 from ufl import *
 from dune.ufl import DirichletBC
 from dune.grid import structuredGrid
-from dune.fem import threading
 from dune.fem.plotting import plotPointData as plot
 from dune.fem.space import lagrange, dgonb
 from dune.fem.scheme import galerkin
 from dune.femdg import femDGOperator
 from dune.femdg.rk import femdgStepper
-
-threading.use = 4
 
 gridView = structuredGrid([0,0],[2*math.pi,2*math.pi],[20,20])
 
