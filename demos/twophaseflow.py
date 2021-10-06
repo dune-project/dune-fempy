@@ -26,6 +26,7 @@ from dune.plotting import plotPointData as plot
 
 from limit import createOrderRedcution, createLimiter
 
+fem.threading.use = 4
 
 # %% [markdown]
 # Some parameters

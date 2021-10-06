@@ -7,11 +7,14 @@ matplotlib.rc( 'image', cmap='jet' )
 from matplotlib import pyplot
 from ufl import *
 from dune.grid import structuredGrid, reader
+import dune.fem
 from dune.fem.space import dgonb, finiteVolume
 from dune.fem.function import gridFunction
 from dune.femdg import femDGOperator
 from dune.femdg.rk import femdgStepper
 from dune.fem.utility import lineSample
+
+dune.fem.threading.use = 4
 
 # %% [markdown]
 # The dune-fem-dg module can either used stabilizer DG methods to solve

@@ -36,6 +36,7 @@ import dune.fem
 from ufl import *
 import dune.ufl
 
+dune.fem.threading.use = 4
 dune.fem.parameter.append({"fem.verboserank": 0})
 
 # %% [markdown]
