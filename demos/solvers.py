@@ -260,10 +260,8 @@ else:
 # %% [markdown]
 # Implementing a Newton Krylov solver using the binding provided by petsc4py
 
-# __Note__: this is not working at the moment!
-
 # %%
-if 0: # petsc4py is not None and spacePetsc is not None:
+if petsc4py is not None and spacePetsc is not None:
     class Scheme3:
       def __init__(self, scheme):
           self.model = scheme.model
@@ -300,10 +298,8 @@ if 0: # petsc4py is not None and spacePetsc is not None:
 
 # %% [markdown]
 # Using the petsc4py bindings for the non linear KSP solvers from PETSc
-# __Note__: this is not working at the moment!
-
 # %%
-if 0: # petsc4py is not None and spacePetsc is not None:
+if petsc4py is not None and spacePetsc is not None:
     class Scheme4:
         def __init__(self, scheme):
             self.model = scheme.model
