@@ -1,6 +1,8 @@
+import mpi4py
+
 import os
 ## set number of threads to be used for thread parallel version
-#os.environ['OMP_NUM_THREADS'] = '4'
+os.environ['OMP_NUM_THREADS'] = '4'
 
 import sys
 import math
@@ -85,9 +87,9 @@ maxLevel *= gridView.hierarchicalGrid.refineStepsForHalf
 startLevel *= gridView.hierarchicalGrid.refineStepsForHalf
 gridView.hierarchicalGrid.globalRefine(startLevel)
 
-storage = 'istl'
+#storage = 'istl'
 #storage = 'fem'
-#storage = 'petsc'
+storage = 'petsc'
 
 if nonConforming:
     space = dune.fem.space.lagrangehp( gridView, order=maxOrder, storage=storage )
