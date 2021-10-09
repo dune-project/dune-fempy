@@ -32,6 +32,8 @@ import time, numpy, math, sys
 import matplotlib
 matplotlib.rc( 'image', cmap='jet' )
 import matplotlib.pyplot as pyplot
+import dune.fem
+
 from dune.common import FieldVector
 x = FieldVector([0.25,0.25,0.25])
 
@@ -141,18 +143,18 @@ for edge in unitSquare.edges:
 # These are functions that can be evaluated given an entity in the grid and
 # a local coordinate within the reference element of that entity.
 # %%
-@dune.grid.gridFunction(aluView)
+@dune.fem.function.gridFunction(aluView, name="cos", order=3)
 def f(x):
     return numpy.cos(2.*math.pi/(0.3+abs(x[0]*x[1])))
 
-@dune.grid.gridFunction(aluView)
+@dune.fem.function.gridFunction(aluView, name="hat0", order=3)
 def hat0(element,hatx):
     return 1-hatx[0]-hatx[1]
 
 hatx = FieldVector([1./3., 1./3.])
-maxValue = max(f(e, hatx) for e in f.grid.elements)
+maxValue = max(f(e, hatx) for e in f.gridView.elements)
 
-maxValue = max(f(e.geometry.toGlobal(hatx)) for e in f.grid.elements)
+maxValue = max(f(e.geometry.toGlobal(hatx)) for e in f.gridView.elements)
 
 f.plot()
 hat0.plot()
@@ -192,11 +194,11 @@ print("integral of function 'f':",integral)
 # %%
 # an easy case
 dimR = 2
-@dune.grid.gridFunction(aluView)
+@dune.fem.function.gridFunction(aluView, name="g", order=3)
 def g(x):
     return [numpy.cos(2.*math.pi/(0.3+abs(x[0]*x[1])))]*dimR
 # bit more complex to code
-@dune.grid.gridFunction(aluView)
+@dune.fem.function.gridFunction(aluView, name="g", order=3)
 def g(x):
     if type(x[0]) is float:
         return [numpy.cos(2.*math.pi/(0.3+abs(x[0]*x[1]))),1]
@@ -243,13 +245,13 @@ def interpolate(grid):
     return mapper, data
 
 mapper, data = interpolate(aluView)
-@dune.grid.gridFunction(aluView)
+@dune.fem.function.gridFunction(aluView, name="p12d", order=1)
 def p12dEvaluate(e, x):
     bary = 1-x[0]-x[1], x[0], x[1]
     idx = mapper.subIndices(e, 2)
     return sum(b * data[i] for b, i in zip(bary, idx))
 
-@dune.grid.gridFunction(aluView)
+@dune.fem.function.gridFunction(aluView, name="error", order=3)
 def error(e, x):
     return abs(p12dEvaluate(e, x)-f(e, x))
 hatx = FieldVector([1./3., 1./3.])
@@ -285,7 +287,7 @@ aluView.writeVTK("interpolation_subsampled", subsampling=2, pointdata=pd)
 # this feature is not available the Docker container.
 # %%
 level = 3
-triangulation = f.grid.triangulation(level)
+triangulation = f.gridView.triangulation(level)
 z = f.pointData(level)[:,0]
 try:
     from mayavi import mlab

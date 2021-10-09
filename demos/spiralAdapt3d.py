@@ -120,7 +120,7 @@ scheme = dune.fem.scheme.galerkin( equation, solver="cg", parameters=solverParam
 # %% [markdown]
 # Error estimator
 # %%
-fvspace = dune.fem.space.finiteVolume(uh.space.grid)
+fvspace = dune.fem.space.finiteVolume(uh.space.gridView)
 estimate = fvspace.interpolate([0], name="estimate")
 estimate_pm1 = fvspace.interpolate([0], name="estimate_pm1")
 

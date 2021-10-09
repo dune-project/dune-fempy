@@ -62,7 +62,7 @@ grid.writeVTK("post-hplaplace", pointdata=[solution,solutionp],subsampling=3)
 from dune.fem.space import finiteVolume as estimatorSpace
 from dune.fem.operator import galerkin as estimatorOp
 
-fvspace = estimatorSpace(solution.space.grid)
+fvspace = estimatorSpace(solution.space.gridView)
 estimate = fvspace.interpolate([0], name="estimate")
 
 u = TrialFunction(space)

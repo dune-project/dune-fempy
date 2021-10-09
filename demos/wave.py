@@ -79,7 +79,7 @@ t = 0
 domain = (reader.gmsh, "wave_tank.msh")
 gridView  = leafGridView( domain, dimgrid=2 )
 gridView.hierarchicalGrid.loadBalance()
-V = solutionSpace(gridView, order=1, storage="fem")
+V = solutionSpace(gridView, order=1, storage="numpy")
 
 p      = V.interpolate(0,name="p")
 phi    = V.interpolate(0,name="phi")

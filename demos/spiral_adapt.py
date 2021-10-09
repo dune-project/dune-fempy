@@ -144,7 +144,7 @@ scheme = dune.fem.scheme.galerkin( form==0, solver="cg", parameters=solverParame
 # Next we define the error estimator based on a residual type indicator
 # similar to the one used for the Laplace problem:
 # %%
-fvspace = dune.fem.space.finiteVolume(uh.space.grid)
+fvspace = dune.fem.space.finiteVolume(uh.space.gridView)
 estimate = fvspace.interpolate([0], name="estimate")
 
 chi = ufl.TestFunction(fvspace)

@@ -22,8 +22,6 @@ from dune.fem.function import integrate, discreteFunction
 from ufl import *
 import dune.ufl
 
-dune.fem.threading.use = 4
-
 # %% [markdown]
 # Grid and space construction - we use a cube grid here:
 # %%

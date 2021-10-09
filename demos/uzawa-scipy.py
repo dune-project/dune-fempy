@@ -20,8 +20,8 @@ from dune.fem.operator import linear as linearOperator
 
 order = 2
 grid = aluCubeGrid(constructor=cartesianDomain([0,0],[3,1],[30,10]))
-spcU = lagrange(grid, dimRange=grid.dimension, order=order, storage="fem")
-spcP = lagrange(grid, dimRange=1, order=order-1, storage="fem")
+spcU = lagrange(grid, dimRange=grid.dimension, order=order, storage="numpy")
+spcP = lagrange(grid, dimRange=1, order=order-1, storage="numpy")
 
 cell  = spcU.cell()
 x     = SpatialCoordinate(cell)

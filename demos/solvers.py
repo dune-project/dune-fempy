@@ -5,13 +5,13 @@
 # Different linear algebra backends can be accessed by changing setting the
 # `storage` parameter during construction of the discrete space. All
 # discrete functions and operators/schemes based on this space will then
-# use this backend. Available backends are `fem,istl,petsc`. The default is
-# `fem` which uses simple data structures and linear solvers implemented in
+# use this backend. Available backends are `numpy,istl,petsc`. The default is
+# `numpy` which uses simple data structures and linear solvers implemented in
 # the `dune-fem` package. The simplicity of the data structure makes it
 # possible to use the buffer protocol to seamlessly move between C++ and
 # Numpy/Scipy data structures on the python side. A degrees of freedom
-# vector (dof vector) can be retrieved # from a discrete function over the
-# `fem` space by using the `as_numpy` method. Similar methods are available
+# vector (dof vector) can be retrieved from a discrete function over the
+# `numpy` space by using the `as_numpy` method. Similar methods are available
 # for the other storages, i.e., `as_istl,as_petsc`. The same methods are
 # also available to retrieve the underlying matrix structures of linear
 # operators.

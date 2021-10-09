@@ -26,8 +26,6 @@ from dune.plotting import plotPointData as plot
 
 from limit import createOrderRedcution, createLimiter
 
-fem.threading.use = 4
-
 # %% [markdown]
 # Some parameters
 
@@ -136,7 +134,7 @@ sol_pm1      = spc.interpolate([0,0], name="sol_pm1")
 intermediate = spc.interpolate([0,0], name="iterate")
 persistentDF = [solution,solution_old,intermediate]
 
-fvspc        = create.space("finitevolume", grid, dimRange=1, storage="fem")
+fvspc        = create.space("finitevolume", grid, dimRange=1, storage="numpy")
 estimate     = fvspc.interpolate([0], name="estimate")
 estimate_pm1 = fvspc.interpolate([0], name="estimate-pm1")
 
@@ -479,7 +477,6 @@ pyplot.plot(x,y)
 
 
 # %%
-from dune.grid import gridFunction
 from dune.fem.function import levelFunction
 @gridFunction(grid,name="polOrder")
 def polOrder(e,x):
