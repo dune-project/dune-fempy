@@ -46,10 +46,10 @@ mainOp      = galerkinOperator( (mainModel==0,DirichletBC(spcU,exact_u,1)), spcU
 gradOp      = galerkinOperator(gradModel,spcP,spcU)
 divOp       = galerkinOperator(divModel,spcU,spcP)
 massOp      = galerkinOperator(massModel==0,spcP)
-preconOp    = galerkinOperator(preconModel==0,spcP)
+preconOp    = galerkinOperator( (preconModel==0,DirichletBC(spcP,[0],1)), spcP)
 
 mainOp.model.mu = 0.1
-mainOp.model.nu = 0.01
+mainOp.model.nu = 1
 
 velocity = spcU.interpolate([0,]*spcU.dimRange, name="velocity")
 pressure = spcP.interpolate([0], name="pressure")
