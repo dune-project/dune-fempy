@@ -14,8 +14,6 @@ from dune.femdg import femDGOperator
 from dune.femdg.rk import femdgStepper
 from dune.fem.utility import lineSample
 
-dune.fem.threading.use = 4
-
 # %% [markdown]
 # The dune-fem-dg module can either used stabilizer DG methods to solve
 # this type of problem or higher order FV methods based on linear
@@ -79,7 +77,7 @@ Model.jump     = jump
 # %%
 def evolve(space, u_h, limiter="MinMod"):
     lu_h = u_h.localFunction()
-    @gridFunction(space.grid,name="rho",order=space.order)
+    @gridFunction(space.gridView,name="rho",order=space.order)
     def rho(e,x):
         lu_h.bind(e)
         return lu_h(x)[0]
@@ -101,8 +99,8 @@ def evolve(space, u_h, limiter="MinMod"):
             rho.plot(gridLines="white", figure=(fig, 131+c), colorbar=False, clim=[0.125,1])
             c += 1
 
-    res = numpy.zeros((2,space.grid.size(0)))
-    for i,e in enumerate(space.grid.elements):
+    res = numpy.zeros((2,space.gridView.size(0)))
+    for i,e in enumerate(space.gridView.elements):
         x = e.geometry.center
         res[0][i] = x.two_norm
         res[1][i] = rho(e,e.geometry.toLocal(x))

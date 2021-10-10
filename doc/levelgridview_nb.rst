@@ -16,13 +16,6 @@
 
 .. parsed-literal::
 
-    
-    Created parallel ALUGrid<2,2,simplex,nonconforming> from input stream. 
-    
-
-
-.. parsed-literal::
-
     WARNING (ignored): Could not open file 'alugrid.cfg', using default values 0 < [balance] < 1.2, partitioning method 'ALUGRID_SpaceFillingCurve(9)'.
     
     You are using DUNE-ALUGrid, please don't forget to cite the paper:
@@ -31,6 +24,9 @@
 
 .. parsed-literal::
 
+    
+    Created parallel ALUGrid<2,2,simplex,nonconforming> from input stream. 
+    
     level: 0 number of elements: 2
     level: 1 number of elements: 8
     level: 2 number of elements: 32

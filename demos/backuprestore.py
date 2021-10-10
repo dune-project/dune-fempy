@@ -13,7 +13,8 @@ import matplotlib
 matplotlib.rc( 'image', cmap='jet' )
 import math, pickle, numpy
 from dune.alugrid import aluConformGrid as view
-from dune.grid import gridFunction, cartesianDomain, Marker
+from dune.grid import cartesianDomain, Marker
+from dune.fem.function import gridFunction
 from dune.fem.space import lagrange
 from dune.fem import adapt
 
@@ -53,7 +54,7 @@ class CheckPointer:
 def test1(fileName):
     grid = view( cartesianDomain([-2,-2],[2,2],[10,10]) )
 
-    @gridFunction(grid)
+    @gridFunction(grid, name="gf", order=3)
     def gf(x): return math.sqrt(1-(x[0]**2+x[1]**2)) if x[0]**2+x[1]**2<1 else 0
 
     space = lagrange(grid)

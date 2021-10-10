@@ -101,7 +101,7 @@ uh, exact, laplace = setup()
 
 # %%
 from dune.fem.scheme import galerkin as solutionScheme
-spaceZ = solutionSpace(uh.space.grid, order=order+1)
+spaceZ = solutionSpace(uh.space.gridView, order=order+1)
 u = TrialFunction(spaceZ)
 v = TestFunction(spaceZ)
 x = SpatialCoordinate(spaceZ)
@@ -111,7 +111,7 @@ z = spaceZ.interpolate(0, name="dual")
 zh = uh.copy(name="dual_h")
 point = common.FieldVector([0.4,0.4])
 pointFunctional = z.copy("dual_rhs")
-eh = expression2GF( uh.space.grid, abs(exact-uh), order=order+1 )
+eh = expression2GF( uh.space.gridView, abs(exact-uh), order=order+1 )
 computeFunctional = algorithm.load("pointFunctional", "laplace-dwr.hh",
             point, pointFunctional, eh)
 
@@ -120,7 +120,7 @@ computeFunctional = algorithm.load("pointFunctional", "laplace-dwr.hh",
 from dune.fem.space import finiteVolume as estimatorSpace
 from dune.fem.operator import galerkin as estimatorOp
 
-fvspace = estimatorSpace(uh.space.grid)
+fvspace = estimatorSpace(uh.space.gridView)
 estimate = fvspace.interpolate([0], name="estimate")
 
 u = TrialFunction(uh.space.as_ufl())
@@ -154,10 +154,10 @@ while True:
     errorVector    += [error]
     estimateVector += [eta]
     if count%3 == 2:
-        print(count, ": size=", uh.space.grid.size(0), "estimate=", eta, "error=", error)
+        print(count, ": size=", uh.space.gridView.size(0), "estimate=", eta, "error=", error)
     if eta < tolerance:
         break
-    marked = fem.mark(estimate,eta/uh.space.grid.size(0))
+    marked = fem.mark(estimate,eta/uh.space.gridView.size(0))
     fem.adapt(uh) # can also be a list or tuple of function to prolong/restrict
     fem.loadBalance(uh)
     count += 1
@@ -179,7 +179,7 @@ plot(uh, figure=(fig, 133), xlim=(-0.02, 0.5), ylim=(-0.02, 0.5),
 
 fig = pyplot.figure(figsize=(30,10))
 from dune.fem.function import levelFunction
-levels = levelFunction(uh.space.grid)
+levels = levelFunction(uh.space.gridView)
 plot(levels, figure=(fig, 131), xlim=(-0.5, 0.5), ylim=(-0.5, 0.5),
         gridLines="white", colorbar={"shrink": 0.75})
 plot(levels, figure=(fig, 132), xlim=(-0.1, 0.5), ylim=(-0.1, 0.5),

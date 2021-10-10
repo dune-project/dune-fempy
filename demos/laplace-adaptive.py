@@ -64,7 +64,7 @@ def setup():
     domain = {"vertices": vertices, "simplices": triangles}
     gridView = adaptiveGridView( leafGridView(domain) )
     gridView.hierarchicalGrid.globalRefine(2)
-    space = solutionSpace(gridView, order=order, storage="istl")
+    space = solutionSpace(gridView, order=order, storage="petsc")
 
     from dune.fem.scheme import galerkin as solutionScheme
     u = TrialFunction(space)
@@ -79,7 +79,7 @@ def setup():
 
     # set up the scheme
     laplace = solutionScheme([a==0, DirichletBC(space, exact, 1)], solver="cg",
-                parameters={"newton.linear.preconditioning.method":"amg-ilu"})
+                parameters={"newton.linear.preconditioning.method":"jacobi"})
     uh = space.interpolate([0], name="solution")
     return uh, exact, laplace
 
@@ -96,15 +96,15 @@ def setup():
 
 # %%
 uh, exact, laplace = setup()
-h1error = uflFunction(uh.space.grid, name="h1error", order=uh.space.order, ufl=dot(grad(uh - exact), grad(uh - exact)))
+h1error = uflFunction(uh.space.gridView, name="h1error", order=uh.space.order, ufl=dot(grad(uh - exact), grad(uh - exact)))
 errorGlobal = []
 dofsGlobal  = []
 for count in range(10):
     laplace.solve(target=uh)
-    error = math.sqrt(integrate(uh.space.grid, h1error, 5))
+    error = math.sqrt(integrate(uh.space.gridView, h1error, 5))
     errorGlobal += [error]
     dofsGlobal  += [uh.space.size]
-    print(count, ": size=", uh.space.grid.size(0), "error=", error)
+    print(count, ": size=", uh.space.gridView.size(0), "error=", error)
     fem.globalRefine(1,uh)
 
 
@@ -138,7 +138,7 @@ uh, exact, laplace = setup()
 from dune.fem.space import finiteVolume as estimatorSpace
 from dune.fem.operator import galerkin as estimatorOp
 
-fvspace = estimatorSpace(uh.space.grid)
+fvspace = estimatorSpace(uh.space.gridView)
 estimate = fvspace.interpolate([0], name="estimate")
 
 u = TrialFunction(uh.space.as_ufl())
@@ -155,7 +155,7 @@ tolerance = 0.05
 # Let us solve over a loop (solve,estimate,mark) and plot the solutions side by side.
 
 # %%
-h1error = uflFunction(uh.space.grid, name="h1error", order=uh.space.order, ufl=dot(grad(uh - exact), grad(uh - exact)))
+h1error = uflFunction(uh.space.gridView, name="h1error", order=uh.space.order, ufl=dot(grad(uh - exact), grad(uh - exact)))
 fig = pyplot.figure(figsize=(10,10))
 count = 0
 errorVector    = []
@@ -165,14 +165,14 @@ while True:
     laplace.solve(target=uh)
     if count%9 == 8:
         plot(uh, figure=(fig, 131+count//9), colorbar=False)
-    error = math.sqrt(integrate(uh.space.grid, h1error, 5))
+    error = math.sqrt(integrate(uh.space.gridView, h1error, 5))
     estimator(uh, estimate)
     eta = math.sqrt( sum(estimate.dofVector) )
     dofs           += [uh.space.size]
     errorVector    += [error]
     estimateVector += [eta]
     if count%3 == 2:
-        print(count, ": size=", uh.space.grid.size(0), "estimate=", eta, "error=", error)
+        print(count, ": size=", uh.space.gridView.size(0), "estimate=", eta, "error=", error)
     if eta < tolerance:
         break
     marked = fem.doerflerMark(estimate,0.6,layered=0.1)
@@ -198,7 +198,7 @@ plot(uh, figure=(fig, 133), xlim=(-0.02, 0.02), ylim=(-0.02, 0.02),
 # %%
 fig = pyplot.figure(figsize=(35,15))
 from dune.fem.function import levelFunction
-levels = levelFunction(uh.space.grid)
+levels = levelFunction(uh.space.gridView)
 plot(levels, figure=(fig, 131), xlim=(-0.5, 0.5), ylim=(-0.5, 0.5),
         gridLines="white", colorbar={"shrink": 0.75}, linewidth=0.5)
 plot(levels, figure=(fig, 132), xlim=(-0.1, 0.1), ylim=(-0.1, 0.1),
