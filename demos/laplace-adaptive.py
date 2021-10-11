@@ -64,7 +64,7 @@ def setup():
     domain = {"vertices": vertices, "simplices": triangles}
     gridView = adaptiveGridView( leafGridView(domain) )
     gridView.hierarchicalGrid.globalRefine(2)
-    space = solutionSpace(gridView, order=order, storage="petsc")
+    space = solutionSpace(gridView, order=order, storage="numpy")
 
     from dune.fem.scheme import galerkin as solutionScheme
     u = TrialFunction(space)
