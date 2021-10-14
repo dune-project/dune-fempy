@@ -14,6 +14,8 @@ from dune.femdg import femDGOperator
 from dune.femdg.rk import femdgStepper
 from dune.fem.utility import lineSample
 
+dune.fem.threading.use = 4
+
 # %% [markdown]
 # The dune-fem-dg module can either used stabilizer DG methods to solve
 # this type of problem or higher order FV methods based on linear
