@@ -1,6 +1,13 @@
 # %% [markdown]
 # # Euler System of Gas Dynamics
 # %%
+try:
+    import dune.femdg
+except ImportError:
+    print("This example needs 'dune.femdg'")
+    import sys
+    sys.exit(0)
+
 import math, numpy
 import matplotlib
 matplotlib.rc( 'image', cmap='jet' )

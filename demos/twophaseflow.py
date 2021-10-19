@@ -2,12 +2,12 @@
 # # Problem Description
 # Describe model and scheme here...
 # %%
-from dune.common.checkconfiguration import assertHave, ConfigurationError
 try:
-    assertHave("HAVE_DUNE_FEM_DG")
-except ConfigurationError:
+    import dune.femdg
+except ImportError:
+    print("This example needs 'dune.femdg'")
     import sys
-    sys.exit("Module dune-fem-dg was not found!")
+    sys.exit(0)
 
 import matplotlib
 matplotlib.rc( 'image', cmap='jet' )

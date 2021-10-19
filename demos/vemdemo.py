@@ -22,6 +22,7 @@
 try:
     import dune.vem
 except:
+    print("This example needs 'dune.vem'")
     import sys
     sys.exit(0)
 import matplotlib

@@ -1,6 +1,13 @@
 # %% [markdown]
 # # A Advection-Diffusion-Reaction System: Chemical Reaction Problem
 # %%
+try:
+    import dune.femdg
+except ImportError:
+    print("This example needs 'dune.femdg'")
+    import sys
+    sys.exit(0)
+
 import math
 import matplotlib
 matplotlib.rc( 'image', cmap='jet' )
