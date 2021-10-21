@@ -16,15 +16,15 @@ def createLimiter(domainSpace, rangeSpace=None, bounds = [1e-12,1.], limiter='sc
     if rangeSpace is None:
         rangeSpace = domainSpace
 
-    domainSpaceType = domainSpace._typeName
-    rangeSpaceType = rangeSpace._typeName
+    domainSpaceType = domainSpace.cppTypeName
+    rangeSpaceType = rangeSpace.cppTypeName
 
     _, domainFunctionIncludes, domainFunctionType, _, _, _ = domainSpace.storage
     _, rangeFunctionIncludes, rangeFunctionType, _, _, _   = rangeSpace.storage
 
     includes = ["dune/fem-dg/operator/limiter/limiter.hh"]
-    includes += domainSpace._includes + domainFunctionIncludes
-    includes += rangeSpace._includes + rangeFunctionIncludes
+    includes += domainSpace.cppIncludes + domainFunctionIncludes
+    includes += rangeSpace.cppIncludes + rangeFunctionIncludes
 
     typeName = 'Dune::Fem::ScalingLimiter< ' + domainFunctionType + ', ' + rangeFunctionType + ' >'
     # FV type limiter where FV based reconstructions are done
@@ -44,12 +44,12 @@ def createLimiter(domainSpace, rangeSpace=None, bounds = [1e-12,1.], limiter='sc
 
 def createOrderRedcution(domainSpace):
 
-    domainSpaceType = domainSpace._typeName
+    domainSpaceType = domainSpace.cppTypeName
 
     _, domainFunctionIncludes, domainFunctionType, _, _, _ = domainSpace.storage
 
     includes = ["dune/fem-dg/operator/common/orderreduction.hh"]
-    includes += domainSpace._includes + domainFunctionIncludes
+    includes += domainSpace.cppIncludes + domainFunctionIncludes
 
     typeName = 'Dune::Fem::OrderReduction< ' + domainFunctionType + ' >'
 
