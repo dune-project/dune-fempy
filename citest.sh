@@ -16,7 +16,6 @@ python -m ipykernel install --user --name=dune-env
 jupyter kernelspec list
 
 cd /duneci/modules
-./dune-common/bin/setup-dunepy.py
 cd $CI_PROJECT_DIR
 
 echo "*******************************"
