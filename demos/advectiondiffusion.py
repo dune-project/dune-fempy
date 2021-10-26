@@ -12,7 +12,8 @@
 
 import os
 # set number of threads to be used for thread parallel version
-os.environ['OMP_NUM_THREADS'] = '6'
+#os.environ['OMP_NUM_THREADS'] = '6'
+#os.environ['DUNE_NUM_THREADS'] = '1'
 
 import numpy
 import matplotlib
@@ -36,28 +37,29 @@ from dune.ufl import Constant
 from ufl import TestFunction, TrialFunction, SpatialCoordinate, triangle, FacetNormal
 from ufl import dx, ds, grad, div, grad, dot, inner, sqrt, exp, conditional, sin, cos
 from ufl import as_vector, as_tensor, avg, jump, dS, CellVolume, FacetArea, atan, pi
-from dune.femdg.rk import ssp3, ssp2, euler, Midpoint
+from dune.femdg.rk import ssp3, ssp2, euler, Midpoint, femdgStepper
 #from newrk import ssp3, ssp2, euler
 
 import time as systime
 
-from dune.fem import threading
-threading.useMax()
+#from dune.fem import threading
+#threading.useMax()
 #threading.use = 4
 
 parameter.append({"fem.verboserank":0})
 parameter.append({"fem.threads.verbose": True})
 
 
-#explicit = True
-explicit = False
+explicit = True
+#explicit = False
 #Stepper = ssp3(4,explicit=explicit)
 Stepper = ssp2(2,explicit=explicit)
 #Stepper = euler(explicit=explicit)
 #Stepper = lambda op, cfl=None: Midpoint(op, cfl=cfl)
+#Stepper = lambda op, cfl=None:  femdgStepper(order=1, rkType='IM', operator=op)
 
 time = Constant(0., "time")
-dt   = Constant(0.01,"dt")
+dt   = Constant(0.001,"dt")
 
 class MolOp:
     def __init__(self,form,space,cfl=0.45):
@@ -97,7 +99,8 @@ class MolOp:
 #domain = (reader.dgf, "cubedsphere2d.dgf")
 domain = cartesianDomain([0, 0], [1, 1], [20, 20])
 gridView = leafGridView(domain, dimgrid=2 )
-space    = dgSpace(gridView, order=2, storage="fem")
+gridView.hierarchicalGrid.loadBalance()
+space    = dgSpace(gridView, order=2, storage="numpy")
 #space  = fvSpace(gridView)
 
 u    = TrialFunction(space)
@@ -228,6 +231,9 @@ def printCurve( gv ):
 
 error0 = 0.
 eoc = 0
+
+mainRank = gridView.comm.rank==0
+
 for i in range(3):
     t = 0
     op.setTime( t )
@@ -257,19 +263,22 @@ for i in range(3):
         t += dt.value
         op.setTime( t )
         if t > savetime:
-            print(f"time = {t}, dt = {dt.value}")
+            if mainRank:
+                print(f"time = {t}, dt = {dt.value}")
             savetime += savestep
 
     gridView.writeVTK("adv",number=1,celldata=[uh],pointdata=[uh])
-    error1= numpy.sqrt( integrate(gridView,dot(uh-exact,uh-exact),order=6))
-    uh.plot()
+    err = gridView.comm.sum( integrate(gridView,dot(uh-exact,uh-exact),order=6) )
+    error1= numpy.sqrt( err )
+    #uh.plot()
     #exact.plot()
 
-    print("Finished with average operator evaluation = ", cputime/count)
+    # print("Finished with average operator evaluation = ", cputime/count)
 
     if i > 0:
         eoc = [ numpy.log(error1/error0) / numpy.log(0.5) ]
-    print(i,error1, eoc)
+    if mainRank:
+        print(i,error1, eoc)
     error0 = error1
     gridView.hierarchicalGrid.globalRefine(1)
 
