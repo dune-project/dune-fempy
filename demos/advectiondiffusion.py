@@ -10,11 +10,6 @@
 # constant and $b$ a given vector.
 # <codecell>
 
-import os
-# set number of threads to be used for thread parallel version
-#os.environ['OMP_NUM_THREADS'] = '6'
-#os.environ['DUNE_NUM_THREADS'] = '1'
-
 import numpy
 import matplotlib
 matplotlib.rc( 'image', cmap='jet' )
@@ -42,12 +37,13 @@ from dune.femdg.rk import ssp3, ssp2, euler, Midpoint, femdgStepper
 
 import time as systime
 
-#from dune.fem import threading
+from dune.fem import threading
+# set number of threads to be used for thread parallel version
 #threading.useMax()
-#threading.use = 4
+threading.use = 6
 
 parameter.append({"fem.verboserank":0})
-parameter.append({"fem.threads.verbose": True})
+#parameter.append({"fem.threads.verbose": True})
 
 
 explicit = True
