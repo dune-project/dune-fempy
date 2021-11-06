@@ -8,6 +8,8 @@ Using C++ Code Snippets
 
 .. todo:: link to `developers.rst`
 
+.. index:: C++; User defined code   
+
 In this section we demonstrate how it possible to use small piece of C++
 code to either extend the existing functionality or improve the efficiency
 of the code by moving code from Python to C++.  We have already seen how to
