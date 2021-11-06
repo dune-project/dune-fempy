@@ -133,6 +133,12 @@ where they can be found in the demo folder.
    installation
 
 .. toctree::
+   :maxdepth: 2
+   :caption: Index
+
+   indextoc
+
+.. toctree::
    :maxdepth: 3
    :caption: Getting Started
 

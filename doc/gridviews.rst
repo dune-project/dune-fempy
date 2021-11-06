@@ -48,7 +48,7 @@ Dynamic Local Grid Refinement and Coarsening
 ============================================
 
 For refining and coarsening a grid locally the `dune.fem` module provides a
-functon `adapt`. The storage of all discrete functions will be
+function `adapt`. The storage of all discrete functions will be
 automatically resized to accommodate the changes in the grid but the
 resulting dof vector will not be initialized. To prolong and restrict data
 from the old to the new grid, the corresponding discrete functions have to be

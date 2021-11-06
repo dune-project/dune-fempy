@@ -46,15 +46,19 @@
 
 .. parsed-literal::
 
+    
+    Created parallel ALUGrid<2,2,simplex,conforming> from input stream. 
+    
+
+
+.. parsed-literal::
+
     GridParameterBlock: Parameter 'refinementedge' not specified, defaulting to 'ARBITRARY'.
     WARNING (ignored): Could not open file 'alugrid.cfg', using default values 0 < [balance] < 1.2, partitioning method 'ALUGRID_SpaceFillingCurve(9)'.
 
 
 .. parsed-literal::
 
-    
-    Created parallel ALUGrid<2,2,simplex,conforming> from input stream. 
-    
     level: 0 number of elements: 2
     level: 1 number of elements: 4
     level: 2 number of elements: 8
