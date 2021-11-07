@@ -7,11 +7,11 @@ Welcome to the dune-fem tutorial
 
 This module brings python scripting support to `Dune`_.
 This version describes the bindings for the development version
-(to become 2.8). It serves three purposes:
+(to become 2.9). It serves three purposes:
 
 1. High level program control for solving partial differential equations
    using classes from the `Dune`_ core and from `Dune-Fem`_
-   :cite:`Dune-Grid-Paper,Dune-Fem-Paper`.
+   :cite:`Dune-Grid-Paper,Dune-Fem-Paper` with a recent update provided in :cite:`DuneReview`.
    The unified form language `UFL`_ :cite:`UFL-Paper`
    is used to describe the mathematical
    model, all realizations of the `Dune`_ grid interface can be used to
