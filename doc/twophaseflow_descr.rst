@@ -1,7 +1,7 @@
 ###############################################
 HP adaptive DG scheme for twophase flow problem
 ###############################################
-:download:`(notebook) <twophaseflow_nb.ipynb>` :download:`(script) <twophaseflow.py>`
+:download:`(notebook) <twophaseflow_nb.ipynb>` :download:`(twophaseflow.py) <twophaseflow.py>`
 
 .. sectionauthor:: Andreas Dedner <a.s.dedner@warwick.ac.uk>, Birane Kane <birane.kane@ians.uni-stuttgart.de>, Robert Kl\ |oe|\ fkorn <robert dot klofkorn at math dot lu dot se>, Martin Nolte <nolte.mrtn@gmail.com>
 

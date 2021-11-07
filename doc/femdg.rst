@@ -21,11 +21,9 @@ method of lines approach for the time stepping based on explicit, implicit
 or, `IMEX` Runge-Kutta schemes using matrix-free `Newton-Krylov` solvers. As a
 final note the module can also be used to solve first order hyperbolic
 problems using a Finite-Volume method with linear reconstruction.
-A detailed description of the module is found in the `dune-fem-dg paper`_.
+A detailed description of the module is found in the :cite:`DuneFemDG`.
 
 .. _Dune-Fem-Dg: https://gitlab.dune-project.org/dune-fem/dune-fem-dg
-
-.. _dune-fem-dg paper: https://dx.doi.org/10.1007/s42967-021-00134-5
 
 .. todo:: dune-fem-dg examples need more details in notebooks
 
