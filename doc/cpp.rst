@@ -1,4 +1,4 @@
-.. sectionauthor:: Andreas Dedner <a.s.dedner@warwick.ac.uk>, Robert Kl\ |oe|\ fkorn <robert.kloefkorn@iris.no>, Martin Nolte <nolte.mrtn@gmail.com>
+.. sectionauthor:: Andreas Dedner <a.s.dedner@warwick.ac.uk>, Robert Kl\ |oe|\ fkorn <robert dot klofkorn at math dot lu dot se>, Martin Nolte <nolte.mrtn@gmail.com>
 
 .. _algorithms:
 
@@ -7,6 +7,8 @@ Using C++ Code Snippets
 #######################
 
 .. todo:: link to `developers.rst`
+
+.. index:: C++; User defined code   
 
 In this section we demonstrate how it possible to use small piece of C++
 code to either extend the existing functionality or improve the efficiency
