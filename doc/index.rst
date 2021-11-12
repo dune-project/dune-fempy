@@ -58,7 +58,8 @@ where they can be found in the demo folder.
 #. First off some remarks on getting the package to work: the simplest
    approach is to use the Python package index (pip) to install the software
    into a new virtual environment.
-   Docker and working from the git sources is also discussed.
+   Working from the git sources is a good option for more advanced users
+   who want to change the underlying Dune C++ source files.
 #. A scalar Laplace problem and a simple scalar, non linear time dependent partial
    differential equation
    is used to describe the basic concepts. This leads through the steps

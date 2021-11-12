@@ -282,9 +282,6 @@ aluView.writeVTK("interpolation_subsampled", subsampling=2, pointdata=pd)
 # Mayavi can also be used to plot grid function in Python. This approach
 # relies on methods to extract `numpy` representations of the grid data
 # structure and values of a given grid function.
-#
-# __Note__: mayavi is not installed in the Docker image and, therefore,
-# this feature is not available the Docker container.
 # %%
 level = 3
 triangulation = f.gridView.triangulation(level)
