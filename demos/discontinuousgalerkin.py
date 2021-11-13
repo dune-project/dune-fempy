@@ -1,8 +1,14 @@
 # %% [markdown]
+# .. index:: Methods; Discontinuous Galerkin
+#
+# .. index:: Equations; Advection-Diffusion
+#
+# .. index:: Spaces; DG Legendre
+#
 # # Advection-Diffusion: Discontinuous Galerkin Method with Upwinding
 # So far we have been using Lagrange spaces of different order to solve our
 # PDE. In the following we show how to use Discontinuous Galerkin method to
-# solve an advection dominated advection-diffusion probllem:
+# solve an advection dominated advection-diffusion problem:
 # \begin{align*}
 # -\varepsilon\triangle u + b\cdot\nabla u &= f
 # \end{align*}

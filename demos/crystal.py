@@ -1,4 +1,6 @@
 # %% [markdown]
+# .. index:: Equations; Crystal Growth
+#
 # # Crystal Growth
 # Here we demonstrate crystallisation on the surface of a liquid due to cooling from [@Guyer].
 #
@@ -77,7 +79,7 @@ u_h_n = u_h.copy()
 
 
 # %% [markdown]
-# As we will be discretising in time, we define the unknown data as $u = (\phi_1, \Delta T_1)$, while given data (from the previous time step) is $u_n = (\phi_0, \Delta T_0)$ and test function $v = (v_0, v_1)$.
+# As we will be discretizing in time, we define the unknown data as $u = (\phi_1, \Delta T_1)$, while given data (from the previous time step) is $u_n = (\phi_0, \Delta T_0)$ and test function $v = (v_0, v_1)$.
 
 
 # %%
@@ -89,7 +91,7 @@ dt = Constant(0, "dt")    # time step
 
 
 # %% [markdown]
-# For the numerical scheme, we discretise the time derivatives in the usual way, and we obtain the weak form by multiplying by a test function and integrating by parts. We also express the system using vectors.
+# For the numerical scheme, we discretize the time derivatives in the usual way, and we obtain the weak form by multiplying by a test function and integrating by parts. We also express the system using vectors.
 #
 # This gets us the following equation.
 #
@@ -161,6 +163,8 @@ scheme = solutionScheme(a_im == a_ex, space, solver="gmres", parameters=solverPa
 # %%
 indicator = dot(grad(u_h[0]),grad(u_h[0]))
 # %% [markdown]
+# .. index:: Adaptation; Marking for h-Adaptation (fast)
+#
 # We perform the initial refinement of the grid using the general form of the `mark' method
 
 # %%

@@ -1,10 +1,10 @@
 # %% [markdown]
 # # General Concepts (including how to solve a Laplace problem)
-# In the foloowing we introduce how to construct and use the basic components of
+# In the following we introduce how to construct and use the basic components of
 # a finite element method ending the first part with solving a simple Laplace
 # problem. The required steps are:
 #
-# *  constructing a tesselation of the computational domain
+# *  constructing a tessellation of the computational domain
 # *  working with functions defined over the grid
 # *  setting up discrete functions
 # *  defining the mathematical model to solve
@@ -30,7 +30,9 @@
 # `gmsh` file. This will be discussed in later section, see for example
 # here for [a 3d gmsh file](othergrids_nb.ipynb)
 # or here [for a simple example using a dictonary](dune-corepy_nb.ipynb#An-unstructured-grid).
-
+#
+# .. index:: Grids; Plotting
+#
 # %%
 import io, math, matplotlib
 matplotlib.rc( 'image', cmap='jet' )
@@ -41,6 +43,8 @@ gridView = leafGridView([0, 0], [1, 1], [4, 4])
 gridView.plot()
 
 # %% [markdown]
+# .. index:: Functions; Grid Functions
+#
 # ## Grid Functions
 # These are function that are defined over a given grid and are evaluated
 # by using an element of the grid and local coordinated within that
@@ -72,6 +76,8 @@ from dune.fem.function import integrate
 print( integrate(gridView, exact, order=5) )
 
 # %% [markdown]
+# .. index:: I/O; Writing VTK files
+
 # and plot them using matplotlib or write a vtk file for postprocessing
 
 # %%
@@ -127,6 +133,8 @@ print(mass)
 print( integrate(gridView, [exact,exactLocal,exactGlobal], order=5) )
 
 # %% [markdown]
+# .. index:: Functions; UFL functions
+#
 # As pointed out the `dune.fem` grid function can be used like any other
 # UFL coefficient to form UFL expressions:
 
@@ -210,11 +218,16 @@ print( integrate(gridView, abs(2*exactCpp-exactCpp2), order=5) )
 # alternative.
 
 # %% [markdown]
+# .. index:: Functions; Discrete Functions
+#
+# .. index:: Spaces; Lagrange Space
+#
 # ## Discrete Functions
 # Note that the grid functions set up so far did not involve any
 # discretization, they are exactly evaluated at the given point.
 # A special type of grid functions are discrete functions living in a
 # discrete (finite dimensional) space.
+# .. index:: Functions; discrete functions
 
 # %%
 from dune.fem.space import lagrange as solutionSpace
@@ -273,6 +286,10 @@ for element in gridView.elements:
 print(mass)
 
 # %% [markdown]
+# .. index:: Functions; Plotting
+#
+# .. index:: I/O; Writing VTK files
+#
 # or plot using matplotlib and write a vtk file for postprocessing
 # (using binary data format to reduce size)
 
@@ -347,6 +364,8 @@ b   = f*v*dx + dot(g_N,n)*conditional(x[0]>=1e-8,1,0)*v*ds
 dbc = DirichletBC(space,exact,x[0]<=1e-8)
 
 # %% [markdown]
+# .. index:: Schemes; Galerkin
+#
 # With the model described as a ufl form, we can construct a scheme class
 # that provides the solve method which we can use to compute the solution:
 
@@ -434,9 +453,27 @@ print("Number of elements:",gridView.size(0),
       "number of dofs:",space.size,"H^1 error:", error)
 
 # %% [markdown]
+# .. index:: Parallelization; MPI
+#
 # ## Parallelization
 # Parallelization is available using either distributed memory based on MPI
 # or multithreading using OpenMP.
+#
+# ### MPI
+#
+# It is straightforward to use MPI for parallelization. It requires a
+# parallel grid, in fact most of the DUNE grids work in parallel except albertaGrid or polyGrid.
+# Most iterative solvers in DUNE work for parallel runs. Some of the
+# preconditioning methods also work in parallel. Running a parallel job can be
+# done by using `mpirun`
+# ```
+# mpirun -np 4 python script.py
+# ```
+# in order to use `4` MPI processes. Example scripts that run in parallel are,
+# for example, the [Re-entrant Corner Problem](laplace-adaptive_nb.ipynb).
+#
+# ### OpenMP
+# .. index:: Parallelization; OpenMP
 #
 # It is straightforward to enable some multithreading support. Note that
 # this will speedup assembly and evaluation of the spatial operators but
@@ -469,6 +506,8 @@ threading.useMax()
 print("Using",threading.use,"threads")
 
 # %% [markdown]
+# .. index:: Grids; Available Grids
+#
 # ## Listing Available Dune Components
 # The available realization of a given interface, i.e., the available
 # grid implementations, depends on the modules found during configuration.
@@ -480,3 +519,28 @@ from dune.utility import components
 components()
 # to get for example all available grid implementations:
 components("grid")
+# %%
+
+# %% [markdown]
+# .. index:: Spaces; Available Spaces
+#
+# Available discrete function spaces are:
+
+# %%
+components("space")
+
+# %% [markdown]
+# .. index:: Functions; Available Functions
+#
+# Available discrete functions are:
+
+# %%
+components("function")
+
+# %% [markdown]
+# .. index:: Schemes; Available Schemes
+#
+# Available schemes:
+
+# %%
+components("scheme")

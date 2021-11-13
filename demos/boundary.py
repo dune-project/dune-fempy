@@ -1,4 +1,6 @@
 # %% [markdown]
+# .. index:: Boundary; Dirichlet Conditions
+#
 # # More General Boundary Conditions
 # So far we only used natural boundary conditions. Here we discuss how to
 # set Dirichlet boundary conditions and use different conditions for

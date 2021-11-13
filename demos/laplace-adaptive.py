@@ -1,4 +1,8 @@
 # %% [markdown]
+# .. index:: Methods; Adaptive Finite Elements
+#
+# .. index:: Equations; Poisson Problem
+#
 # # Re-entrant Corner Problem
 #
 # Here we will consider the classic _re-entrant corner_ problem,
@@ -152,6 +156,8 @@ tolerance = 0.05
 
 
 # %% [markdown]
+# .. index:: Adaptation; Doerfler marking
+#
 # Let us solve over a loop (solve,estimate,mark) and plot the solutions side by side.
 
 # %%

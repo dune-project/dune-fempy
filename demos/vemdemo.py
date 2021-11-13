@@ -1,4 +1,6 @@
 # %% [markdown]
+# .. index:: Methods; Virtual Finite Elements
+#
 # The main concepts of our virtual element implementation is provided in
 # <cite data-cite="VEM"></cite>
 # where we focus on the forth order problems but the second order problems

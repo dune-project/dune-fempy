@@ -1,4 +1,8 @@
 # %% [markdown]
+# .. index:: Equations; Darcy flow
+#
+# .. index:: Methods; hp adaptive Discontinuous Galerkin
+#
 # # Problem Description
 # Describe model and scheme here...
 # %%
@@ -46,7 +50,7 @@ newtonParameters = {"tolerance": tolerance,
 
 # %% [markdown]
 # # Defining the model
-# using a Broks Corey pressure law
+# using a Brooks Corey pressure law
 
 
 # %%
@@ -328,6 +332,8 @@ def step():
 
 
 # %% [markdown]
+# .. index:: Adaptation; hp-Adaptation
+#
 # # HP Adpativity
 
 # Setting up residual indicator
@@ -348,6 +354,8 @@ estimator = create.operator("galerkin", estimatorModel, spc, fvspc)
 
 
 # %% [markdown]
+# .. index:: Adaptation; Marking for h-Adaptation
+#
 # # Marker for grid adaptivity (h)
 
 
@@ -365,6 +373,8 @@ def markh(element):
 
 
 # %% [markdown]
+# .. index:: Adaptation; Marking for p-Adaptation
+#
 # # Marker for space adaptivity (p)
 
 

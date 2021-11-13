@@ -1,4 +1,6 @@
 # %% [markdown]
+# .. index:: Equations; Mean Curvature Flow
+#
 # # Mean Curvature Flow
 #
 # Mean curvature flow is a specific example of a geometric evolution
@@ -58,9 +60,9 @@ R0 = 2.
 
 
 # %% [markdown]
+# .. index: Grid construction; Dune Grid Format file (DGF)
+#
 # We begin by setting up reference domain $\Gamma_0$ (```grid```), and the space on $\Gamma_0$ that describes $\Gamma(t)$ (```space```). From this we interpolate the non-spherical initial surface ```positions```, and, then reconstruct ```space``` for the discrete solution on $\Gamma(t)$.
-# %% [raw] raw_mimetype="text/restructuredtext"
-# :index:`grid construction; dune grid format file`
 
 # %%
 from dune.fem.view import geometryGridView
@@ -154,12 +156,19 @@ form = dot(u - uh_old, phi) * dx + dt * xForm
 # define dirichlet boundary conditions - freezing the boundary
 bc = DirichletBC(space,x)
 
-# setup scheme
+# %% [markdown]
+# .. index:: Solvers; Parameters
+#
+# Choosing solver parameters is done by passing a dictionary when constructing
+# the scheme.
+
+# %%
 dune.fem.parameter.append({"fem.verboserank": 0})
 solverParameters =\
        {"newton.tolerance": 1e-9,
         "newton.linear.tolerance": 1e-11,
         "newton.linear.preconditioning.method": "jacobi"}
+# setup scheme
 scheme = solutionScheme([form == 0, bc], space, solver="cg",
                         parameters=solverParameters)
 

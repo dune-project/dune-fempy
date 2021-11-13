@@ -1,4 +1,6 @@
 # %% [markdown]
+# .. index:: Equations; Cahn-Hilliard
+#
 # # Cahn-Hilliard
 # In this script we show how to use the $C^1$ non-conforming virtual
 # element space to solve the Cahn-Hilliard equation. We use a fully implicit

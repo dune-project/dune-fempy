@@ -1,4 +1,6 @@
 # %% [markdown]
+# .. index:: Overview; Dense Vectors and Geometries
+#
 # # Overview
 # To facilitate rapid prototyping, the Dune Python bindings
 # provid Python classes for all the core interfaces of Dune. This makes
@@ -54,11 +56,11 @@ print("quadrature points:",points)
 print("quadrature weights:",weights)
 
 # %% [markdown]
+# .. index:: Grid construction; Structured grids
+#
 # # Grid Construction and Basic Interface
 # We now move on to the Dune-Grid module. First let us discuss different
 # possibilities of constructing a grid.
-# %% [raw] raw_mimetype="text/restructuredtext"
-# .. index:: grid construction; structured grids
 
 # %%
 from dune.grid import cartesianDomain, yaspGrid
@@ -80,11 +82,11 @@ aluView.hierarchicalGrid.globalRefine()
 aluView.plot()
 
 # %% [markdown]
+# .. index:: Grid construction; Dictionaries
+#
 # #### An unstructured grid
 # can be constructed by providing a dictionary containing vertex coordinate
 # and element connectivity
-# %% [raw] raw_mimetype="text/restructuredtext"
-# .. index:: grid construction; dictionaries
 
 # %%
 vertices = [(0,0), (1,0), (1,0.6), (0,0.6), (-1,0.6), (-1,0), (-1,-0.6), (0,-0.6)]
@@ -95,6 +97,8 @@ aluView.hierarchicalGrid.globalRefine(2)
 aluView.plot(figsize=(5,5))
 
 # %% [markdown]
+# .. index:: Adaptation; h-refinement
+#
 # In addition to global refinement we can also pre process the grid by
 # marking a subset of elements for local refinement.
 # %%
@@ -138,6 +142,8 @@ for edge in unitSquare.edges:
 # which is discussed in the next section.
 
 # %% [markdown]
+# .. index:: Functions; Grid Functions
+#
 # # Using grid functions
 # This is a fundamental concept in any grid based discretization package.
 # These are functions that can be evaluated given an entity in the grid and
@@ -160,6 +166,8 @@ f.plot()
 hat0.plot()
 
 # %% [markdown]
+# .. index:: Quadratures; Simple Quadrature Rules
+#
 # We can now use the quadrature rules discuss at the beginning of this
 # chapter to compute the integral over each element of the grid function.
 # %%
@@ -215,12 +223,17 @@ for e in aluView.elements:
 print("integral of function 'g':",integral)
 
 # %% [markdown]
-# Final remark: to achieve close to native efficiency the Python prototype
+# .. index:: C++; User defined code
+#
+# # Importing user defined C++ code
+# To achieve close to native efficiency the Python prototype
 # can be easily reimplemented as a C++ function and the `algorithm` module
 # used for just in time compilation. This is discussed in a later section
 # based on [some examples](cpp.rst).
 
 # %% [markdown]
+# .. index:: Grids; Attaching data
+#
 # # Attaching Data to the Grid
 # To attach data to the entities in a grid, each Dune grid has an
 # `IndexSet` which provides a consecutive, zero starting integer for the
@@ -258,6 +271,10 @@ hatx = FieldVector([1./3., 1./3.])
 print(max(error(e, hatx) for e in aluView.elements))
 
 # %% [markdown]
+# .. index:: Grids; Visualization
+#
+# .. index:: I/O; Plotting
+#
 # # Output of Grid and Visualization of Data
 # We already used `matplotlib` to plot the grid and grid functions. For more
 # flexible plotting Dune relies on `vtk` and Dune-Python makes it easy to

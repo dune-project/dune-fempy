@@ -1,4 +1,6 @@
 # %% [markdown]
+# .. index:: Solvers; Saddle Point (Uzawa)
+#
 # # Saddle Point Solver (using Scipy)
 # %%
 import matplotlib

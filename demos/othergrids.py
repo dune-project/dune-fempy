@@ -1,9 +1,9 @@
 # %% [markdown]
+# .. index:: Grid construction; gmsh (from Python)
+#
 # # 1D and 3D examples (using GMesh files)
-# In this example we use pygmsh to construct a tetrahedral mesh and olve a
+# In this example we use pygmsh to construct a tetrahedral mesh and solve a
 # simple laplace problem
-# %% [raw] raw_mimetype="text/restructuredtext"
-# .. index:: grid construction; pygmsh
 
 # %%
 import numpy, math

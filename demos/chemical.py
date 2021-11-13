@@ -1,5 +1,7 @@
 # %% [markdown]
-# # A Advection-Diffusion-Reaction System: Chemical Reaction Problem
+# .. index:: Equations; Advection-Diffusion-Reaction
+#
+# # An Advection-Diffusion-Reaction System: Chemical Reaction Problem
 # %%
 try:
     import dune.femdg
@@ -24,7 +26,7 @@ from dune.femdg.rk import femdgStepper
 gridView = structuredGrid([0,0],[2*math.pi,2*math.pi],[20,20])
 
 # %% [markdown]
-# Method to conpute the velocity based on a scalar elliptic equation
+# Method to compute the velocity based on a scalar elliptic equation
 # %%
 def computeVelocity():
     streamSpace = lagrange(gridView, order=1, dimRange=1)

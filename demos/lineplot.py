@@ -1,4 +1,6 @@
 # %% [markdown]
+# .. index:: I/O; Sampling
+#
 # # Sampling the Solution over a Line
 # Let us revisit our simple 3d example from the introduction
 # %%

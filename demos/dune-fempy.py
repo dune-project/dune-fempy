@@ -1,4 +1,6 @@
 # %% [markdown]
+# .. index:: Equations; Non-linear Diffusion (Forchheimer)
+#
 # # A Nonlinear Time Dependent Problem
 # Now we can set up our PDE model
 # As an example we will study the Forchheimer problem
@@ -103,6 +105,8 @@ l2error = uflFunction(gridView, name="l2error", order=u_h.space.order, ufl=dot(u
 h1error = uflFunction(gridView, name="h1error", order=u_h.space.order, ufl=dot(grad(u_h - exact_end), grad(u_h - exact_end)))
 
 # %% [markdown]
+# .. index:: I/O; Writing VTK files
+#
 # Now we evolve the solution from time $t=0$ to $t=T$ in a loop. Since the
 # PDE model has time dependent coefficient (through the forcing term), we
 # need to update the `t` constant used to define the model before each step.

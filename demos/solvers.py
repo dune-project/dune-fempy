@@ -1,4 +1,5 @@
 # %% [markdown]
+#
 # # Alternate Solve Methods (Scipy and Petsc)
 # Here we look at different ways of solving PDEs using external
 # packages and python functionality.
@@ -125,6 +126,8 @@ for eocLoop in range(loops):
         scheme.model.dt /= 2
 
 # %% [markdown]
+# .. index:: Solvers; Scipy
+#
 # ## Using Scipy
 # We implement a simple Newton Krylov solver using a linear solver from
 # Scipy. We can use the `as_numpy` method to access the degrees of freedom as
@@ -220,6 +223,8 @@ print("Forchheimer(scipy) size: ", gridView.size(0), "L^2, H^1 error:",'{:0.5e},
   *[ sqrt(e) for e in integrate(gridView,[error**2,inner(grad(error),grad(error))], order=5) ]))
 
 # %% [markdown]
+# .. index:: Solvers; Petsc
+#
 # ## Using Petsc and Petsc4Py
 # Switching to a storage based on the PETSc solver package and solving the
 # system using the dune-fem bindings

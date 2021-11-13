@@ -1,4 +1,6 @@
 # %% [markdown]
+# .. index:: Equations; Euler equations
+#
 # # Euler System of Gas Dynamics
 # %%
 try:
@@ -24,6 +26,8 @@ from dune.fem.utility import lineSample
 dune.fem.threading.use = 4
 
 # %% [markdown]
+# .. index:: Methods; Stabilized Discontinuous Galerkin
+#
 # The dune-fem-dg module can either used stabilizer DG methods to solve
 # this type of problem or higher order FV methods based on linear
 # reconstruction. The following function uses a finite-volume space when
@@ -65,6 +69,8 @@ class Model:
         return abs(dot(v,n)) + sqrt(Model.gamma*p/rho)
 
 # %% [markdown]
+# .. index:: Methods; Limiter
+#
 # Add methods for limiting
 # %%
 def velocity(t,x,U):
@@ -116,7 +122,7 @@ def evolve(space, u_h, limiter="MinMod"):
     return res
 
 # %% [markdown]
-# A radial Rieman problem
+# A radial Riemann problem
 # %%
 x = SpatialCoordinate(triangle)
 initial = conditional(dot(x,x)<0.1,as_vector([1,0,0,2.5]),
@@ -142,7 +148,7 @@ order = 1
 space = getSpace( gridView, order )
 
 # %% [markdown]
-# Initial conditions for a radial Rieman problem
+# Initial conditions for a radial Riemann problem
 #
 # First solved on a triangle grid and minmod limiter
 
