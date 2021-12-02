@@ -30,7 +30,7 @@
 # provided by Dune-Geometry, providing, for example, reference elements and
 # quadrature rules.
 # %%
-import time, numpy, math, sys
+import time, numpy, sys
 import matplotlib
 matplotlib.rc( 'image', cmap='jet' )
 import matplotlib.pyplot as pyplot
@@ -151,7 +151,7 @@ for edge in unitSquare.edges:
 # %%
 @dune.fem.function.gridFunction(aluView, name="cos", order=3)
 def f(x):
-    return numpy.cos(2.*math.pi/(0.3+abs(x[0]*x[1])))
+    return numpy.cos(2.*numpy.pi/(0.3+abs(x[0]*x[1])))
 
 @dune.fem.function.gridFunction(aluView, name="hat0", order=3)
 def hat0(element,hatx):
@@ -204,14 +204,14 @@ print("integral of function 'f':",integral)
 dimR = 2
 @dune.fem.function.gridFunction(aluView, name="g", order=3)
 def g(x):
-    return [numpy.cos(2.*math.pi/(0.3+abs(x[0]*x[1])))]*dimR
+    return [numpy.cos(2.*numpy.pi/(0.3+abs(x[0]*x[1])))]*dimR
 # bit more complex to code
 @dune.fem.function.gridFunction(aluView, name="g", order=3)
 def g(x):
     if type(x[0]) is float:
-        return [numpy.cos(2.*math.pi/(0.3+abs(x[0]*x[1]))),1]
+        return [numpy.cos(2.*numpy.pi/(0.3+abs(x[0]*x[1]))),1]
     else:
-        return [numpy.cos(2.*math.pi/(0.3+abs(x[0]*x[1]))),[1]*len(x[0])]
+        return [numpy.cos(2.*numpy.pi/(0.3+abs(x[0]*x[1]))),[1]*len(x[0])]
 integral = g.dimRange*[0]
 for e in aluView.elements:
     # obtain numpy arrays containing the points and weights and then call

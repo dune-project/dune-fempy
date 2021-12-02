@@ -22,7 +22,6 @@
 # %%
 import matplotlib
 matplotlib.rc( 'image', cmap='jet' )
-import math
 import numpy
 import matplotlib.pyplot as pyplot
 from dune.fem.plotting import plotPointData as plot
@@ -61,8 +60,8 @@ def setup():
     vertices = numpy.zeros((8, 2))
     vertices[0] = [0, 0]
     for i in range(0, 7):
-        vertices[i+1] = [math.cos(cornerAngle/6*math.pi/180*i),
-                         math.sin(cornerAngle/6*math.pi/180*i)]
+        vertices[i+1] = [numpy.cos(cornerAngle/6*numpy.pi/180*i),
+                         numpy.sin(cornerAngle/6*numpy.pi/180*i)]
     triangles = numpy.array([[2,1,0], [0,3,2], [4,3,0],
                              [0,5,4], [6,5,0], [0,7,6]])
     domain = {"vertices": vertices, "simplices": triangles}
@@ -105,7 +104,7 @@ errorGlobal = []
 dofsGlobal  = []
 for count in range(10):
     laplace.solve(target=uh)
-    error = math.sqrt(integrate(uh.space.gridView, h1error, 5))
+    error = numpy.sqrt(integrate(uh.space.gridView, h1error, 5))
     errorGlobal += [error]
     dofsGlobal  += [uh.space.size]
     print(count, ": size=", uh.space.gridView.size(0), "error=", error)
@@ -171,9 +170,9 @@ while True:
     laplace.solve(target=uh)
     if count%9 == 8:
         plot(uh, figure=(fig, 131+count//9), colorbar=False)
-    error = math.sqrt(integrate(uh.space.gridView, h1error, 5))
+    error = numpy.sqrt(integrate(uh.space.gridView, h1error, 5))
     estimator(uh, estimate)
-    eta = math.sqrt( sum(estimate.dofVector) )
+    eta = numpy.sqrt( sum(estimate.dofVector) )
     dofs           += [uh.space.size]
     errorVector    += [error]
     estimateVector += [eta]

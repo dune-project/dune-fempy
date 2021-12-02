@@ -23,7 +23,6 @@
 import matplotlib
 matplotlib.rc( 'image', cmap='jet' )
 import matplotlib.pyplot as pyplot
-import math
 import numpy
 from dune.fem.plotting import plotPointData as plot
 import dune.grid as grid
@@ -60,8 +59,8 @@ def setup():
     vertices = numpy.zeros((8, 2))
     vertices[0] = [0, 0]
     for i in range(0, 7):
-        vertices[i+1] = [math.cos(cornerAngle/6*math.pi/180*i),
-                         math.sin(cornerAngle/6*math.pi/180*i)]
+        vertices[i+1] = [numpy.cos(cornerAngle/6*numpy.pi/180*i),
+                         numpy.sin(cornerAngle/6*numpy.pi/180*i)]
     triangles = numpy.array([[2,1,0], [0,3,2], [4,3,0],
                              [0,5,4], [6,5,0], [0,7,6]])
     domain = {"vertices": vertices, "simplices": triangles}

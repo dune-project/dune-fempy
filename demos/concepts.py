@@ -34,7 +34,7 @@
 # .. index:: Grids; Plotting
 #
 # %%
-import io, math, matplotlib
+import io, numpy, matplotlib
 matplotlib.rc( 'image', cmap='jet' )
 from matplotlib import pyplot
 
@@ -404,7 +404,7 @@ for eocLoop in range(loops):
     u_h.interpolate(0)
     scheme.solve(target = u_h)
     error = sqrt(integrate(gridView, h1error, order=5))
-    eoc = round(math.log(error/error_old)/math.log(0.5),2)
+    eoc = round(numpy.log(error/error_old)/numpy.log(0.5),2)
     print("EOC:",eoc,
           "Number of elements:", gridView.size(0),
           "number of dofs:", space.size,"H^1 error:", error)

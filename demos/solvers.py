@@ -39,7 +39,7 @@
 # %%
 import matplotlib
 matplotlib.rc( 'image', cmap='jet' )
-import math, sys, io
+import numpy, sys, io
 
 from dune.grid import structuredGrid as leafGridView
 from dune.fem.space import lagrange as solutionSpace
@@ -115,7 +115,7 @@ for eocLoop in range(loops):
     if eocLoop == 0:
         eocs = ['-','-']
     else:
-        eocs = [ round(math.log(e/e_old)/math.log(0.5),2) \
+        eocs = [ round(numpy.log(e/e_old)/numpy.log(0.5),2) \
                  for e,e_old in zip(errors,errors_old) ]
     print('Forchheimer: step:', eocLoop, ', size:', gridView.size(0))
     print('\t | u_h - u | =', '{:0.5e}'.format(errors[0]), ', eoc =', eocs[0])
@@ -156,7 +156,7 @@ class Scheme:
       n = 0
       while True:
           scheme(target, res)
-          absF = math.sqrt( np.dot(res_coeff,res_coeff) )
+          absF = numpy.sqrt( np.dot(res_coeff,res_coeff) )
           if absF < 1e-10:
               break
           scheme.jacobian(target,self.jacobian)
@@ -286,7 +286,7 @@ if petsc4py is not None and spacePetsc is not None:
           n = 0
           while True:
               schemePetsc(target, res)
-              absF = math.sqrt( res_coeff.dot(res_coeff) )
+              absF = numpy.sqrt( res_coeff.dot(res_coeff) )
               if absF < 1e-10:
                   break
               schemePetsc.jacobian(target, self.jacobian)

@@ -27,7 +27,7 @@ matplotlib.rc( 'image', cmap='jet' )
 from matplotlib import ticker
 from dune.fem.plotting import plotComponents
 
-import math, io
+import numpy, io
 from dune.grid import structuredGrid as leafGridView
 from dune.fem.space import lagrange as solutionSpace
 from dune.fem.scheme import galerkin as solutionScheme
@@ -81,7 +81,7 @@ test.clear()
 bc = DirichletBC(vecSpace,[vec[0],None])
 @gridFunction(gridView ,name="bnd",order=2)
 def bnd(x):
-    return [math.sin(4*(x[0]+x[1])),1]
+    return [numpy.sin(4*(x[0]+x[1])),1]
 bcBottom = DirichletBC(vecSpace,bnd,x[1]<1e-10)
 vecScheme = solutionScheme( [a == f, bc, bcBottom],
         parameters={"newton.linear.tolerance": 1e-9} )

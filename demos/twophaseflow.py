@@ -14,9 +14,10 @@ except ImportError:
     sys.exit(0)
 
 import matplotlib
+from matplotlib import pyplot
 matplotlib.rc( 'image', cmap='jet' )
-import math
 
+import numpy
 from ufl import *
 from dune.ufl import Space, Constant
 
@@ -306,7 +307,7 @@ else:
 # %%
 def errorMeasure(w,dw):
     rel = integrate(grid, [w[1]**2,dw[1]**2], 5)
-    return math.sqrt(rel[1]) < tolerance * math.sqrt(rel[0])
+    return numpy.sqrt(rel[1]) < tolerance * numpy.sqrt(rel[0])
 
 
 # %% [markdown]
@@ -474,8 +475,6 @@ x0 = FieldVector([0.25,  0.65])
 x1 = FieldVector([0.775, 0.39])
 p,v = algorithm.run('sample', 'utility.hh', solution, x0, x1, 1000)
 
-from matplotlib import pyplot
-import numpy
 x = numpy.zeros(len(p))
 y = numpy.zeros(len(p))
 l = (x1-x0).two_norm

@@ -10,7 +10,7 @@ except ImportError:
     import sys
     sys.exit(0)
 
-import math
+import numpy
 import matplotlib
 matplotlib.rc( 'image', cmap='jet' )
 from matplotlib import pyplot
@@ -23,7 +23,10 @@ from dune.fem.scheme import galerkin
 from dune.femdg import femDGOperator
 from dune.femdg.rk import femdgStepper
 
-gridView = structuredGrid([0,0],[2*math.pi,2*math.pi],[20,20])
+from dune.fem import threading
+threading.use = 4 # use 4 threads
+
+gridView = structuredGrid([0,0],[2*numpy.pi,2*numpy.pi],[20,20])
 
 # %% [markdown]
 # Method to compute the velocity based on a scalar elliptic equation

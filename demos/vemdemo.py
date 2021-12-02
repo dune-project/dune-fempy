@@ -30,7 +30,7 @@ except:
 import matplotlib
 matplotlib.rc( 'image', cmap='jet' )
 from matplotlib import pyplot
-import math
+import numpy
 from dune.grid import cartesianDomain, gridFunction
 from dune.fem.plotting import plotPointData as plot
 from dune.fem.function import integrate, discreteFunction
@@ -55,7 +55,7 @@ polyGrid = dune.vem.polyGrid( dune.vem.voronoiCells([[-0.5,-0.5],[1,1]], 50, llo
 #
 # In general we can construct a `polygrid` by providing a dictionary with
 # the `vertices` and the `polygons`. The `voronoiCells` function creates
-# such a dictonary using random seeds to generate voronoi cells which are
+# such a dictionary using random seeds to generate voronoi cells which are
 # cut off using the provided `cartesianDomain`. The seeds can be
 # provided as list of points as second argument:
 # ```
@@ -193,7 +193,7 @@ def compute(grid, space,spaceArgs, schemeName,schemeArgs):
     edf = exact-df
     err = [inner(edf,edf),
            inner(grad(edf),grad(edf))]
-    errors = [ math.sqrt(e) for e in integrate(grid, err, order=8) ]
+    errors = [ numpy.sqrt(e) for e in integrate(grid, err, order=8) ]
 
     return df, errors, info
 
@@ -229,14 +229,14 @@ scheme = dune.vem.vemScheme( [a==b, *dbcs], space, gradStabilization=Dcoeff(u),
 solution = space.interpolate([0], name="solution")
 info = scheme.solve(target=solution)
 edf = exact-solution
-errors = [ math.sqrt(e) for e in
+errors = [ numpy.sqrt(e) for e in
            integrate(polyGrid, [inner(edf,edf),inner(grad(edf),grad(edf))], order=5) ]
 print("non linear problem:", errors )
 solution.plot(gridLines=None)
 
 # %% [markdown]
 # # Linear Elasticity
-# Next we solve a linear elasticity equation usign a conforming VEM space:
+# Next we solve a linear elasticity equation using a conforming VEM space:
 
 # First we setup the domain
 # %%
@@ -330,8 +330,8 @@ ncC1testSpaces = [ [0], [order-3,order-2], [order-4] ]
 #       for function which continuous derivatives we have
 #       laplace(u)*laplace(v)*dx = inner(u,v)*dx
 #       as can be seen by using integration by parts on the mixed terms on the right
-#       and using continuety of u,v
-#       For the non conforming spaces we don't have continuety of the
+#       and using continuity of u,v
+#       For the non conforming spaces we don't have continuity of the
 #       derivatives so the equivalence does not hold and one should use the
 #       right hand side directly to obtain a coercive bilinear form w.r.t.
 #       the norm on H^2 (the left is not a norm in this case).
@@ -363,7 +363,7 @@ scheme = dune.vem.vemScheme( [a==b, *dbcs], space, hessStabilization=1,
 solution = discreteFunction(space, name="solution")
 info = scheme.solve(target=solution)
 edf = exact-solution
-errors = [ math.sqrt(e) for e in
+errors = [ numpy.sqrt(e) for e in
            integrate(polyGrid, [inner(edf,edf),inner(grad(edf),grad(edf))], order=5) ]
 print("bi-laplace errors:", errors )
 solution.plot(gridLines=None)

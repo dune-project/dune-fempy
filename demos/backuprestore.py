@@ -13,7 +13,7 @@
 # %%
 import matplotlib
 matplotlib.rc( 'image', cmap='jet' )
-import math, pickle, numpy
+import pickle, numpy
 from dune.alugrid import aluConformGrid as view
 from dune.grid import cartesianDomain, Marker
 from dune.fem.function import gridFunction
@@ -57,7 +57,7 @@ def test1(fileName):
     grid = view( cartesianDomain([-2,-2],[2,2],[10,10]) )
 
     @gridFunction(grid, name="gf", order=3)
-    def gf(x): return math.sqrt(1-(x[0]**2+x[1]**2)) if x[0]**2+x[1]**2<1 else 0
+    def gf(x): return numpy.sqrt(1-(x[0]**2+x[1]**2)) if x[0]**2+x[1]**2<1 else 0
 
     space = lagrange(grid)
     df = space.interpolate(gf,name="test")

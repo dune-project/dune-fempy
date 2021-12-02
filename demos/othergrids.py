@@ -6,7 +6,7 @@
 # simple laplace problem
 
 # %%
-import numpy, math
+import numpy
 import matplotlib
 matplotlib.rc( 'image', cmap='jet' )
 from matplotlib import pyplot
@@ -63,7 +63,7 @@ gridView3d.writeVTK('3dexample', pointdata=[uh3d],
 
 # %%
 from dune.grid import onedGrid
-v = [math.log(i) for i in range(1,100)]
+v = [numpy.log(i) for i in range(1,100)]
 e = [(i,i+1) for i in range(1,len(v))]
 g = onedGrid(constructor={"vertices":v, "simplices":e})
 s = solutionSpace(g)

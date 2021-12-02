@@ -35,9 +35,9 @@
 # is implemented in C++ using the `dune.generator.algorithm` functionality.
 
 # %%
-import math, time, io
+import time, io
 import pickle
-import numpy as np
+import numpy
 from matplotlib import pyplot as plt
 from matplotlib.ticker import ScalarFormatter
 
@@ -61,7 +61,7 @@ def plot(ct, ct2):
     xticks = ax.xaxis.get_minor_ticks()
     for t in xticks:
         t.label1.set_visible(False)
-    plt.yticks(np.append(ct[1], ct2[1]))
+    plt.yticks(numpy.append(ct[1], ct2[1]))
     plt.xticks(ct[0])
     plt.legend(loc="upper left")
     plt.xlabel('Number of Grid Elements (log)',fontsize=20)
@@ -146,16 +146,16 @@ def calculate(use_cpp, gridView):
 
     scheme = solutionScheme(a == 0, space, solver="cg")
 
-    Rexact = lambda t: math.sqrt(R0*R0 - 4.*t)
+    Rexact = lambda t: numpy.sqrt(R0*R0 - 4.*t)
     radius = switchCalcRadius(use_cpp,surface)
 
     scheme.model.dt = 0.02
 
     numberOfLoops = 3
-    times = np.zeros(numberOfLoops)
-    errors = np.zeros(numberOfLoops)
-    totalIterations = np.zeros(numberOfLoops, np.dtype(np.uint32))
-    gridSizes = np.zeros(numberOfLoops, np.dtype(np.uint32))
+    times = numpy.zeros(numberOfLoops)
+    errors = numpy.zeros(numberOfLoops)
+    totalIterations = numpy.zeros(numberOfLoops, numpy.dtype(numpy.uint32))
+    gridSizes = numpy.zeros(numberOfLoops, numpy.dtype(numpy.uint32))
     for i in range(numberOfLoops):
         positions.interpolate(x * (R0/sqrt(dot(x,x))))
         solution.interpolate(x)
@@ -179,10 +179,10 @@ def calculate(use_cpp, gridView):
         if i < numberOfLoops - 1:
             gridView.hierarchicalGrid.globalRefine(1)
             scheme.model.dt /= 2
-    eocs = np.log(errors[0:][:numberOfLoops-1] / errors[1:]) / math.log(math.sqrt(2))
+    eocs = numpy.log(errors[0:][:numberOfLoops-1] / errors[1:]) / numpy.log(numpy.sqrt(2))
     try:
         import pandas as pd
-        keys = {'size': gridSizes, 'error': errors, "eoc": np.insert(eocs, 0, None), 'iterations': totalIterations}
+        keys = {'size': gridSizes, 'error': errors, "eoc": numpy.insert(eocs, 0, None), 'iterations': totalIterations}
         table = pd.DataFrame(keys, index=range(numberOfLoops),columns=['size', 'error', 'eoc', 'iterations'])
         print(table)
     except ImportError:

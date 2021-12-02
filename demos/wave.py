@@ -54,7 +54,7 @@
 # %%
 import matplotlib
 matplotlib.rc( 'image', cmap='jet' )
-import math
+import numpy
 import dune.fem as fem
 from dune.grid import reader
 from dune.alugrid import aluConformGrid as leafGridView
@@ -153,7 +153,7 @@ while t <= T:
     pVec[:]   += S*phiVec[:]
     t += dt
     # set the values on the Dirichlet boundary
-    op.model.g = math.sin(2*math.pi*5*t)
+    op.model.g = numpy.sin(2*numpy.pi*5*t)
     op.setConstraints(p)
     phiVec[:] -= pVec[:]*dt/2
 phi.plot(gridLines=None, clim=[-0.02,0.02])
