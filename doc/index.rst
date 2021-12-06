@@ -190,14 +190,6 @@ where they can be found in the demo folder.
 .. API reference <api/modules>
 
 
-##################
-Indices and Tables
-##################
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
-
 ############
 Bibliography
 ############
