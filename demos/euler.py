@@ -10,7 +10,7 @@ except ImportError:
     import sys
     sys.exit(0)
 
-import math, numpy
+import numpy
 import matplotlib
 matplotlib.rc( 'image', cmap='jet' )
 from matplotlib import pyplot

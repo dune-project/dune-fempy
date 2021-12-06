@@ -57,7 +57,6 @@
 # Let's get started by importing some standard python packages, ufl, and some part of the dune-fempy package:
 
 # %%
-import math
 import ufl
 import dune.ufl
 import dune.grid

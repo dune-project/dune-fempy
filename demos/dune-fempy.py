@@ -37,7 +37,7 @@
 # %%
 import matplotlib
 matplotlib.rc( 'image', cmap='jet' )
-import math, sys, io
+import sys, io
 
 from dune.grid import structuredGrid as leafGridView
 from dune.fem.space import lagrange as solutionSpace
