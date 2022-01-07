@@ -45,7 +45,12 @@ further in this chapter:
    in the filter but in addition it is also possible to obtain a new index
    set with indices restricted to the elements in the filter.
 
-.. include:: filteredgridview_nb.rst
+.. toctree::
+   :maxdepth: 2
+   :name: filteredGV
+
+   levelgridview_nb
+   filteredgridview_nb
 
 ============================================
 Dynamic Local Grid Refinement and Coarsening

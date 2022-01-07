@@ -1,3 +1,10 @@
+# %% [markdown]
+# .. index:: Grid construction; Level grid views
+#
+# # LevelGridView examples
+#
+
+# %%
 from dune.grid import cartesianDomain
 from dune.alugrid import aluConformGrid, aluSimplexGrid
 domain = cartesianDomain([0,0],[1,1],[1,1])
