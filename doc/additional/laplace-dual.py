@@ -3,7 +3,6 @@ try:
 except:
     pass
 import numpy
-import math
 from ufl import *
 from dune.common import FieldVector
 from dune.generator import algorithm
@@ -35,7 +34,7 @@ v = TestFunction(spc)
 x = SpatialCoordinate(spc)
 n, h = FacetNormal(spc), MinFacetEdgeLength(spc)
 
-phi    = atan_2(x[1], x[0]) + conditional(x[1] < 0, 2*math.pi, 0)
+phi    = atan_2(x[1], x[0]) + conditional(x[1] < 0, 2*numpy.pi, 0)
 exact  = as_vector([inner(x,x)**(0.5*180/270) * sin((180/270) * phi)])
 s      = (1-x[0]**2)*(1-x[1]**2)
 s      = -sin(1.5*pi*s)
@@ -76,8 +75,8 @@ scheme.solve(target=uh)
 op = create.operator("galerkin", inner(jump(u),jump(v))*dS, spc)
 w = spc.interpolate([0],name="tmp")
 op(uh, w)
-dgError = [ math.sqrt( integrate(grid,(uh[0]-exact[0])**2,order=7) ),
-            math.sqrt( integrate(grid,inner(grad(uh[0]-exact[0]),grad(uh[0]-exact[0])),order=7)\
+dgError = [ numpy.sqrt( integrate(grid,(uh[0]-exact[0])**2,order=7) ),
+            numpy.sqrt( integrate(grid,inner(grad(uh[0]-exact[0]),grad(uh[0]-exact[0])),order=7)\
             + w.scalarProductDofs(uh)) ]
 l2Errors = [dgError[0]]
 h1Errors = [dgError[1]]

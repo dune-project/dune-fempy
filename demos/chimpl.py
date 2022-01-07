@@ -16,7 +16,7 @@ except:
 import matplotlib
 matplotlib.rc( 'image', cmap='jet' )
 from matplotlib import pyplot
-import math, random
+import random
 from dune.grid import cartesianDomain, gridFunction
 import dune.fem
 from dune.fem.plotting import plotPointData as plot

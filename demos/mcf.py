@@ -39,7 +39,6 @@
 # %%
 import matplotlib
 matplotlib.rc( 'image', cmap='jet' )
-import math
 
 from ufl import *
 from dune.ufl import Constant, DirichletBC
