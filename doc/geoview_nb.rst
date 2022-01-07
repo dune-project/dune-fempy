@@ -1,9 +1,5 @@
 .. code:: ipython3
 
-    # <markdowncell>
-
-.. code:: ipython3
-
     import matplotlib
     matplotlib.rc( 'image', cmap='jet' )
     from matplotlib import pyplot
@@ -16,7 +12,6 @@
     transform = as_vector([ (x[0]+x[1])/sqrt(2), (-x[0]+x[1])*sqrt(2) ])
     gridFunction = uflFunction(square,ufl=transform,order=1,name="diamond")
     diamond = geometryGridView(gridFunction)
-    # <markdowncell>
 
 .. code:: ipython3
 

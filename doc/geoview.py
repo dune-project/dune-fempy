@@ -1,5 +1,6 @@
-# <markdowncell>
-# <codecell>
+# %% [markdown]
+
+# %%
 import matplotlib
 matplotlib.rc( 'image', cmap='jet' )
 from matplotlib import pyplot
@@ -12,6 +13,6 @@ x = SpatialCoordinate(triangle)
 transform = as_vector([ (x[0]+x[1])/sqrt(2), (-x[0]+x[1])*sqrt(2) ])
 gridFunction = uflFunction(square,ufl=transform,order=1,name="diamond")
 diamond = geometryGridView(gridFunction)
-# <markdowncell>
-# <codecell>
+
+# %%
 diamond.plot()

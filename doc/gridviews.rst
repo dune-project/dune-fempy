@@ -4,6 +4,10 @@
 Grid Views: Adaptivity and Moving Domains
 #########################################
 
+=======================================================
+Overview and some basic grid views (level and filtered)
+=======================================================
+
 When constructing a grid, the object returned to Python is always the so
 called `LeafGridView`. Without any refinement this is simply a view on all
 the elements of the grid. As soon as the grid is refined the leaf grid view changes

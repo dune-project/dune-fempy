@@ -2,6 +2,7 @@
 # .. index:: Grid construction; Filtered grid views
 #
 # # FilteredGridView examples
+#
 # In this example we use `filteredGridView` to filter out parts of a given
 # grid view.
 
