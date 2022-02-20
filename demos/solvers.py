@@ -264,7 +264,6 @@ else:
 
 # %% [markdown]
 # Implementing a Newton Krylov solver using the binding provided by petsc4py
-
 # %%
 if petsc4py is not None and spacePetsc is not None:
     class Scheme3:
