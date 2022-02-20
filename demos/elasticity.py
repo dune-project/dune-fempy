@@ -39,10 +39,10 @@ dbc = dune.ufl.DirichletBC(space, as_vector([0,0]), x[0]<1e-10)
 
 
 # %%
-mu = 1
-lamb = 0.1
-rho = 1/1000.
-g = 9.8
+lamb = 0.1     # 1st Lamé coefficient (\lambda)
+mu   = 1       # 2nd Lamé coefficient (\mu)
+rho  = 1/1000. # material density
+g    = 9.8     # gravitational acceleration
 
 
 # %% [markdown]
