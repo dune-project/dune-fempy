@@ -365,69 +365,30 @@ space = solutionSpace(gridView, order=2, storage='numpy')
 
 # %% [markdown]
 # Switching is as simple as passing `storage='istl'` or  `storage='petsc'`.
+# Here is a summary of the available backends
 #
-# When creating a scheme, there is the possibility to select a linear solver for the internal Newton method.
-# The following options are available:
+# | Solver    | Description |
+# | --------- | ------------------------------------------------------------------- |
+# | numpy     | the storage is based on a raw C pointer which can be                |
+# |           | directly accessed as a numpy.array using the Python buffer protocol |
+# |           | To change the underlying vector of a discrete function 'u_h' use    |
+# |           | 'uh.as_numpy[:]'.                                                   |
+# |           | As shown in the examples, linear operators return a                 |
+# |           | scipy.sparse_matrix through the 'as_numpy' property.                |
+# | istl      | data is stored in a block vector/matrix from the dune.istl package  |
+# |           | Access through 'as_istl'                                            |
+# | petsc     | data is stored in a petsc vector/matrix which can also be used with |
+# |           | petsc4py on the python side using 'as_petsc'                        |
+#
+
+#
+# When creating a scheme, there is the possibility to select a linear
+# solver for the internal Newton method.
+# In addition the behavior of the solver can be customized through a
+# parameter dictionary. This allows to set tolerances, verbosity, but also
+# which preconditioner to use.
+#
+# For details see the help avaialble for a scheme:
 
 # %%
-
-availableSolvers =\
-"""
- -------------------------------------
- |  Solver  |        Storage         |
- |   name   |  numpy |  istl | petsc |
- |----------|--------|-------|-------|
- | cg       |    x   |   x   |   x   |
- | gmres    |    x   |   x   |   x   |
- | bicgstab |    x   |   x   |   x   |
- | bicg     |   ---  |  ---  |   x   |
- | minres   |   ---  |   x   |   x   |
- | lu       |   ---  |   x   |  (x)  |
- | umfpack  |    x   |  ---  |  ---  |
- -------------------------------------
-"""
-
-availablePreconditioners =\
-"""
- ----------------------------------------------------------
- |  Preconditioning |  parallel  |        Storage         |
- |  method          |            |  numpy |  istl | petsc |
- |------------------|------------|--------|-------|-------|
- | jacobi           |     x      |    x   |   x   |   x   |
- | gauss-seidel     |     x      |    x   |   x   |   x   |
- | sor              |     x      |    x   |   x   |   x   |
- | ssor             |     x      |    x   |   x   |   x   |
- | ilu              |    ---     |   ---  |   x   |   x   |
- | amg-jacobi       |    (x)     |   ---  |   x   |  ---  |
- | amg-ilu          |    ---     |   ---  |   x   |  ---  |
- | hypre            |     x      |   ---  |  ---  |   x   |
- |   - boomeramg    |     x      |   ---  |  ---  |   x   |
- |   - pilu_t       |     x      |   ---  |  ---  |   x   |
- |   - parasails    |     x      |   ---  |  ---  |   x   |
- | ml               |     x      |   ---  |  ---  |   x   |
- | lu               |    (x)     |   ---  |  (x)  |   x   |
- | pcgamg           |     x      |   ---  |  ---  |   x   |
- | oas              |     x      |   ---  |  (x)  |   x   |
- ----------------------------------------------------------
-"""
-
-# %% [markdown]
-#
-#  In addition the following parameters can be passed on to the solvers.
-
-# %%
-
-solverParameters =\
-       {"newton.tolerance": 1e-3, # tolerance for newton solver
-        "newton.verbose": False,  # toggle iteration output
-        "newton.linear.tolerance": 1e-5, # tolerance for linear solver
-        "newton.linear.errormeasure": "absolute", # or "relative" or "residualreduction"
-        "newton.linear.preconditioning.method": "jacobi", # (see table above)
-        "newton.linear.preconditioning.hypre.method": "boomeramg", # or "pilu-t" or "parasails"
-        "newton.linear.preconditioning.iteration": 3, # number of iterations for preconditioner
-        "newton.linear.preconditioning.relaxation": 1.0, # omega for stationary iterative method
-        "newton.linear.maxiterations":1000, # max number of linear iterations
-        "newton.linear.verbose": False}     # toggle linear iteration output
-        # "newton.linear.preconditioning.level": 0, # fill-in level for ILU preconditioning
-
-scheme = solutionScheme(a == b, solver='cg', parameters=solverParameters )
+help(scheme)
