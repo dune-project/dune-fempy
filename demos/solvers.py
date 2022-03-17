@@ -389,7 +389,7 @@ space = solutionSpace(gridView, order=2, storage='numpy')
 # parameter dictionary. This allows to set tolerances, verbosity, but also
 # which preconditioner to use.
 #
-# For details see the help avaialble for a scheme:
+# For details see the help available for a scheme:
 
 # %%
 help(scheme)
