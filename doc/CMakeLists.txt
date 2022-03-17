@@ -27,6 +27,7 @@ figures _static dune-fempy.bib .special.rst
 soap.dgf sphere.dgf unitcube-2d.dgf wave_tank.msh
 config.opts
 levelgridview_nb.ipynb
+levelgridview_nb.ipynb
 filteredgridview_nb.ipynb
 filteredgridview_nb_files
 geoview_nb.rst

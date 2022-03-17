@@ -22,7 +22,11 @@ using the underlying `hierarchical grid`, i.e.,
 For a given hierarchical grid one can use different views, i.e., a view on
 all the elements of a given level:
 
-.. include:: levelgridview_nb.rst
+.. toctree::
+   :maxdepth: 2
+   :name: levelGV
+
+   levelgridview_nb
 
 DUNE-FEM provides a number of additional views which will be discussed
 further in this chapter:
@@ -31,7 +35,7 @@ further in this chapter:
    the grid is supposed to be locally adapted. The view is still on the leaf
    elements of the grid but way data is attached to the entities of the grid
    is optimized for frequent grid changes as caused by local adaptivity. Its
-   usage is shown in the following example.
+   usage is shown in the following examples.
 
 *  `dune.fem.view.geometryGridView`: this is an example of a `meta` grid
    view which is constructed from an existing grid view and replaces some
@@ -49,7 +53,6 @@ further in this chapter:
    :maxdepth: 2
    :name: filteredGV
 
-   levelgridview_nb
    filteredgridview_nb
 
 ============================================

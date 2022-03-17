@@ -349,6 +349,7 @@ if petsc4py is not None and spacePetsc is not None:
       *[ sqrt(e) for e in integrate(gridView,[error**2,inner(grad(error),grad(error))], order=5) ]))
 
 # %% [markdown]
+# .. index:: Solvers; Parameters
 #
 # # Available built-in solvers and parameters
 # Upon creation of a discrete function space one also have to specifies the
