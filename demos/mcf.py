@@ -116,7 +116,7 @@ while t < end_time:
              gridLines="", triplot=True)
 
 # %% [markdown]
-# By chosing an initial surface with boundary we can solve the _soap film_
+# By choosing an initial surface with boundary we can solve the _soap film_
 # problem, i.e., compute the surface of minimum curvature:
 # %%
 pyplot.close('all')
@@ -127,7 +127,7 @@ space = solutionSpace(referenceView, dimRange=referenceView.dimWorld,
 
 # setup deformed surface
 x         = SpatialCoordinate(space)
-# npte that 'positions' also deforms the boundary which will then be fixed
+# note that 'positions' also deforms the boundary which will then be fixed
 # during the evolution by the chosen boundary conditions:
 positions = space.interpolate(x * (1 + 0.5*sin(2*pi*(x[0]+x[1]))*cos(0.25*pi*x[2])), name="position")
 gridView  = geometryGridView(positions)
@@ -152,12 +152,10 @@ xForm = inner(grad(u), grad(phi)) * dx
 # add time discretization
 form = dot(u - uh_old, phi) * dx + dt * xForm
 
-# define dirichlet boundary conditions - freezing the boundary
+# define Dirichlet boundary conditions - freezing the boundary
 bc = DirichletBC(space,x)
 
 # %% [markdown]
-# .. index:: Solvers; Parameters
-#
 # Choosing solver parameters is done by passing a dictionary when constructing
 # the scheme.
 
@@ -166,7 +164,9 @@ dune.fem.parameter.append({"fem.verboserank": 0})
 solverParameters =\
        {"newton.tolerance": 1e-9,
         "newton.linear.tolerance": 1e-11,
-        "newton.linear.preconditioning.method": "jacobi"}
+        "newton.linear.preconditioning.method": "ssor",
+        "newton.verbose": True,
+        "newton.linear.preconditioning.iteration": 3}
 # setup scheme
 scheme = solutionScheme([form == 0, bc], space, solver="cg",
                         parameters=solverParameters)
