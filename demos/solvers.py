@@ -349,7 +349,7 @@ if petsc4py is not None and spacePetsc is not None:
       *[ sqrt(e) for e in integrate(gridView,[error**2,inner(grad(error),grad(error))], order=5) ]))
 
 # %% [markdown]
-# .. index:: Solvers; Parameters
+# .. index:: Solvers; Dune built-in
 #
 # # Available built-in solvers and parameters
 # Upon creation of a discrete function space one also have to specifies the
@@ -382,7 +382,12 @@ space = solutionSpace(gridView, order=2, storage='numpy')
 # |           | petsc4py on the python side using 'as_petsc'                        |
 #
 
+# %%
+
 #
+# %% [markdown]
+# .. index:: Solvers; Parameters
+
 # When creating a scheme, there is the possibility to select a linear
 # solver for the internal Newton method.
 # In addition the behavior of the solver can be customized through a
