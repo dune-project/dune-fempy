@@ -69,7 +69,7 @@ where they can be found in the demo folder.
    simple problem up and running, we discuss:
 
    * how to use different solver backends (including build in solvers, solvers and
-     preconditioners available in `Dune-Istl`_, `scipy`_, `petsc`_ and
+     preconditioners available in `Dune-Istl`_, `scipy`_, `PETSc`_ and
      also `petsc4py`_ see also :cite:`PETSc-Paper,SciPy-Paper`).
    * how to add more complicated boundary conditions to the problem formulation.
    * how to backup and restore data including discrete functions and the
@@ -112,7 +112,7 @@ where they can be found in the demo folder.
 .. _matplotlib: https://matplotlib.org
 .. _gmsh: https://pypi.org/project/pygmsh
 .. _scipy: https://www.scipy.org
-.. _petsc: https://www.mcs.anl.gov/petsc
+.. _PETSc: https://www.mcs.anl.gov/petsc
 .. _petsc4py: https://bitbucket.org/petsc/petsc4py
 .. _docker: https://www.docker.com
 .. _pybind11: https://github.com/pybind/pybind11
