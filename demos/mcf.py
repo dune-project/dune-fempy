@@ -164,7 +164,7 @@ dune.fem.parameter.append({"fem.verboserank": 0})
 solverParameters =\
        {"newton.tolerance": 1e-9,
         "newton.linear.tolerance": 1e-11,
-        "newton.linear.preconditioning.method": "ssor",
+        "newton.linear.preconditioning.method": "jacobi",
         "newton.verbose": True,
         "newton.linear.preconditioning.iteration": 3}
 # setup scheme
