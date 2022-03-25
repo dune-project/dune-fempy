@@ -44,7 +44,7 @@ x = SpatialCoordinate(space3d)
 scheme3d = solutionScheme((dot(grad(u),grad(v))+u*v)*dx ==
                         conditional(dot(x,x)<.01,100,0)*v*dx,
                         solver='cg')
-uh3d = space3d.interpolate([0],name="solution")
+uh3d = space3d.interpolate(0,name="solution")
 info = scheme3d.solve(target=uh3d)
 
 # %% [markdown]
