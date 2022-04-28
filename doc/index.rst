@@ -47,7 +47,7 @@ description on how we export the polymorphic interfaces in `Dune`_ is
 provided in :cite:`Dune-Python-Paper` which describes the dune module
 `Dune-Python`_ which after the Dune 2.7 release has been directly
 integrated into the Dune core modules. If you have a version newer then 2.8
-then note that the `Dune-Python_` module is obsolete.
+then note that the `Dune-Python`_ module is obsolete.
 
 Here is a quick summary of the different parts of this document - all of
 the code is available for download in form of both :ref:`scripts`.
@@ -93,7 +93,7 @@ where they can be found in the demo folder.
 
    * Local grid refinement and coarsening is a central feature of
      `Dune-Fem`_. Here we show how to use it for stationary and
-     time dependent problems. Grid adaptivity makes use of special grid views.i
+     time dependent problems. Grid adaptivity makes use of special grid views.
    * Other views are also
      available, one of these can be used to deform the grid given an
      arbitrary (discrete) vector field. This is used to compute the evolution
