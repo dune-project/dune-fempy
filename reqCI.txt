@@ -17,7 +17,7 @@ sortedcontainers
 triangle
 fenics-ufl
 x3d
-petsc4py
 pygmsh
+# petsc4py
 # gmsh - fails in CI for some reason
 
