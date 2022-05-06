@@ -61,7 +61,6 @@ from dune.alugrid import aluConformGrid as leafGridView
 from dune.fem.space import lagrange as solutionSpace
 from ufl import TrialFunction, TestFunction, grad, dot, dx
 from dune.ufl import Constant, BoxDirichletBC
-fem.parameter.append({"fem.verboserank":-1})
 T = 3
 dt = 0.005
 t = 0

@@ -39,8 +39,6 @@ import dune.fem
 from ufl import *
 import dune.ufl
 
-dune.fem.parameter.append({"fem.verboserank": 0})
-
 # %% [markdown]
 # We use a grid build up of voronoi cells around $50$ random points
 # in the interval $[-\frac{1}{2},1]\times [-\frac{1}{2},1]$ using 100
