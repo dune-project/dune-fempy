@@ -147,7 +147,7 @@ scheme = dune.fem.scheme.galerkin( equation, solver="cg", parameters=solverParam
 # Error estimator
 # <codecell>
 
-fvspace = dune.fem.space.finiteVolume(uh.space.grid)
+fvspace = dune.fem.space.finiteVolume(uh.space.gridView)
 estimate = fvspace.interpolate([0], name="estimate")
 
 chi = ufl.TestFunction(fvspace)
