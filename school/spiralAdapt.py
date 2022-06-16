@@ -75,7 +75,7 @@ maxLevel     = 13
 startLevel   = 9
 dt           = dune.ufl.Constant(0.5,"dt")
 t            = dune.ufl.Constant(0,"time")
-endTime      = 7.
+endTime      = 15.
 saveInterval = 0.5
 maxTol       = 1e-6
 
@@ -136,9 +136,10 @@ equation   = form == 0
 # <codecell>
 
 solverParameters =\
-       {"newton.tolerance": 1e-10,
+       {"newton.tolerance": 1e-6,
         "newton.linear.tolerance": 1e-8,
-        "newton.verbose": False,
+        "newton.verbose": True,
+        "newton.linear.predoncitioning.method": "ssor",
         "newton.linear.verbose": False}
 scheme = dune.fem.scheme.galerkin( equation, solver="cg", parameters=solverParameters)
 
