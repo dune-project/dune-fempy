@@ -16,3 +16,23 @@ diamond = geometryGridView(gridFunction)
 
 # %%
 diamond.plot()
+
+# %% [markdown]
+# In a second example we embed a 1D interval into 3D:
+
+# %%
+from ufl import interval,cos,sin
+square = structuredGrid([0],[25],[100])
+theta = SpatialCoordinate(interval)[0]
+transform = as_vector([cos(theta),sin(theta)])*(25-theta)
+gridFunction = uflFunction(square,ufl=transform,order=1,name="diamond")
+spiral = geometryGridView(gridFunction)
+
+# %% [markdown]
+# Note: currently plotting for 1d grids is not implemented
+#   spiral.plot()
+# but we can plot some grid function, e.g., given by ufl expressions
+
+# %%
+from dune.fem.plotting import plotPointData as plot
+plot(theta, grid=spiral)

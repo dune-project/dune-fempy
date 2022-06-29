@@ -77,6 +77,19 @@ other dof vectors will be resized.
 
 .. note::
 
+    All the prolongation/restriction described here requires that the
+    discrete spaces were constructed over an `adaptiveLeafGridView`.
+
+    So the code has to be modified for example as follows
+
+.. code:: python
+
+    from dune.alugrid import aluConformGrid as leafGridView
+    from dune.fem.view import adaptiveLeafGridView as adaptiveGridView
+    gridView = adaptiveGridView( leafGridView(domain) )
+
+.. note::
+
    if the underlying storage of a discrete function is stored on the Python
    side as a numpy array, i.e., `vec = uh.as_numpy` was called, then access
    to `vec` will be undefined after a grid modification since the

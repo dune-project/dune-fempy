@@ -16,11 +16,13 @@ except:
 import matplotlib
 matplotlib.rc( 'image', cmap='jet' )
 from matplotlib import pyplot
-import random
+import random, time
 from dune.grid import cartesianDomain, gridFunction
 import dune.fem
 from dune.fem.plotting import plotPointData as plot
 from dune.fem.function import integrate, discreteFunction
+
+# dune.fem.parameter.append("fem.verbositylevel",2)
 
 from ufl import *
 import dune.ufl
@@ -33,7 +35,7 @@ dune.fem.threading.use = 4
 order        = 3
 polyGrid = dune.vem.polyGrid( cartesianDomain([0,0],[1,1],[30,30]), cubes=True)
 ncC1testSpaces = [ [0], [order-3,order-2], [order-4] ]
-space = dune.vem.vemSpace(polyGrid, order=order, testSpaces=ncC1testSpaces)
+space = dune.vem.vemSpace(polyGrid, order=order, testSpaces=ncC1testSpaces, storage="petsc")
 
 # %% [markdown]
 # To define the mathematical model, let $\psi\colon{\mathbb R} \rightarrow
@@ -80,12 +82,23 @@ Eint  = lambda v: eps*eps/2*inner(grad(v),grad(v))+W(v)
 # Next we construct the scheme providing some suitable expressions to stabilize the method
 
 # %%
+solverParameters = {
+        "newton.tolerance": 1e-8,
+        # "newton.linear.tolerance": 1e-10,
+        "newton.verbose": False,
+        "newton.linear.verbose": False,
+        "newton.linear.preconditioning.method": "hypre",
+        "newton.linear.tolerance.strategy": "eisenstatwalker",
+        "newton.linear.errormeasure": "residualreduction", # or "relative"
+    }
 biLaplaceCoeff = eps*eps*tau
 diffCoeff      = 2*tau
 massCoeff      = 1
 scheme = dune.vem.vemScheme(
                        [equation, *dbc],
-                       solver=("suitesparse","umfpack"),
+                       solver="bicgstab",
+                       # solver=("suitesparse","umfpack"),
+                       parameters=solverParameters,
                        hessStabilization=biLaplaceCoeff,
                        gradStabilization=diffCoeff,
                        massStabilization=massCoeff,
@@ -117,15 +130,17 @@ tau.value = 1e-02
 fig = pyplot.figure(figsize=(40,20))
 count = 0
 pos = 1
+start = time.time()
 while t.value < 0.8:
     df_n.assign(df)
     info = scheme.solve(target=df)
+    # print(info)
     t.value += tau
     count += 1
     if count % 10 == 0:
-        df.plot(figure=(fig,240+pos),colorbar=None,clim=[-1,1])
+        # df.plot(figure=(fig,240+pos),colorbar=None,clim=[-1,1])
         energy = integrate(polyGrid,Eint(df),order=5)
-        print("[",pos,"]",t.value,tau.value,energy,info,flush=True)
+        print("[",pos,"]",t.value,tau.value,energy,info, time.time()-start, flush=True)
         pos += 1
 
 # %% [markdown]
@@ -139,10 +154,11 @@ pos = 1
 while t.value < 2.0:
     df_n.assign(df)
     info = scheme.solve(target=df)
+    # print(info)
     t.value += tau
     count += 1
     if count % 10 == 0:
-        df.plot(figure=(fig,140+pos),colorbar=None,clim=[-1,1])
+        # df.plot(figure=(fig,140+pos),colorbar=None,clim=[-1,1])
         energy = integrate(polyGrid,Eint(df),order=5)
-        print("[",pos,"]",t.value,tau.value,energy,info,flush=True)
+        print("[",pos,"]",t.value,tau.value,energy,info,time.time()-start,flush=True)
         pos += 1

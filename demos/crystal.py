@@ -11,6 +11,7 @@
 import matplotlib
 matplotlib.rc( 'image', cmap='jet' )
 
+import time
 import dune.fem as fem
 from dune.grid import cartesianDomain
 from dune.alugrid import aluConformGrid as leafGridView
@@ -152,7 +153,9 @@ solverParameters = {
         "newton.tolerance": 1e-8,
         "newton.linear.tolerance": 1e-10,
         "newton.verbose": False,
-        "newton.linear.verbose": False
+        "newton.linear.verbose": False,
+        "newton.linear.tolerance.strategy": "eisenstatwalker",
+        "newton.linear.errormeasure": "residualreduction", # or "relative"
     }
 scheme = solutionScheme(a_im == a_ex, space, solver="gmres", parameters=solverParameters)
 
@@ -226,16 +229,22 @@ from dune.fem.plotting import plotPointData
 u_h[0].plot(onlyContours=True,contours=[0.5], contourWidth=1, contourColor="black")
 # %%
 endTime = 0.1
+nlIter, lIter = 0,0
+start = time.time()
 while t < endTime:
     u_h_n.assign(u_h)
-    scheme.solve(target=u_h)
-    print(t, gridView.size(0), end="\r")
+    info = scheme.solve(target=u_h)
+    nlIter += info['iterations']
+    lIter  += info['linear_iterations']
+    # print(t, gridView.size(0), info) # , end="\r")
     t += scheme.model.dt
     fem.mark(indicator,1.4,1.2,0,maxLevel)
     fem.adapt(u_h)
     fem.loadBalance(u_h)
     # vtk()                # store result in sequence of vtk file
 print()
+print("iterations:",nlIter,lIter)
+print("time:",time.time()-start)
 
 plotComponents(u_h, cmap=pyplot.cm.jet)
 u_h[0].plot(onlyContours=True,contours=[0.5], contourWidth=1, contourColor="yellow")
