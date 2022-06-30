@@ -21,3 +21,27 @@
 
 .. image:: geoview_nb_files/geoview_nb_2_0.png
 
+
+In a second example we embed a 1D interval into 3D:
+
+.. code:: ipython3
+
+    from ufl import interval,cos,sin
+    square = structuredGrid([0],[25],[100])
+    theta = SpatialCoordinate(interval)[0]
+    transform = as_vector([cos(theta),sin(theta)])*(25-theta)
+    gridFunction = uflFunction(square,ufl=transform,order=1,name="diamond")
+    spiral = geometryGridView(gridFunction)
+
+Note: currently plotting for 1d grids is not implemented spiral.plot()
+but we can plot some grid function, e.g., given by ufl expressions
+
+.. code:: ipython3
+
+    from dune.fem.plotting import plotPointData as plot
+    plot(theta, grid=spiral)
+
+
+
+.. image:: geoview_nb_files/geoview_nb_6_0.png
+

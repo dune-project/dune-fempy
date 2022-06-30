@@ -18,6 +18,6 @@ triangle
 fenics-ufl
 x3d
 pygmsh
-# petsc4py
-# gmsh - fails in CI for some reason
-
+petsc4py
+gmsh # - fails in CI for some reason
+mayavi

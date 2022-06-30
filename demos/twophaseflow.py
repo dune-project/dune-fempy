@@ -45,7 +45,7 @@ coupled   = True
 tolerance = 3e-2
 penalty   = 5 * (maxOrder * ( maxOrder + 1 ))
 newtonParameters = {"tolerance": tolerance,
-                    "verbose": "true", "linear.verbose": "false",
+                    "verbose": "false", "linear.verbose": "false",
                     "linabstol": 1e-8, "reduction": 1e-8}
 
 
