@@ -94,7 +94,7 @@ def setup():
 # Note that by using `fem.globalRefine` instead of
 # `hierarchicalGrid.globalRefine` we can prolongate discrete functions
 # to the next level. The second argument can also be a list/tuple
-# of discrete functions to prolong. With this approach we optain a good
+# of discrete functions to prolong. With this approach we obtain a good
 # initial guess for solving the problem on the refined grid.
 
 # %%

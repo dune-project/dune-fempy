@@ -10,7 +10,7 @@ from dune.grid import cartesianDomain
 from dune.fem import doerflerMark, adapt, loadBalance, globalRefine
 from dune.fem.function import integrate, levelFunction
 from dune.ufl import DirichletBC, expression2GF
-importd dune.create as create
+imported dune.create as create
 
 newtonParameter = {"tolerance": 1e-10, "verbose": "true",
                    "linear.tolerance": 1e-25,

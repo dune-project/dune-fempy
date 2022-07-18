@@ -33,3 +33,17 @@ ubuntu-20.04-clang-10-17:
     # bug in CI clang-10-17 and clang-10-20 are mixed up
     DUNECI_TOOLCHAIN: clang-10-20
   tags: [duneci]
+
+# Check for spelling mistakes in text
+code-spelling-check:
+  stage: .pre
+  image: registry.dune-project.org/docker/ci/debian:11
+  script:
+  # ipynb are generated from py files so if those are correct the notebooks
+  # should be fine as well
+  - codespell
+    --ignore-words-list dof,te,inout,incrementall,iif,\trun,referr,ba
+    --skip "*.ipynb"
+  - codespell
+    --ignore-words-list te,inout,incrementall,iif,\trun,referr,ba
+    --skip pybind11

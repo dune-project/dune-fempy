@@ -3,7 +3,7 @@
 #
 # # Overview
 # To facilitate rapid prototyping, the Dune Python bindings
-# provid Python classes for all the core interfaces of Dune. This makes
+# provide Python classes for all the core interfaces of Dune. This makes
 # it easy to develop algorithms directly in Python which go beyond what is
 # available through the Dune-Fem discretization module. This is especially
 # of interest for pre- and postprocessing part of the overall simulation

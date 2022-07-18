@@ -26,7 +26,7 @@ for i in range(len(lines)):
               "equation environment instead... need to bail out")
         sys.exit(1)
     # add pythonstyle highlighting if not already done
-    # if "\\begin{aligned" in lines[i]: # also coveres {alignedat}{n}
+    # if "\\begin{aligned" in lines[i]: # also covers {alignedat}{n}
     #     output.write("```math\n")
     #     output.write(lines[i])
     # if "\\end{aligned" in lines[i]:

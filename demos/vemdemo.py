@@ -307,7 +307,7 @@ beam.plot()
 
 # %% [markdown]
 # # Forth order problem
-# As final example we solve some forth order PDEs usign a non-conforming VEM
+# As final example we solve some forth order PDEs using a non-conforming VEM
 # space for H^2 functions. To construct the space we just need to define
 # a suitable 'moments' vector to construct a suitable space for H^2 problems.
 #

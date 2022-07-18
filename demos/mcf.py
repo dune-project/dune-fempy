@@ -184,7 +184,7 @@ try:
     from mayavi import mlab
     from mayavi.tools.notebook import display
     def plot3d(uh,level):
-        x, triangles = uh.space.gridView.tesselate(level)
+        x, triangles = uh.space.gridView.tessellate(level)
         mlab.init_notebook("png") # use x3d for interactive plotting in the notebook
         mlab.figure(bgcolor = (1,1,1))
         s = mlab.triangular_mesh(x[:,0],x[:,1],x[:,2],triangles)

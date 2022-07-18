@@ -73,4 +73,4 @@ u.plot()
 
 # %% [markdown]
 # pyplot can very easily be used in 1d:
-# pyplot.plot(g.tesselate()[0], u.pointData(), '-p')
+# pyplot.plot(g.tessellate()[0], u.pointData(), '-p')

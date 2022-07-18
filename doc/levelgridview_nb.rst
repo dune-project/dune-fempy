@@ -26,14 +26,6 @@ LevelGridView examples
 
 .. parsed-literal::
 
-    WARNING (ignored): Could not open file 'alugrid.cfg', using default values 0 < [balance] < 1.2, partitioning method 'ALUGRID_SpaceFillingCurve(9)'.
-    
-    You are using DUNE-ALUGrid, please don't forget to cite the paper:
-    Alkaemper, Dedner, Kloefkorn, Nolte. The DUNE-ALUGrid Module, 2016.
-
-
-.. parsed-literal::
-
     level: 0 number of elements: 2
     level: 1 number of elements: 8
     level: 2 number of elements: 32
@@ -49,9 +41,4 @@ LevelGridView examples
     level: 7 number of elements: 256
     level: 8 number of elements: 512
     level: 9 number of elements: 1024
-
-
-.. parsed-literal::
-
-    WARNING (ignored): Could not open file 'alugrid.cfg', using default values 0 < [balance] < 1.2, partitioning method 'ALUGRID_SpaceFillingCurve(9)'.
 
