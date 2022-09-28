@@ -24,10 +24,7 @@ order = 2
 
 grid = aluCubeGrid(constructor=cartesianDomain([0,0],[3,1],[30,10]))
 spcU = lagrange(grid, dimRange=grid.dimension, order=order, storage="numpy")
-if order > 1:
-    spcP = lagrange(grid, order=order-1, storage="numpy")
-else: # this is not a stable pair
-    spcP = dgonb(grid, order=order-1, storage="numpy")
+spcP = lagrange(grid, order=order-1, storage="numpy")
 
 x     = SpatialCoordinate(spcU)
 mu    = Constant(muValue, "mu")
@@ -48,7 +45,7 @@ divModel    = -div(u)*q * dx
 massModel   = p*q * dx
 preconModel = inner(grad(p),grad(q)) * dx
 
-mainOp      = galerkinOperator( (mainModel,DirichletBC(spcU,exact_u,1)), spcU)
+mainOp      = galerkinOperator( (mainModel, DirichletBC(spcU,exact_u)), spcU)
 gradOp      = galerkinOperator( gradModel, spcP,spcU)
 divOp       = galerkinOperator( divModel, spcU,spcP)
 massOp      = galerkinOperator( massModel, spcP)
@@ -61,7 +58,7 @@ M = linearOperator(massOp).as_numpy
 def Minv(rhs,target): target[:] = linalg.spsolve(M,rhs)
 
 if mainOp.model.nu > 0:
-    preconOp    = galerkinOperator( (preconModel,DirichletBC(spcP,[0],1)), spcP)
+    preconOp    = galerkinOperator( (preconModel, DirichletBC(spcP,0)), spcP)
     P = linearOperator(preconOp).as_numpy
     def Pinv(rhs,target): target[:] = linalg.spsolve(P,rhs)
 
