@@ -141,7 +141,7 @@ plotComponents(vec, gridLines=None, level=2,
 # todo: add tutorial link or describe here and link to dgf documentation).
 # todo: describe what the boundary ids for a Cartesian domain are.
 #
-# These ids can be used as third argument in the `DirichletBC` constructer
+# These ids can be used as third argument in the `DirichletBC` constructor
 # and also in the boundary measure `ufl.ds` as shown in the following
 # example:
 
