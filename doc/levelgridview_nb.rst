@@ -26,6 +26,7 @@ LevelGridView examples
 
 .. parsed-literal::
 
+    Call to deprecated function/property `cartesianDomain`. Use dune.domain.cartesian instead
     level: 0 number of elements: 2
     level: 1 number of elements: 8
     level: 2 number of elements: 32

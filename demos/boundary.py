@@ -13,8 +13,8 @@
 # expression, and a description of $\Gamma$. There are different ways to
 # do this. If it is omitted or `None` the condition is applied to the whole
 # domain, a integer $s>0$ can be provided which can be set to describe a
-# part of the boundary during grid construction as described in another
-# place. Finally a UFL condition can be used, i.e., `x[0]<0`.
+# part of the boundary during grid construction as described at the end of
+# this section. Finally a UFL condition can be used, i.e., `x[0]<0`.
 #
 # For vector valued functions $u$ the value function $g$ can be a UFL
 # vector or a list. In the later case a component of `None` can be used to
@@ -128,3 +128,42 @@ for i,block in enumerate(dc):
             vec.dofVector[i*len(block)+j] = 0
 plotComponents(vec, gridLines=None, level=2,
                colorbar={"orientation":"horizontal", "ticks":ticker.MaxNLocator(nbins=4)})
+
+# %% [markdown]
+# Up until now we have used ufl boolean expressions to
+# define the subset of the boundary where a Dirichlet condition should be
+# applied. In many cases different parts of the boundary are already marked
+# with ids (integers) during grid construction. These ids can also be used
+# to define where boundary conditions are to be applied.
+# At the moment to use boundary ids the grid has to be constructed using
+# the Dune Grid Format (dgf) reader
+#
+# todo: add tutorial link or describe here and link to dgf documentation).
+# todo: describe what the boundary ids for a Cartesian domain are.
+#
+# These ids can be used as third argument in the `DirichletBC` constructer
+# and also in the boundary measure `ufl.ds` as shown in the following
+# example:
+
+# %%
+from dune.ufl import BoundaryId
+from ufl import ds, grad, dot, inner, conditional, eq, And, FacetNormal
+
+gridView.hierarchicalGrid.globalRefine(3)
+space = solutionSpace(gridView, order=2)
+x,n = SpatialCoordinate(space), FacetNormal(space)
+u,v = TrialFunction(space), TestFunction(space)
+
+forcing = 16*x[0]*(1-x[0])*x[1]*(1-x[1])
+a  = ( inner(grad(u), grad(v)) + inner(u,v) ) * dx
+f  = forcing * v * dx
+
+fbnd  =    2 * v * ds(3)               # bottom side
+fbnd += (-10 * v *                     # middle of left and right side
+         conditional(abs(x[1]-0.5)<0.1,1,0) ) * ds( (1,2) )
+dbc   = [DirichletBC(space, 1,         # middle of top side
+         And( eq(BoundaryId(space),4), abs(x[0]-0.5)<0.2 ))]
+scheme   = solutionScheme( [a == f+fbnd, *dbc] )
+solution = space.interpolate(0, name='u_h')
+scheme.solve(target=solution)
+solution.plot()
