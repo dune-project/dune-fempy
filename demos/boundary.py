@@ -143,27 +143,56 @@ plotComponents(vec, gridLines=None, level=2,
 #
 # These ids can be used as third argument in the `DirichletBC` constructor
 # and also in the boundary measure `ufl.ds` as shown in the following
-# example:
+# examples solving a Laplace problem with a combination of Neumann, Robin, and
+# Dirichlet boundary conditions.
+
+# %% [markdown]
+# In this example the boundary conditions are
+#
+# - left and right boundary (id=1 and id=2):
+#   Robin boundary conditions $\nabla u\cdot n + u = -10$ for $y\in[0.4,0.6]$ and
+#   natural boundary conditions ($\nabla u\cdot n=0$) otherwise.
+# - bottom boundary (id=3):
+#   Neumann conditions $\nabla u\cdot n=2$
+# - top boundary (id=4):
+#   Dirichlet conditions $u=1$ for $x\in [0.3,0.6]$ and
+#   natural boundary conditions ($\nabla u\cdot n=0$) otherwise.
 
 # %%
 from dune.ufl import BoundaryId
-from ufl import ds, grad, dot, inner, conditional, eq, And, FacetNormal
+from ufl import ds, grad, dot, inner, conditional, eq, And, FacetNormal, Not
 
 gridView.hierarchicalGrid.globalRefine(3)
 space = solutionSpace(gridView, order=2)
 x,n = SpatialCoordinate(space), FacetNormal(space)
 u,v = TrialFunction(space), TestFunction(space)
+a  = inner(grad(u), grad(v)) * dx
 
-forcing = 16*x[0]*(1-x[0])*x[1]*(1-x[1])
-a  = ( inner(grad(u), grad(v)) + inner(u,v) ) * dx
-f  = forcing * v * dx
-
-fbnd  =    2 * v * ds(3)               # bottom side
-fbnd += (-10 * v *                     # middle of left and right side
+fbnd  = (u-10 * v *                    # middle of left and right boundary
          conditional(abs(x[1]-0.5)<0.1,1,0) ) * ds( (1,2) )
-dbc   = [DirichletBC(space, 1,         # middle of top side
-         And( eq(BoundaryId(space),4), abs(x[0]-0.5)<0.2 ))]
-scheme   = solutionScheme( [a == f+fbnd, *dbc] )
+fbnd += 2 * v * ds(3)                  # bottom boundary
+dbc   = DirichletBC(space, 1,          # middle of top boundary
+           And( eq(BoundaryId(space),4), abs(x[0]-0.5)<0.2 ))
+
+scheme   = solutionScheme( [a == fbnd, dbc] )
+solution = space.interpolate(0, name='u_h')
+scheme.solve(target=solution)
+solution.plot()
+
+# %% [markdown]
+# The final example has a slightly more complex setup at the boundary:
+#
+# - left and right (id=1 and id=2):
+#   for $y\in[0.4,0.6]$ we set Neumann conditions $\nabla u\cdot n=-10$
+# - rest of boundary: 1
+
+# %%
+fbnd  = (-10 * v *                     # middle of left and right boundary
+         conditional(abs(x[1]-0.5)<0.1,1,0) ) * ds( (1,2) )
+dbc   = DirichletBC(space, 1,        # not middle of left and right boundary
+           Not( And(BoundaryId(space)<=2,abs(x[1]-0.5)<0.1) ) )
+
+scheme   = solutionScheme( [a == fbnd, dbc] )
 solution = space.interpolate(0, name='u_h')
 scheme.solve(target=solution)
 solution.plot()
