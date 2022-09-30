@@ -114,7 +114,7 @@ assert sum([ abs(td-vd) for td,vd in zip(test.dofVector, vec.dofVector)] ) /\
        len(vec.dofVector) < 1e-7
 
 # %% [markdown]
-# ## Accesing the Dirichlet degrees of freedom in Python
+# ## Accessing the Dirichlet degrees of freedom in Python
 #
 # We provide a few method, to apply or otherwise access information about
 # the Dirichlet constraints from an existing  scheme.
