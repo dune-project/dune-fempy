@@ -114,22 +114,38 @@ assert sum([ abs(td-vd) for td,vd in zip(test.dofVector, vec.dofVector)] ) /\
        len(vec.dofVector) < 1e-7
 
 # %% [markdown]
+# ## Accesing the Dirichlet degrees of freedom in Python
+#
 # We provide a few method, to apply or otherwise access information about
-# the dirichlet constraints from an existing  scheme.
-
+# the Dirichlet constraints from an existing  scheme.
+#
 # The following shows how to set all degrees of freedom on the Dirichlet
 # boundary to zero.
 
 # %%
 dc = vecScheme.dirichletBlocks
-for i,block in enumerate(dc):
-    for j,b in enumerate(block):
-        if b > 0:
-            vec.dofVector[i*len(block)+j] = 0
+for i,block in enumerate(dc):         # a block is of size `dimRange`
+    for j,b in enumerate(block):      # iterate over the block
+        if b > 0:                     # if b>0 it's a boundary (this is a `id`)
+            vec.dofVector[i*len(block)+j] = 0 # set all Dirichlet dofs to 0
+
+# %% [markdown]
+# We have set all degrees of freedom on the boundary to zero. In this
+# example the Dirichlet boundary was specified by the two `DirichletBC`
+# instances `bc` and `bcBottom`. The first specified that for the
+# first component the whole boundary was Dirichlet while specifying nothing
+# for the second component. The second then set Dirichlet conditions for
+# the second component along the lower boundary. Consequently, the solution
+# should now be zero along the whole boundary in the first component, and
+# zero along the lower boundary for the second:
+
+# %%
 plotComponents(vec, gridLines=None, level=2,
                colorbar={"orientation":"horizontal", "ticks":ticker.MaxNLocator(nbins=4)})
 
 # %% [markdown]
+# ## Using boundary ids (and some more complex examples)
+#
 # Up until now we have used ufl boolean expressions to
 # define the subset of the boundary where a Dirichlet condition should be
 # applied. In many cases different parts of the boundary are already marked
@@ -140,6 +156,8 @@ plotComponents(vec, gridLines=None, level=2,
 #
 # todo: add tutorial link or describe here and link to dgf documentation).
 # todo: describe what the boundary ids for a Cartesian domain are.
+# todo: mention that ids are set at the macro level while ufl conditions
+#       are evaluated on the given grid
 #
 # These ids can be used as third argument in the `DirichletBC` constructor
 # and also in the boundary measure `ufl.ds` as shown in the following
@@ -183,16 +201,29 @@ solution.plot()
 # The final example has a slightly more complex setup at the boundary:
 #
 # - left and right (id=1 and id=2):
-#   for $y\in[0.4,0.6]$ we set Neumann conditions $\nabla u\cdot n=-10$
-# - rest of boundary: 1
+#   for $y\in[0.4,0.6]$ we set Neumann conditions $\nabla u\cdot n=-50$
+# - left and right (id=1 and id=2):
+#   for $y\in[0.2,0.8]\setminus [0.4,0.6]$ we set Dirichlet conditions $u=1$
+# - rest of boundary: 3
 
 # %%
-fbnd  = (-10 * v *                     # middle of left and right boundary
+fbnd  = (-50 * v *                     # middle of left and right boundary
          conditional(abs(x[1]-0.5)<0.1,1,0) ) * ds( (1,2) )
-dbc   = DirichletBC(space, 1,        # not middle of left and right boundary
-           Not( And(BoundaryId(space)<=2,abs(x[1]-0.5)<0.1) ) )
+dbc   = [ DirichletBC(space, 1,        # not middle of left and right boundary
+            And( And( BoundaryId(space)<=2,
+                 abs(x[1]-0.5)>0.1 ), abs(x[1]-0.5)<0.3 ) ),
+          DirichletBC(space, 3,        # not middle of left and right boundary
+            Not( And(BoundaryId(space)<=2,abs(x[1]-0.5)<0.3) ) ), ]
 
-scheme   = solutionScheme( [a == fbnd, dbc] )
+scheme   = solutionScheme( [a == fbnd, *dbc] )
 solution = space.interpolate(0, name='u_h')
+scheme.solve(target=solution)
+solution.plot()
+
+# %% [markdown]
+# Let check if that solution makes sense...
+
+# %%
+gridView.hierarchicalGrid.globalRefine(1)
 scheme.solve(target=solution)
 solution.plot()
