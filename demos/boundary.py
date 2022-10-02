@@ -46,7 +46,7 @@ f  = ( uVec[0]*(1-uVec[1])*vVec[0] + uVec[1]*(1-uVec[0])*vVec[1] ) * dx
 # Add nonlinear Neuman boundary conditions for all non Dirichlet boundaries
 # for second quantity:
 f  = f + uVec[0]*uVec[0] * vVec[1] * ds
-# Define dirichlet Boundary conditions for first component on all boundaries
+# Define Dirichlet boundary conditions for first component on all boundaries
 bc = DirichletBC(vecSpace,[sin(4*(x[0]+x[1])),None])
 vecScheme = solutionScheme( [a == f, bc],
         parameters={"newton.linear.tolerance": 1e-9} )
@@ -57,6 +57,8 @@ plotComponents(vec, gridLines=None, level=2,
                colorbar={"orientation":"horizontal", "ticks":ticker.MaxNLocator(nbins=4)})
 
 # %% [markdown]
+# .. index:: Boundary; Neuman Conditions
+#
 # To prescribe $u_2=0$ at the bottom boundary is also straightforward - the
 # Neuman boundary flux added to the right hand side `f` previously will
 # still be used on the top and vertical boundaries:
@@ -114,6 +116,8 @@ assert sum([ abs(td-vd) for td,vd in zip(test.dofVector, vec.dofVector)] ) /\
        len(vec.dofVector) < 1e-7
 
 # %% [markdown]
+# .. index:: Boundary; Dirichlet degrees of freedom
+#
 # ## Accessing the Dirichlet degrees of freedom in Python
 #
 # We provide a few method, to apply or otherwise access information about
@@ -144,15 +148,18 @@ plotComponents(vec, gridLines=None, level=2,
                colorbar={"orientation":"horizontal", "ticks":ticker.MaxNLocator(nbins=4)})
 
 # %% [markdown]
+# .. index:: Boundary; Boundary Identifiers (ids)
+#
 # ## Using boundary ids (and some more complex examples)
 #
-# Up until now we have used ufl boolean expressions to
+# Up until now we have used UFL boolean expressions to
 # define the subset of the boundary where a Dirichlet condition should be
 # applied. In many cases different parts of the boundary are already marked
 # with ids (integers) during grid construction. These ids can also be used
 # to define where boundary conditions are to be applied.
 # At the moment to use boundary ids the grid has to be constructed using
-# the Dune Grid Format (dgf) reader
+# the Dune Grid Format (dgf) reader. A documentation of the file format can be
+# found here
 #
 # todo: add tutorial link or describe here and link to dgf documentation).
 # todo: describe what the boundary ids for a Cartesian domain are.

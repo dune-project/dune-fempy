@@ -59,7 +59,7 @@ R0 = 2.
 
 
 # %% [markdown]
-# .. index: Grid construction; Dune Grid Format file (DGF)
+# .. index: Grid construction; Dune Grid Format file (`DGF`_)
 #
 # We begin by setting up reference domain $\Gamma_0$ (```grid```), and the space on $\Gamma_0$ that describes $\Gamma(t)$ (```space```). From this we interpolate the non-spherical initial surface ```positions```, and, then reconstruct ```space``` for the discrete solution on $\Gamma(t)$.
 
