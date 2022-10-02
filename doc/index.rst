@@ -121,8 +121,9 @@ where they can be found in the demo folder.
 .. _Dune-Fem: https://www.dune-project.org/modules/dune-fem/
 .. _Dune-Python: https://www.dune-project.org/modules/dune-python/
 .. _DGF: https://dune-project.org/doxygen/master/group__DuneGridFormatParser.html#details
-.. _UFL: https://bitbucket.org/fenics-project/ufl
 .. _tutorial compatible with the 2.7 release: https://dune-project.org/sphinx/content/sphinx/dune-fem-2.7/
+.. _UFL: https://bitbucket.org/fenics-project/ufl
+.. _RefElem: https://dune-project.org/doxygen/master/group__GeometryReferenceElements.html#details
 
 .. todo:: add more citations
 

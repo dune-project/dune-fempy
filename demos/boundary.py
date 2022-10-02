@@ -43,7 +43,7 @@ vec = vecSpace.interpolate([0,0], name='u_h')
 uVec,vVec = TrialFunction(vecSpace), TestFunction(vecSpace)
 a  = ( inner(grad(uVec), grad(vVec)) + inner(uVec,vVec) ) * dx
 f  = ( uVec[0]*(1-uVec[1])*vVec[0] + uVec[1]*(1-uVec[0])*vVec[1] ) * dx
-# Add nonlinear Neuman boundary conditions for all non Dirichlet boundaries
+# Add nonlinear Neumann boundary conditions for all non Dirichlet boundaries
 # for second quantity:
 f  = f + uVec[0]*uVec[0] * vVec[1] * ds
 # Define Dirichlet boundary conditions for first component on all boundaries
@@ -57,10 +57,12 @@ plotComponents(vec, gridLines=None, level=2,
                colorbar={"orientation":"horizontal", "ticks":ticker.MaxNLocator(nbins=4)})
 
 # %% [markdown]
-# .. index:: Boundary; Neuman Conditions
+# .. index:: Boundary; Neumann Conditions
+#
+# ## Neumann boundary conditions
 #
 # To prescribe $u_2=0$ at the bottom boundary is also straightforward - the
-# Neuman boundary flux added to the right hand side `f` previously will
+# Neumann boundary flux added to the right hand side `f` previously will
 # still be used on the top and vertical boundaries:
 
 # %%
@@ -116,7 +118,7 @@ assert sum([ abs(td-vd) for td,vd in zip(test.dofVector, vec.dofVector)] ) /\
        len(vec.dofVector) < 1e-7
 
 # %% [markdown]
-# .. index:: Boundary; Dirichlet degrees of freedom
+# .. index:: Boundary; Dirichlet Degrees of Freedom
 #
 # ## Accessing the Dirichlet degrees of freedom in Python
 #
@@ -158,30 +160,39 @@ plotComponents(vec, gridLines=None, level=2,
 # with ids (integers) during grid construction. These ids can also be used
 # to define where boundary conditions are to be applied.
 # At the moment to use boundary ids the grid has to be constructed using
-# the Dune Grid Format (dgf) reader. Please consult the documentation of the
-# `DGF`_ file format for details.
+# the Dune Grid Format (dgf) reader. Please consult the [documentation of the
+# DGF file format](https://dune-project.org/doxygen/master/group__DuneGridFormatParser.html#details) for details.
+#
+
+# %% [markdown]
+# .. index:: Boundary; Cartesian Boundary Ids
 #
 # ### Cartesian boundary ids
 #
-# For Cartesian grids the boundary ids are rather fixed and pre-described to due to
+# For Cartesian grids the boundary ids are rather fixed and pre-described due to
 # implementation specifics. The numbering of the boundary edges follows the numbering of
-# faces of the reference element but starts from 1. For example, in 2d the left
-# boundary has id=1, right=2, bottom=3, top=4. For grids implementing a true
-# Cartesian grid like YaspGrid, this is fixed and can only be
-# altered using an unstructured grid, e.g. ALUGrid.
+# faces of the [DUNE reference elements](https://dune-project.org/doxygen/master/group__GeometryReferenceElements.html#details)
+# but starts from 1. For example, in 2d the boundary ids are
+# left=1, right=2, bottom=3, top=4. For grids implementing a true
+# Cartesian grids, like YaspGrid, this is fixed. Altering this numbering
+# can only be done by using an unstructured grid, e.g. ALUGrid.
 #
-# ### Boundary ids and refinement
-#
+#  **Boundary ids and refinement:**
 # Boundary ids only allow to tell apart intersections with the domain boundary
 # on the macro level of a grid. Descendants of macro intersections on the domain
 # boundary inherit the boundary id of their parent.
 #
-# These ids can be used as third argument in the `DirichletBC` constructor
-# and also in the boundary measure `ufl.ds` as shown in the following
-# examples solving a Laplace problem with a combination of Neumann, Robin, and
-# Dirichlet boundary conditions.
 
 # %% [markdown]
+# .. index:: Boundary; Robin Conditions
+#
+# ### Mixing different types of boundary conditions
+#
+# These ids can be used as third argument in the `DirichletBC` constructor
+# and also in the boundary measure `ufl.ds` as shown in the following
+# examples solving a Laplace problem with a combination of **Neumann**, **Robin**, and
+# **Dirichlet** boundary conditions.
+#
 # In this example the boundary conditions are
 #
 # - left and right boundary (id=1 and id=2):
