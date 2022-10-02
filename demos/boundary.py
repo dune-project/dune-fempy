@@ -158,13 +158,23 @@ plotComponents(vec, gridLines=None, level=2,
 # with ids (integers) during grid construction. These ids can also be used
 # to define where boundary conditions are to be applied.
 # At the moment to use boundary ids the grid has to be constructed using
-# the Dune Grid Format (dgf) reader. A documentation of the file format can be
-# found here
+# the Dune Grid Format (dgf) reader. Please consult the documentation of the
+# `DGF`_ file format for details.
 #
-# todo: add tutorial link or describe here and link to dgf documentation).
-# todo: describe what the boundary ids for a Cartesian domain are.
-# todo: mention that ids are set at the macro level while ufl conditions
-#       are evaluated on the given grid
+# ### Cartesian boundary ids
+#
+# For Cartesian grids the boundary ids are rather fixed and pre-described to due to
+# implementation specifics. The numbering of the boundary edges follows the numbering of
+# faces of the reference element but starts from 1. For example, in 2d the left
+# boundary has id=1, right=2, bottom=3, top=4. For grids implementing a true
+# Cartesian grid like YaspGrid, this is fixed and can only be
+# altered using an unstructured grid, e.g. ALUGrid.
+#
+# ### Boundary ids and refinement
+#
+# Boundary ids only allow to tell apart intersections with the domain boundary
+# on the macro level of a grid. Descendants of macro intersections on the domain
+# boundary inherit the boundary id of their parent.
 #
 # These ids can be used as third argument in the `DirichletBC` constructor
 # and also in the boundary measure `ufl.ds` as shown in the following
