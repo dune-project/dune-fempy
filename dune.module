@@ -1,5 +1,5 @@
 Module: dune-fempy
-Version: 2.9-git
+Version: 2.10-git
 Maintainer: a.s.dedner@warwick.ac.uk, nolte.mrtn@gmail.com
 Whitespace-Hook: Yes
-Depends: dune-common (>= 2.9)
+Depends: dune-common (>= 2.10)
