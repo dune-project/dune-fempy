@@ -75,7 +75,7 @@ where they can be found in the demo folder.
    * how to backup and restore data including discrete functions and the
      grid hierarchy as is useful for example to checkpoint a simulation.
    * more details on constructing a grid using different formats including for
-     example `gmsh`_ but also using simple python structures like
+     example the Dune Grid Format (`DGF`_) or `gmsh`_ but also using simple python structures like
      dictionaries for describing general unstructured grids is available.
      Results can be plotted using `matplotlib`_ (for 2d) and for example
      `mayavi`_ (for 2d and 3d). For more advanced plotting options data can
@@ -120,8 +120,10 @@ where they can be found in the demo folder.
 .. _Dune-Istl: https://www.dune-project.org/modules/dune-istl/
 .. _Dune-Fem: https://www.dune-project.org/modules/dune-fem/
 .. _Dune-Python: https://www.dune-project.org/modules/dune-python/
-.. _UFL: https://bitbucket.org/fenics-project/ufl
+.. _DGF: https://dune-project.org/doxygen/master/group__DuneGridFormatParser.html#details
 .. _tutorial compatible with the 2.7 release: https://dune-project.org/sphinx/content/sphinx/dune-fem-2.7/
+.. _UFL: https://bitbucket.org/fenics-project/ufl
+.. _RefElem: https://dune-project.org/doxygen/master/group__GeometryReferenceElements.html#details
 
 .. todo:: add more citations
 

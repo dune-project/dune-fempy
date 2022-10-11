@@ -43,10 +43,10 @@ vec = vecSpace.interpolate([0,0], name='u_h')
 uVec,vVec = TrialFunction(vecSpace), TestFunction(vecSpace)
 a  = ( inner(grad(uVec), grad(vVec)) + inner(uVec,vVec) ) * dx
 f  = ( uVec[0]*(1-uVec[1])*vVec[0] + uVec[1]*(1-uVec[0])*vVec[1] ) * dx
-# Add nonlinear Neuman boundary conditions for all non Dirichlet boundaries
+# Add nonlinear Neumann boundary conditions for all non Dirichlet boundaries
 # for second quantity:
 f  = f + uVec[0]*uVec[0] * vVec[1] * ds
-# Define dirichlet Boundary conditions for first component on all boundaries
+# Define Dirichlet boundary conditions for first component on all boundaries
 bc = DirichletBC(vecSpace,[sin(4*(x[0]+x[1])),None])
 vecScheme = solutionScheme( [a == f, bc],
         parameters={"newton.linear.tolerance": 1e-9} )
@@ -57,8 +57,12 @@ plotComponents(vec, gridLines=None, level=2,
                colorbar={"orientation":"horizontal", "ticks":ticker.MaxNLocator(nbins=4)})
 
 # %% [markdown]
+# .. index:: Boundary; Neumann Conditions
+#
+# ## Neumann boundary conditions
+#
 # To prescribe $u_2=0$ at the bottom boundary is also straightforward - the
-# Neuman boundary flux added to the right hand side `f` previously will
+# Neumann boundary flux added to the right hand side `f` previously will
 # still be used on the top and vertical boundaries:
 
 # %%
@@ -114,6 +118,8 @@ assert sum([ abs(td-vd) for td,vd in zip(test.dofVector, vec.dofVector)] ) /\
        len(vec.dofVector) < 1e-7
 
 # %% [markdown]
+# .. index:: Boundary; Dirichlet Degrees of Freedom
+#
 # ## Accessing the Dirichlet degrees of freedom in Python
 #
 # We provide a few method, to apply or otherwise access information about
@@ -144,27 +150,49 @@ plotComponents(vec, gridLines=None, level=2,
                colorbar={"orientation":"horizontal", "ticks":ticker.MaxNLocator(nbins=4)})
 
 # %% [markdown]
+# .. index:: Boundary; Boundary Identifiers (ids)
+#
 # ## Using boundary ids (and some more complex examples)
 #
-# Up until now we have used ufl boolean expressions to
+# Up until now we have used UFL boolean expressions to
 # define the subset of the boundary where a Dirichlet condition should be
 # applied. In many cases different parts of the boundary are already marked
 # with ids (integers) during grid construction. These ids can also be used
 # to define where boundary conditions are to be applied.
 # At the moment to use boundary ids the grid has to be constructed using
-# the Dune Grid Format (dgf) reader
+# the Dune Grid Format (dgf) reader. Please consult the [documentation of the
+# DGF file format](https://dune-project.org/doxygen/master/group__DuneGridFormatParser.html#details) for details.
 #
-# todo: add tutorial link or describe here and link to dgf documentation).
-# todo: describe what the boundary ids for a Cartesian domain are.
-# todo: mention that ids are set at the macro level while ufl conditions
-#       are evaluated on the given grid
+
+# %% [markdown]
+# .. index:: Boundary; Cartesian Boundary Ids
+#
+# ### Cartesian boundary ids
+#
+# For Cartesian grids the boundary ids are rather fixed and pre-described due to
+# implementation specifics. The numbering of the boundary edges follows the numbering of
+# faces of the [DUNE reference elements](https://dune-project.org/doxygen/master/group__GeometryReferenceElements.html#details)
+# but starts from 1. For example, in 2d the boundary ids are
+# left=1, right=2, bottom=3, top=4. For grids implementing a true
+# Cartesian grids, like YaspGrid, this is fixed. Altering this numbering
+# can only be done by using an unstructured grid, e.g. ALUGrid.
+#
+#  **Boundary ids and refinement:**
+# Boundary ids only allow to tell apart intersections with the domain boundary
+# on the macro level of a grid. Descendants of macro intersections on the domain
+# boundary inherit the boundary id of their parent.
+#
+
+# %% [markdown]
+# .. index:: Boundary; Robin Conditions
+#
+# ### Mixing different types of boundary conditions
 #
 # These ids can be used as third argument in the `DirichletBC` constructor
 # and also in the boundary measure `ufl.ds` as shown in the following
-# examples solving a Laplace problem with a combination of Neumann, Robin, and
-# Dirichlet boundary conditions.
-
-# %% [markdown]
+# examples solving a Laplace problem with a combination of **Neumann**, **Robin**, and
+# **Dirichlet** boundary conditions.
+#
 # In this example the boundary conditions are
 #
 # - left and right boundary (id=1 and id=2):
