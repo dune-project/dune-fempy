@@ -24,7 +24,7 @@ from dune.femdg import femDGOperator
 from dune.femdg.rk import femdgStepper
 
 from dune.fem import threading
-threading.use = 4 # use 4 threads
+threading.use = max(4,threading.max) # use at most 4 threads
 
 gridView = structuredGrid([0,0],[2*numpy.pi,2*numpy.pi],[20,20])
 
