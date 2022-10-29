@@ -34,21 +34,21 @@ from dune.fem.scheme import galerkin as solutionScheme
 from dune.fem.function import gridFunction, cppFunction, integrate, uflFunction
 from dune.ufl import DirichletBC, Constant
 from ufl import TestFunction, TrialFunction, SpatialCoordinate,\
-                dx, ds, grad, inner, sin
+                dx, ds, grad, inner, sin, pi
 
 gridView = leafGridView([0, 0], [1, 1], [4, 4])
 vecSpace = solutionSpace(gridView, dimRange=2, order=2)
 x = SpatialCoordinate(vecSpace)
 vec = vecSpace.interpolate([0,0], name='u_h')
 uVec,vVec = TrialFunction(vecSpace), TestFunction(vecSpace)
-a  = ( inner(grad(uVec), grad(vVec)) + inner(uVec,vVec) ) * dx
-f  = ( uVec[0]*(1-uVec[1])*vVec[0] + uVec[1]*(1-uVec[0])*vVec[1] ) * dx
-# Add nonlinear Neumann boundary conditions for all non Dirichlet boundaries
-# for second quantity:
-f  = f + uVec[0]*uVec[0] * vVec[1] * ds
+a  = inner(grad(uVec), grad(vVec)) * dx
+a += ( ( 10*(1-2*uVec[1])+uVec[0] ) * vVec[0] +\
+       ( 10*sin(2*pi*x[1]) + (1-2*uVec[0])**2*uVec[1] ) * vVec[1]
+     ) * dx
+
 # Define Dirichlet boundary conditions for first component on all boundaries
-bc = DirichletBC(vecSpace,[sin(4*(x[0]+x[1])),None])
-vecScheme = solutionScheme( [a == f, bc],
+bc = DirichletBC(vecSpace,[sin(2*pi*(x[0]+x[1])),None])
+vecScheme = solutionScheme( [a == 0, bc],
         parameters={"newton.linear.tolerance": 1e-9} )
 
 vecScheme.solve(target=vec)
@@ -57,17 +57,12 @@ plotComponents(vec, gridLines=None, level=2,
                colorbar={"orientation":"horizontal", "ticks":ticker.MaxNLocator(nbins=4)})
 
 # %% [markdown]
-# .. index:: Boundary; Neumann Conditions
-#
-# ## Neumann boundary conditions
-#
-# To prescribe $u_2=0$ at the bottom boundary is also straightforward - the
-# Neumann boundary flux added to the right hand side `f` previously will
-# still be used on the top and vertical boundaries:
+# To prescribe $u_2=1$ at the bottom boundary is also straightforward
+
 
 # %%
-bcBottom = DirichletBC(vecSpace,[sin(4*(x[0]+x[1])),1],x[1]<1e-10)
-vecScheme = solutionScheme( [a == f, bc, bcBottom],
+bcBottom = DirichletBC(vecSpace,[sin(2*pi*(x[0]+x[1])),1],x[1]<1e-10)
+vecScheme = solutionScheme( [a == 0, bc, bcBottom],
         parameters={"newton.linear.tolerance": 1e-9} )
 vecScheme.solve(target=vec)
 plotComponents(vec, gridLines=None, level=2,
@@ -76,25 +71,32 @@ plotComponents(vec, gridLines=None, level=2,
 # %% [markdown]
 # We can also use general grid functions (including discrete functions)
 # for the boundary conditions in the same way we could use grid functions
-# anywhere within the UFL forms. So the following code leads to the same
-# results as above:
+# anywhere within the UFL forms.
+# We could for example fix the boundary values of the first component using the discrete solution
+# from # the previous computation by writing
+# `bc = DirichletBC(vecSpace,[vec[0],None])`
+# Since this would just be an approximation to the actual boundary
+# condition the overall results would not be identical to the previous
+# version. We therefore do not use the discrete solution to describe the
+# boundary conditions but instead use other forms of grid functions.
+# The following two code snippets lead to the same results as above:
 
 # %%
 test = vec.copy()
 test.clear()
-bc = DirichletBC(vecSpace,[vec[0],None])
 @gridFunction(gridView ,name="bnd",order=2)
 def bnd(x):
-    return [numpy.sin(4*(x[0]+x[1])),1]
+    return [numpy.sin(2*numpy.pi*(x[0]+x[1])),1]
 bcBottom = DirichletBC(vecSpace,bnd,x[1]<1e-10)
-vecScheme = solutionScheme( [a == f, bc, bcBottom],
+vecScheme = solutionScheme( [a == 0, bc, bcBottom],
         parameters={"newton.linear.tolerance": 1e-9} )
 vecScheme.solve(target=test)
 plotComponents(test, gridLines=None, level=2,
                colorbar={"orientation":"horizontal", "ticks":ticker.MaxNLocator(nbins=4)})
 assert sum([ abs(td-vd) for td,vd in zip(test.dofVector, vec.dofVector)] ) /\
-       len(vec.dofVector) < 1e-7
+       len(vec.dofVector) < 1e-8
 
+# %%
 test.clear()
 code="""
 #include <cmath>
@@ -102,20 +104,20 @@ template <class GridView>
 auto bnd() {
   return [](const auto& en,const auto& xLocal) -> auto {
     auto x = en.geometry().global(xLocal);
-    return sin(4.*(x[0]+x[1]));
+    return sin(2.*M_PI*(x[0]+x[1]));
   };
 }
 """
 bndCpp = cppFunction(gridView, name="bndCpp", order=2,
                      fctName="bnd",includes=io.StringIO(code))
 bc = DirichletBC(vecSpace,[bndCpp,None])
-vecScheme = solutionScheme( [a == f, bc, bcBottom],
+vecScheme = solutionScheme( [a == 0, bc, bcBottom],
                             parameters={"newton.linear.tolerance": 1e-9} )
 vecScheme.solve(target=test)
 plotComponents(test, gridLines=None, level=2,
                colorbar={"orientation":"horizontal", "ticks":ticker.MaxNLocator(nbins=4)})
 assert sum([ abs(td-vd) for td,vd in zip(test.dofVector, vec.dofVector)] ) /\
-       len(vec.dofVector) < 1e-7
+       len(vec.dofVector) < 1e-8
 
 # %% [markdown]
 # .. index:: Boundary; Dirichlet Degrees of Freedom
@@ -132,7 +134,8 @@ assert sum([ abs(td-vd) for td,vd in zip(test.dofVector, vec.dofVector)] ) /\
 dc = vecScheme.dirichletBlocks
 for i,block in enumerate(dc):         # a block is of size `dimRange`
     for j,b in enumerate(block):      # iterate over the block
-        if b > 0:                     # if b>0 it's a boundary (this is a `id`)
+        # 'b' is the `id` of the boundary as described below
+        if b > 0:                     # if b>0 it's a boundary
             vec.dofVector[i*len(block)+j] = 0 # set all Dirichlet dofs to 0
 
 # %% [markdown]
@@ -148,6 +151,32 @@ for i,block in enumerate(dc):         # a block is of size `dimRange`
 # %%
 plotComponents(vec, gridLines=None, level=2,
                colorbar={"orientation":"horizontal", "ticks":ticker.MaxNLocator(nbins=4)})
+
+# %% [markdown]
+# .. index:: Boundary; Neumann Conditions
+#
+# ## Neumann boundary conditions
+#
+# Neumann boundary flux are added to the ufl form by using the measure # `ufl.ds`.
+# By default they will be added to all boundaries for which no Dirichlet
+# conditions have been prescribed. In the above example we prescribed no
+# Dirichlet conditions to the second component at both vertical
+# and the top boundary. This leads to zero fluxes being used there. To
+# To add some (here nonlinear) Neumann boundary conditions for the second
+# component at these three sides we can simply add an additional term to
+# `a`:
+
+# %%
+a  = a + uVec[0]*uVec[0] * vVec[1] * ds
+vecScheme = solutionScheme( [a == 0, bc],
+        parameters={"newton.linear.tolerance": 1e-9} )
+
+vecScheme.solve(target=vec)
+
+plotComponents(vec, gridLines=None, level=2,
+               colorbar={"orientation":"horizontal", "ticks":ticker.MaxNLocator(nbins=4)})
+
+
 
 # %% [markdown]
 # .. index:: Boundary; Boundary Identifiers (ids)
