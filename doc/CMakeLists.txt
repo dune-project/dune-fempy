@@ -33,6 +33,8 @@ filteredgridview_nb_files
 geoview_nb.rst
 geoview_nb_files
 mcf.gif
+dune-python-logo.png
+favicon.ico
 )
 
 
