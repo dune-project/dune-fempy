@@ -27,7 +27,7 @@ linkcheck:
 	@sphinx-build -b linkcheck . html
 
 clean:
-	@rm -f *.vtu *.pvtu *.p *.png $(FIGURES) $(NBS)
+	@rm -f *.vtu *.pvtu *.p $(FIGURES) $(NBS)
 	@rm -f geoview_nb_files/geoview_nb_1_0.png
 distclean: clean
 	@rm -f *.bbl

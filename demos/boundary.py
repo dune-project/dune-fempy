@@ -1,10 +1,12 @@
 # %% [markdown]
-# .. index:: Boundary; Dirichlet Conditions
 #
 # # More General Boundary Conditions
 # So far we only used natural boundary conditions. Here we discuss how to
 # set Dirichlet boundary conditions and use different conditions for
 # different components of the solution.
+#
+# ## Dirichlet boundary conditions
+# .. index:: Boundary; Dirichlet Conditions
 #
 # To fix Dirichlet boundary conditions $u=g$ on part of the boundary
 # $\Gamma\subset\partial\Omega$ the central class is

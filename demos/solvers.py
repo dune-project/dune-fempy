@@ -45,9 +45,10 @@ from dune.grid import structuredGrid as leafGridView
 from dune.fem.space import lagrange as solutionSpace
 from dune.fem.scheme import galerkin as solutionScheme
 from dune.fem.function import gridFunction, cppFunction, integrate, uflFunction
-from dune.ufl import DirichletBC, Constant
+from dune.ufl import Constant
 from ufl import TestFunction, TrialFunction, SpatialCoordinate, FacetNormal, \
-                dx, ds, div, grad, dot, inner, sqrt, exp, sin
+                dx, ds, div, grad, dot, inner, sqrt, exp, sin,\
+                conditional
 
 gridView = leafGridView([0, 0], [1, 1], [4, 4])
 space = solutionSpace(gridView, order=2)
@@ -229,6 +230,72 @@ evolve(scheme2_cls, u_h, u_h_n, endTime)
 error = u_h - exact_end
 print("Forchheimer(scipy) size: ", gridView.size(0), "L^2, H^1 error:",'{:0.5e}, {:0.5e}'.format(
   *[ sqrt(e) for e in integrate(gridView,[error**2,inner(grad(error),grad(error))], order=5) ]))
+
+# %% [markdown]
+# .. index:: Solvers; Dirichlet Conditions
+# .. index:: Boundary; Linear Solvers
+#
+# ## Adding Dirichlet boundary conditions
+# We look at a simple Poisson problem with Dirichlet BCs
+# to show how to use external solvers like the cg method
+# from Scipy in this case.
+# We solve $-\triangle u=1$ with $u=-1$ at the left boundary
+# and $u=1$ at the right boundary (trivial Neuman at top/bottom).
+# We will use the CG solver from `scipy.sparse.linalg`:
+#
+# Note: since we are not needing to invert the operator
+# we will use the `dune.fem.operator.galerkin` class
+# to setup the problem. This is similar to `dune.fem.scheme.galerkin`
+# we have been using so far but can be used to model
+# operators between different spaces.
+
+# %%
+from dune.ufl import DirichletBC
+from dune.fem.operator import galerkin
+from scipy.sparse.linalg import cg as solver
+model  = ( inner(grad(u), grad(v)) -
+           conditional(dot(x,x)<0.6,10.,0.) * v ) * dx
+dbcs   = [ DirichletBC(space,-1,1),
+           DirichletBC(space, 1,2) ]
+op     = galerkin([model, *dbcs], space)
+A = linearOperator(op).as_numpy
+sol = space.interpolate(0, name="u_h")
+rhs = sol.copy()
+op(sol, rhs)
+rhs.as_numpy[:] *= -1
+
+# %% [markdown]
+# So far everything is as before. Dirichlet boundary conditions
+# are handled in the matrix through setting all rows
+# associated with boundary degrees of freedom to unit rows.
+# For solving the system we need to modify the right hand side
+# and the initial guess for the iterative solver to include
+# the boundary values. To this end the operators/schemes
+# provide methods `setConstraints`. There are three versions
+# of this method: the first takes a discrete function and
+# sets the Dirichlet dofs to the boundary data provided
+# in the `DirichletBC` structure. The second version takes a
+# range vector and a discrete function; this version
+# can used for example to set the values at the boundary to
+# zero, e.g., `op.setConstraints(0, uh)` or for a vector
+# function `op.setConstraints([0,]*space.dimension, vec_h)`.
+# Finally there is a version taking a grid function and a
+# discrete function `op.setConstraints(g, uh)` which sets
+# the dofs at the boundary so that `uh=g` at the Dirichlet boundary.
+#
+# Here we only need to use the first version:
+
+# %%
+op.setConstraints(rhs)
+op.setConstraints(sol)
+rk = sol.copy("residual")
+def cb(xk):
+    x_h = space.function("tmp", dofVector=xk)
+    op(x_h,rk)
+    print(rk.as_numpy[:].dot(rk.as_numpy[:]), flush=True)
+sol.as_numpy[:], _ = solver(A, rhs.as_numpy, x0=sol.as_numpy,
+                            callback=cb, tol=1e-10)
+sol.plot()
 
 # %% [markdown]
 # .. index:: Solvers; Petsc

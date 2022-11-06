@@ -152,8 +152,8 @@ where they can be found in the demo folder.
    :maxdepth: 2
    :caption: Next Steps
 
-   solvers_nb
    boundary_nb
+   solvers_nb
    othergrids_nb
    backuprestore_nb
    corepy
