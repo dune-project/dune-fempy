@@ -235,7 +235,7 @@ print("Forchheimer(scipy) size: ", gridView.size(0), "L^2, H^1 error:",'{:0.5e},
 # .. index:: Solvers; Dirichlet Conditions
 # .. index:: Boundary; Linear Solvers
 #
-# ## Adding Dirichlet boundary conditions
+# ## Handling Dirichlet boundary conditions
 # We look at a simple Poisson problem with Dirichlet BCs
 # to show how to use external solvers like the cg method
 # from Scipy in this case.
