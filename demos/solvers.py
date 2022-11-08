@@ -239,8 +239,11 @@ print("Forchheimer(scipy) size: ", gridView.size(0), "L^2, H^1 error:",'{:0.5e},
 # We look at a simple Poisson problem with Dirichlet BCs
 # to show how to use external solvers like the cg method
 # from Scipy in this case.
-# We solve $-\triangle u=1$ with $u=-1$ at the left boundary
-# and $u=1$ at the right boundary (trivial Neuman at top/bottom).
+# We solve $-\triangle u=10\chi_\omega$ where $\chi_\omega$ is a characteristic
+# function with $\omega=\{x\colon |x|^2<0.6\}$. For the boundary
+# we prescribe trivial Neuman at the top and bottom boundaries
+# and Dirichlet values $u=-1$ and $u=1$ at the left and right
+# boundaries, respectively.
 # We will use the CG solver from `scipy.sparse.linalg`:
 #
 # Note: since we are not needing to invert the operator
@@ -266,11 +269,13 @@ rhs.as_numpy[:] *= -1
 
 # %% [markdown]
 # So far everything is as before. Dirichlet boundary conditions
-# are handled in the matrix through setting all rows
-# associated with boundary degrees of freedom to unit rows.
+# are handled in the matrix through changing all rows
+# associated with boundary degrees of freedom to unit rows -
+# associated columns are not changed so the matrix will not be symmetric anymore.
 # For solving the system we need to modify the right hand side
 # and the initial guess for the iterative solver to include
-# the boundary values. To this end the operators/schemes
+# the boundary values (to counter the missing symmetry).
+# To this end the operators/schemes
 # provide methods `setConstraints`. There are three versions
 # of this method: the first takes a discrete function and
 # sets the Dirichlet dofs to the boundary data provided
@@ -289,10 +294,10 @@ rhs.as_numpy[:] *= -1
 op.setConstraints(rhs)
 op.setConstraints(sol)
 rk = sol.copy("residual")
-def cb(xk):
-    x_h = space.function("tmp", dofVector=xk)
+def cb(xk): # a callback to print the residual norm in each step
+    x_h = space.function("iterate", dofVector=xk)
     op(x_h,rk)
-    print(rk.as_numpy[:].dot(rk.as_numpy[:]), flush=True)
+    print(rk.as_numpy[:].dot(rk.as_numpy[:]), flush=True, end='\t')
 sol.as_numpy[:], _ = solver(A, rhs.as_numpy, x0=sol.as_numpy,
                             callback=cb, tol=1e-10)
 sol.plot()
