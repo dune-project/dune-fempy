@@ -2,7 +2,10 @@
 #
 # # More General Boundary Conditions
 # So far we only used natural boundary conditions. Here we discuss how to
-# set Dirichlet boundary conditions and use different conditions for
+# impose other conditions like Neumann, Robin
+# and especially Dirichlet.
+# We will show how to add these to the model and how to
+# prescribe different conditions for
 # different components of the solution.
 #
 # ## Dirichlet boundary conditions
@@ -157,7 +160,7 @@ plotComponents(vec, gridLines=None, level=2,
 # %% [markdown]
 # .. index:: Boundary; Neumann Conditions
 #
-# ## Neumann boundary conditions
+# ## Neumann and Robin boundary conditions
 #
 # Neumann boundary flux are added to the ufl form by using the measure # `ufl.ds`.
 # By default they will be added to all boundaries for which no Dirichlet
@@ -178,7 +181,9 @@ vecScheme.solve(target=vec)
 plotComponents(vec, gridLines=None, level=2,
                colorbar={"orientation":"horizontal", "ticks":ticker.MaxNLocator(nbins=4)})
 
-
+# %% [markdown]
+# Robin boundary conditions can be handled in the same way using
+# the `ufl.ds` measure.
 
 # %% [markdown]
 # .. index:: Boundary; Boundary Identifiers (ids)

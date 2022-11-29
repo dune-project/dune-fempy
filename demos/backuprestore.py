@@ -20,6 +20,8 @@ from dune.fem.function import gridFunction
 from dune.fem.space import lagrange
 from dune.fem import adapt
 
+order=4
+
 class CheckPointer:
     # if 'hgrid=None' then restore hierarchical grid using given file name
     # otherwise backup 'hgrid' to given file
@@ -59,7 +61,7 @@ def test1(fileName):
     @gridFunction(grid, name="gf", order=3)
     def gf(x): return numpy.sqrt(1-(x[0]**2+x[1]**2)) if x[0]**2+x[1]**2<1 else 0
 
-    space = lagrange(grid)
+    space = lagrange(grid, order=order)
     df = space.interpolate(gf,name="test")
 
     grid.hierarchicalGrid.globalRefine(4)
@@ -85,7 +87,7 @@ test1("dump.pickle")
 checkPointer = CheckPointer("dump.pickle")
 grid = checkPointer.hierarchicalGrid().leafView
 print("size of restored grid:", grid.size(0))
-space = lagrange(grid)
+space = lagrange(grid, order=order)
 df = space.interpolate([0],name="test")
 checkPointer.add(df)
 checkPointer.restore()
