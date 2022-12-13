@@ -3,7 +3,7 @@
 #
 # The main concepts of our virtual element implementation is provided in
 # <cite data-cite="VEM"></cite>
-# where we focus on the forth order problems but the second order problems
+# where we focus on the fourth order problems but the second order problems
 # are discussed there as well.
 
 # # Elliptic Problems
@@ -119,7 +119,7 @@ b = (-div(diffCoeff*grad(exact[0])) + massCoeff*exact[0] ) * v[0] * dx
 dbc = [dune.ufl.DirichletBC(space, exact, i+1) for i in range(4)]
 
 # %% [markdown]
-# Finally we can construct the solver passing in the space the pde
+# Finally, we can construct the solver passing in the space the pde
 # description and arguments for stabilization:
 
 # %%
@@ -306,12 +306,12 @@ beam = geometryGridView( position )
 beam.plot()
 
 # %% [markdown]
-# # Forth order problem
-# As final example we solve some forth order PDEs using a non-conforming VEM
-# space for H^2 functions. To construct the space we just need to define
-# a suitable 'moments' vector to construct a suitable space for H^2 problems.
+# # Fourth order problem
+# As final example we solve some fourth order PDEs using a non-conforming VEM
+# space for $H^2$ functions. To construct the space we just need to define
+# a suitable 'moments' vector to construct a suitable space for $H^2$ problems.
 #
-# __Note__: at the moment a H^2-conforming space is not implemented.
+# __Note__: at the moment a $H^2$-conforming space is not implemented.
 
 # %%
 ncC1testSpaces = [ [0], [order-3,order-2], [order-4] ]
@@ -325,14 +325,14 @@ ncC1testSpaces = [ [0], [order-3,order-2], [order-4] ]
 # \end{align*}
 #
 # __Note__:
-#       for function which continuous derivatives we have
+#       For function with continuous derivatives we have
 #       laplace(u)*laplace(v)*dx = inner(u,v)*dx
 #       as can be seen by using integration by parts on the mixed terms on the right
-#       and using continuity of u,v
-#       For the non conforming spaces we don't have continuity of the
+#       and using continuity of u,v.
+#       For the non-conforming spaces we don't have continuity of the
 #       derivatives so the equivalence does not hold and one should use the
 #       right hand side directly to obtain a coercive bilinear form w.r.t.
-#       the norm on H^2 (the left is not a norm in this case).
+#       the norm on $H^2$ (the left is not a norm in this case).
 #       For computing the forcing term 'b' both formula are fine since
 #       'exact' is smooth enough.
 
