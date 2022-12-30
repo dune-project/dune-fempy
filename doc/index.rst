@@ -152,11 +152,7 @@ where they can be found in the demo folder.
    :maxdepth: 2
    :caption: Next Steps
 
-   boundary_nb
-   solvers_nb
-   othergrids_nb
-   backuprestore_nb
-   corepy
+   nextsteps
 
 .. toctree::
    :maxdepth: 2
@@ -168,25 +164,20 @@ where they can be found in the demo folder.
    :maxdepth: 3
    :caption: Further Topics
 
-   gridviews
-   cpp
-   femdg
+   furthertopics
 
 .. toctree::
    :maxdepth: 1
    :caption: User Projects
    :name: userprojects
 
-   twophaseflow_descr
-   vemdemo_descr
+   userprojects
 
 .. toctree::
    :maxdepth: 2
    :caption: Information and Resources
 
-   developers
-   contributions
-   additional
+   inforesources
 
 
 .. API reference <api/modules>
