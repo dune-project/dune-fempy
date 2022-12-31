@@ -68,10 +68,11 @@ where they can be found in the demo folder.
 #. After the introduction to the underlying concepts and how to get a
    simple problem up and running, we discuss:
 
+   * how to add more complicated boundary conditions to the problem formulation.
    * how to use different solver backends (including build in solvers, solvers and
      preconditioners available in `Dune-Istl`_, `scipy`_, `PETSc`_ and
      also `petsc4py`_ see also :cite:`PETSc-Paper,SciPy-Paper`).
-   * how to add more complicated boundary conditions to the problem formulation.
+   * how to enable either multithreading or MPI parallelization for your problem
    * how to backup and restore data including discrete functions and the
      grid hierarchy as is useful for example to checkpoint a simulation.
    * more details on constructing a grid using different formats including for
