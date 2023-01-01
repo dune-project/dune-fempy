@@ -424,7 +424,7 @@ if petsc4py is not None and spacePetsc is not None:
 # %% [markdown]
 # .. index:: Solvers; Dune built-in
 #
-# # Available built-in solvers and parameters
+# ## Available built-in solvers and parameters
 # Upon creation of a discrete function space one also have to specifies the
 # storage which is tied to the solver backend.
 # As mentioned, different linear algebra backends can be accessed by changing setting the
