@@ -8,6 +8,9 @@
 # ## MPI
 # .. index:: Parallelization; MPI
 #
+# .. todo:: add some remarks on `dune.fem.loadBalance` and possibly some information on loadbalancing strategies available in `dune-alugrid`?
+#
+#
 # It is straightforward to use MPI for parallelization. It requires a
 # parallel grid, in fact most of the DUNE grids work in parallel except albertaGrid or polyGrid.
 # Most iterative solvers in DUNE work for parallel runs. Some of the
@@ -28,9 +31,8 @@
 # the code might not be as high as expected. Since we rely mostly on
 # external packages for the linear algebra, speedup in this step will
 # depend on the multithreading support available in the chosen linear
-# algebra backend. We discuss [in a later section](solvers_nb.ipynb)
-# how to switch between different implementation for solving linear systems
-# of equations, e.g., how to use the thread parallel solvers from scipy.
+# algebra backend - see the discussion on how to [switch between linear solver backends](solvers_nb.ipynb)
+# to, for example, use the thread parallel solvers from scipy.
 #
 # By default only a single thread is used. To enable multithreading simply add
 
