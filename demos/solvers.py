@@ -1,6 +1,6 @@
 # %% [markdown]
 #
-# # Alternate Solve Methods (Scipy and Petsc)
+# # Alternative Linear Solvers (Scipy and Petsc)
 # Here we look at different ways of solving PDEs using external
 # packages and python functionality.
 # Different linear algebra backends can be accessed by changing setting the
@@ -422,9 +422,9 @@ if petsc4py is not None and spacePetsc is not None:
       *[ sqrt(e) for e in integrate(gridView,[error**2,inner(grad(error),grad(error))], order=5) ]))
 
 # %% [markdown]
-# .. index:: Solvers; Dune built-in
+# .. index:: Solvers; overview
 #
-# ## Available built-in solvers and parameters
+# ## Available solvers and parameters
 # Upon creation of a discrete function space one also have to specifies the
 # storage which is tied to the solver backend.
 # As mentioned, different linear algebra backends can be accessed by changing setting the
@@ -453,11 +453,7 @@ space = solutionSpace(gridView, order=2, storage='numpy')
 # |           | Access through 'as_istl'                                            |
 # | petsc     | data is stored in a petsc vector/matrix which can also be used with |
 # |           | petsc4py on the python side using 'as_petsc'                        |
-#
 
-# %%
-
-#
 # %% [markdown]
 # .. index:: Solvers; Parameters
 

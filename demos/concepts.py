@@ -410,6 +410,7 @@ for eocLoop in range(loops):
           "number of dofs:", space.size,"H^1 error:", error)
 
 # %% [markdown]
+# ## Handling constant parameters
 # We have already seen how grid function can be used within UFL expressions
 # and forms - in the [next section](dune-fempy_nb.ipynb) we will give another example for this in the
 # context of a time dependent problems. In addition we can also use the
