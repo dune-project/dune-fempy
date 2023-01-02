@@ -263,7 +263,7 @@ print()
 # we will see how to extract the underlying dof vector in the form of a `numpy` or a `petsc` vector.
 
 # %% [markdown]
-# ## Models and Schemes
+# ## Solving PDE - Models and Schemes
 # We consider a scalar boundary value problem
 # \begin{align*}
 # -\triangle u &= f & \text{in}\;\Omega:=(0,1)^2 \\
@@ -301,18 +301,50 @@ a = dot(grad(u), grad(v)) * dx
 f   = -div( grad(exact) )
 g_N = grad(exact)
 n   = FacetNormal(space)
-b   = f*v*dx + dot(g_N,n)*conditional(x[0]>=1e-8,1,0)*v*ds
+rhs = f*v*dx + dot(g_N,n)*conditional(x[0]>=1e-8,1,0)*v*ds
 dbc = DirichletBC(space,exact,x[0]<=1e-8)
+
+# %% [markdown]
+# .. index:: assemble
+#
+# We now have a right hand side and the bilinear form and need to assemble
+# to corresponding matrix and right hand side vector.
+
+# %%
+from dune.fem import assemble
+A = assemble( [a, dbc] )
+b = assemble( [rhs, dbc] )
+# or in one line
+A,b = assemble( [a==rhs, dbc] )
+# which is equivalent to
+A,b = assemble( [a-rhs==0, dbc] )
+
+# %% [markdown]
+# Note that `A`,`b`, and `u_h` are `dune.fem` objects which contain the
+# data structures for a sparse matrix and degrees of freedom vectors,
+# respectively. By default these can be accessed like standard
+# `numpy/scipy` data structures without any copies being made.
+# In a later section we the available [linear algebra backends](solvers_nb.ipynb)
+# in more detail.
+# For now we can use the `as_numpy` attribute to solve the problem using a `scipy` solver.
+
+# %%
+from scipy.sparse.linalg import spsolve as solve
+u_h.as_numpy[:] = solve(A.as_numpy,b.as_numpy[:])
+u_h.plot()
 
 # %% [markdown]
 # .. index:: Schemes; Galerkin
 #
+# `dune.fem` also provides a number of solvers (`schemes`).
 # With the model described as a ufl form, we can construct a scheme class
-# that provides the solve method which we can use to compute the solution:
+# that provides the solve method which we can use to compute the solution.
+# This function can be used both for linear and non-linear problem, where
+# in the later case a Newton method is used to find the solution.
 
 # %%
 from dune.fem.scheme import galerkin as solutionScheme
-scheme = solutionScheme([a == b, dbc], solver='cg')
+scheme = solutionScheme([a == rhs, dbc], solver='cg')
 scheme.solve(target = u_h)
 
 # %% [markdown]
@@ -372,7 +404,7 @@ from dune.ufl import Constant
 
 m = Constant(1,name="mass")   # start with m=1
 a = dot(grad(u), grad(v)) * dx + m*u*v * dx
-scheme = solutionScheme([a == b, dbc], solver='cg')
+scheme = solutionScheme([a == rhs, dbc], solver='cg')
 
 scheme.solve(target = u_h)
 
