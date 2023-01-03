@@ -16,6 +16,9 @@
 # and $f=f(x,t)$ is some time dependent forcing term.
 # On the boundary we prescribe Neumann boundary as before
 # and initial conditions $u=u_0$.
+# The ideas described here provide the basis for defining a number of
+# complex models and using different discretization approaches as discussed
+# in the [next steps section](nextsteps.rst).
 #
 # We will solve this problem in variational form and using Crank Nicholson in time
 # \begin{equation}

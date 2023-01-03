@@ -340,7 +340,8 @@ u_h.plot()
 # With the model described as a ufl form, we can construct a scheme class
 # that provides the solve method which we can use to compute the solution.
 # This function can be used both for linear and non-linear problem, where
-# in the later case a Newton method is used to find the solution.
+# in the later case a Newton method is used to find the solution. An
+# example is given in [the next section](dune-fempy.py).
 
 # %%
 from dune.fem.scheme import galerkin as solutionScheme
