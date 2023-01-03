@@ -7,7 +7,7 @@ Welcome to the dune-fem tutorial
 
 This module brings python scripting support to `Dune`_.
 This version describes the bindings for the development version
-(to become 2.9). It serves three purposes:
+(to become 2.10). The bindings serves three purposes:
 
 1. High level program control for solving partial differential equations
    using classes from the `Dune`_ core and from `Dune-Fem`_
@@ -17,17 +17,17 @@ This version describes the bindings for the development version
    model, all realizations of the `Dune`_ grid interface can be used to
    work with the domain tessellation, and the finite element spaces,
    operator, and solvers provided by `Dune-Fem`_ for the discretizations 
-   and solving steps. All of this is available within to be used in python
+   and solving steps. All of this is available to be used in python
    scripts or through Jupyter notebooks.
 2. Rapid prototyping of new methods or other parts of a simulation is easy
    since the interfaces provided are very similar to the `Dune`_ C++
    interface. This makes it easy to transfer a working prototype from
    python (easy to develop) to C++ (high efficiency). Small C++ code
    snippets can be easy called from python using just in time compilation.
-3. Rapid prototyping of new implementations of `Dune`_ interfaces. So
+3. Rapid prototyping of new implementations of `Dune`_ interfaces. For example
    new implementations of the `Dune`_ grid interface can be easily
    tested. For `Dune-Fem`_ developers, new grid views, discrete function spaces, and
-   scheme classes following the *Dune-Fem-Howto* concept can be added and tested.
+   scheme classes can be added and tested.
 
 ############################
 An Overview of this Document
@@ -53,7 +53,7 @@ Here is a quick summary of the different parts of this document - all of
 the code is available for download in form of both :ref:`scripts`.
 Or can be obtained by cloning the git repository
 https://gitlab.dune-project.org/dune-fem/dune-fempy
-where they can be found in the demo folder.
+where the scripts can be found in the demo folder.
 
 #. First off some remarks on getting the package to work: the simplest
    approach is to use the Python package index (pip) to install the software
@@ -61,10 +61,9 @@ where they can be found in the demo folder.
    Working from the git sources is a good option for more advanced users
    who want to change the underlying Dune C++ source files.
 #. A scalar Laplace problem and a simple scalar, non linear time dependent partial
-   differential equation
-   is used to describe the basic concepts. This leads through the steps
-   required to set up the problem, solve the system of equations, and
-   visualize the results.
+   differential equation are used to describe the basic concepts.
+   This leads through the steps required to set up the problem, solve the system of equations,
+   and visualize the results.
 #. After the introduction to the underlying concepts and how to get a
    simple problem up and running, we discuss:
 
