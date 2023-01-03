@@ -6,8 +6,6 @@
 Using C++ Code Snippets
 #######################
 
-.. todo:: link to `developers.rst`
-
 .. index:: C++; User defined code   
 
 In this section we demonstrate how it possible to use small piece of C++
@@ -27,3 +25,6 @@ C++. This will be demonstrated in the following examples:
    mcf-algorithm_nb
    laplace-dwr_nb
    lineplot_nb
+
+Debugging the C++ snippets is not always straightforward see the later
+section for some :ref:`hints for developers</developers.rst>`
