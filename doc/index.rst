@@ -107,6 +107,9 @@ where the scripts can be found in the demo folder.
    hear about it and would ask you to contribute to this
    chapter. Doing so is quite easy (see :ref:`contributing` for details).
 
+   indextoc
+
+
 .. _mayavi: https://docs.enthought.com/mayavi/mayavi
 .. _paraview: https://www.paraview.org
 .. _matplotlib: https://matplotlib.org
@@ -136,17 +139,12 @@ where the scripts can be found in the demo folder.
    installation
 
 .. toctree::
-   :maxdepth: 2
-   :caption: Index
-
-   indextoc
-
-.. toctree::
    :maxdepth: 3
    :caption: Getting Started
 
    concepts_nb
    dune-fempy_nb
+
 
 .. toctree::
    :maxdepth: 2
@@ -178,7 +176,6 @@ where the scripts can be found in the demo folder.
    :caption: Information and Resources
 
    inforesources
-
 
 .. API reference <api/modules>
 

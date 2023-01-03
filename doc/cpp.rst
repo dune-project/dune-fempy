@@ -6,7 +6,8 @@
 Using C++ Code Snippets
 #######################
 
-.. index:: C++; User defined code   
+.. index::
+   triple: Algorithm; C++; User defined code
 
 In this section we demonstrate how it possible to use small pieces of C++
 code to either extend the existing functionality or improve the efficiency

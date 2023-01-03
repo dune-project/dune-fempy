@@ -1,7 +1,14 @@
 # %% [markdown]
-# .. index:: Overview; Dense Vectors and Geometries
-#
 # # Overview
+# .. index::
+#    pair: Overview; Dense Vectors
+#
+# .. index::
+#    pair: Overview; Geometries
+#
+# .. index::
+#    pair: Overview; Geometries
+#
 # To facilitate rapid prototyping, the Dune Python bindings
 # provide Python classes for all the core interfaces of Dune. This makes
 # it easy to develop algorithms directly in Python which go beyond what is
@@ -56,7 +63,8 @@ print("quadrature points:",points)
 print("quadrature weights:",weights)
 
 # %% [markdown]
-# .. index:: Grid construction; Structured grids
+# .. index::
+#    pair: Grid construction; Structured grids
 #
 # # Grid Construction and Basic Interface
 # We now move on to the Dune-Grid module. First let us discuss different
@@ -117,6 +125,9 @@ triangles = [aluView.indexSet.subIndices(e, 2) for e in aluView.elements]
 aluView = aluSimplexGrid({"vertices": vertices, "simplices": triangles})
 
 # %% [markdown]
+# .. index::
+#    pair: Overview; Iterators
+#
 # We next discuss how to retrieve basic information from a constructed grid
 # and iterate over its entities (i.e., elements, faces, edges, vertices, etc.).
 # %%
@@ -142,9 +153,10 @@ for edge in unitSquare.edges:
 # which is discussed in the next section.
 
 # %% [markdown]
-# .. index:: Functions; Grid Functions
-#
 # # Using grid functions
+# .. index::
+#    pair: Functions; Grid Functions
+#
 # This is a fundamental concept in any grid based discretization package.
 # These are functions that can be evaluated given an entity in the grid and
 # a local coordinate within the reference element of that entity.
@@ -166,7 +178,8 @@ f.plot()
 hat0.plot()
 
 # %% [markdown]
-# .. index:: Quadratures; Simple Quadrature Rules
+# .. index::
+#    pair: Quadratures; Simple Quadrature Rules
 #
 # We can now use the quadrature rules discuss at the beginning of this
 # chapter to compute the integral over each element of the grid function.
@@ -234,6 +247,9 @@ print("integral of function 'g':",integral)
 # %% [markdown]
 # .. index:: Grids; Attaching data
 #
+# .. index::
+#    pair: Overview; Dof Mappers
+#
 # # Attaching Data to the Grid
 # To attach data to the entities in a grid, each Dune grid has an
 # `IndexSet` which provides a consecutive, zero starting integer for the
@@ -271,9 +287,11 @@ hatx = FieldVector([1./3., 1./3.])
 print(max(error(e, hatx) for e in aluView.elements))
 
 # %% [markdown]
-# .. index:: Grids; Visualization
+# .. index::
+#    pair: Grids; Plotting
 #
-# .. index:: I/O; Plotting
+# .. index::
+#    pair: I/O; Plotting
 #
 # # Output of Grid and Visualization of Data
 # We already used `matplotlib` to plot the grid and grid functions. For more

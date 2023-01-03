@@ -1,5 +1,5 @@
 # %% [markdown]
-# .. index:: Input/Output; Checkpointing (Backup/Restore)
+# .. index:: I/O; Checkpointing (Backup/Restore)
 #
 # # Backup and restore (pickling)
 # We show here how the state of a simulation can be stored and restored

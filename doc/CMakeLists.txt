@@ -4,7 +4,7 @@ dune_symlink_to_source_files(FILES
 additional.rst index.rst twophaseflow_descr.rst contributions.rst
 corepy.rst installation.rst vemdemo_descr.rst
 furtherexamples.rst nextsteps.rst furthertopics.rst inforesources.rst userprojects.rst
-gridviews.rst cpp.rst femdg.rst developers.rst indextoc.rst
+gridviews.rst cpp.rst femdg.rst developers.rst
 3dexample.py          limit.py              spiral.py
 crystal.py            lineplot.py           svg2pdf.py            cppfunctions.py
 dune-corepy.py        mcf-algorithm.py      twophaseflow.py       chemical.py
@@ -38,6 +38,7 @@ dune-python-logo.png
 favicon.ico
 )
 
+add_subdirectory("_templates")
 
 #add_custom_target(compilegrids2 ${PYTHON_EXECUTABLE} compilegrids.py 2)
 #add_custom_target(compilegrids3 ${PYTHON_EXECUTABLE} compilegrids.py 3)

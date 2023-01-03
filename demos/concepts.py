@@ -31,7 +31,8 @@
 # here for [a 3d gmsh file](othergrids_nb.ipynb)
 # or here [for a simple example using a dictionary](dune-corepy_nb.ipynb#An-unstructured-grid).
 #
-# .. index:: Grids; Plotting
+# .. index::
+#    pair: Grids; Plotting
 #
 # %%
 import io, numpy, matplotlib
@@ -43,7 +44,8 @@ gridView = leafGridView([0, 0], [1, 1], [4, 4])
 gridView.plot()
 
 # %% [markdown]
-# .. index:: Functions; Grid Functions
+# .. index::
+#    pair: Functions; Grid Functions
 #
 # ## Grid Functions
 # These are function that are defined over a given grid and are evaluated
@@ -76,7 +78,8 @@ from dune.fem.function import integrate
 print( integrate(gridView, exact, order=5) )
 
 # %% [markdown]
-# .. index:: I/O; Writing VTK files
+# .. index::
+#    pair: I/O; Writing VTK files
 
 # and plot them using matplotlib or write a vtk file for postprocessing
 
@@ -131,7 +134,8 @@ for element in gridView.elements:
 print(mass)
 
 # %% [markdown]
-# .. index:: Functions; UFL functions
+# .. index::
+#    pair: Functions; UFL functions
 #
 # As pointed out the `dune.fem` grid function can be used like any other
 # UFL coefficient to form UFL expressions:
@@ -155,16 +159,17 @@ exactGlobal.plot(figure=(fig,122))
 # [C++ Based Grid Functions](cppfunctions_nb.ipynb).
 
 # %% [markdown]
-# .. index:: Functions; Discrete Functions
+# .. index::
+#    pair: Functions; Discrete Functions
 #
-# .. index:: Spaces; Lagrange Space
+# .. index::
+#    pair: Spaces; Lagrange Space
 #
 # ## Discrete Functions
 # Note that the grid functions set up so far did not involve any
 # discretization, they are exactly evaluated at the given point.
 # A special type of grid functions are discrete functions living in a
 # discrete (finite dimensional) space.
-# .. index:: Functions; discrete functions
 
 # %%
 from dune.fem.space import lagrange as solutionSpace
@@ -220,9 +225,11 @@ for element in gridView.elements:
 print(mass)
 
 # %% [markdown]
-# .. index:: Functions; Plotting
+# .. index::
+#    pair: Functions; Plotting
 #
-# .. index:: I/O; Writing VTK files
+# .. index::
+#    pair: I/O; Writing VTK files
 #
 # or plot using matplotlib and write a vtk file for postprocessing
 # (using binary data format to reduce size)
@@ -345,6 +352,9 @@ for eocLoop in range(loops):
 
 # %% [markdown]
 # ## Handling constant parameters
+# .. index::
+#    pair: Models; Constants
+#
 # We have already seen how grid function can be used within UFL expressions
 # and forms - in the [next section](dune-fempy_nb.ipynb) we will give another example for this in the
 # context of a time dependent problems. In addition we can also use the

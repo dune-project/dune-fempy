@@ -9,7 +9,8 @@
 # different components of the solution.
 #
 # ## Dirichlet boundary conditions
-# .. index:: Boundary; Dirichlet Conditions
+# .. index::
+#    pair: Boundary; Dirichlet
 #
 # To fix Dirichlet boundary conditions $u=g$ on part of the boundary
 # $\Gamma\subset\partial\Omega$ the central class is
@@ -108,7 +109,8 @@ assert sum([ abs(td-vd) for td,vd in zip(test.dofVector, vec.dofVector)] ) /\
 # to define the Dirichlet conditions.
 
 # %% [markdown]
-# .. index:: Boundary; Dirichlet Degrees of Freedom
+# .. index::
+#    triple: Boundary; Dirichlet; Degrees of Freedom
 #
 # ## Accessing the Dirichlet degrees of freedom in Python
 #
@@ -141,7 +143,8 @@ plotComponents(vec, gridLines=None, level=2,
                colorbar={"orientation":"horizontal", "ticks":ticker.MaxNLocator(nbins=4)})
 
 # %% [markdown]
-# .. index:: Boundary; Neumann Conditions
+# .. index::
+#    pair: Boundary; Neumann
 #
 # ## Neumann and Robin boundary conditions
 #
@@ -169,7 +172,8 @@ plotComponents(vec, gridLines=None, level=2,
 # the `ufl.ds` measure.
 
 # %% [markdown]
-# .. index:: Boundary; Boundary Identifiers (ids)
+# .. index:
+#    triple: Boundary; Dirichlet; Boundary Identifiers (ids)
 #
 # ## Using boundary ids (and some more complex examples)
 #
@@ -184,7 +188,8 @@ plotComponents(vec, gridLines=None, level=2,
 #
 
 # %% [markdown]
-# .. index:: Boundary; Cartesian Boundary Ids
+# .. index::
+#    triple: Boundary; Dirichlet; Cartesian Boundary Ids
 #
 # ### Cartesian boundary ids
 #
@@ -203,7 +208,8 @@ plotComponents(vec, gridLines=None, level=2,
 #
 
 # %% [markdown]
-# .. index:: Boundary; Robin Conditions
+# .. index::
+#    pair: Boundary; Robin
 #
 # ### Mixing different types of boundary conditions
 #
