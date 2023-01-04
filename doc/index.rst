@@ -107,9 +107,6 @@ where the scripts can be found in the demo folder.
    hear about it and would ask you to contribute to this
    chapter. Doing so is quite easy (see :ref:`contributing` for details).
 
-   indextoc
-
-
 .. _mayavi: https://docs.enthought.com/mayavi/mayavi
 .. _paraview: https://www.paraview.org
 .. _matplotlib: https://matplotlib.org
@@ -130,7 +127,11 @@ where the scripts can be found in the demo folder.
 
 .. todo:: add more citations
 
+.. toctree::
+   :maxdepth: 1
+   :caption: Changes and new features
 
+   changelog
 
 .. toctree::
    :maxdepth: 2
