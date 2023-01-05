@@ -30,18 +30,89 @@ in this tutorial and try them out
   python concepts.py
 
 All examples are available as Python scripts or IPython notebooks - for
-this `jupyter` is needed
+the later `jupyter` is needed
 
 .. code-block:: bash
 
-  pip install jupyter
-  jupyter notebook
+  pip install jupyterlab
+  jupyter lab
 
 This has been tested with different Linux distributions, MacOS, and using
-the Windows Linux Subsystem. 
+the *Windows Subsystem for Linux*.
 
 .. note::
    the current installation requires MPI to be available.
+
+*****************
+Hints for Windows
+*****************
+
+Some hints on getting Dune to 11 using the
+*Windows Subsystem for Linux* (tested on Windows 11).
+Installation in three steps:
+
+1. First we need to `install the wsl`_ (an Ubuntu version):
+
+   Open ``PowerShell`` as administrator and run ``wsl --install``
+   (find Windows ``PowerShell`` and right click;
+   the first entry should be ``Run as administrator``).
+   This step takes quite some time ('get a coffee' long).
+   Close the ``PowerShell`` again (enter ``exit``).
+   Possibly one needs to restart after this step (second coffee).
+
+2. We need to add some packages and setup a Python virtual environment.
+   Open the wsl (Pinguin icon) - again some installation is done.
+   Enter a new username and password.
+   Then run the following commands:
+
+   .. code-block:: bash
+
+      sudo apt update  # enter the password you used above 
+      sudo apt install --reinstall ca-certificates
+      sudo apt install python3-dev python3-pip python3-venv cmake
+      sudo apt install jupyter-core
+      python3 -m venv dune-env
+      source dune-env/bin/activate
+      pip install jupyterlab
+
+3. We have reached the Dune specific part of the installation
+   (I would suggest some tea at this stage)
+
+   .. code-block:: bash
+
+      pip install dune-fem
+      python -m dune.fem
+
+   The last step downloads the tutorial scripts into the folder
+   ``fem_tutorial``.
+
+Each time to open the Linux terminal (wsl) again you will need to
+run the following commands:
+
+.. code-block:: bash
+
+  source ~/dune-env/bin/activate
+
+To work on one of the scripts from the tutorial you can ether use
+``jupyter-lab``
+
+.. code-block:: bash
+
+  cd ~/fem_tutorial/
+  jupyter lab &
+
+then open the given link in your favourite web browser.
+
+Instead of using the notebooks you can also run the python scripts from
+the command line, e.g., run
+
+.. code-block:: bash
+
+  python concepts.py
+
+in the ``fem_tutorial`` folder.
+
+.. _install the wsl: https://learn.microsoft.com/en-us/windows/wsl/setup/environment
 
 ###########
 From Source
