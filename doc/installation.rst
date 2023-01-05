@@ -93,7 +93,7 @@ run the following commands:
 
   source ~/dune-env/bin/activate
 
-To work on one of the scripts from the tutorial you can ether use
+To work on one of the scripts from the tutorial you can either use
 ``jupyter-lab``
 
 .. code-block:: bash
