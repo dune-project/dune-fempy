@@ -345,7 +345,6 @@ else:
 # %% [markdown]
 # Implementing a Newton Krylov solver using the binding provided by petsc4py
 # %%
-petsc4py = None # at the moment petsc4py is not correctly working
 if petsc4py is not None and spacePetsc is not None:
     class Scheme3:
       def __init__(self, scheme):
@@ -356,7 +355,7 @@ if petsc4py is not None and spacePetsc is not None:
           # use conjugate gradients method
           self.ksp.setType("cg")
           # and incomplete Cholesky
-          self.ksp.getPC().setType(None) # "icc")
+          self.ksp.getPC().setType("icc")
           self.ksp.setOperators(self.jacobian.as_petsc)
           self.ksp.setFromOptions()
       def solve(self, target):
