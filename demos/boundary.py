@@ -104,7 +104,7 @@ assert sum([ abs(td-vd) for td,vd in zip(test.dofVector, vec.dofVector)] ) /\
 
 # %% [markdown]
 # As with other grid functions we can also use
-# [C++ code snipets](cppfunctions_nb.ipynb).
+# [C++ code snippets](cppfunctions_nb.ipynb).
 # to define the Dirichlet conditions.
 
 # %% [markdown]
