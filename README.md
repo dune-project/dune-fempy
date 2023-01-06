@@ -1,48 +1,64 @@
-Python Bindings for the DUNE-FEM module
-=======================================
+Tutorial for the Python Bindings of DUNE-FEM Module
+===================================================
 
 *Authors: Andreas Dedner, Martin Nolte, and Robert Kl&ouml;fkorn*
 
-dune-fempy aims to provide Python bindings for the [dune-fem][femlink] discretization
-module. Here an example for solving Poisson's equation:
+**dune-fempy** provides Python scripts that form the [tutorial][tutlink] for the [dune-fem][femlink] discretization
+module. Here is an example:
 
-```python
-import math
+```Python
+# from laplace-readme.py
+
+import numpy as np
 from ufl import *
 import dune.ufl
-import dune.create as create
+from dune.ufl import DirichletBC
+from dune.grid import cartesianDomain
+from dune.alugrid import aluConformGrid
+from dune.fem.space import lagrange
+from dune.fem.scheme import galerkin
+from dune.fem.function import uflFunction
 
-grid = create.grid("ALUConform", dune.grid.cartesianDomain([0, 0], [1, 1], [8, 8]), dimgrid=2)
-
-# set up a diffusion reaction model using UFL
-uflSpace = dune.ufl.Space((grid.dimGrid, grid.dimWorld), 1, field="double")
-u = TrialFunction(uflSpace)
-v = TestFunction(uflSpace)
-x = SpatialCoordinate(uflSpace.cell())
-a = (inner(grad(u), grad(v)) + inner(u,v)) * dx
-# provide an exact solution that will be used to add suitable forcing and dirichlet b.c.
-exact = as_vector( [cos(2.*pi*x[0])*cos(2.*pi*x[1])] )
-model = create.model("elliptic", grid, a==0, exact=exact, dirichlet={ 1:exact } )
+domain = cartesianDomain([0, 0], [1, 1], [16, 16])
+gridView = aluConformGrid( domain, dimgrid=2)
 
 # set up a space and a conforming finite element scheme and solve the PDE
-space  = dune.create.space("Lagrange", grid, dimrange=1, order=1)
-scheme = create.scheme("h1", space, model, "cg")
-uh,info = scheme.solve()
+space  = lagrange(gridView, dimrange=1, order=1)
+uh = space.function(name="u_h")
 
+# set up a diffusion reaction model using UFL
+u = TrialFunction(space)
+v = TestFunction(space)
+x = SpatialCoordinate(space)
+
+# provide an exact solution that will be used to add suitable forcing and Dirichlet b.c.
+exact = as_vector( [cos(2.*pi*x[0])*cos(2.*pi*x[1])] )
 # make 'exact' into a grid function for output and uh into an UFL coefficient for error computation
-exact_gf = create.function("ufl", grid, "exact", 5, exact)
-uh_coeff = dune.ufl.GridCoefficient(uh)
-# now define a grid function representing the pointwise error
-l2error_gf = create.function("ufl", grid, "error", 5, as_vector([(exact[0]-uh_coeff[0])**2]) )
+exact_gf = uflFunction( gridView, "exact", order=5, ufl=exact)
 
-error = math.sqrt( l2error_gf.integrate() )
-print("size:",grid.size(0),"L2-error:",error)
-grid.writeVTK("laplace", pointdata=[ uh, l2error_gf, exact_gf ])
+# bilinear form
+a = (inner(grad(u), grad(v)) + inner(u,v)) * dx
+# forcing term (in this case very simple)
+b = (inner(grad(exact_gf), grad(v)) + inner(exact_gf,v)) * dx
+
+# create a scheme (operator and solver)
+dbc = DirichletBC(space, exact)
+scheme = galerkin([a==b, dbc])
+
+# compute solution
+info = scheme.solve( target=uh )
+
+# now define a grid function representing the pointwise error
+l2error_gf = uflFunction( gridView, "error", 5, as_vector([dot((exact-uh),(exact-uh))]) )
+
+error = np.sqrt( l2error_gf.integrate() )
+print("size:",gridView.size(0),"L2-error:",error)
+gridView.writeVTK("laplace", pointdata=[ uh, l2error_gf, exact_gf ])
 ```
 
 See the file COPYING for full copying permissions.
 
-If you find this tutorial helpful for getting your own projects up and
+If you find this [tutorial][tutlink] helpful for getting your own projects up and
 running please cite
 
 Title: Python Bindings for the DUNE-FEM module
@@ -56,23 +72,24 @@ Dependencies
 ------------
 
 dune-fempy depends on the following DUNE modules:
-- dune-common 2.8+
-- dune-geometry 2.8+
-- dune-grid 2.8+
-- dune-python 2.8+
-- dune-fem 2.8+
+- dune-common 2.9+
+- dune-geometry 2.9+
+- dune-grid 2.9+
+- dune-python 2.9+
+- dune-fem 2.9+
 
 In addition to the dependencies of these DUNE modules, the following software
 packages are required:
 
 - a C++17 compatible C++ compiler
-- Python 2.7+ (although mostly tested with 3.4+)
+- Python 3.6+
 
 We strongly recommend installing the following Python packages to make full
 use of dune-fem's Python bindings:
 
 - numpy
 - mpi4py
-- ufl (2016.1.0+)
+- ufl (2022.2.0+)
 
 [femlink]: https://gitlab.dune-project.org/dune-fem/dune-fem
+[tutlink]: https://dune-project.org/sphinx/content/sphinx/dune-fem/
