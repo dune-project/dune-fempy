@@ -6,7 +6,7 @@ corepy.rst installation.rst vemdemo_descr.rst
 furtherexamples.rst nextsteps.rst furthertopics.rst inforesources.rst userprojects.rst
 gridviews.rst cpp.rst femdg.rst developers.rst indextoc.rst
 3dexample.py          limit.py              spiral.py
-crystal.py            lineplot.py           svg2pdf.py
+crystal.py            lineplot.py           svg2pdf.py            cppfunctions.py
 dune-corepy.py        mcf-algorithm.py      twophaseflow.py       chemical.py
 concepts.py           dune-fempy.py         mcf_cmp_plot.py       euler.py
 elasticity.py         mcf.py                uzawa-scipy.py        othergrids.py
@@ -22,7 +22,7 @@ laplace-adaptive_nb.ipynb  vemdemo_nb.ipynb           chimpl_nb.ipynb
 discontinuousgalerkin_nb.ipynb
 laplace-dwr_nb.ipynb       lineplot_nb.ipynb          wave_nb.ipynb
 mcf-algorithm_nb.ipynb     parallelization_nb.ipynb   backuprestore_nb.ipynb
-boundary_nb.ipynb          solvers_nb.ipynb
+boundary_nb.ipynb          solvers_nb.ipynb           cppfunctions_nb.ipynb
 laplace-dwr.hh             utility.hh                 uzawa.hh
 figures _static dune-fempy.bib .special.rst
 soap.dgf sphere.dgf unitcube-2d.dgf wave_tank.msh

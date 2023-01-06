@@ -5,14 +5,14 @@
 # problem. The required steps are:
 #
 # *  constructing a tessellation of the computational domain
-# *  working with functions defined over the grid
+# *  working with functions defined over the grid (grid functions)
 # *  setting up discrete functions
 # *  defining the mathematical model to solve
 # *  solving the (non linear) system arising from the discretization of the
 #    model by the Galerkin method
 #
-# After that we study the more complex problem of solving a time dependent
-# non linear problem.
+# After that we study the more complex problem of solving a
+# [time dependent non linear problem](dune-fempy_nb.ipynb).
 
 # %% [markdown]
 # ## Setting up the Mesh
@@ -88,7 +88,7 @@ gridView.writeVTK('exact', pointdata={'exact': exact})
 # %% [markdown]
 # In some cases it can be necessary to convert a UFL expression into a grid
 # function explicitly - for example to be able to evaluate it over each
-# element in the grid [(in a later section)](dune-corepy_nb.ipynb)
+# element in the grid ([in a later section](dune-corepy_nb.ipynb)
 # we provide more detail on how to access the grid interface).
 
 # %%
@@ -130,8 +130,6 @@ for element in gridView.elements:
     lf.unbind()
 print(mass)
 
-print( integrate(gridView, [exact,exactLocal,exactGlobal], order=5) )
-
 # %% [markdown]
 # .. index:: Functions; UFL functions
 #
@@ -148,74 +146,13 @@ exactGlobal.plot(figure=(fig,122))
 # %% [markdown]
 # Converting UFL expressions to grid functions leads to JIT code generation
 # and is therefore efficient when used in other C++ algorithm (like
-# `integrate`). On the other hand using the `gridFunction` decorator leads
+# `integrate`). But more complex control structures are hard to express
+# within UFL. On the other hand using the `gridFunction` decorator leads
 # to a callback into Python for each evaluation and is therefore much less
 # efficient. An alternative approach is based on writing small C++ snippets
-# implementing the grid function:
-
-# %%
-from dune.fem.function import cppFunction
-code="""
-#include <cmath>
-#include <dune/common/fvector.hh>
-template <class GridView>
-auto aTimesExact(double a) {
-  // the return value needs to be a lambda which either returns a `double`
-  // or a `Dune::FieldVector<double,R>` with `R>=1`
-  return [a](const auto& en,const auto& xLocal) -> auto {
-    auto x = en.geometry().global(xLocal);
-    return a*(1./2.*(std::pow(x[0],2)+std::pow(x[1],2)) - 1./3.*(std::pow(x[0],3) - std::pow(x[1],3)) + 1.);
-  };
-}
-"""
-exactCpp = cppFunction(gridView, name="exactCpp", order=2,
-                       fctName="aTimesExact",includes=io.StringIO(code),
-                       args=[2.])
-print( integrate(gridView, abs(2*exact-exactCpp), order=5) )
-exactCpp.plot()
-
-
-# %% [markdown]
-# As the above example shows it is easy to pass in parameters to the C++
-# implementation - here a double `2`. Note that it is not possible to
-# obtain a reference to this double so to make sure a change to the
-# constant on the Python side carries over to the C++ side an option is to
-# use a `dune.common.FieldVector` instead.
-# These parameters can also be more complex e.g. other grid # function -
-# note that a UFL expression can not be directly passed in - it first needs
-# to be converted into a grid function using `uflFunction`.
-
-# %%
-code2="""
-#include <cmath>
-#include <dune/common/fvector.hh>
-template <class GridView, class GF>
-auto aTimesExact(const GF &gf,Dune::FieldVector<double,1> &a) {
-  return [lgf=localFunction(gf),&a] (const auto& en,const auto& xLocal) mutable -> auto {
-    lgf.bind(en); // lambda must be mutable so that the non const function can be called
-    return a[0]*lgf(xLocal);
-  };
-}
-"""
-from dune.common import FieldVector
-a = FieldVector([2])
-exactCpp2 = cppFunction(gridView, name="exactCpp", order=2,
-                        fctName="aTimesExact",includes=io.StringIO(code2),
-                        args=[exact_gf,a])
-print( integrate(gridView, abs(exactCpp-exactCpp2), order=5) )
-a[0] = 4
-print( integrate(gridView, abs(2*exactCpp-exactCpp2), order=5) )
-
-# %% [markdown]
-# The above is just one of a few ways C++ code snippets can be used
-# together with Python code to improve efficiency or extend the existing
-# binding to Dune. In the above example there is no advantage of using the
-# C++ code over the code generated based on the UFL expression. For more
-# complicated functions e.g. with many if statements or based on more
-# information from the given element like it's neighbors the expressibility
-# of UFL might not be sufficient or lead to hard to read code. In these
-# cases directly providing C++ code (or Python code) can be a reasonable
-# alternative.
+# implementing the grid function as described in the section on
+# generating
+# [C++ Based Grid Functions](cppfunctions_nb.ipynb).
 
 # %% [markdown]
 # .. index:: Functions; Discrete Functions
@@ -245,9 +182,6 @@ u_h = space.interpolate(exact, name='u_h')
 # reinitialize it
 
 # %%
-u_h.interpolate( cppFunction(gridView, name="exactCpp", order=2,
-                 fctName="aTimesExact",includes=io.StringIO(code),
-                 args=[2.]) )
 u_h.interpolate( lambda x: 1/2.*(x[0]**2+x[1]**2) - 1/3*(x[0]**3 - x[1]**3) + 1 )
 
 # %% [markdown]
@@ -255,7 +189,7 @@ u_h.interpolate( lambda x: 1/2.*(x[0]**2+x[1]**2) - 1/3*(x[0]**3 - x[1]**3) + 1 
 # automatically using the same concept used in the `gridFunction`
 # decorator. As pointed out above there are some methods where these
 # conversions are implicit and no explicit generation of a grid function
-# has be carried out.
+# has to be carried out.
 #
 # If a discrete function is already available it is possible to call `copy`
 # to obtain further discrete functions:
@@ -296,7 +230,7 @@ print(mass)
 # %%
 u_h.plot(gridLines="white")
 from dune.grid import OutputType
-gridView.writeVTK('uh', pointdata=[u_h], outputType=OutputType.appendedraw)
+gridView.writeVTK('uh', pointdata=[u_h])
 
 # %% [markdown]
 # Note: the discrete function `u_h` already has a `name` attribute given in

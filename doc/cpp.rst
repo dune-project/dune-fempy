@@ -8,23 +8,24 @@ Using C++ Code Snippets
 
 .. index:: C++; User defined code   
 
-In this section we demonstrate how it possible to use small piece of C++
+In this section we demonstrate how it possible to use small pieces of C++
 code to either extend the existing functionality or improve the efficiency
-of the code by moving code from Python to C++.  We have already seen how to
-define grid functions using C++ code snippets in the
-:ref:`Grid Function</concepts_nb.ipynb#Grid-Functions>` section
-In the following we will move parts of an algorithm from
+of the code by moving code from Python to C++.
+We will first describe how to define grid functions based on some
+simple C++ code.
+We will then move parts of an algorithm from
 Python to C++. The DUNE interfaces exported to
 Python are very close to their C++ counterpart so that rapid prototyping of
 new algorithms can be carried out using Python and then easily moved to
 C++. This will be demonstrated in the following examples:
 
+Debugging the C++ snippets is not always straightforward see the later
+section for some :ref:`hints for developers</developers.rst>`
+
 .. toctree::
    :maxdepth: 2
 
+   cppfunctions_nb
    mcf-algorithm_nb
    laplace-dwr_nb
    lineplot_nb
-
-Debugging the C++ snippets is not always straightforward see the later
-section for some :ref:`hints for developers</developers.rst>`

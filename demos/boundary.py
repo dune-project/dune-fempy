@@ -36,7 +36,7 @@ import numpy, io
 from dune.grid import structuredGrid as leafGridView
 from dune.fem.space import lagrange as solutionSpace
 from dune.fem.scheme import galerkin as solutionScheme
-from dune.fem.function import gridFunction, cppFunction, integrate, uflFunction
+from dune.fem.function import gridFunction, integrate, uflFunction
 from dune.ufl import DirichletBC, Constant
 from ufl import TestFunction, TrialFunction, SpatialCoordinate,\
                 dx, ds, grad, inner, sin, pi
@@ -101,35 +101,11 @@ plotComponents(test, gridLines=None, level=2,
 assert sum([ abs(td-vd) for td,vd in zip(test.dofVector, vec.dofVector)] ) /\
        len(vec.dofVector) < 1e-8
 
-# %%
-test.clear()
-code="""
-#include <cmath>
-#include <dune/python/pybind11/numpy.h>
-template <class GridView>
-auto bnd(pybind11::array_t<double> &a, double h) {
-  return [ptr=static_cast<double*>(a.request(true).ptr),h](const auto& en,const auto& xLocal) -> auto {
-    auto x = en.geometry().global(xLocal);
-    return sin(h*M_PI*(ptr[0]*x[0]+ptr[1]*x[1]));
-  };
-}
-"""
-coeffVec = numpy.array([5.,-2.])
-bndCpp = cppFunction(gridView, name="bndCpp", order=2,
-                     fctName="bnd",includes=io.StringIO(code),
-                     args=[coeffVec,2.])
-bc = DirichletBC(vecSpace,[bndCpp,None])
-vecScheme = solutionScheme( [a == 0, bc, bcBottom],
-                            parameters={"newton.linear.tolerance": 1e-9} )
-vecScheme.solve(target=test)
-plotComponents(test, gridLines=None, level=2,
-               colorbar={"orientation":"horizontal", "ticks":ticker.MaxNLocator(nbins=4)})
-coeffVec[:] = numpy.array([1.,1.])
-vecScheme.solve(target=test)
-plotComponents(test, gridLines=None, level=2,
-               colorbar={"orientation":"horizontal", "ticks":ticker.MaxNLocator(nbins=4)})
-assert sum([ abs(td-vd) for td,vd in zip(test.dofVector, vec.dofVector)] ) /\
-       len(vec.dofVector) < 1e-8
+
+# %% [markdown]
+# As with other grid functions we can also use
+# [C++ code snippets](cppfunctions_nb.ipynb).
+# to define the Dirichlet conditions.
 
 # %% [markdown]
 # .. index:: Boundary; Dirichlet Degrees of Freedom

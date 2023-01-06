@@ -42,7 +42,7 @@ import sys, io
 from dune.grid import structuredGrid as leafGridView
 from dune.fem.space import lagrange as solutionSpace
 from dune.fem.scheme import galerkin as solutionScheme
-from dune.fem.function import gridFunction, cppFunction, integrate, uflFunction
+from dune.fem.function import gridFunction, integrate, uflFunction
 from dune.ufl import DirichletBC, Constant
 from ufl import TestFunction, TrialFunction, SpatialCoordinate, FacetNormal, \
                 dx, ds, div, grad, dot, inner, sqrt, exp, sin
