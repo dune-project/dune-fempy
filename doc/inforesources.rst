@@ -6,3 +6,12 @@
    developers
    contributions
    additional
+
+
+#############
+Keyword index
+#############
+
+.. 
+
+* :ref:`genindex`

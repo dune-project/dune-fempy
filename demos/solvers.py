@@ -135,7 +135,8 @@ for eocLoop in range(loops):
         scheme.model.dt /= 2
 
 # %% [markdown]
-# .. index:: Solvers; Scipy
+# .. index::
+#    pair: Solvers; Scipy
 #
 # ## Using Scipy
 # We implement a simple Newton Krylov solver using a linear solver from
@@ -232,8 +233,11 @@ print("Forchheimer(scipy) size: ", gridView.size(0), "L^2, H^1 error:",'{:0.5e},
   *[ sqrt(e) for e in integrate(gridView,[error**2,inner(grad(error),grad(error))], order=5) ]))
 
 # %% [markdown]
-# .. index:: Solvers; Dirichlet Conditions
-# .. index:: Boundary; Linear Solvers
+# .. index::
+#    triple: Solvers; Dirichlet; Conditions
+#
+# .. index::
+#    pair: Boundary; Linear Solvers
 #
 # ## Handling Dirichlet boundary conditions
 # We look at a simple Poisson problem with Dirichlet BCs
@@ -303,7 +307,8 @@ sol.as_numpy[:], _ = solver(A, rhs.as_numpy, x0=sol.as_numpy,
 sol.plot()
 
 # %% [markdown]
-# .. index:: Solvers; Petsc
+# .. index::
+#    pair: Solvers; Petsc
 #
 # ## Using Petsc and Petsc4Py
 # Switching to a storage based on the PETSc solver package and solving the
@@ -421,7 +426,7 @@ if petsc4py is not None and spacePetsc is not None:
       *[ sqrt(e) for e in integrate(gridView,[error**2,inner(grad(error),grad(error))], order=5) ]))
 
 # %% [markdown]
-# .. index:: Solvers; overview
+# .. index:: Solvers; Available solvers
 #
 # ## Available solvers and parameters
 # Upon creation of a discrete function space one also have to specifies the

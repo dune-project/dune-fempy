@@ -127,7 +127,11 @@ where the scripts can be found in the demo folder.
 
 .. todo:: add more citations
 
+.. toctree::
+   :maxdepth: 1
+   :caption: Changes and new features
 
+   changelog
 
 .. toctree::
    :maxdepth: 2
@@ -136,17 +140,12 @@ where the scripts can be found in the demo folder.
    installation
 
 .. toctree::
-   :maxdepth: 2
-   :caption: Index
-
-   indextoc
-
-.. toctree::
    :maxdepth: 3
    :caption: Getting Started
 
    concepts_nb
    dune-fempy_nb
+
 
 .. toctree::
    :maxdepth: 2
@@ -178,7 +177,6 @@ where the scripts can be found in the demo folder.
    :caption: Information and Resources
 
    inforesources
-
 
 .. API reference <api/modules>
 
