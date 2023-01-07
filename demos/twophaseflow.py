@@ -8,7 +8,7 @@
 # In all that follows, we assume that the flow is immiscible and
 # incompressible with no mass transfer between phases.
 # A detailed description of the mathematical model and parameters
-# can be found `TwoPhaseFlow`_,.
+# can be found <cite data-cite="TwoPhaseFlow"></cite>.
 
 # %%
 try:

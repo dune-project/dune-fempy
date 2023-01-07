@@ -7,7 +7,7 @@
 # equation where the evolution is governed by the mean curvature $H$.
 # One real-life example of this is in how soap films change over time,
 # although it can also be applied to image processing (e.g.
-# <cite data-cite="Malladi"></cite>
+# <cite data-cite="Malladi"></cite>).
 # Assume we can define a reference surface $\Gamma_0$ such that
 # we can write the evolving surface $\Gamma(t)$ in the form
 # \begin{gather*}
