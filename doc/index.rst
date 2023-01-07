@@ -180,6 +180,8 @@ where the scripts can be found in the demo folder.
 
 .. API reference <api/modules>
 
+.. index::
+   see: Mesh construction; Grid construction
 
 ############
 Bibliography

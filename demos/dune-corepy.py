@@ -66,9 +66,6 @@ print("quadrature weights:",weights)
 # .. index::
 #    pair: Grid construction; Structured grids
 #
-# .. index::
-#    pair  Mesh construction; Grid construction
-#
 # # Grid Construction and Basic Interface
 # We now move on to the Dune-Grid module. First let us discuss different
 # possibilities of constructing a grid.
