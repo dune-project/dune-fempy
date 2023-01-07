@@ -9,7 +9,7 @@ HP adaptive DG scheme for twophase flow problem
 We solve a two phase flow model using an hp adaptive higher order
 discontinuous Galerkin scheme :cite:`TwoPhaseFlow`.
 
-In this example we present a framework for solving two-phase flow problems in porous media. 
+This examples presents a framework for solving two-phase flow problems in porous media. 
 The discretization is based on a Discontinuous Galerkin method and includes local
 grid adaptivity and local choice of polynomial degree. The method is implemented using
 the Python frontend described here. The example contains a number of time stepping 
