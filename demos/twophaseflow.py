@@ -4,7 +4,12 @@
 # .. index:: Methods; hp adaptive Discontinuous Galerkin
 #
 # # Problem Description
-# Describe model and scheme here...
+# This example considers two-phase porous-media flow.
+# In all that follows, we assume that the flow is immiscible and
+# incompressible with no mass transfer between phases.
+# A detailed description of the mathematical model and parameters
+# can be found `TwoPhaseFlow`_,.
+
 # %%
 try:
     import dune.femdg
