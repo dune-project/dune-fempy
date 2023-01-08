@@ -236,7 +236,8 @@ for e in aluView.elements:
 print("integral of function 'g':",integral)
 
 # %% [markdown]
-# .. index:: C++; User defined code
+# .. index::
+#    triple: Algorithm; C++; User defined code
 #
 # # Importing user defined C++ code
 # To achieve close to native efficiency the Python prototype

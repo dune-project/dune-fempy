@@ -13,12 +13,6 @@
     gridFunction = uflFunction(square,ufl=transform,order=1,name="diamond")
     diamond = geometryGridView(gridFunction)
 
-
-.. parsed-literal::
-
-    GPConv: 0x399fae0 0x39cbf30
-
-
 .. code:: ipython3
 
     diamond.plot()
@@ -38,12 +32,6 @@ In a second example we embed a 1D interval into 3D:
     transform = as_vector([cos(theta),sin(theta)])*(25-theta)
     gridFunction = uflFunction(square,ufl=transform,order=1,name="diamond")
     spiral = geometryGridView(gridFunction)
-
-
-.. parsed-literal::
-
-    GPConv: 0x3add130 0x3b950a0
-
 
 Note: currently plotting for 1d grids is not implemented spiral.plot()
 but we can plot some grid function, e.g., given by ufl expressions

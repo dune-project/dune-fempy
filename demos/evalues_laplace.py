@@ -1,9 +1,9 @@
 # %% [markdown]
 #
 # # Eigenvalue problems
-# .. index:: Eigenvalues
+# .. index:: Equations; Eigenvalue problems
 #
-# .. sectionauthor:: Philip Herbert <P.Herbert@hw.ac.uk>
+# .. sectionauthor:: contribution by Philip Herbert <P.Herbert@hw.ac.uk>
 #
 # We use Dune and SciPy to compute the Eigenvalues and Eigenfunctions of the Laplace operator.
 #
@@ -102,7 +102,8 @@ for k in range(rows):
             solutions[k*cols+l].plot( figure=(fig, axs[k][l]) )
 
 # %% [markdown]
-# ## Dirichlet Eigenvalues
+# ## Dirichlet Eigenvalue problem
+#
 # The calculation for the Dirichlet Eigenvalues is a little more intricate.
 # This is because when we adjust the LHS matrix and RHS matrix for the boundary conditions, the RHS matrix needs to be treated slightly different.
 # To begin, let us remind ourselves of the problem: find $(u,\lambda)\in H^1(\Omega)\times \mathbb{R}$ satisfy
@@ -142,11 +143,16 @@ RHSOpPerturbation = galerkin([Constant(0)*inner(u,v)*dx, dbc])
 M = linear(RHSOp).as_numpy - linear(RHSOpPerturbation).as_numpy
 
 # %% [markdown]
+# .. index::
+#    triple: Boundary; Dirichlet; Degrees of Freedom
+#
 # The second approach makes the desired change directly on the SciPy matrix.
-# We first extract the [indices of the Dirichlet dofs](boundary_nb.ipynb#Accessing-the-Dirichlet-degrees-of-freedom-in-Python)
+# We first extract the
+# [indices of the Dirichlet dofs](boundary_nb.ipynb#Accessing-the-Dirichlet-degrees-of-freedom-in-Python)
 # and use those indices to setup a diagonal matrix $D$ similar to the first approach.
 # We could now subtract the two matrices as before but instead we multiply
 # $M$ with $D$ from both sides to change both rows and columns in $M$ to zero.
+
 # %%
 import scipy.sparse as sps
 import scipy.linalg as linalg

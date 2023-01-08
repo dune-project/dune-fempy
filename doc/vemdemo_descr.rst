@@ -1,5 +1,5 @@
 ############################################
-Virtual Finite Elements: the DUNE-VEM module
+Virtual Element Methods: the DUNE-VEM module
 ############################################
 :download:`(notebook) <vemdemo_nb.ipynb>` :download:`(script) <vemdemo.py>`
 

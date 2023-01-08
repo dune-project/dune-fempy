@@ -1,7 +1,7 @@
 # %% [markdown]
-# .. index:: Equations; Laplace
-#
 # # Introduction
+#
+# .. index:: Equations; Laplace
 #
 # ## A Laplace problem
 #
@@ -70,7 +70,10 @@ mat,rhs = assemble(a==l)
 # %% [markdown]
 # We solve the resulting linear system of equations $Ay=b$ using scipy.
 # To this end it is straightforward to expose the underlying data
-# structures in $A,b,u_h$ using the ``as_numpy`` attribute
+# structures in $A,b,u_h$ using the ``as_numpy`` attribute.
+# More details on how to use
+# [Scipy and also PetSC4py](solvers_nb.ipynb) will be discussed later
+# in the tutorial.
 
 # %%
 from scipy.sparse.linalg import spsolve as solver
@@ -98,6 +101,71 @@ u_h.plot()
 # %%
 from dune.fem.function import integrate
 exact = cos(2*pi*x[0])*cos(2*pi*x[1])
+e_h = u_h-exact
+squaredErrors = integrate(gridView, [e_h**2,inner(grad(e_h),grad(e_h))], order=5)
+print("L^2 and H^1 errors:",[np.sqrt(e) for e in squaredErrors])
+
+# %% [markdown]
+# .. index:: Equations; Boundary value problem
+#
+# ## Laplace equation with Dirichlet boundary conditions
+# We consider the scalar boundary value problem
+# \begin{align*}
+# -\triangle u &= f & \text{in}\;\Omega:=(0,1)^2 \\
+# \nabla u\cdot n &= g_N & \text{on}\;\Gamma_N \\
+# u &= g_D & \text{on}\;\Gamma_D
+# \end{align*}
+# and $f=f(x)$ is some forcing term.
+# For the boundary conditions we set $\Gamma_D={0}\times[0,1]$ and take
+# $\Gamma_N$ to be the remaining boundary of $\Omega$.
+#
+# We will solve this problem in variational form
+# \begin{align*}
+# \int \nabla u \cdot \nabla \varphi \
+# - \int_{\Omega} f(x) \varphi\ dx
+# - \int_{\Gamma_N} g_N(x) v\ ds
+# = 0.
+# \end{align*}
+# We choose $f,g_N,g_D$ so that the exact solution is
+# \begin{align*}
+# u(x) = \left(\frac{1}{2}(x_1^2 + x_2^2) - \frac{1}{3}(x_1^3 - x_2^3)\right) + 1~.
+# \end{align*}
+# Note: [in a later section](boundary_nb.ipynb) we discuss more general boundary
+# conditions.
+#
+# The setup of the model using ufl is very similar to the previous example
+# but we need to include the non trivial Neumann boundary conditions:
+
+# %%
+from ufl import conditional, FacetNormal, ds, div
+
+exact = 1/2*(x[0]**2+x[1]**2) - 1/3*(x[0]**3 - x[1]**3) + 1
+a   = dot(grad(u), grad(v)) * dx
+f   = -div( grad(exact) )
+g_N = grad(exact)
+n   = FacetNormal(space)
+l   = f*v*dx + dot(g_N,n)*conditional(x[0]>=1e-8,1,0)*v*ds
+
+# %% [markdown]
+# With the model described as a ufl form, we can again assemble the system
+# matrix and right hand side using ``dune.fem.assemble``. To take the
+# Dirichlet boundary conditions into account we construct an instance of
+# ``dune.ufl.DirichletBC`` that described the values to use and the part
+# of the boundary to apply them to. This is then passed into the
+# ``assemble`` function:
+
+# %%
+from dune.ufl import DirichletBC
+dbc = DirichletBC(space,exact,x[0]<=1e-8)
+mat,rhs = assemble([a==l,dbc])
+
+# %% [markdown]
+# Solving the linear system of equations, plotting the solution, and
+# computing the error is now identical to the previous example:
+
+# %%
+u_h.as_numpy[:] = solver(mat.as_numpy, rhs.as_numpy)
+u_h.plot()
 e_h = u_h-exact
 squaredErrors = integrate(gridView, [e_h**2,inner(grad(e_h),grad(e_h))], order=5)
 print("L^2 and H^1 errors:",[np.sqrt(e) for e in squaredErrors])
@@ -131,14 +199,18 @@ print("L^2 and H^1 errors:",[np.sqrt(e) for e in squaredErrors])
 a = ( inner(grad(u),grad(v)) + (1+u)**2*u*v ) * dx
 l = dot(x,x)*v * dx
 
+# [Scipy and also PetSC4py](solvers_nb.ipynb) will be discussed later
 # %% [markdown]
 # To solve the non-linear problem we need to use something like a Newton
-# solver. We could use the implementation available in Scipy but
-# ``dune-fem`` provides ``schemes`` that have a ``solve`` method
-# that can handle both linear and non-linear models. The default method is
+# solver. We could use
+# [the implementation available in Scipy](solvers_nb.ipynb)
+# but ``dune-fem`` provides so called ``schemes`` that have a ``solve`` method
+# which can handle both linear and non-linear models. The default method is
 # a Newton-Krylov solver using a ``gmres`` method to solve the intermediate
 # linear problems. Since the problem here is symmetric we can use a ``cg``
-# method.
+# method. A full list of available solvers, preconditioners, and how
+# to customize them is available
+# [here](solvers_nb.ipynb#Available-solvers-and-parameters)
 
 # %%
 from dune.fem.scheme import galerkin as solutionScheme
@@ -157,146 +229,9 @@ print(info)
 u_h.plot()
 
 # %% [markdown]
-# .. index:: Equations; Non-linear parabolic
-#
-# ## A Nonlinear Time Dependent Problem
-#
-# As a second example we will study the Forchheimer problem
-# <cite data-cite="Kieu"></cite>
-# which is a scalar, nonlinear parabolic equation
-# \begin{equation}
-# \partial_tu - \nabla\cdot K(\nabla u)\nabla u = f
-# \end{equation}
-# where the diffusion tensor is given by
-# \begin{equation}
-# K(\nabla u) = \frac{2}{1+\sqrt{1+4|\nabla u|}}
-# \end{equation}
-# and $f=f(x,t)$ is some time dependent forcing term.
-# On the boundary we prescribe Neumann boundary as before
-# and initial conditions $u=u_0$.
-#
-# We will solve this problem in variational form and using Crank Nicholson in time
-# \begin{equation}
-# \begin{split}
-# \int_{\Omega} \frac{u^{n+1}-u^n}{\Delta t} \varphi
-# + \frac{1}{2}K(\nabla u^{n+1}) \nabla u^{n+1} \cdot \nabla \varphi \
-# + \frac{1}{2}K(\nabla u^n) \nabla u^n \cdot \nabla \varphi v\ dx \\
-# - \int_{\Omega} \frac{1}{2}(f(x,t^n)+f(x,t^n+\Delta t) \varphi\ dx
-# - \int_{\partial \Omega} \frac{1}{2}(g(x,t^n)+g(x,t^n+\Delta t)) v\ ds
-# = 0.
-# \end{split}
-# \end{equation}
-# on a domain $\Omega=[0,1]^2$. We choose $f,g$ so that the exact solution
-# is given by
-# \begin{align*}
-# u(x,t) = e^{-2t}\left(\frac{1}{2}(x^2 + y^2) - \frac{1}{3}(x^3 - y^3)\right) + 1
-# \end{align*}
-# We solve this problem using a quadratic finite element space.
-# We first setup this space, define the initial data,
-# and a second discrete function to store
-# the solution at the current time step (``u_h`` will be used to store the
-# next time step):
-
-# %%
-space = lagrange(gridView, order=2)
-u_h   = space.interpolate(0, name='u_h')
-u_h_n = u_h.copy(name="previous")
-
-x = SpatialCoordinate(space)
-initial = 1/2*(x[0]**2+x[1]**2) - 1/3*(x[0]**3 - x[1]**3) + 1
-
-# %% [markdown]
-# Next we setup the form $a=a(u,v)$ which depends on time $t$ and the
-# chosen time step $\Delta t$. Since we want to be able to change these
-# during the simulation (we need to do this for $t$ and might want to do
-# this for $\Delta t$ we use the ``dune.ufl.Constant`` which stores a
-# mutable scalar and can be used within a ufl expression:
-
-# %%
-from ufl import FacetNormal, ds, div, dot, sqrt, exp
-from dune.ufl import Constant
-dt = Constant(0, name="dt")    # time step
-t  = Constant(0, name="t")     # current time
-u = TrialFunction(space)
-v = TestFunction(space)
-
-abs_du = lambda u: sqrt(inner(grad(u), grad(u)))
-K = lambda u: 2/(1 + sqrt(1 + 4*abs_du(u)))
-a = ( dot((u - u_h_n)/dt, v) \
-    + 0.5*dot(K(u)*grad(u), grad(v)) \
-    + 0.5*dot(K(u_h_n)*grad(u_h_n), grad(v)) ) * dx
-
-# %% [markdown]
-# To define the right hand side we use the given function $u$ to define
-# the forcing $f$ and the boundary flux $g$
-
-# %%
-exact = lambda t: exp(-2*t)*(initial - 1) + 1
-f     = lambda s: -2*exp(-2*s)*(initial - 1) - div( K(exact(s))*grad(exact(s)) )
-g = lambda s: K(exact(s))*grad(exact(s))
-n = FacetNormal(space)
-b = 0.5*(f(t)+f(t+dt))*v*dx + 0.5*dot(g(t)+g(t+dt),n)*v*ds
-
-# %% [markdown]
-# With the model described as a ufl form, we can again construct a scheme class
-# that provides the solve method which we can use to evolve the solution from
-# one time step to the next. As already mentioned the solve methods always assumes
-# that the problem is non-linear and use a Newton method to solve the problem:
-
-# %%
-scheme = solutionScheme(a == b, solver='cg')
-
-# %% [markdown]
-# Optionally, we may want to increase the default quadrature orders which are
-# '2 * space.order' for element integrals and '2 * space.order + 1' for surface
-# integrals. Depending on the data this might not be enough. Then we simply
-# set the integration orders by hand like in the following example, by calling
-# the method setQuadratureOrders(interiorOrder, surfaceOrder).
-
-# %%
-#scheme.setQuadratureOrders( 2*space.order, 2*space.order+1 )
-
-# %% [markdown]
-# Since we have forced the system towards a given solution, we can compute
-# the discretization error. First we define ufl expressions for the $L^2$
-# and $H^1$ norms and will use those to compute the experimental order of
-# convergence of the scheme by computing the time evolution on different grid
-# levels. We use ``dune.fem.function.uflFunction`` to generate code for the
-# errors which can be more efficient than using the ufl expressions
-# directly.
-
-# %%
-from dune.fem.function import uflFunction
-endTime    = 0.25
-exact_end  = exact(endTime)
-l2error = uflFunction(gridView, name="l2error", order=u_h.space.order, ufl=dot(u_h - exact_end, u_h - exact_end))
-h1error = uflFunction(gridView, name="h1error", order=u_h.space.order, ufl=dot(grad(u_h - exact_end), grad(u_h - exact_end)))
-
-# %% [markdown]
-# .. index::
-#    pair: I/O; Writing VTK files
-#
-# Now we evolve the solution from time $t=0$ to $t=T$ in a loop. Since the
-# PDE model has time dependent coefficient (through the forcing term), we
-# need to update the `t` constant used to define the model before each step.
-# A second constant we used to define the model was `dt` which defines the
-# time step. We keep this constant and set it to $0.002$ at the beginning
-# of the simulation. This value could be changed in each time step:
-
-# %%
-scheme.model.dt = 0.002
-u_h.interpolate(initial)
-time = 0
-u_h = space.interpolate(initial, name='u_h')
-while time < (endTime - 1e-6):
-    scheme.model.t = time
-    u_h_n.assign(u_h)
-    scheme.solve(target=u_h)
-    time += scheme.model.dt
-
-errors = [np.sqrt(e) for e in integrate(gridView, [l2error,h1error], order=5)]
-print('grid size:', gridView.size(0))
-print('\t | u_h - u | =', '{:0.5e}'.format(errors[0]))
-print('\t | grad(uh - u) | =', '{:0.5e}'.format(errors[1]))
-u_h.plot()
-gridView.writeVTK('forchheimer', pointdata={'u': u_h, 'l2error': l2error, 'h1error': h1error})
+# A wide range of problems a covered in in the
+# [further examples](furtherexamples.rst) section.
+# In the [next section](concepts_nb.ipynb) we explain the main concepts
+# we use to solve PDE using finite-element approximations which we end with
+# a solution to a non-linear time-dependent problem using the
+# Crank-Nicholson method in time.
