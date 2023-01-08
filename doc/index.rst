@@ -143,8 +143,8 @@ where the scripts can be found in the demo folder.
    :maxdepth: 3
    :caption: Getting Started
 
-   concepts_nb
    dune-fempy_nb
+   concepts_nb
 
 
 .. toctree::
