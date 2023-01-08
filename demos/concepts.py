@@ -1,5 +1,5 @@
 # %% [markdown]
-# # General Concepts (including how to solve a Laplace problem)
+# # General Concepts (with another elliptic problem)
 # In the following we introduce how to construct and use the basic components of
 # a finite element method ending the first part with solving a simple Laplace
 # problem. The required steps are:
