@@ -114,6 +114,9 @@ for element in gridView.elements:
 print(mass)
 
 # %% [markdown]
+# .. index::
+#    triple: Functions; Grid Functions; decorator
+#
 # Another way to obtain a grid function is to use the `gridFunction`
 # decorator. This can be obtained from `dune.grid` but then without UFL
 # support. Using the decorator from `dune.fem.function` the resulting grid

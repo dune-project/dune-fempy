@@ -118,7 +118,9 @@ assert sum([ abs(td-vd) for td,vd in zip(test.dofVector, vec.dofVector)] ) /\
 # the Dirichlet constraints from an existing  scheme.
 #
 # The following shows how to set all degrees of freedom on the Dirichlet
-# boundary to zero.
+# boundary to zero. For a more realistic example see the second approach in
+# the section on
+# [solving Dirichlet Eigenvalue problems](evalues_laplace_nb.ipynb#Dirichlet-Eigenvalue-problem).
 
 # %%
 dc = vecScheme.dirichletBlocks
