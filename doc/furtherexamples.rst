@@ -8,6 +8,7 @@
    spiral_nb
    wave_nb
    uzawa-scipy_nb
+   evalues_laplace_nb
 
 .. todo:: Give some details on the Uzawa algorithm, add dune-fempy version and an algorithm implementation
 .. todo:: Add an example using mass lumping to show how to change quadrature
