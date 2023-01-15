@@ -1,7 +1,7 @@
 # %% [markdown]
-# .. index:: Equations; Crystal Growth
+# .. index:: Equations; Phase Field
 #
-# # Crystal Growth
+# # Crystal Growth (Phase Field model)
 # Here we demonstrate crystallisation on the surface of a liquid due to cooling from [@Guyer].
 #
 # Let us first set up the grid and the function space. We use the default DoF storage available in ```dune-fem``` - this can be changed for example to ```istl``` or ```petsc```.
