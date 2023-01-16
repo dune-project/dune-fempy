@@ -126,26 +126,32 @@ space    = dgSpace(gridView, order=1)
 # matrix is even diagonal. The ODE is thus of the form
 # $$ \frac{d}{dt} \vec{u}(t) = M^{-1}\vec{F}(\vec{u}(t)) $$
 #
-# We discretize this ODE using a simple forward Euler method with a time-step $\tau$
-# (although it would be straightforward to use a higher order explicit Runge-Kutta method for example).
-# $$ \vec{u}^{n+1} = \vec{u}^n + \tau M^{-1}\vec{F}(\vec{u}^n) $$
+# We discretize this ODE using an explicit two-step Runge-Kutta method with
+# a fixed time-step $\tau$. Given $\vec{u}^n$ we define the solution at the
+# next time step by
+# $$ \vec{u}^{n+1} := \frac{1}{2}\Big(
+#         \vec{u}_1^{n+1} + \vec{u}_2^{n+1} \Big) $$
+# with
+# \begin{align*}
+# \vec{u}_1^{n+1} &= \vec{u}^n   + \tau M^{-1}\vec{F}(\vec{u}^n) \\
+# \vec{u}_2^{n+1} &= \vec{u}_1^n + \tau M^{-1}\vec{F}(\vec{u}_1^n)
+# \end{align*}
+# This is __Heun's method__.
 #
-# We first setup the form for the right hand side $\vec{F}$:
+# We first setup the form for the right hand side $\vec{F}$ which is very
+# similar to the stationary case described above:
 
 # %%
 u    = TrialFunction(space)
 v    = TestFunction(space)
 n    = FacetNormal(space)
-area = CellVolume(space)
-he   = avg( area ) / FacetArea(space)
-hbnd = area / FacetArea(space)
 x    = SpatialCoordinate(space)
 
 # transport direction and upwind flux
 speed = 0.5
 b     = as_vector([speed])
 hatb  = (dot(b, n) + abs(dot(b, n)))/2.0
-# boundary values (for left/right boundary)
+# boundary values (for left boundary)
 dD    = conditional(x[0]<0.01,1,0)
 g     = 1
 
@@ -162,24 +168,42 @@ form        = (advInternal + advSkeleton + advBnd)
 
 # %%
 from dune.fem.operator import molGalerkin as molOperator
-scheme = molOperator(form)
+op = molOperator(form)
 
 # %% [markdown]
-# The remaining part is a rather standard time loop where we compute for a
-# given old time step vector $\vec{u}$ the update vector $\vec{w} = M^{-1}\vec{F}(\vec{u}) $
-# and then the new step vector $ \vec{u} = \vec{u} + \tau\vec{w} $.
+# .. role:: python(code)
+#    :language: python
+#
+# So :python:`op(uh,res)` applies the given operator to :python:`uh`,
+# applies the inverse mass matrix and stores the result in :python:`res`.
+# Consequently in our case, :python:`op(uh,res)` computes
+# $M^{-1}\vec{F}(\vec{u}^n)$ as required.
+#
+# The remaining code is a rather standard time loop where we compute for a
+# given old time step vector $\vec{u}$ the new vector
+# $$ \frac{1}{2}\Big( \vec{u}_1^{n+1} + \vec{u}_2^{n+1} \Big) $$
+# by applying the above operator twice.
+#
+# We show the transport of a a simple discontinuety:
 
 # %%
 uh = space.interpolate(conditional(x[0]<0.1,1,0), name="solution")
+uh.plot()
 w = uh.copy()
+un = uh.copy()
 cfl = 0.1
 tau = cfl/(speed*N)
 
 t = 0
 while t<1:
-    # uh.plot()
-    scheme(uh, w)
+    un.assign(uh)
+
+    op(uh, w)
     uh.as_numpy[:] -= tau*w.as_numpy[:]
+    op(uh, w)
+    uh.as_numpy[:] -= tau*w.as_numpy[:]
+
+    uh.as_numpy[:] = 0.5*(uh.as_numpy[:] + un.as_numpy[:])
     t += tau
 uh.plot()
 
