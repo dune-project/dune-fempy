@@ -1,13 +1,14 @@
 # %% [markdown]
 # .. index::
 #    pair: Methods; Discontinuous Galerkin
+# # Discontinuous Galerkin Methods
 #
+# ## Advection-Diffusion: Discontinuous Galerkin Method with Upwinding
 # .. index:: Equations; Advection-Diffusion
 #
 # .. index::
 #    pair: Spaces; DG Legendre
 #
-# # Advection-Diffusion: Discontinuous Galerkin Method with Upwinding
 # So far we have been using Lagrange spaces of different order to solve our
 # PDE. In the following we show how to use Discontinuous Galerkin method to
 # solve an advection dominated advection-diffusion problem:
@@ -26,13 +27,19 @@ from dune.grid import structuredGrid as leafGridView
 from dune.fem.space import dglegendre as dgSpace
 from dune.fem.scheme import galerkin as solutionScheme
 from dune.ufl import Constant
-from ufl import TestFunction, TrialFunction, SpatialCoordinate, triangle, FacetNormal
-from ufl import dx, ds, grad, div, grad, dot, inner, sqrt, exp, conditional
-from ufl import as_vector, avg, jump, dS, CellVolume, FacetArea, atan
+from ufl import ( TestFunction, TrialFunction, SpatialCoordinate, triangle, FacetNormal,
+                  dx, ds, grad, div, grad, dot, inner, sqrt, exp, conditional,
+                  as_vector, avg, jump, dS, CellVolume, FacetArea, atan )
 
 gridView = leafGridView([-1, -1], [1, 1], [20, 20])
 space    = dgSpace(gridView, order=2)
 
+# %% [markdown]
+#
+# .. todo:: add some more details on the forms for upwinding
+#
+
+# %%
 u    = TrialFunction(space)
 v    = TestFunction(space)
 n    = FacetNormal(space)
@@ -80,3 +87,129 @@ eps.value = 1e-5 # could also use scheme.model.eps = 1e-5
 uh.interpolate(0)
 scheme.solve(target=uh)
 uh.plot()
+
+# %% [markdown]
+# ## Transport equation:
+# .. index:: Equations; Transport
+#
+# .. index:: Spaces; DG Legendre;
+#
+# .. index:: Methods; Method of Lines
+#
+# We now use a DG space to approximate the solution to the transport problem
+# $$ \partial_t u + b\cdot \nabla u = f $$
+# with a constant transport velocity vector $b$. We will solve the problem
+# in one space dimension taking $b=\frac{1}{2}$.
+#
+
+# %%
+
+# %% [markdown]
+# We first setup the 1D grid and the Discontinuous Galerkin space.
+# %%
+# remove later, shows same error: from dune.fem.space import dgonb as dgSpace
+N = 200
+gridView = leafGridView([0], [1], [N])
+space    = dgSpace(gridView, order=1)
+
+# %% [markdown]
+# The space discretization uses the same upwind flux discussed already for the
+# Advection-Diffusion problem in a previous example. This can be written as
+# an ODE
+# $$ \int_\Omega \partial_t u(t)\varphi_i = F_i(u(t)) $$
+# where $(\varphi_i)_i$ is a basis of a DG space, i.e.,
+# $\varphi_i=\varphi^E_l$ only has support on one element $E$ of the grid.
+# This leads to the matrix vector problem
+# $$ M\frac{d}{dt} \vec{u}(t) = \vec{F}(\vec{u}(t)) $$
+# where $M$ is the mass matrix which in the case of a DG space is block
+# diagonal - in fact with the `dune.fem.space.dglegendre` space the mass
+# matrix is even diagonal. The ODE is thus of the form
+# $$ \frac{d}{dt} \vec{u}(t) = M^{-1}\vec{F}(\vec{u}(t)) $$
+#
+# We discretize this ODE using an explicit two-step Runge-Kutta method with
+# a fixed time-step $\tau$. Given $\vec{u}^n$ we define the solution at the
+# next time step by
+# $$ \vec{u}^{n+1} := \frac{1}{2}\Big(
+#         \vec{u}_1^{n+1} + \vec{u}_2^{n+1} \Big) $$
+# with
+# \begin{align*}
+# \vec{u}_1^{n+1} &= \vec{u}^n   + \tau M^{-1}\vec{F}(\vec{u}^n) \\
+# \vec{u}_2^{n+1} &= \vec{u}_1^n + \tau M^{-1}\vec{F}(\vec{u}_1^n)
+# \end{align*}
+# This is __Heun's method__.
+#
+# We first setup the form for the right hand side $\vec{F}$ which is very
+# similar to the stationary case described above:
+
+# %%
+u    = TrialFunction(space)
+v    = TestFunction(space)
+n    = FacetNormal(space)
+x    = SpatialCoordinate(space)
+
+# transport direction and upwind flux
+speed = 0.5
+b     = as_vector([speed])
+hatb  = (dot(b, n) + abs(dot(b, n)))/2.0
+# boundary values (for left boundary)
+dD    = conditional(x[0]<0.01,1,0)
+g     = 1
+
+# forms
+advInternal = dot(-b*u, grad(v)) * dx
+advSkeleton = jump(hatb*u)*jump(v) * dS
+advBnd      = ( hatb*u + (dot(b,n)-hatb)*g )*v * dD*ds
+form        = (advInternal + advSkeleton + advBnd)
+
+# %% [markdown]
+# We could use the standard approach based on the `dune.fem.operator.galerkin` construction
+# but this requires adding the inverse mass operator later on. `dune-fem` provide an alternative approach
+# where the operator automatically includes the inverse mass matrix:
+
+# %%
+from dune.fem.operator import molGalerkin as molOperator
+op = molOperator(form)
+
+# %% [markdown]
+# So :code:`op(uh,res)` applies the given operator to :code:`uh`,
+# applies the inverse mass matrix and stores the result in :code:`res`.
+# Consequently in our case, :code:`op(uh,res)` computes
+# $M^{-1}\vec{F}(\vec{u}^n)$ as required.
+#
+# The remaining code is a rather standard time loop where we compute for a
+# given old time step vector $\vec{u}$ the new vector
+# $$ \frac{1}{2}\Big( \vec{u}_1^{n+1} + \vec{u}_2^{n+1} \Big) $$
+# by applying the above operator twice.
+#
+# We show the transport of a a simple discontinuety:
+
+# %%
+uh = space.interpolate(conditional(x[0]<0.1,1,0), name="solution")
+uh.plot()
+w = uh.copy()
+un = uh.copy()
+cfl = 0.1
+tau = cfl/(speed*N)
+
+t = 0
+while t<1:
+    un.assign(uh)
+
+    op(uh, w)
+    uh.as_numpy[:] -= tau*w.as_numpy[:]
+    op(uh, w)
+    uh.as_numpy[:] -= tau*w.as_numpy[:]
+
+    uh.as_numpy[:] = 0.5*(uh.as_numpy[:] + un.as_numpy[:])
+    t += tau
+uh.plot()
+
+# %% [markdown]
+#
+# .. todo:: add some remarks on spectral dg
+#
+# The `dune.femdg` module provides further methods for solving time
+# dependent advection-diffusion problem. The module includes
+# implicit-explicit Runge-Kutta methods and stabilization approaches for
+# non-linear advection dominated models. This module is described in
+# more details in [other places in this tutorial](femdg.rst).
