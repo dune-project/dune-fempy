@@ -171,12 +171,9 @@ from dune.fem.operator import molGalerkin as molOperator
 op = molOperator(form)
 
 # %% [markdown]
-# .. role:: python(code)
-#    :language: python
-#
-# So :python:`op(uh,res)` applies the given operator to :python:`uh`,
-# applies the inverse mass matrix and stores the result in :python:`res`.
-# Consequently in our case, :python:`op(uh,res)` computes
+# So :code:`op(uh,res)` applies the given operator to :code:`uh`,
+# applies the inverse mass matrix and stores the result in :code:`res`.
+# Consequently in our case, :code:`op(uh,res)` computes
 # $M^{-1}\vec{F}(\vec{u}^n)$ as required.
 #
 # The remaining code is a rather standard time loop where we compute for a
