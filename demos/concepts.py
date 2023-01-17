@@ -274,6 +274,26 @@ for d in u_h.dofVector:
 print()
 
 # %% [markdown]
+# In addition to `clear` and `assign` we can also add (scalar
+# multiples of) discrete functions together or multiply them by a scalar
+# which will directly change the underlying dofVector - this can only be
+# done __in place__, so `u_h *= 2` changes the dof vector while
+# `u_h*2` results in an UFL expression. Here are some examples:
+# %%
+u_h_n *= 2
+u_h   += u_h_n
+# this is equivalent to
+u_h.axpy(2,u_h_n)
+
+# %% [markdown]
+# We started with `u_h_n=u_h` so after these changes each dof in
+# `u_h` should be seven times its original value
+# %%
+for d in u_h.dofVector:
+    print(d,end=", ")
+print()
+
+# %% [markdown]
 # [In a later section](solvers_nb.ipynb)
 # we will see how to extract the underlying dof vector in the form of a `numpy` or a `petsc` vector.
 
