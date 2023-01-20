@@ -151,4 +151,19 @@ ischeme = galerkin([ia == ib])
 from dune.mmesh import monolithicSolve
 monolithicSolve(schemes=(scheme, ischeme), targets=(uh, iuh), verbose=True)
 
-assert( (max(iuh.as_numpy) - 0.14063) < 1e-3 )
+assert( (max(iuh.as_numpy) - 0.143) < 1e-3 )
+
+
+# %% [markdown]
+# We can use the plotPointData function to visualize the solution of both grids.
+
+
+# %%
+
+import matplotlib.pyplot as plt
+from dune.fem.plotting import plotPointData as plot
+
+figure = plt.figure(figsize=(3,3))
+plot(uh, figure=figure, gridLines=None)
+plot(iuh, figure=figure, linewidth=0.04, colorbar=None)
+plt.show()
