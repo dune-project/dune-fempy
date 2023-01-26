@@ -1,7 +1,7 @@
 include(DuneSphinxDoc)
 add_sphinx_targets(sphinx)
 dune_symlink_to_source_files(FILES
-additional.rst index.rst twophaseflow_descr.rst contributions.rst
+additional.rst index.rst twophaseflow_descr.rst contributions.rst mmesh_descr.rst
 corepy.rst installation.rst vemdemo_descr.rst
 furtherexamples.rst nextsteps.rst furthertopics.rst inforesources.rst userprojects.rst
 gridviews.rst cpp.rst femdg.rst developers.rst
@@ -24,9 +24,9 @@ laplace-adaptive_nb.ipynb  vemdemo_nb.ipynb           chimpl_nb.ipynb
 discontinuousgalerkin_nb.ipynb
 laplace-dwr_nb.ipynb       lineplot_nb.ipynb          wave_nb.ipynb
 mcf-algorithm_nb.ipynb     parallelization_nb.ipynb   backuprestore_nb.ipynb
-boundary_nb.ipynb          solvers_nb.ipynb           cppfunctions_nb.ipynb
-laplace-dwr.hh             utility.hh                 uzawa.hh
-evalues_laplace_nb.ipynb
+boundary_nb.ipynb          solvers_nb.ipynb           mmesh_nb.ipynb
+cppfunctions_nb.ipynb      laplace-dwr.hh             utility.hh
+uzawa.hh                   evalues_laplace_nb.ipynb
 figures _static dune-fempy.bib .special.rst
 soap.dgf sphere.dgf unitcube-2d.dgf wave_tank.msh
 config.opts
