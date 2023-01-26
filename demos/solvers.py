@@ -279,20 +279,9 @@ rhs.as_numpy[:] *= -1
 # For solving the system we need to modify the right hand side
 # and the initial guess for the iterative solver to include
 # the boundary values (to counter the missing symmetry).
-# To this end the operators/schemes
-# provide methods `setConstraints`. There are three versions
-# of this method: the first takes a discrete function and
-# sets the Dirichlet dofs to the boundary data provided
-# in the `DirichletBC` structure. The second version takes a
-# range vector and a discrete function; this version
-# can used for example to set the values at the boundary to
-# zero, e.g., `op.setConstraints(0, uh)` or for a vector
-# function `op.setConstraints([0,]*space.dimension, vec_h)`.
-# Finally there is a version taking a grid function and a
-# discrete function `op.setConstraints(g, uh)` which sets
-# the dofs at the boundary so that `uh=g` at the Dirichlet boundary.
-#
-# Here we only need to use the first version:
+# We can use the first of the three versions of the
+# `setConstraints` methods on the scheme class discussed
+# [previously](boundary_nb.ipynb#Accessing-the-Dirichlet-degrees-of-freedom).
 
 # %%
 op.setConstraints(rhs)

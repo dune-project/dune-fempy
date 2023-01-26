@@ -148,7 +148,7 @@ M = linear(RHSOp).as_numpy - linear(RHSOpPerturbation).as_numpy
 #
 # The second approach makes the desired change directly on the SciPy matrix.
 # We first extract the
-# [indices of the Dirichlet dofs](boundary_nb.ipynb#Accessing-the-Dirichlet-degrees-of-freedom-in-Python)
+# [indices of the Dirichlet dofs](boundary_nb.ipynb#Accessing-the-Dirichlet-degrees-of-freedom)
 # and use those indices to setup a diagonal matrix $D$ similar to the first approach.
 # We could now subtract the two matrices as before but instead we multiply
 # $M$ with $D$ from both sides to change both rows and columns in $M$ to zero.

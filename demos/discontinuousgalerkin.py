@@ -1,6 +1,7 @@
 # %% [markdown]
 # .. index::
 #    pair: Methods; Discontinuous Galerkin
+#
 # # Discontinuous Galerkin Methods
 #
 # ## Advection-Diffusion: Discontinuous Galerkin Method with Upwinding

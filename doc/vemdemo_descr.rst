@@ -1,7 +1,8 @@
 ############################################
 Virtual Element Methods: the DUNE-VEM module
 ############################################
-:download:`(notebook) <vemdemo_nb.ipynb>` :download:`(script) <vemdemo.py>`
+:download:`demo notebook <vemdemo_nb.ipynb>` :download:`demo script <vemdemo.py>`
+:download:`Cahn-Hilliard notebook <vemdemo_nb.ipynb>` :download:`Cahn-Hilliard script <vemdemo.py>`
 
 .. .. sectionauthor:: Andrea Cnagiani, Andreas Dedner <a.s.dedner@warwick.ac.uk>, Martin Nolte <nolte.mrtn@gmail.com>
 
