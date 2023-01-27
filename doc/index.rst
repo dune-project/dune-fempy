@@ -166,6 +166,12 @@ where the scripts can be found in the demo folder.
    furthertopics
 
 .. toctree::
+   :maxdepth: 3
+   :caption: Extension Modules
+
+   extensionmodules
+
+.. toctree::
    :maxdepth: 1
    :caption: User Projects
    :name: userprojects
