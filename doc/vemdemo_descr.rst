@@ -6,16 +6,18 @@ Virtual Element Methods: the DUNE-VEM module
 
 .. .. sectionauthor:: Andrea Cnagiani, Andreas Dedner <a.s.dedner@warwick.ac.uk>, Martin Nolte <nolte.mrtn@gmail.com>
 
-This module is based on DUNE-FEM
-(https://gitlab.dune-project.org/dune-fem/dune-fem)
-and provides implementation for the Virtual Element Method. The methods and
-a Python frontend based on the new Python extension to DUNE
-is available in the
-https://gitlab.dune-project.org/dune-fem/dune-vem.
-The `publication`_ provides more details (mainly for forth order
-problems but second order problems are also discussed).
+This module is based on `dune-fem <https://gitlab.dune-project.org/dune-fem/dune-fem>`_
+and provides implementation for the Virtual Element Method.
+You can install the package from Pypi by running :code:`pip install dune-vem`.
+The sources for
+the methods is available in the `dune-vem git repository <https://gitlab.dune-project.org/dune-fem/dune-vem>`_.
+See our `publication`_ for details on our approach to add virtual element
+spaces to existing finite element software frameworks.
+For a focus on forth order spaces have a look `here`_.
 
-.. _publication: https://academic.oup.com/imajna/advance-article-abstract/doi/10.1093/imanum/drab003/6174313?redirectedFrom=fulltext
+.. _here: https://academic.oup.com/imajna/advance-article-abstract/doi/10.1093/imanum/drab003/6174313?redirectedFrom=fulltext
+
+.. _publication: https://arxiv.org/abs/2208.08978
 
 .. toctree::
    :maxdepth: 3
