@@ -168,7 +168,7 @@ plotComponents(vec, gridLines=None, level=2,
 # We use the first version to set the data at the boundary first having
 # cleared the discrete function. As second
 # example we interpolate the :code:`bnd` grid function and then set all
-# boundary dofs to 0. Recall that the second compnent has no Dirichlet
+# boundary dofs to 0. Recall that the second component has no Dirichlet
 # boundary conditions set at the lower boundary.
 
 # %%
