@@ -1,6 +1,7 @@
 # %% [markdown]
 # .. index::
 #    pair: Methods; Discontinuous Galerkin
+#
 # # Discontinuous Galerkin Methods
 #
 # ## Advection-Diffusion: Discontinuous Galerkin Method with Upwinding
@@ -171,9 +172,9 @@ from dune.fem.operator import molGalerkin as molOperator
 op = molOperator(form)
 
 # %% [markdown]
-# So :code:`op(uh,res)` applies the given operator to :code:`uh`,
-# applies the inverse mass matrix and stores the result in :code:`res`.
-# Consequently in our case, :code:`op(uh,res)` computes
+# So `op(uh,res)` applies the given operator to `uh`,
+# applies the inverse mass matrix and stores the result in `res`.
+# Consequently in our case, `op(uh,res)` computes
 # $M^{-1}\vec{F}(\vec{u}^n)$ as required.
 #
 # The remaining code is a rather standard time loop where we compute for a
@@ -184,7 +185,7 @@ op = molOperator(form)
 # We show the transport of a a simple discontinuety:
 
 # %%
-uh = space.interpolate(conditional(x[0]<0.1,1,0), name="solution")
+uh = space.interpolate(conditional(x[0]<0.25,1,0), name="solution")
 uh.plot()
 w = uh.copy()
 un = uh.copy()
@@ -196,11 +197,14 @@ while t<1:
     un.assign(uh)
 
     op(uh, w)
-    uh.as_numpy[:] -= tau*w.as_numpy[:]
+    uh.axpy(-tau,w)   # with numpy backend equivalent to 'uh.as_numpy[:] -= tau*w.as_numpy[:]'
     op(uh, w)
-    uh.as_numpy[:] -= tau*w.as_numpy[:]
+    uh.axpy(-tau,w)   # with numpy backend equivalent to 'uh.as_numpy[:] -= tau*w.as_numpy[:]'
 
-    uh.as_numpy[:] = 0.5*(uh.as_numpy[:] + un.as_numpy[:])
+    # with numpy backend the following is equivalent to
+    # 'uh.as_numpy[:] = 0.5*(uh.as_numpy[:] + un.as_numpy[:])'
+    uh *= 0.5
+    uh.axpy(0.5,un)
     t += tau
 uh.plot()
 

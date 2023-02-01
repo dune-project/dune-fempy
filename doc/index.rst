@@ -101,6 +101,11 @@ where the scripts can be found in the demo folder.
    * We complete our discussion by demonstrating how to straightforwardly
      extend the functionality of the package and
      improve performance by important additional C++ algorithms and classes.
+#. There are two larger extension modules build on top of dune-fem which
+   provide Python bindings: those are the `Dune-Fem-Dg`_ and the
+   `Dune-Vem`_ modules which focus on Discontinuous Galerkin methods for
+   advection-diffusion (especially advection dominated problems) and the
+   implementations of the virtual element method, respectively.
 #. Finally other projects are presented some of them developed by
    the authors of this document, some contributed by other
    users. If you have used this package then we would like to
@@ -117,9 +122,11 @@ where the scripts can be found in the demo folder.
 .. _docker: https://www.docker.com
 .. _pybind11: https://github.com/pybind/pybind11
 .. _Dune: https://www.dune-project.org
+.. _Dune-Python: https://www.dune-project.org/modules/dune-python/
 .. _Dune-Istl: https://www.dune-project.org/modules/dune-istl/
 .. _Dune-Fem: https://www.dune-project.org/modules/dune-fem/
-.. _Dune-Python: https://www.dune-project.org/modules/dune-python/
+.. _Dune-Vem: https://www.dune-project.org/modules/dune-vem/
+.. _Dune-Fem-Dg: https://www.dune-project.org/modules/dune-fem-dg/
 .. _DGF: https://dune-project.org/doxygen/master/group__DuneGridFormatParser.html#details
 .. _tutorial compatible with the 2.7 release: https://dune-project.org/sphinx/content/sphinx/dune-fem-2.7/
 .. _UFL: https://bitbucket.org/fenics-project/ufl
@@ -143,8 +150,8 @@ where the scripts can be found in the demo folder.
    :maxdepth: 3
    :caption: Getting Started
 
-   concepts_nb
    dune-fempy_nb
+   concepts_nb
 
 
 .. toctree::
@@ -164,6 +171,12 @@ where the scripts can be found in the demo folder.
    :caption: Further Topics
 
    furthertopics
+
+.. toctree::
+   :maxdepth: 3
+   :caption: Extension Modules
+
+   extensionmodules
 
 .. toctree::
    :maxdepth: 1

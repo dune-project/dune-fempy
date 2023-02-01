@@ -112,13 +112,15 @@ assert sum([ abs(td-vd) for td,vd in zip(test.dofVector, vec.dofVector)] ) /\
 # .. index::
 #    triple: Boundary; Dirichlet; Degrees of Freedom
 #
-# ## Accessing the Dirichlet degrees of freedom in Python
+# ## Accessing the Dirichlet degrees of freedom
 #
 # We provide a few method, to apply or otherwise access information about
 # the Dirichlet constraints from an existing  scheme.
 #
 # The following shows how to set all degrees of freedom on the Dirichlet
-# boundary to zero.
+# boundary to zero. For a more realistic example see the second approach in
+# the section on
+# [solving Dirichlet Eigenvalue problems](evalues_laplace_nb.ipynb#Dirichlet-Eigenvalue-problem).
 
 # %%
 dc = vecScheme.dirichletBlocks
@@ -139,6 +141,43 @@ for i,block in enumerate(dc):         # a block is of size `dimRange`
 # zero along the lower boundary for the second:
 
 # %%
+plotComponents(vec, gridLines=None, level=2,
+               colorbar={"orientation":"horizontal", "ticks":ticker.MaxNLocator(nbins=4)})
+
+# %% [markdown]
+# .. index::
+#    triple: Boundary; Dirichlet; Setting Constraints
+#
+# It is sometimes necessary to set all degrees of freedom on the boundary
+# to zero, to be equal to some other function, or to as an interpolation of
+# the boundary data provided to the scheme.
+# To this end the operators/schemes
+# provide methods `setConstraints`. To cover the cases detailed above,
+# there are three versions of this method:
+#
+# 1. the first takes a discrete function and sets the Dirichlet dofs
+#    to the boundary data provided in the `DirichletBC` structure.
+# 2. The second version takes a range vector and a discrete function;
+#    this version can used for example to set the values at the boundary to
+#    zero, e.g., :code:`op.setConstraints(0, uh)` or for a vector
+#    function `op.setConstraints([0,]*space.dimension, vec_h)`.
+# 3. Finally there is a version taking a grid function and a
+#    discrete function `op.setConstraints(g, uh)` which sets
+#    the dofs at the boundary so that `uh=g` at the Dirichlet boundary.
+#
+# We use the first version to set the data at the boundary first having
+# cleared the discrete function. As second
+# example we interpolate the :code:`bnd` grid function and then set all
+# boundary dofs to 0. Recall that the second component has no Dirichlet
+# boundary conditions set at the lower boundary.
+
+# %%
+vec.clear()
+vecScheme.setConstraints(vec)
+plotComponents(vec, gridLines=None, level=2,
+               colorbar={"orientation":"horizontal", "ticks":ticker.MaxNLocator(nbins=4)})
+vec.interpolate(bnd)
+vecScheme.setConstraints([0,]*len(vec), vec)
 plotComponents(vec, gridLines=None, level=2,
                colorbar={"orientation":"horizontal", "ticks":ticker.MaxNLocator(nbins=4)})
 

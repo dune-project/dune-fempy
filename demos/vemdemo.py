@@ -154,7 +154,17 @@ print("size of space:",space.size,flush=True)
 df.plot()
 
 # %% [markdown]
-# we can compare different method, e.g., a lagrange/dg scheme (on the the subtriangulation),
+# The Vem spaces have an additional method :code:diameters which returns
+# estimation of the polygon sizes. Note that for technical reasons this is at the
+# time of writing not available on the grid itself.
+# A estimate of the minimum and the maximum bounding box diameters are
+# returned. Note that this is just an estimate of the actual polygon
+# diameters.
+# %%
+print("Polygon diameters:",space.diameters())
+
+# %% [markdown]
+# We can compare different method, e.g., a lagrange/dg scheme (on the the subtriangulation),
 # a bounding box dg method and conforming/non conforming VEM:
 
 # %%
@@ -204,7 +214,8 @@ figPos = 111+10*len(methods)
 for i,m in enumerate(methods):
     dfs,errors,info = compute(polyGrid, m[1],m[3], m[2],m[4])
     print("method (",m[0],"):",
-          "Size: ",dfs.space.size, "L^2: ", errors[0], "H^1: ", errors[1],
+          "dofs: ",dfs.space.size,
+          "L^2: ", errors[0], "H^1: ", errors[1],
           info["linear_iterations"], flush=True)
     dfs.plot(figure=(fig,figPos+i), gridLines=None, colorbar="horizontal")
 

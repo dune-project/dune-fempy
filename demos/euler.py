@@ -133,13 +133,8 @@ domain = (reader.dgf, "triangle.dgf")
 # %% [markdown]
 # We start with a triangular grid
 # %%
-try:
-    from dune.polygongrid import polygonGrid
-    gridView = polygonGrid( domain, dualGrid=False )
-except ImportError:
-    print("dune.polygongrid module not found using a simplex grid instead - ignored")
-    from dune.alugrid import aluSimplexGrid as simplexGrid
-    gridView = simplexGrid( domain, dimgrid=2 )
+from dune.alugrid import aluSimplexGrid as simplexGrid
+gridView = simplexGrid( domain, dimgrid=2 )
 gridView.plot()
 
 # fix the order to use and storage structure for results
@@ -178,7 +173,7 @@ res["simplex (fv)"] = evolve(fvspace,u_h,limiter=None)
 # %%
 fvspace = getSpace( gridView, 0 )
 u_h   = fvspace.interpolate( initial, name="solution")
-res["simplex (higher order fv)"] = evolve(fvspace,u_h,limiter="minmod")
+res["simplex (higher order fv)"] = evolve(fvspace,u_h,limiter="MinMod")
 
 # %% [markdown]
 # Using a polygonal grid (dual grid of previous grid)
@@ -187,7 +182,7 @@ try:
     from dune.polygongrid import polygonGrid
     gridView = polygonGrid( domain, dualGrid=True )
 except ImportError:
-    print("dune.polygongrid module not found using a simplex grid instead - ignored")
+    print("dune.polygongrid module not found using the simplex grid again")
     gridView = simplexGrid( domain, dimgrid=2 )
 gridView.plot()
 space = getSpace( gridView, order )

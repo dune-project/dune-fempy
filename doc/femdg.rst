@@ -1,8 +1,8 @@
 .. sectionauthor:: Andreas Dedner <a.s.dedner@warwick.ac.uk>, Robert Kl\ |oe|\ fkorn <robert dot klofkorn at math dot lu dot se>, Martin Nolte <nolte.mrtn@gmail.com>
 
-##################################################
-Discontinuous Galerkin Methods: DUNE-FEM-DG Module
-##################################################
+######################################################
+Discontinuous Galerkin Methods: the DUNE-FEM-DG Module
+######################################################
 
 The add on module `Dune-Fem-Dg`_ provides a number of DG algorithms focusing
 on solving systems of evolution equations of advection-diffusion-reaction type of the form
