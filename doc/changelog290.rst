@@ -41,6 +41,9 @@ module now also provides a ``boundarySample`` function
 
 See the help text of `dune.fem.utility.boundarySample` for details.
 
+Point sampler returning (entity,local coordinate) for given global coordinate
+------------------------------------------------------------------------------
+
 Improved Dirichlet Boundary Indexing in UFL Forms
 -------------------------------------------------
 To restrict a domain integral to a part of the boundary given by a boundary id 
@@ -60,3 +63,6 @@ Eisenstatwalker in Newton method
 
 Storage setup in scheme
 -----------------------
+
+Methods on space to return local mapper and for evaluating basis functions
+--------------------------------------------------------------------------
