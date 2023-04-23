@@ -39,7 +39,7 @@ aluView.plot(figsize=(5,5))
 #
 # .. index:: Grid construction; gmsh (from Python)
 #
-# ## 1D and 3D examples (using GMsh)
+# ## 3D examples (using GMsh)
 # In this example we use **pygmsh** to construct a tetrahedral mesh and solve a
 # simple Laplace problem
 
@@ -96,7 +96,8 @@ gridView3d.writeVTK('3dexample', pointdata=[uh3d],
 # Using the above convenient way of generating grids
 # in Python we can then store those as DGF and add boundary
 # ids for description of more complicated boundaries or
-# parameters for vertices or cells.
+# parameters for vertices or cells. Use `gmsh2DGF` from
+# [gmsh2dgf](gmsh2dgf_nb.ipynb) to convert the above `points` and `cells`
 #
 # %%
 from gmsh2dgf import gmsh2DGF
@@ -105,6 +106,8 @@ with open ("3dmesh.dgf", "w") as file:
     file.write(dgf)
 
 # %% [markdown]
+#
+# ## 1D example
 # We can also do 1D
 
 # %%

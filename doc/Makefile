@@ -12,7 +12,7 @@ NBS = spiral_nb.ipynb uzawa-scipy_nb.ipynb elasticity_nb.ipynb wave_nb.ipynb \
 			geoview_nb.ipynb geoview_nb.rst \
 			levelgridview_nb.ipynb levelgridview_nb.rst \
       filteredgridview_nb.ipynb \
-      vemdemo_nb.ipynb chimpl_nb.ipynb
+      vemdemo_nb.ipynb chimpl_nb.ipynb gmsh2dgf_nb.ipynb
 			# spiral_adapt_nb.ipynb
 
 # .EXPORT_ALL_VARIABLES:
