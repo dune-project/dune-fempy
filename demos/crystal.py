@@ -201,12 +201,14 @@ def vtk():
 #
 # We can construct a vtk writer that generates a sequence of files:
 #
+# ```
 # vtk = gridView.sequencedVTK("crystal", pointdata=[u_h],
 #          celldata=[levelFunction(gridView), partitionFunction(gridView)])
+# ```
 #
-# This can be for example used in a time loop. Simply adding 'vtk()' in the
-# loop will write files 'crystalXXXX.vtu' where the sequence counter 'XXXX'
-# is automatically increased by one each time 'vtk()' is called.
+# This can be for example used in a time loop. Simply adding `vtk()` in the
+# loop will write files `crystalXXXX.vtu` where the sequence counter `XXXX`
+# is automatically increased by one each time `vtk()` is called.
 
 matplotlib.rcParams.update({'font.size': 10})
 matplotlib.rcParams['figure.figsize'] = [10, 5]
@@ -237,8 +239,8 @@ while t < endTime:
     print(t, gridView.size(0), end="\r")
     t += scheme.model.dt
     fem.mark(indicator,1.4,1.2,0,maxLevel)
-    fem.adapt(u_h)
-    fem.loadBalance(u_h)
+    fem.adapt(u_h) # can also be a list or tuple of function to prolong/restrict
+    fem.loadBalance(u_h) # can also be a list or tuple of function
     vtk()                # store result in sequence of vtk file
 print()
 

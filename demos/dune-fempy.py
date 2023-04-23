@@ -199,7 +199,6 @@ print("L^2 and H^1 errors:",[np.sqrt(e) for e in squaredErrors])
 a = ( inner(grad(u),grad(v)) + (1+u)**2*u*v ) * dx
 l = dot(x,x)*v * dx
 
-# [Scipy and also PetSC4py](solvers_nb.ipynb) will be discussed later
 # %% [markdown]
 # To solve the non-linear problem we need to use something like a Newton
 # solver. We could use

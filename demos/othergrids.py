@@ -1,21 +1,40 @@
-# %% [markdown]
-# .. index:: Grid construction; gmsh (from Python)
-#
-# # 1D and 3D examples (using GMesh files)
-# In this example we use pygmsh to construct a tetrahedral mesh and solve a
-# simple laplace problem
-
-# %%
 import numpy
 import matplotlib
 matplotlib.rc( 'image', cmap='jet' )
 from matplotlib import pyplot
-from dune.alugrid import aluSimplexGrid as leafGridView3d
-from dune.grid import OutputType
+from dune.alugrid import aluSimplexGrid as leafGridView
+from dune.grid import OutputType, reader
 from dune.fem.space import lagrange as solutionSpace
 from dune.fem.scheme import galerkin as solutionScheme
 from ufl import TestFunction, TrialFunction, SpatialCoordinate
 from ufl import dx, grad, grad, dot, inner, conditional, sin
+# %% [markdown]
+# .. index:: Grid construction; DGF
+#
+# # Example using the Dune Grid Format (DGF)
+#
+# Please read the [Dune Grid Format (DGF)](https://dune-project.org/doxygen/master/group__DuneGridFormatParser.html#details) for a detailed description of DGF.
+# The format works for 2d or 3d and most DUNE grids can be constructed using a DGF file.
+# The format allows easy description of [boundary ids](boundary_nb.ipynb) and parameters and is used as follows
+#
+# %%
+domain2d = (reader.dgf, "triangle.dgf")
+
+# specify dimgrid since it cannot be easily extracted from the dgf file
+aluView = leafGridView(domain2d, dimgrid=2)
+aluView.plot(figsize=(5,5))
+
+# %% [markdown]
+# There is also a `reader.gmsh` option allowing previously stored `gmsh` files to be
+# read.
+#
+# .. index:: Grid construction; gmsh (from Python)
+#
+# # 1D and 3D examples (using GMesh files)
+# In this example we use **pygmsh** to construct a tetrahedral mesh and solve a
+# simple Laplace problem
+
+# %%
 
 # The following code is taken from the `pygmsh` homepage
 try:
@@ -39,7 +58,7 @@ except ImportError: # pygmsh not installed - use a simple cartesian domain
     from dune.grid import cartesianDomain
     domain3d = cartesianDomain([-0.25,-0.25,0],[0.25,0.25,1],[30,30,60])
 
-gridView3d  = leafGridView3d(domain3d)
+gridView3d  = leafGridView(domain3d)
 space3d = solutionSpace(gridView3d, order=1)
 
 u = TrialFunction(space3d)

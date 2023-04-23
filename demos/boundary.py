@@ -236,7 +236,8 @@ plotComponents(vec, gridLines=None, level=2,
 # implementation specifics. The numbering of the boundary edges follows the numbering of
 # faces of the [DUNE reference elements](https://dune-project.org/doxygen/master/group__GeometryReferenceElements.html#details)
 # but starts from 1. For example, in 2d the boundary ids are
-# left=1, right=2, bottom=3, top=4. For grids implementing a true
+# `left=1`, `right=2`, `bottom=3`, `top=4` and in 3d `bottom=5`, `top=6`.
+# For grids implementing a true
 # Cartesian grids, like YaspGrid, this is fixed. Altering this numbering
 # can only be done by using an unstructured grid, e.g. ALUGrid.
 #

@@ -42,9 +42,6 @@ print("Using",threading.use,"threads")
 # ## MPI
 # .. index:: Parallelization; MPI
 #
-# .. todo:: add some remarks on `dune.fem.loadBalance` and possibly some information on loadbalancing strategies available in `dune-alugrid`?
-#
-#
 # It is straightforward to use **MPI** for parallelization. It requires a
 # parallel grid, in fact most of the DUNE grids work in parallel except `albertaGrid` or `polyGrid`.
 # Most iterative solvers in DUNE work for parallel runs. Some of the
@@ -65,14 +62,40 @@ print("Using",threading.use,"threads")
 #
 # ### Load balancing
 #
-# When running distributed memory jobs load balancing is an issue. There are two
-# ways to ensure a balanced work load.
+# .. index:: Parallelization; Load Balancing
+#
+# When running distributed memory jobs load balancing is an issue. The specific
+# load balancing method used, depends on the grid implementation.
+# There are two ways to ensure a balanced work load. For computations without
+# dynamic adaptation this only has to be done once in the beginning of the run. In
+# fact, most grids do this automatically. For adaptation and load balancing with
+# data see the [crystal growth](crystal_nb.ipynb) or [Re-entrant Corner Problem](laplace-adaptive_nb.ipynb) examples.
 
 # %%
-
-from dune.alugrid import aluCubeGrid as leafGridView
+from dune.alugrid import aluCubeGrid
 from dune.grid import cartesianDomain
+from dune.fem.function import partitionFunction
 domain = cartesianDomain([0,0], [1,1], [40,40], overlap=1)
-gridView = leafGridView( domain )
+gridView = aluCubeGrid( domain, lbMethod=9 )
+
+# distribute work load, no user data is adjusted
+gridView.hierarchicalGrid.loadBalance()
+
 # print possible load balancing methods
-help( leafGridView )
+help( aluCubeGrid )
+
+# %% [markdown]
+
+# Run this code snippet in parallel and then inspect the different domain decompositions.
+# For plotting of parallel data vtk has to be used. In this case we display the
+# rank information for each partition.
+
+# %%
+vtk = gridView.sequencedVTK("data", celldata=[partitionFunction(gridView)])
+vtk()
+
+# %% [markdown]
+
+# For load balancing with re-distribution of user data the function
+# `dune.fem.loadBalance` should be used. See
+# the [crystal growth](crystal_nb.ipynb) or [Re-entrant Corner Problem](laplace-adaptive_nb.ipynb) examples.

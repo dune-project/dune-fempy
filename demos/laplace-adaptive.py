@@ -182,7 +182,7 @@ while True:
         break
     marked = fem.doerflerMark(estimate,0.6,layered=0.1)
     fem.adapt(uh) # can also be a list or tuple of function to prolong/restrict
-    fem.loadBalance(uh)
+    fem.loadBalance(uh) # can also be a list or tuple of function
     count += 1
 plot(uh, figure=(fig, 131+2), colorbar=False)
 

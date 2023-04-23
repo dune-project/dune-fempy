@@ -105,6 +105,11 @@ aluView.hierarchicalGrid.globalRefine(2)
 aluView.plot(figsize=(5,5))
 
 # %% [markdown]
+
+# An unstructured grid can also be constructed from a file.
+# Currently [gmsh](othergrids_nb.ipynb) and [DGF](othergrids_nb.ipynb) are supported.
+
+# %% [markdown]
 # .. index:: Adaptation; h-refinement
 #
 # In addition to global refinement we can also pre process the grid by
