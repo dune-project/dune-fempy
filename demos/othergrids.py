@@ -39,7 +39,7 @@ aluView.plot(figsize=(5,5))
 #
 # .. index:: Grid construction; gmsh (from Python)
 #
-# ## 3D examples (using GMsh)
+# ## 3D example (using Gmsh)
 # In this example we use **pygmsh** to construct a tetrahedral mesh and solve a
 # simple Laplace problem
 
