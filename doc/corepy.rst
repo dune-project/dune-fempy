@@ -5,8 +5,6 @@
 Using the Full Grid Interface
 #############################
 
-.. todo:: Add more examples on grid construction, i.e., dgf parser with boundary ids
-
 .. toctree::
    :maxdepth: 1
 
