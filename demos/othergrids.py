@@ -1,3 +1,12 @@
+# %% [markdown]
+# .. index:: Grid construction
+#
+# # Examples of grid construction
+# Besides the already discussed construction of Cartesian grid and using
+# dictionaries [from general concepts](dune-corepy_nb.ipynb) it is also possible
+# to read grid files using either the `DGF` or `gmsh` format, see below.
+#
+# %%
 import numpy
 import matplotlib
 matplotlib.rc( 'image', cmap='jet' )
@@ -11,7 +20,7 @@ from ufl import dx, grad, grad, dot, inner, conditional, sin
 # %% [markdown]
 # .. index:: Grid construction; DGF
 #
-# # Example using the Dune Grid Format (DGF)
+# ## Example using the Dune Grid Format (DGF)
 #
 # Please read the [Dune Grid Format (DGF)](https://dune-project.org/doxygen/master/group__DuneGridFormatParser.html#details) for a detailed description of DGF.
 # The format works for 2d or 3d and most DUNE grids can be constructed using a DGF file.
@@ -30,13 +39,13 @@ aluView.plot(figsize=(5,5))
 #
 # .. index:: Grid construction; gmsh (from Python)
 #
-# # 1D and 3D examples (using GMesh files)
+# ## 1D and 3D examples (using GMsh)
 # In this example we use **pygmsh** to construct a tetrahedral mesh and solve a
 # simple Laplace problem
 
 # %%
 
-# The following code is taken from the `pygmsh` homepage
+# The following code is taken from the **pygmsh** homepage
 try:
     import pygmsh
     with pygmsh.geo.Geometry() as geom:
@@ -74,8 +83,26 @@ scheme3d.solve(target=uh3d)
 gridView3d.writeVTK('3dexample', pointdata=[uh3d],
                     outputType=OutputType.appendedraw)
 
+
 # %% [markdown]
 # ![3d laplace problem](figures/3dexample.png)
+
+# %% [markdown]
+#
+# .. index:: Grid construction; gmsh2dgf (from Python)
+#
+# ## Converting gmsh to DGF
+#
+# Using the above convenient way of generating grids
+# in Python we can then store those as DGF and add boundary
+# ids for description of more complicated boundaries or
+# parameters for vertices or cells.
+#
+# %%
+from gmsh2dgf import gmsh2DGF
+dgf = gmsh2DGF(points, cells)
+with open ("3dmesh.dgf", "w") as file:
+    file.write(dgf)
 
 # %% [markdown]
 # We can also do 1D
