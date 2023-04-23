@@ -195,6 +195,7 @@ where the scripts can be found in the demo folder.
 
 .. index::
    see: Mesh construction; Grid construction
+   see: Load Balancing; Parallelization
 
 ############
 Bibliography
