@@ -101,7 +101,10 @@ gridView3d.writeVTK('3dexample', pointdata=[uh3d],
 #
 # %%
 from gmsh2dgf import gmsh2DGF
-dgf = gmsh2DGF(points, cells)
+bndDomain = {1:"-0.6 -0.6 -0.1  0.6 0.6 0.0", # lower bnd gets id 1
+             2:"-0.6 -0.6  1.0  0.6 0.6 1.1", # upper bnd gets id 2
+             3: "default"} # all other boundary faces get id 3
+dgf = gmsh2DGF(points, cells, bndDomain=bndDomain)
 with open ("3dmesh.dgf", "w") as file:
     file.write(dgf)
 
