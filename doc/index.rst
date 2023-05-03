@@ -132,8 +132,6 @@ where the scripts can be found in the demo folder.
 .. _UFL: https://bitbucket.org/fenics-project/ufl
 .. _RefElem: https://dune-project.org/doxygen/master/group__GeometryReferenceElements.html#details
 
-.. todo:: add more citations
-
 .. toctree::
    :maxdepth: 1
    :caption: Changes and new features

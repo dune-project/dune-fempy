@@ -12,15 +12,15 @@ or can be downloaded here:
 ================================================= ===================================================== =================================================
 Example                                           Notebooks                                             Scripts
 ================================================= ===================================================== =================================================
-General Concepts                                  :download:`notebook <concepts_nb.ipynb>`              :download:`script <concepts.py>`
+Introduction                                      :download:`notebook <concepts_nb.ipynb>`              :download:`script <concepts.py>`
 Time Dependent Problem                            :download:`notebook <dune-fempy_nb.ipynb>`            :download:`script <dune-fempy.py>`
-Using different linear solver packages            :download:`notebook <solvers_nb.ipynb>`               :download:`script <solvers.py>`
 Adding boundary data                              :download:`notebook <boundary_nb.ipynb>`              :download:`script <boundary.py>`
-Discontinuous Galerkin method                     :download:`notebook <discontinuousgalerkin_nb.ipynb>` :download:`script <discontinuousgalerkin.py>`
+Using different linear solver packages            :download:`notebook <solvers_nb.ipynb>`               :download:`script <solvers.py>`
 One and three dimensional grids                   :download:`notebook <othergrids_nb.ipynb>`            :download:`script <othergrids.py>`
 Parallelization                                   :download:`notebook <parallelization_nb.ipynb>`       :download:`script <parallelization.py>`
 Checkpointing                                     :download:`notebook <backuprestore_nb.ipynb>`         :download:`script <backuprestore.py>`
 Full Grid Interface                               :download:`notebook <dune-corepy_nb.ipynb>`           :download:`script <dune-corepy.py>`
+Discontinuous Galerkin method                     :download:`notebook <discontinuousgalerkin_nb.ipynb>` :download:`script <discontinuousgalerkin.py>`
 Bending beam (linear elasticity)                  :download:`notebook <elasticity_nb.ipynb>`            :download:`script <elasticity.py>`
 Spiral wave (reaction diffusion system)           :download:`notebook <spiral_nb.ipynb>`                :download:`script <spiral.py>`
 Slit domain (wave equation)                       :download:`notebook <wave_nb.ipynb>`                  :download:`script <wave.py>`
@@ -41,6 +41,9 @@ VEM method for Cahn-Hilliard                      :download:`notebook <chimpl_nb
 ###############################
 Mesh Files used in the Examples
 ###############################
+
+This script can be used to
+:download:`convert gmsh file to dgf format <gmsh2dgf.py>`.
 
 :download:`unit cube grid file <unitcube-2d.dgf>`
 :download:`sphere grid file <sphere.dgf>`

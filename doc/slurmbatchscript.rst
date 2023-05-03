@@ -30,7 +30,7 @@ below.
   # * you installed Dune using the `dune-fem-dg/scripts/build-dune-fem-dg.sh` script
   # * you want to create the `$RUNDIR` directory to store job data
   # * This should also work fine with other installations, i.e. pip install but
-  # * might slight adjustments.
+  # * might require some adjustments.
   ###
   DUNE_HOME="$HOME/dune"
   RUNDIR="`pwd`/jobs/$SLURM_JOB_ID"
