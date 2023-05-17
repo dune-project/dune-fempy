@@ -136,7 +136,7 @@ def calculate(use_cpp, gridView):
     solution  = space.interpolate(x, name="solution")
 
     # set up model using theta scheme
-    theta = 0.5   # Crank-Nicholson
+    theta = 0.5   # Crank-Nicolson
 
     I = Identity(3)
     dt = dune.ufl.Constant(0,"dt")

@@ -384,7 +384,7 @@ print("Number of elements:",gridView.size(0),
 # On the boundary we prescribe Neumann boundary as before
 # and initial conditions $u=u_0$.
 #
-# We will solve this problem in variational form and using Crank Nicholson in time
+# We will solve this problem in variational form and using Crank Nicolson in time
 # \begin{equation}
 # \begin{split}
 # \int_{\Omega} \frac{u^{n+1}-u^n}{\Delta t} \varphi

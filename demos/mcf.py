@@ -80,7 +80,7 @@ solution = space.interpolate(x, name="solution")
 
 
 # %% [markdown]
-# We set up the theta scheme with $\theta = 0.5$ (Crank-Nicholson).
+# We set up the theta scheme with $\theta = 0.5$ (Crank-Nicolson).
 
 
 # %%

@@ -233,4 +233,4 @@ u_h.plot()
 # In the [next section](concepts_nb.ipynb) we explain the main concepts
 # we use to solve PDE using finite-element approximations which we end with
 # a solution to a non-linear time-dependent problem using the
-# Crank-Nicholson method in time.
+# Crank-Nicolson method in time.
