@@ -321,8 +321,6 @@ beam.plot()
 # As final example we solve some fourth order PDEs using a non-conforming VEM
 # space for $H^2$ functions. To construct the space we just need to define
 # a suitable 'moments' vector to construct a suitable space for $H^2$ problems.
-#
-# __Note__: at the moment a $H^2$-conforming space is not implemented.
 
 # %%
 ncC1testSpaces = [ [0], [order-3,order-2], [order-4] ]

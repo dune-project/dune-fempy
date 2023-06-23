@@ -106,6 +106,12 @@ squaredErrors = integrate(gridView, [e_h**2,inner(grad(e_h),grad(e_h))], order=5
 print("L^2 and H^1 errors:",[np.sqrt(e) for e in squaredErrors])
 
 # %% [markdown]
+# <div class="alert alert-block alert-info">
+# <b>Note:</b>
+# using the assemble function with 'a==l' and 'a-l==0' produces the same result.
+# </div>
+
+# %% [markdown]
 # .. index:: Equations; Boundary value problem
 #
 # ## Laplace equation with Dirichlet boundary conditions

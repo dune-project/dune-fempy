@@ -28,7 +28,7 @@ boundary_nb.ipynb          solvers_nb.ipynb           mmesh_nb.ipynb
 cppfunctions_nb.ipynb      laplace-dwr.hh             utility.hh
 uzawa.hh                   evalues_laplace_nb.ipynb
 figures _static dune-fempy.bib .special.rst
-soap.dgf sphere.dgf unitcube-2d.dgf wave_tank.msh
+soap.dgf sphere.dgf unitcube-2d.dgf wave_tank.msh quads.msh
 config.opts
 levelgridview_nb.ipynb
 levelgridview_nb.ipynb

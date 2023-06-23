@@ -4,7 +4,8 @@
 # # Examples of grid construction
 # Besides the already discussed construction of Cartesian grid and using
 # dictionaries [from general concepts](dune-corepy_nb.ipynb) it is also possible
-# to read grid files using either the `DGF` or `gmsh` format, see below.
+# to read grid files using either the `DGF` or `gmsh` format (or other
+# formats available through the `meshio` package).
 #
 # %%
 import numpy
@@ -34,18 +35,27 @@ aluView = leafGridView(domain2d, dimgrid=2)
 aluView.plot(figsize=(5,5))
 
 # %% [markdown]
+#
+# .. index:: Grid construction; gmsh (from file)
+#
 # There is also a `reader.gmsh` option allowing previously stored `gmsh` files to be
-# read.
-#
-# .. index:: Grid construction; gmsh (from Python)
-#
-# ## 3D example (using Gmsh)
-# In this example we use **pygmsh** to construct a tetrahedral mesh and solve a
-# simple Laplace problem
+# read. The grid is the one used in the [wave equation](wave_nb.ipynb) example.
 
 # %%
+waveDomain = (reader.gmsh, "wave_tank.msh")
+waveGrid = leafGridView(waveDomain, dimgrid=2)
+waveGrid.plot()
 
-# The following code is taken from the **pygmsh** homepage
+# %% [markdown]
+#
+# .. index:: Grid construction; pygmsh
+#
+# ## 3D example (using PyGmsh)
+# In this example we use **pygmsh** to construct a tetrahedral mesh and solve a
+# simple Laplace problem.
+# The following code is taken from the **pygmsh** homepage.
+
+# %%
 try:
     import pygmsh
     with pygmsh.geo.Geometry() as geom:
@@ -83,7 +93,6 @@ scheme3d.solve(target=uh3d)
 gridView3d.writeVTK('3dexample', pointdata=[uh3d],
                     outputType=OutputType.appendedraw)
 
-
 # %% [markdown]
 # ![3d laplace problem](figures/3dexample.png)
 
@@ -107,6 +116,55 @@ bndDomain = {1:"-0.6 -0.6 -0.1  0.6 0.6 0.0", # lower bnd gets id 1
 dgf = gmsh2DGF(points, cells, bndDomain=bndDomain)
 with open ("3dmesh.dgf", "w") as file:
     file.write(dgf)
+
+# %% [markdown]
+#
+# .. index:: Grid construction; meshio
+#
+# ## Using `meshio` to read a gmsh file
+#
+# We will use the `meshio` package to read a gmsh file, extract the points
+# and cells and use that to construct a Dune grid. The final part is then
+# quite similar to the above. We use the 2D grid from the
+# [wave equation](wave_nb.ipynb) test case. Note that this is a 2D grid but the points are
+# returned as 3D points so we need to remove the final columns containing
+# only zeros. We have already seen this grid above so let's zoom in to the
+# 'slit' region...
+
+# %%
+try:
+    import numpy as np
+    import meshio
+    mesh = meshio.read("wave_tank.msh")
+    points = np.delete( mesh.points, 2, 1) # remove the z component from the points
+    cells = mesh.cells_dict
+    waveDomain = {"vertices":points.astype("float"), "simplices":cells["triangle"]}
+    waveGrid = leafGridView(waveDomain)
+    waveGrid.plot(xlim=[0.3,1.7],ylim=[-0.2,1.2])
+except ImportError:
+    print("This example requires the meshio package which can be installed using pip.")
+
+
+# %% [markdown]
+#
+# .. index:: Grid construction; meshio (quadrilateral grids)
+#
+# Here is a second example where we want to read a gmsh containing
+# quadrilateral elements. Note that the vertices of the cells are ordered
+# counterclockwise which is not identical to the ordering required by the
+# [Dune reference element](https://www.dune-project.org/doxygen/2.5.0/group__GeometryReferenceElements.html).
+# The last two vertices need to be exchanged:
+
+# %%
+if meshio:
+    from dune.alugrid import aluCubeGrid
+    mesh = meshio.read("quads.msh")
+    points2d = np.delete(mesh.points,2,1)
+    cells = mesh.cells_dict['quad']
+    cells[:, [2, 3]] = cells[:, [3, 2]]
+    domain = {"vertices":points2d, "cubes":cells}
+    quadGrid  = aluCubeGrid(domain)
+    quadGrid.plot()
 
 # %% [markdown]
 #
