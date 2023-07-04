@@ -25,6 +25,7 @@ Bending beam (linear elasticity)                  :download:`notebook <elasticit
 Spiral wave (reaction diffusion system)           :download:`notebook <spiral_nb.ipynb>`                :download:`script <spiral.py>`
 Slit domain (wave equation)                       :download:`notebook <wave_nb.ipynb>`                  :download:`script <wave.py>`
 Saddle point solver (stokes flow)                 :download:`notebook <uzawa-scipy_nb.ipynb>`           :download:`script <uzawa-scipy.py>`
+Eigenvalue problems                               :download:`notebook <evalues_laplace.ipynb>`          :download:`script <evalues_laplace.py>`
 Adaptive FE (laplace problem)                     :download:`notebook <laplace-adaptive_nb.ipynb>`      :download:`script <laplace-adaptive.py>`
 Adaptive FE (using DWR)                           :download:`notebook <laplace-dwr_nb.ipynb>`           :download:`script <laplace-dwr.py>`
 Crystal growth (phase field model)                :download:`notebook <crystal_nb.ipynb>`               :download:`script <crystal.py>`
