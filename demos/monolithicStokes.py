@@ -98,7 +98,7 @@ h_ext = CellVolume(cell(dim_space)) / FacetArea(cell(dim_space))
 sigma_ip = Constant(1000, name="interior_penalty_parameter")
 
 # %% [markdown]
-# We then define the weak form of the stokes problem, first in a standard Continous Galerkin (CG) setting:
+# We then define the weak form of the stokes problem, first in a standard Continuous Galerkin (CG) setting:
 
 # %%
 def weak_form_stationary_stokes(u,v,p,q, f, dirichlet_velocity=None):
@@ -137,7 +137,7 @@ def weak_form_stationary_stokes(u,v,p,q, f, dirichlet_velocity=None):
 
 # %% [markdown]
 # In the DG framework the weak form becomes more complicated because
-# we have to deal with a discontinous basis. The discontinuities
+# we have to deal with a discontinuous basis. The discontinuities
 # yield a bunch of jump terms on the inter-element boundaries (*interior facets*)
 # that we have to approximate. A full coverage of the DG setup is beyond the
 # scope of this tutorial, the references below can serve as starting point.
@@ -340,7 +340,7 @@ f_exact = uflFunction(gridView,
 
 
 # %% [markdown]
-# Continous Galerkin (CG) setup
+# Continuous Galerkin (CG) setup
 
 # %%
 print("\n")
@@ -420,7 +420,7 @@ scheme_taylor_hood_cg = solutionScheme(eqns,
 # %%
 print("\n")
 print("----------------------")
-print("Test solve with continous galerkin on the base mesh: \n")
+print("Test solve with continuous galerkin on the base mesh: \n")
 sigma_ip.value = 100
 solution_vector_cg.interpolate([0]*(dim_space+1))
 output = scheme_taylor_hood_cg.solve(target = solution_vector_cg)
@@ -521,7 +521,7 @@ print("number linear iterations: " + str(output['linear_iterations']))
 # %% [markdown]
 # To validate our method we conduct a small experimental convergence study. The method
 # `convergence_study` takes a scheme and executes a series of solves on a uniformly refined mesh.
-# *Special care needs to be taken when chosing a fixed penalty parameter in the DG setting, since
+# *Special care needs to be taken when choosing a fixed penalty parameter in the DG setting, since
 # the necessary penalization scales with the characteristic mesh element size.*
 
 # %%
@@ -610,7 +610,7 @@ def convergence_study(scheme, solution_vector, refinement_steps=3, penalty = 20)
 
 
 # %%[markdown]
-# Convergence Test Continous Galerkin:
+# Convergence Test Continuous Galerkin:
 
 # %%
 
