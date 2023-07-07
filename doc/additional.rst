@@ -24,7 +24,8 @@ Discontinuous Galerkin method                     :download:`notebook <discontin
 Bending beam (linear elasticity)                  :download:`notebook <elasticity_nb.ipynb>`            :download:`script <elasticity.py>`
 Spiral wave (reaction diffusion system)           :download:`notebook <spiral_nb.ipynb>`                :download:`script <spiral.py>`
 Slit domain (wave equation)                       :download:`notebook <wave_nb.ipynb>`                  :download:`script <wave.py>`
-Saddle point solver (stokes flow)                 :download:`notebook <uzawa-scipy_nb.ipynb>`           :download:`script <uzawa-scipy.py>`
+Saddle point solver (monolithic solver)           :download:`notebook <monolithicStokes_nb.ipynb>`      :download:`script <monolithicStokes.py>`
+Saddle point solver (uzawa solver)                :download:`notebook <uzawa-scipy_nb.ipynb>`           :download:`script <uzawa-scipy.py>`
 Eigenvalue problems                               :download:`notebook <evalues_laplace.ipynb>`          :download:`script <evalues_laplace.py>`
 Adaptive FE (laplace problem)                     :download:`notebook <laplace-adaptive_nb.ipynb>`      :download:`script <laplace-adaptive.py>`
 Adaptive FE (using DWR)                           :download:`notebook <laplace-dwr_nb.ipynb>`           :download:`script <laplace-dwr.py>`

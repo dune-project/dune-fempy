@@ -7,6 +7,7 @@
    elasticity_nb
    spiral_nb
    wave_nb
+   monolithicStokes_nb
    uzawa-scipy_nb
    evalues_laplace_nb
 
