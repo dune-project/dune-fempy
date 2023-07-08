@@ -12,9 +12,8 @@
 # Governing Equations are
 #
 # \begin{align}
-# -\nabla^2\mathbf{u} + \nabla p &= \mathbf{f} \qquad \text{Conservation of Momentum} \\
+# -\mu\nabla^2\mathbf{u} + \nabla p &= \mathbf{f} \qquad \text{Conservation of Momentum} \\
 # -\nabla \cdot \mathbf{u} &= 0 \qquad \text{Conservation of Mass} \\
-# \mu &\equiv 1
 # \end{align}
 #
 # The problem is closed with Dirichlet boundary conditions
@@ -44,25 +43,11 @@ spatial_coordinate = SpatialCoordinate(cell(dim_space))
 
 
 # %% [markdown]
-# A helper function to coarsen the grid to base level ([7,7] elements by default)
-
-# %%
-def unrefine():
-    # Coarsen grid to base level
-
-    base_refinement_level = False
-    while base_refinement_level == False:
-        try:
-            gridView.hierarchicalGrid.globalRefine(-1)
-        except:
-            base_refinement_level = True
-
-# %% [markdown]
 # A weak form of stationary stokes problem reads
-# $$ \int_{\Omega_h} \nabla\mathbf{u_h}:\nabla\mathbf{v_h}\,\mathrm{d}x - \underline{\int_{\partial\Omega_h} (\nabla\mathbf{u_h}\cdot \mathbf{n})\cdot\mathbf{v}_h \, \mathrm{d}s} - \int_{\Omega_h} p_h\,\nabla\cdot\mathbf{v_h} \,\mathrm{d}x + \underline{\int_{\partial\Omega_h} p_h\,\mathbf{v}_h\cdot\mathbf{n}\, \mathrm{d}s} = \int_\Omega \mathbf{f}\cdot\mathbf{v}_h\,\mathrm{d}x $$
+# $$ \mu\int_{\Omega_h} \nabla\mathbf{u_h}:\nabla\mathbf{v_h}\,\mathrm{d}x - \underline{\int_{\partial\Omega_h} (\nabla\mathbf{u_h}\cdot \mathbf{n})\cdot\mathbf{v}_h \, \mathrm{d}s} - \int_{\Omega_h} p_h\,\nabla\cdot\mathbf{v_h} \,\mathrm{d}x + \underline{\int_{\partial\Omega_h} p_h\,\mathbf{v}_h\cdot\mathbf{n}\, \mathrm{d}s} = \int_\Omega \mathbf{f}\cdot\mathbf{v}_h\,\mathrm{d}x $$
 # $$  \int_{\Omega_h} \nabla\cdot\mathbf{u_h}\, q_h\,\mathrm{d}x = 0 $$
 #
-# where the underlined terms vanish if $\mathbf{v_h} \in H_0^1(\Omega_h)$ (*not the case for standard Lagrangian basis*)
+# where the underlined terms vanish if $\mathbf{v_h} \in H_0^1(\Omega_h)$.
 # Here, $u_h$ and $v_h$ $\in V_h$ denote vector-valued (in our case 2D) trial- and test-functions for the velocity,
 # $p_h$ and $q_h$ $\in Q_h$ denote trial- and test-function for the pressure.
 # In this example we will chose $V_h$ and $Q_h$ as polynomial spaces of order $P^k$ and $P^{k-1}$ for velocity
@@ -73,6 +58,7 @@ def unrefine():
 
 # %% [markdown]
 # On the DUNE side we start by initializing some geometric / ufl variables
+# (some will only be needed later on for the DG version of our approximation).
 
 # %%
 from ufl import div, grad, dot, inner, dS, dx, ds, jump, avg, CellVolume, FacetArea, MinCellEdgeLength, MinFacetEdgeLength, conditional
@@ -84,8 +70,8 @@ n  = FacetNormal(cell(dim_space))
 
 # each element facet has sides + | - with normal ne=n('+') pointing
 # from + to - ( meaning + |-> -)
-# in the notation of the paper:
-# superscript "int" == ('+'), "ext" == ('-')
+# in the notation of the paper: superscript "int" == ('+'), "ext" == ('-')
+# TODO: add paper reference
 ne = n('+')
 
 # Representative element length for interior facets
@@ -98,10 +84,12 @@ h_ext = CellVolume(cell(dim_space)) / FacetArea(cell(dim_space))
 sigma_ip = Constant(1000, name="interior_penalty_parameter")
 
 # %% [markdown]
-# We then define the weak form of the stokes problem, first in a standard Continuous Galerkin (CG) setting:
+# ## Taylor-Hood formulation
+#
+# We now define the weak form of the stokes problem, first in a standard Continuous Galerkin (CG) setting:
 
 # %%
-def weak_form_stationary_stokes(u,v,p,q, f, dirichlet_velocity=None):
+def weak_form_stationary_stokes(u,v,p,q, f,mu, dirichlet_velocity=None):
     """
     Return weak form for the stationary stokes problem, given a set of trial and test basis
     functions for velocity and pressure.
@@ -114,10 +102,11 @@ def weak_form_stationary_stokes(u,v,p,q, f, dirichlet_velocity=None):
     :param q: (scalar) test function for pressure (in R)
     """
 
-    # Note: This assumes Dirichlet Velocity BCs everywhere:
-    viscous_stress = inner(grad(u), grad(v))*dx - inner(dot(grad(u),n), v)*ds
+    # Note: This assumes Dirichlet Velocity BCs everywhere so we don't need
+    # the boundary integrals which are shown here for completeness
+    viscous_stress = mu*inner(grad(u), grad(v))*dx # - inner(dot(grad(u),n), v)*ds
 
-    pressure_force = -p*div(v)*dx + p*dot(v,n)*ds
+    pressure_force = -p*div(v)*dx # + p*dot(v,n)*ds
     continuity = div(u)*q*dx
 
     lhs_terms = viscous_stress + pressure_force + continuity
@@ -134,163 +123,8 @@ def weak_form_stationary_stokes(u,v,p,q, f, dirichlet_velocity=None):
 
     return lhs_terms == dot(f, v)*dx
 
-
 # %% [markdown]
-# In the DG framework the weak form becomes more complicated because
-# we have to deal with a discontinuous basis. The discontinuities
-# yield a bunch of jump terms on the inter-element boundaries (*interior facets*)
-# that we have to approximate. A full coverage of the DG setup is beyond the
-# scope of this tutorial, the references below can serve as starting point.
-
-# %%
-
-# Switch for interior penalty stabilization method
-# -1: symmetric interior penalty (SIP)
-#  1: non-symmetric " " (NIPG)
-#  0: stabilization off
-method_switch_ip = Constant(-1.0, name="switch_interior_penalty_method")
-
-
-gamma_grad_div = Constant(0.0, name="grad_div_stab_param")
-"""
-Switch / penalty parameter for "grad/div"-type stabilization term,
-adds an additional penalization of the discrete divergence
-(gamma_grad_div*div(v_h)*div(u_h)*dx ) where u_h, v_h are trial-
-and test-functions for velocity.
-
-See also Eqn. (41) of
-https://doi.org/10.48550/arXiv.1711.04442 for the definition
-and further discussion.
-"""
-
-gamma_mass_flux = Constant(0.0, name="mass_flux_stab_param")
-"""
-Switch / penalty parameter for "mass-flux" stabilization, e.g.
-a penalization of deviations of the velocity from the H1_div
-space. More precisely, jumps in the normal component of the
-discrete velocity are penalized, yielding a "better" element-local mass
-conservation.
-
-This could be intuitively thought of as
-pushing the solution from a DG approximation space to behave like
-a solution from a H_div conforming space (RT, ...).
-Full discussion in https://doi.org/10.48550/arXiv.1711.04442 , see Eqn. (18)
-
-"""
-gamma_stab_cburn = Constant(0.0, name="stab_cburn")
-"""
-Gamma from Eqn (19) for the stabilization term j0 defined in Eqn (18)
-of https://doi.org/10.1016/j.cma.2018.07.019
-"""
-
-
-def c_h_cburn(p,q):
-    """ Stabilization term from https://doi.org/10.1016/j.cma.2018.07.019 (Eqn. 19)"""
-    return gamma_stab_cburn*h_int*dot(jump(p)*ne, jump(q)*ne)*dS
-
-
-
-def weak_form_stationary_stokes_dg(u,v,p,q,f, is_dirichlet_velocity, dirichlet_value_velocity):
-    """
-    Return weak form for the stationary stokes problem, given a set of trial and test basis
-    functions for velocity and pressure. The viscous stress is discretized
-    with SIPG.
-
-    The exact DG form / fluxes correspond to the method documented in https://doi.org/10.48550/arXiv.1711.04442
-    In particular, viscous_stress = a(u, v), pressure_force = b(v,p)
-
-    :param u: (vector-valued) trial function for velocity (in R^d)
-    :param v: (vector-valued) test function for velocity (in R^d)
-    :param p: (scalar) trial function for pressure (in R)
-    :param q: (scalar) test function for pressure (in R)
-    """
-
-    # Interior penalty stabilization of viscous terms and penalization
-    # of jump discontinuities (also used to weakly enforce Dirichlet BCs in the
-    # last term)
-
-    viscous_stress = inner(grad(u), grad(v))*dx \
-                   - dot(avg(grad(u))*ne, jump(v))*dS \
-                   - dot(grad(u)*n, v)*is_dirichlet_velocity*ds \
-                   + method_switch_ip*dot(avg(grad(v))*ne, jump(u))*dS \
-                   + method_switch_ip*dot(grad(v)*n, u  - dirichlet_value_velocity)*is_dirichlet_velocity*ds \
-                   + (sigma_ip/h_int)*dot(jump(u),jump(v))*dS \
-                   + (sigma_ip/h_ext)*dot(u - dirichlet_value_velocity,v)*is_dirichlet_velocity*ds
-
-    #2: pressure_force = b_div(v, p)
-    pressure_force = - p*div(v)*dx \
-                     + avg(p)*dot(jump(v), ne)*dS \
-                     + p*dot(v,n)*ds
-
-    # Optional stabilization terms, can be turned off by setting gamma_grad_div.value = 0, gamma_mass_flux.value = 0
-    grad_div_stabilization = gamma_grad_div*div(u)*div(v)*dx
-    mass_flux_stabilization = gamma_mass_flux*((1/h_int)*dot(jump(u),ne)*dot(jump(v),ne)*dS \
-                                              +(1/h_ext)*dot(u - dirichlet_value_velocity, n)*dot(v, n)*ds )
-    pressure_stabilization = c_h_cburn(p, q)
-    stab_terms = grad_div_stabilization + mass_flux_stabilization + pressure_stabilization
-
-    continuity = - q*div(u)*dx \
-                 + avg(q)*dot(jump(u), ne)*dS \
-                 + q*dot(u - dirichlet_value_velocity,n)*ds
-
-    return viscous_stress + pressure_force + continuity + stab_terms == dot(f, v)*dx
-
-# %% [markdown]
-# The DG weak form introduces a penalty for discontinuities in the discrete velocity.
-# For a sufficiently large value of the penalty parameter `sigma_ip`
-# penalization ensures coercivity of the bilinear form defined as
-# `viscous_stress` above. However, increasing the penalty parameter has an adverse
-# effect on the condition number of the linear system (*and the numerical convergence study below
-# suggests it also degrades the pressure convergence rate?*)
-# so one generally wants to find sigma_ip "large enough but not too large".
-# The "optimal" `sigma_ip` would depend on the local mesh geometry and polynomial degree, here
-# we generally just impose a global "guessed" value. Below we also offer two choices for
-# `sigma_ip` from literature:
-
-# %%
-def penalty_parameter_abkas(order_discrete_space):
-    """ Penalty parameter for the interior penalty DG method
-
-    Formula corresponds to to the heuristic parameter used in Sec. 6.1
-    of https://doi.org/10.48550/arXiv.1711.04442,
-    see definition of sigma on the very bottom of page 19.
-    """
-    return 4*order_discrete_space**2
-
-def penalty_parameter_shabazi(view, order_discrete_space):
-    """ Penalty parameter for the interior penalty DG method
-
-    Formula corresponds to Remark (4) of https://doi.org/10.1016/j.jcp.2004.11.017
-    Carefully revise the assessment of faces if the code
-    is ever changed to 3D! Also note that the derivation
-    is for simplical meshes (not for quads!)
-    """
-    max_ratio = 0
-    """ max. area / volume ratio of all elements on the grid """
-    d = view.dimGrid
-    """ spatial dimension """
-    k = order_discrete_space
-    """ approximation space order """
-
-    for element in view.elements:
-        # Iterate all elements and find the max. ratio of area / volume
-        # (or edge length over area in 2D)
-        total_surface_area_element = 0
-        for face in element.subEntities(1):
-            total_surface_area_element += face.geometry.volume
-
-        ratio_element = total_surface_area_element / element.geometry.volume
-        """ the surface area / volume ratio of the current element """
-
-        max_ratio = np.max([ratio_element, max_ratio])
-
-
-    return ((k+1)*(k+d)/d)*max_ratio
-
-
-
-# %% [markdown]
-# ## Bercovier-Engelmann Testcase
+# ### Bercovier-Engelmann Testcase
 #
 # Reference case with analytical solution from:
 # https://numtourcfd.pages.math.cnrs.fr/doc/NumtourCFD/v1.0.1-alpha.2/applications/validation/bercovier-engelman.html
@@ -299,7 +133,7 @@ def penalty_parameter_shabazi(view, order_discrete_space):
 #
 #
 # $$ \Omega = [0,\,1]^2$$
-# Analytical Solution:
+# With $\mu\equiv 1$ the problem has the analytical solution
 # \begin{align*}
 # u(x,y) &= -256\,y\,(y-1)\,(2\,y -1)\,x^2\,(x-1)^2 \\
 # v(x,y) &= 256\,x\,(x-1)\,(2\,x-1)\,y^2\,(y-1)^2 \\
@@ -307,9 +141,9 @@ def penalty_parameter_shabazi(view, order_discrete_space):
 # \mathbf{f} &= (f_1(x,\,y) + (y-0.5), -f_1(y,\,x) + (x-0.5))^T \\
 # \end{align*}
 # where $f_1(x,\,y) = 256\,[x^2\,(x-1)^2\,(12\,y-6) + y\,(y-1)\,(2\,y-1)(12\,x^2 -12\,x + 2) ]$
+#
 
 # %%
-
 from dune.ufl import DirichletBC, BoundaryId
 from ufl import as_vector
 from dune.fem.function import uflFunction
@@ -338,6 +172,7 @@ f_exact = uflFunction(gridView,
                       order=5,
                       ufl=as_vector([f_1(x,y) + (y-0.5), -f_1(y,x) +(x-0.5)]) )
 
+mu = 1
 
 # %% [markdown]
 # Continuous Galerkin (CG) setup
@@ -397,9 +232,9 @@ solver_parameters ={"newton.tolerance": 1e-10,
                     "newton.linear.maxiterations": 1000}
 
 # Alternative (commented) version uses weakly imposed boundary conditions:
-#eqns = weak_form_stationary_stokes(u_h, v_h, p_h, q_h, f_exact, as_vector([u_exact, v_exact]))
+# eqns = weak_form_stationary_stokes(u_h, v_h, p_h, q_h, f_exact, mu, as_vector([u_exact, v_exact]))
 
-eqns =  [weak_form_stationary_stokes(u_h, v_h, p_h, q_h, f_exact), *dirichlet_bcs_exact]
+eqns =  [weak_form_stationary_stokes(u_h, v_h, p_h, q_h, f_exact, mu), *dirichlet_bcs_exact]
 scheme_taylor_hood_cg = solutionScheme(eqns,
                                        space=taylor_hood_space,
                                        parameters=solver_parameters,
@@ -437,10 +272,169 @@ solution_vector_cg[2].plot(figure=fig, gridLines=None)
 
 
 # %% [markdown]
-# Setup of a combined DG space with lagrangian polynomial basis:
+# ## DG formulation
+#
+# In the DG framework the weak form becomes more complicated because
+# we have to deal with a discontinuous basis. The discontinuities
+# yield a bunch of jump terms on the inter-element boundaries (*interior facets*)
+# that we have to approximate. A full coverage of the DG setup is beyond the
+# scope of this tutorial, the references below can serve as starting point.
+# TODO add reference
 
 # %%
+# Switch for interior penalty stabilization method
+# -1: symmetric interior penalty (SIP)
+#  1: non-symmetric " " (NIPG)
+#  0: stabilization off
+method_switch_ip = Constant(-1.0, name="switch_interior_penalty_method")
 
+
+gamma_grad_div = Constant(0.0, name="grad_div_stab_param")
+"""
+Switch / penalty parameter for "grad/div"-type stabilization term,
+adds an additional penalization of the discrete divergence
+(gamma_grad_div*div(v_h)*div(u_h)*dx ) where u_h, v_h are trial-
+and test-functions for velocity.
+
+See also Eqn. (41) of
+https://doi.org/10.48550/arXiv.1711.04442 for the definition
+and further discussion.
+"""
+
+gamma_mass_flux = Constant(0.0, name="mass_flux_stab_param")
+"""
+Switch / penalty parameter for "mass-flux" stabilization, e.g.
+a penalization of deviations of the velocity from the H1_div
+space. More precisely, jumps in the normal component of the
+discrete velocity are penalized, yielding a "better" element-local mass
+conservation.
+
+This could be intuitively thought of as
+pushing the solution from a DG approximation space to behave like
+a solution from a H_div conforming space (RT, ...).
+Full discussion in https://doi.org/10.48550/arXiv.1711.04442 , see Eqn. (18)
+
+"""
+gamma_stab_cburn = Constant(0.0, name="stab_cburn")
+"""
+Gamma from Eqn (19) for the stabilization term j0 defined in Eqn (18)
+of https://doi.org/10.1016/j.cma.2018.07.019
+"""
+
+
+def c_h_cburn(p,q):
+    """ Stabilization term from https://doi.org/10.1016/j.cma.2018.07.019 (Eqn. 19)"""
+    return gamma_stab_cburn*h_int*dot(jump(p)*ne, jump(q)*ne)*dS
+
+
+
+def weak_form_stationary_stokes_dg(u,v,p,q,f,mu, is_dirichlet_velocity, dirichlet_value_velocity):
+    """
+    Return weak form for the stationary stokes problem, given a set of trial and test basis
+    functions for velocity and pressure. The viscous stress is discretized
+    with SIPG.
+
+    The exact DG form / fluxes correspond to the method documented in https://doi.org/10.48550/arXiv.1711.04442
+    In particular, viscous_stress = a(u, v), pressure_force = b(v,p)
+
+    :param u: (vector-valued) trial function for velocity (in R^d)
+    :param v: (vector-valued) test function for velocity (in R^d)
+    :param p: (scalar) trial function for pressure (in R)
+    :param q: (scalar) test function for pressure (in R)
+    """
+
+    # Interior penalty stabilization of viscous terms and penalization
+    # of jump discontinuities (also used to weakly enforce Dirichlet BCs in the
+    # last term)
+
+    viscous_stress = inner(grad(u), grad(v))*dx \
+                   - dot(avg(grad(u))*ne, jump(v))*dS \
+                   - dot(grad(u)*n, v)*is_dirichlet_velocity*ds \
+                   + method_switch_ip*dot(avg(grad(v))*ne, jump(u))*dS \
+                   + method_switch_ip*dot(grad(v)*n, u  - dirichlet_value_velocity)*is_dirichlet_velocity*ds \
+                   + (sigma_ip/h_int)*dot(jump(u),jump(v))*dS \
+                   + (sigma_ip/h_ext)*dot(u - dirichlet_value_velocity,v)*is_dirichlet_velocity*ds
+
+    #2: pressure_force = b_div(v, p)
+    pressure_force = - p*div(v)*dx \
+                     + avg(p)*dot(jump(v), ne)*dS \
+                     + p*dot(v,n)*ds
+
+    # Optional stabilization terms, can be turned off by setting gamma_grad_div.value = 0, gamma_mass_flux.value = 0
+    # TODO: do we need mu for the stabilization (which one)?
+    grad_div_stabilization = gamma_grad_div*div(u)*div(v)*dx
+    mass_flux_stabilization = gamma_mass_flux*((1/h_int)*dot(jump(u),ne)*dot(jump(v),ne)*dS \
+                                              +(1/h_ext)*dot(u - dirichlet_value_velocity, n)*dot(v, n)*ds )
+    pressure_stabilization = c_h_cburn(p, q)
+    stab_terms = grad_div_stabilization + mass_flux_stabilization + pressure_stabilization
+
+    continuity = - q*div(u)*dx \
+                 + avg(q)*dot(jump(u), ne)*dS \
+                 + q*dot(u - dirichlet_value_velocity,n)*ds
+
+    return mu*viscous_stress + pressure_force + continuity + stab_terms == dot(f, v)*dx
+
+# %% [markdown]
+# The DG weak form introduces a penalty for discontinuities in the discrete velocity.
+# For a sufficiently large value of the penalty parameter `sigma_ip`
+# penalization ensures coercivity of the bilinear form defined as
+# `viscous_stress` above. However, increasing the penalty parameter has an adverse
+# effect on the condition number of the linear system (*and the numerical convergence study below
+# suggests it also degrades the pressure convergence rate?*)
+# so one generally wants to find sigma_ip "large enough but not too large".
+# The "optimal" `sigma_ip` would depend on the local mesh geometry and polynomial degree, here
+# we generally just impose a global "guessed" value. Below we also offer two choices for
+# `sigma_ip` from literature:
+
+# %%
+def penalty_parameter_abkas(order_discrete_space):
+    """ Penalty parameter for the interior penalty DG method
+
+    Formula corresponds to to the heuristic parameter used in Sec. 6.1
+    of https://doi.org/10.48550/arXiv.1711.04442,
+    see definition of sigma on the very bottom of page 19.
+    """
+    return 4*order_discrete_space**2
+
+def penalty_parameter_shabazi(view, order_discrete_space):
+    """ Penalty parameter for the interior penalty DG method
+
+    Formula corresponds to Remark (4) of https://doi.org/10.1016/j.jcp.2004.11.017
+    Carefully revise the assessment of faces if the code
+    is ever changed to 3D! Also note that the derivation
+    is for simplical meshes (not for quads!)
+    """
+    max_ratio = 0
+    """ max. area / volume ratio of all elements on the grid """
+    d = view.dimGrid
+    """ spatial dimension """
+    k = order_discrete_space
+    """ approximation space order """
+
+    for element in view.elements:
+        # Iterate all elements and find the max. ratio of area / volume
+        # (or edge length over area in 2D)
+        total_surface_area_element = 0
+        for face in element.subEntities(1):
+            total_surface_area_element += face.geometry.volume
+
+        ratio_element = total_surface_area_element / element.geometry.volume
+        """ the surface area / volume ratio of the current element """
+
+        max_ratio = np.max([ratio_element, max_ratio])
+
+
+    return ((k+1)*(k+d)/d)*max_ratio
+
+
+
+#########################
+# %% [markdown]
+# ### Bercovier-Engelmann Testcase
+#
+# We repeat the test from above using using a combined DG space with Lagrangian polynomial basis:
+
+# %%
 print("\n")
 print("----------------------")
 print("Set up DG Scheme:")
@@ -475,7 +469,7 @@ print("DG pressure element order: " + str(taylor_hood_space_dg.components[1].ord
 
 is_dirichlet_velocity = Constant(1.0, "all_boundaries")
 dirichlet_velocity = as_vector([u_exact, v_exact])
-weak_form_stokes_dg = weak_form_stationary_stokes_dg(u_h, v_h, p_h, q_h, f_exact, is_dirichlet_velocity, dirichlet_velocity)
+weak_form_stokes_dg = weak_form_stationary_stokes_dg(u_h, v_h, p_h, q_h, f_exact, mu, is_dirichlet_velocity, dirichlet_velocity)
 solution_vector_dg = taylor_hood_space_dg.interpolate([0, 0, 0], name="solution_vector_dg")
 
 solver_parameters ={"newton.tolerance": 1e-10,
@@ -499,7 +493,6 @@ scheme_taylor_hood_dg = solutionScheme(weak_form_stokes_dg,
 print("\n")
 print("----------------------")
 print("Test solve with DG on the base mesh: \n")
-unrefine()
 
 method_switch_ip.value = -1.0 # Corresponds to SIPG (1: NIPG, 0: Diffusive Stabilization off)
 
@@ -519,6 +512,8 @@ print("number linear iterations: " + str(output['linear_iterations']))
 
 
 # %% [markdown]
+# ### Convergence rate check
+#
 # To validate our method we conduct a small experimental convergence study. The method
 # `convergence_study` takes a scheme and executes a series of solves on a uniformly refined mesh.
 # *Special care needs to be taken when choosing a fixed penalty parameter in the DG setting, since
@@ -563,7 +558,7 @@ def convergence_study(scheme, solution_vector, refinement_steps=3, penalty = 20)
 
     # Make sure that the mesh is the coarsest refinement level
     # to begin with
-    unrefine()
+    gridView.hierarchicalGrid.globalRefine(-gridView.hierarchicalGrid.maxLevel)
 
     for eocLoop in range(refinement_steps):
 

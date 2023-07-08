@@ -1,7 +1,7 @@
 # %% [markdown]
 # .. index:: Solvers; Saddle Point (Uzawa)
 #
-# # Saddle Point Solver (using Scipy)
+# # Schur complement solver for the (Quasi) Stokes equations (Uzawa scheme)
 # %%
 import matplotlib
 matplotlib.rc( 'image', cmap='jet' )
