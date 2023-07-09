@@ -11,8 +11,6 @@ except ImportError:
     sys.exit(0)
 
 import numpy
-import matplotlib
-matplotlib.rc( 'image', cmap='jet' )
 from matplotlib import pyplot
 from ufl import *
 from dune.ufl import DirichletBC
@@ -67,7 +65,8 @@ class Model:
                conditional(U[2]>=0,1,0)
     boundary = {range(1,5): as_vector([0,0,0])}
 
-plot(Model.transportVelocity, grid=gridView, gridLines=None, vectors=[0,1])
+fig = pyplot.figure(figsize=(20,20))
+plot(Model.transportVelocity, grid=gridView, gridLines=None, vectors=[0,1],figure=fig)
 
 # %% [markdown]
 # Time evolution scheme

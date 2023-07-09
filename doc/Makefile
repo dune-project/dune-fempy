@@ -20,6 +20,7 @@ NBS = spiral_nb.ipynb elasticity_nb.ipynb wave_nb.ipynb \
 
 export DUNE_LOG_LEVEL=WARNING
 export ALUGRID_VERBOSITY_LEVEL=0
+export IPYTHONDIR=.
 
 all: $(NBS) $(FIGURES)
 

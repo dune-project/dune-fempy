@@ -163,7 +163,7 @@ assert( (max(iuh.as_numpy) - 0.143) < 1e-3 )
 import matplotlib.pyplot as plt
 from dune.fem.plotting import plotPointData as plot
 
-figure = plt.figure(figsize=(3,3))
+figure = plt.figure(figsize=(20,20))
 plot(uh, figure=figure, gridLines=None)
 plot(iuh, figure=figure, linewidth=0.04, colorbar=None)
 plt.show()

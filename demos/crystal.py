@@ -229,9 +229,9 @@ t = 0.0
 # Finally we set up the time loop and solve the problem - each time this cell is run the simulation will progress to the given ```endTime``` and then the result is shown. The simulation can be progressed further by rerunning the cell while increasing the ```endTime```.
 
 
+# %%
 from dune.fem.plotting import plotPointData
 u_h[0].plot(onlyContours=True,contours=[0.5], contourWidth=1, contourColor="black")
-# %%
 endTime = 0.1
 while t < endTime:
     u_h_n.assign(u_h)
@@ -244,5 +244,6 @@ while t < endTime:
     vtk()                # store result in sequence of vtk file
 print()
 
-plotComponents(u_h, cmap=pyplot.cm.jet)
+fig = pyplot.figure(figsize=(30,10))
+plotComponents(u_h, figure=fig)
 u_h[0].plot(onlyContours=True,contours=[0.5], contourWidth=1, contourColor="yellow")

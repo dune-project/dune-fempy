@@ -90,7 +90,7 @@ scheme.solve(target=uh)
 uh.plot()
 
 # %% [markdown]
-# ## Transport equation:
+# ## A linear transport problem
 # .. index:: Equations; Transport
 #
 # .. index:: Spaces; DG Legendre;

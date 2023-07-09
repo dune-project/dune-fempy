@@ -134,7 +134,7 @@ tolerance = 1e-6
 # Let us solve over a loop (solve,estimate,mark) and plot the solutions side by side.
 # %%
 h1error = dot(grad(uh - exact), grad(uh - exact))
-fig = pyplot.figure(figsize=(10,10))
+fig = pyplot.figure(figsize=(30,30))
 count = 0
 errorVector    = []
 estimateVector = []
@@ -142,7 +142,7 @@ dofs           = []
 while True:
     laplace.solve(target=uh)
     if count%9 == 8:
-        plot(uh, figure=(fig, 131+count//9), colorbar=False)
+        plot(uh, figure=(fig, 131+count//9), colorbar=False, linewidth=1)
     pointFunctional.clear()
     error = computeFunctional(point, pointFunctional,eh)
     dual.solve(target=z, rhs=pointFunctional)
@@ -160,7 +160,7 @@ while True:
     fem.adapt(uh) # can also be a list or tuple of function to prolong/restrict
     fem.loadBalance(uh)
     count += 1
-plot(uh, figure=(fig, 131+2), colorbar=False)
+plot(uh, figure=(fig, 131+2), colorbar=False, linewidth=1)
 
 
 # %% [markdown]
@@ -168,7 +168,7 @@ plot(uh, figure=(fig, 131+2), colorbar=False)
 # interest and the origin:
 # %%
 pyplot.close('all')
-fig = pyplot.figure(figsize=(30,10))
+fig = pyplot.figure(figsize=(45,15))
 plot(uh, figure=(fig, 131), xlim=(-0.5, 0.5), ylim=(-0.5, 0.5),
         gridLines="white", colorbar={"shrink": 0.75}, linewidth=2)
 plot(uh, figure=(fig, 132), xlim=(-0.1, 0.5), ylim=(-0.1, 0.5),
@@ -176,7 +176,7 @@ plot(uh, figure=(fig, 132), xlim=(-0.1, 0.5), ylim=(-0.1, 0.5),
 plot(uh, figure=(fig, 133), xlim=(-0.02, 0.5), ylim=(-0.02, 0.5),
         gridLines="white", colorbar={"shrink": 0.75}, linewidth=2)
 
-fig = pyplot.figure(figsize=(30,10))
+fig = pyplot.figure(figsize=(45,15))
 from dune.fem.function import levelFunction
 levels = levelFunction(uh.space.gridView)
 plot(levels, figure=(fig, 131), xlim=(-0.5, 0.5), ylim=(-0.5, 0.5),

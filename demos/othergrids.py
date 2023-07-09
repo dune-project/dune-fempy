@@ -44,7 +44,7 @@ aluView.plot(figsize=(5,5))
 # %%
 waveDomain = (reader.gmsh, "wave_tank.msh")
 waveGrid = leafGridView(waveDomain, dimgrid=2)
-waveGrid.plot()
+waveGrid.plot(figure=pyplot.figure(figsize=(10,10)))
 
 # %% [markdown]
 #
@@ -140,7 +140,7 @@ try:
     cells = mesh.cells_dict
     waveDomain = {"vertices":points.astype("float"), "simplices":cells["triangle"]}
     waveGrid = leafGridView(waveDomain)
-    waveGrid.plot(xlim=[0.3,1.7],ylim=[-0.2,1.2])
+    waveGrid.plot(figure=pyplot.figure(figsize=(10,10)),xlim=[0.3,1.7],ylim=[-0.2,1.2])
 except ImportError:
     print("This example requires the meshio package which can be installed using pip.")
 

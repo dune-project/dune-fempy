@@ -12,7 +12,6 @@ except ImportError:
 
 import numpy
 import matplotlib
-matplotlib.rc( 'image', cmap='jet' )
 from matplotlib import pyplot
 from ufl import *
 from dune.grid import structuredGrid, reader
