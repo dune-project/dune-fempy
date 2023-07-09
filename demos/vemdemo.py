@@ -27,8 +27,6 @@ except:
     print("This example needs 'dune.vem'")
     import sys
     sys.exit(0)
-import matplotlib
-matplotlib.rc( 'image', cmap='jet' )
 from matplotlib import pyplot
 import numpy
 from dune.grid import cartesianDomain, gridFunction

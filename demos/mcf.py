@@ -37,9 +37,6 @@
 # <img src="mcf.gif" style="height:228px;">
 
 # %%
-import matplotlib
-matplotlib.rc( 'image', cmap='jet' )
-
 from ufl import *
 from dune.ufl import Constant, DirichletBC
 import dune.ufl

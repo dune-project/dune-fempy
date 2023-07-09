@@ -52,8 +52,6 @@
 # https://firedrakeproject.org/demos/linear_wave_equation.py.html
 
 # %%
-import matplotlib
-matplotlib.rc( 'image', cmap='jet' )
 import numpy
 import dune.fem as fem
 from dune.grid import reader

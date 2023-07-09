@@ -18,9 +18,7 @@ except ImportError:
     import sys
     sys.exit(0)
 
-import matplotlib
 from matplotlib import pyplot
-matplotlib.rc( 'image', cmap='jet' )
 
 import numpy
 from ufl import *

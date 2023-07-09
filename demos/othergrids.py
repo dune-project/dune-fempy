@@ -9,8 +9,6 @@
 #
 # %%
 import numpy
-import matplotlib
-matplotlib.rc( 'image', cmap='jet' )
 from matplotlib import pyplot
 from dune.alugrid import aluSimplexGrid as leafGridView
 from dune.grid import OutputType, reader

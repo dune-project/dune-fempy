@@ -11,7 +11,6 @@ except ImportError:
     sys.exit(0)
 
 import numpy
-import matplotlib
 from matplotlib import pyplot
 from ufl import *
 from dune.grid import structuredGrid, reader

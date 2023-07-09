@@ -14,10 +14,8 @@
 # We start again by setting up a grid
 
 # %%
-import io, numpy, matplotlib
-matplotlib.rc( 'image', cmap='jet' )
-from matplotlib import pyplot
-from matplotlib import ticker
+import io, numpy
+from matplotlib import pyplot, ticker
 from dune.fem.plotting import plotComponents
 
 from dune.grid import structuredGrid as leafGridView

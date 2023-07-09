@@ -21,8 +21,6 @@
 
 # %%
 import numpy, math
-import matplotlib
-matplotlib.rc( 'image', cmap='jet' )
 from matplotlib import pyplot
 from dune.grid import structuredGrid as leafGridView
 from dune.fem.space import dglegendre as dgSpace

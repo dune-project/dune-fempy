@@ -29,8 +29,6 @@
 # grid with a 20 cells in each coordinate direction
 
 # %%
-import matplotlib
-matplotlib.rc( 'image', cmap='jet' )
 import numpy as np
 
 from dune.grid import structuredGrid

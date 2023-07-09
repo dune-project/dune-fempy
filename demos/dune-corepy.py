@@ -38,8 +38,6 @@
 # quadrature rules.
 # %%
 import time, numpy, sys
-import matplotlib
-matplotlib.rc( 'image', cmap='jet' )
 import matplotlib.pyplot as pyplot
 import dune.fem
 

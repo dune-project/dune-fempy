@@ -7,8 +7,6 @@
 # field:
 
 # %%
-import matplotlib
-matplotlib.rc( 'image', cmap='jet' )
 from matplotlib import pyplot
 from dune.fem.plotting import plotPointData as plot
 from dune.grid import structuredGrid as leafGridView

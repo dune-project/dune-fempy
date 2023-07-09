@@ -37,8 +37,6 @@
 # The following code was described in the introduction:
 
 # %%
-import matplotlib
-matplotlib.rc( 'image', cmap='jet' )
 import numpy, sys, io
 
 from dune.grid import structuredGrid as leafGridView

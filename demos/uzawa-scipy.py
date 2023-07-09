@@ -3,8 +3,6 @@
 #
 # # Schur complement solver for the (Quasi) Stokes equations (Uzawa scheme)
 # %%
-import matplotlib
-matplotlib.rc( 'image', cmap='jet' )
 from matplotlib import pyplot
 import numpy
 from scipy.sparse import bmat, linalg

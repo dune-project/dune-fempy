@@ -161,7 +161,7 @@ def animate(count):
 # And generate the movie:
 # %%
 import matplotlib.pyplot as plt
-from matplotlib import animation, rc
+from matplotlib import animation
 
 from numpy import linspace
 fig, ax = plt.subplots()

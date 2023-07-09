@@ -20,8 +20,6 @@
 # \end{gather*}
 
 # %%
-import matplotlib
-matplotlib.rc( 'image', cmap='jet' )
 import numpy
 import matplotlib.pyplot as pyplot
 from dune.fem.plotting import plotPointData as plot

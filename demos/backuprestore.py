@@ -9,12 +9,6 @@
 # Let's first construct a grid and some discrete function:
 
 # %%
-# import matplotlib
-# matplotlib.rc( 'image', cmap='jet' )
-# matplotlib.rcParams['figure.dpi'] = 100
-# matplotlib.rcParams['figure.figsize'] = [10, 10]
-# config InlineBackend.figure_format = 'jpg'
-
 import numpy
 from dune.alugrid import aluConformGrid
 from dune.fem.view import adaptiveLeafGridView as view

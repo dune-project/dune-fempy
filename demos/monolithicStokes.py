@@ -27,8 +27,6 @@
 # We first introduce a discrete domain $\Omega_h$ with a structured quadrilateral grid:
 
 # %%
-import matplotlib
-matplotlib.rc( 'image', cmap='jet' )
 from matplotlib import pyplot
 
 from dune.grid import structuredGrid

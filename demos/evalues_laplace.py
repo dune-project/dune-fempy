@@ -19,8 +19,6 @@
 # In addition, we import alugrid and consider the domain $[0,1]^2$ and refine:
 
 # %%
-import matplotlib
-matplotlib.rc( 'image', cmap='jet' )
 import matplotlib.pyplot as plt
 import numpy as np
 

@@ -8,9 +8,6 @@
 
 
 # %%
-import matplotlib
-matplotlib.rc( 'image', cmap='jet' )
-
 import dune.fem as fem
 from dune.grid import cartesianDomain
 from dune.alugrid import aluConformGrid as leafGridView
