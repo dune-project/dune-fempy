@@ -88,7 +88,7 @@ print( integrate(gridView, exact, order=5) )
 
 # %% [markdown]
 # .. index::
-#    pair: I/O; Writing VTK files
+#    pair: I/O; VTK files
 
 # and plot them using matplotlib or write a vtk file for postprocessing
 
@@ -242,7 +242,7 @@ print(mass)
 #    pair: Functions; Plotting
 #
 # .. index::
-#    pair: I/O; Writing VTK files
+#    pair: I/O; VTK files
 #
 # or plot using matplotlib and write a vtk file for postprocessing
 # (using binary data format to reduce size)
@@ -482,7 +482,7 @@ h1error = uflFunction(gridView, name="h1error", order=u_h.space.order,
 
 # %% [markdown]
 # .. index::
-#    pair: I/O; Writing VTK files
+#    pair: I/O; VTK files
 #
 # Now we evolve the solution from time $t=0$ to $t=T$ in a loop. Since the
 # PDE model has time dependent coefficient (through the forcing term), we

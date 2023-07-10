@@ -1,7 +1,9 @@
 # %% [markdown]
 #
 # # Saddle point solver for the stationary Stokes problem
-# .. index:: Equations; Stokes; Saddle-Point; Mixed-FEM; Taylor-Hood
+# .. index:: Equations; Stokes; Saddle-Point;
+# .. index:: Methods; Mixed FEM
+# .. index:: Spaces; Taylor-Hood
 #
 # .. sectionauthor:: contribution by Benjamin Terschanski
 #

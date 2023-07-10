@@ -91,7 +91,7 @@ uh.plot()
 # ## A linear transport problem
 # .. index:: Equations; Transport
 #
-# .. index:: Spaces; DG Legendre;
+# .. index:: Spaces; DG Legendre
 #
 # .. index:: Methods; Method of Lines
 #
