@@ -493,7 +493,8 @@ pprint(scheme.parameterLog())
 param = dict(scheme.parameterLog())
 param["logging"] = "Dirichlet" # only needed to use the `parameterLog` method
 param["newton.linear.verbose"] = False
-scheme2 = galerkin( [a==l,DirichletBC(space,0)], parameters=param)
+scheme2 = galerkin( [a==l,DirichletBC(space,0)], parameters=param )
+u_h.clear()
 info = scheme2.solve(target=u_h)
 pprint(scheme2.parameterLog())
 
