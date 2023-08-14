@@ -73,7 +73,16 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'DUNE-FEM Tutorial'
-copyright = u'2018-2022, Andreas Dedner and Robert Klöfkorn'
+
+year = 2023
+try:
+    import datetime
+    year = datetime.date.today().year
+except ImportError:
+    pass
+
+# strings are unicode since Python 3.0
+copyright = '2018-'+str(year)+', Andreas Dedner and Robert Klöfkorn'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
