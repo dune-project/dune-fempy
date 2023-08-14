@@ -416,7 +416,7 @@ if petsc4py is not None and spacePetsc is not None:
 # .. index::
 #    triple: I/O; Logging; Parameters
 
-# ## Accessing values of parameters used
+# ## Accessing and reusing values of parameters
 # Sometimes it is necessary to extract which parameters were read and which
 # values were used, e.g., for debugging purposes like finding spelling
 # in the parameters provided to a scheme.
@@ -499,8 +499,7 @@ info = scheme2.solve(target=u_h)
 pprint(scheme2.parameterLog())
 
 # %% [markdown]
-# Hint
-# ----
+# ### Hint
 #
 # to get information about available values for some parameters
 # (those with string arguments) a possible approach is to provide a non valid
@@ -520,7 +519,8 @@ except RuntimeError as rte:
     print(rte)
 
 # %% [markdown]
-# .. index:: Solvers; Available solvers
+# .. index::
+#    triple: Solvers; Available solvers; Parameters
 #
 # ## Available solvers and parameters
 # Upon creation of a discrete function space one also have to specifies the
