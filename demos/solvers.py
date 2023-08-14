@@ -471,7 +471,7 @@ pprint(dune.fem.parameter.log())
 # %% [markdown]
 # Note above that all parameters are printed including some default ones
 # used in other parts of the code. If multiple schemes with different
-# `logging` paramater strings are used, all would be shown using the `log`
+# `logging` parameter strings are used, all would be shown using the `log`
 # method as shown above.
 # To access only the parameters used in the scheme simply use
 
