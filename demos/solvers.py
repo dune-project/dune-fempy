@@ -474,9 +474,11 @@ pprint(dune.fem.parameter.log())
 # `logging` parameter strings are used, all would be shown using the `log`
 # method as shown above.
 # To access only the parameters used in the scheme simply use
+# either `dune.fem.parameter.log()["tag"])` or access the parameter log
+# through the scheme:
 
 # %%
-pprint(dune.fem.parameter.log()["precon-amg"])
+pprint(scheme.parameterLog())
 
 # %% [markdown]
 # __Hint__: to get information about available values for some parameters
