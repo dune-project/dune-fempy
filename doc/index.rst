@@ -140,6 +140,7 @@ where the scripts can be found in the demo folder.
 
 .. toctree::
    :maxdepth: 2
+   :numbered:
    :caption: Installation
 
    installation
