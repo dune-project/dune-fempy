@@ -179,9 +179,9 @@ get a colored figure and are hopefully ready to go...
    so rerunning the above code a second time (even using other parameters
    in the `structuredGrid` function) should execute almost instantaniously.
 
-***************
+###############
 Troubleshooting
-***************
+###############
 
 * The compiler version needs to be 7 or later. This can be checked in terminal with ::
 
@@ -217,3 +217,15 @@ Troubleshooting
   $ cd mpi4py
   $ python setup.py build --mpicc=/path/to/openmpi/bin/mpicc
   $ python setup.py install --user
+
+* User warning from numpy
+
+  .. code-block:: none
+
+    UserWarning: The value of the smallest subnormal for <class 'numpy.float64'> type is zero.
+
+  This is caused by some shared library using the compiler flag
+  ``fast-math``.
+  Check for example that you are not using this flag in your cmake setup for Dune.
+  See `here <https://moyix.blogspot.com/2022/09/someones-been-messing-with-my-subnormals.html/>`_
+  for a detailed description.
