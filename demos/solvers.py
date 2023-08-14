@@ -481,7 +481,27 @@ pprint(dune.fem.parameter.log())
 pprint(scheme.parameterLog())
 
 # %% [markdown]
-# __Hint__: to get information about available values for some parameters
+# One can easily reuse these parameters to construct another scheme by
+# converting the result of the above call to a dictionary.
+# As an example change the above problem to a PDE with Dirichlet conditions
+# but turn of verbose output of the solver.
+#
+# __Note__: the `logging` parameter has to be set if we want to use the
+# `parameterLog` method on the scheme.
+
+# %%
+param = dict(scheme.parameterLog())
+param["logging"] = "Dirichlet" # only needed to use the `parameterLog` method
+param["newton.linear.verbose"] = False
+scheme2 = galerkin( [a==l,DirichletBC(space,0)], parameters=param)
+info = scheme2.solve(target=u_h)
+pprint(scheme2.parameterLog())
+
+# %% [markdown]
+# Hint
+# ----
+#
+# to get information about available values for some parameters
 # (those with string arguments) a possible approach is to provide a non valid
 # string, e.g., 'help`.
 
