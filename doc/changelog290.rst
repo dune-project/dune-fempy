@@ -66,3 +66,7 @@ Storage setup in scheme
 
 Methods on space to return local mapper and for evaluating basis functions
 --------------------------------------------------------------------------
+
+Logging of parameter values
+---------------------------
+:ref:`See section</solvers_nb.ipynb#Available-solvers-and-parameters>`.

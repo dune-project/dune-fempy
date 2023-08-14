@@ -413,7 +413,114 @@ if petsc4py is not None and spacePetsc is not None:
       *[ sqrt(e) for e in integrate(gridView,[error**2,inner(grad(error),grad(error))], order=5) ]))
 
 # %% [markdown]
-# .. index:: Solvers; Available solvers
+# .. index::
+#    triple: I/O; Logging; Parameters
+
+# ## Accessing and reusing values of parameters
+# Sometimes it is necessary to extract which parameters were read and which
+# values were used, e.g., for debugging purposes like finding spelling
+# in the parameters provided to a scheme.
+# Note that this information can only be reliably obtained after usage of
+# the scheme, e.g., after calling solve as shown in the example below.
+# To add logging to a set of parameters passed to a `scheme` one simply
+# needs to add a `logging` key to the parameter dictionary provided to the scheme
+# with a tag (string) that is used in the output.
+#
+# As an example we will solve the simple Laplace equation from the
+# introduction but pass some preconditioning parameters to the scheme.
+
+# %%
+import dune.fem
+from dune.grid import structuredGrid
+from dune.fem.space import lagrange
+from dune.fem.scheme import galerkin
+from ufl import (TestFunction, TrialFunction, SpatialCoordinate,
+                 dx, grad, inner, dot, sin, cos, pi )
+gridView = structuredGrid([0, 0], [1, 1], [200, 200])
+space = lagrange(gridView, order=1, storage="istl")
+u_h   = space.interpolate(0, name='u_h')
+x = SpatialCoordinate(space)
+u = TrialFunction(space)
+v = TestFunction(space)
+
+f = (8*pi**2+1) * cos(2*pi*x[0])*cos(2*pi*x[1])
+a = ( inner(grad(u),grad(v)) + u*v ) * dx
+l = f*v * dx
+scheme = galerkin( a==l, solver="cg", parameters=
+                   {"newton.linear.tolerance": 1e-12,
+                    "newton.linear.verbose": True,
+                    "newton.linear.preconditioning.method": "amg-ilu",
+                    "fem.solver.newton.linear.errormeasure": "relative",
+                    "logging": "precon-amg"
+                   } )
+info = scheme.solve(target=u_h)
+
+# %% [markdown]
+# We use the `pprint` (pretty print) module if available to get nicer
+# output.
+
+# %%
+try:
+    from pprint import pprint as _pprint
+    pprint = lambda *args,**kwargs: _pprint(*args,**kwargs,width=200,compact=False)
+except ImportError:
+    pprint = print
+
+pprint(dune.fem.parameter.log())
+
+# %% [markdown]
+# Note above that all parameters are printed including some default ones
+# used in other parts of the code. If multiple schemes with different
+# `logging` parameter strings are used, all would be shown using the `log`
+# method as shown above.
+# To access only the parameters used in the scheme simply use
+# either `dune.fem.parameter.log()["tag"])` or access the parameter log
+# through the scheme:
+
+# %%
+pprint(scheme.parameterLog())
+
+# %% [markdown]
+# One can easily reuse these parameters to construct another scheme by
+# converting the result of the above call to a dictionary.
+# As an example change the above problem to a PDE with Dirichlet conditions
+# but turn of verbose output of the solver.
+#
+# __Note__: the `logging` parameter has to be set if we want to use the
+# `parameterLog` method on the scheme.
+
+# %%
+param = dict(scheme.parameterLog())
+param["logging"] = "Dirichlet" # only needed to use the `parameterLog` method
+param["newton.linear.verbose"] = False
+scheme2 = galerkin( [a==l,DirichletBC(space,0)], parameters=param )
+u_h.clear()
+info = scheme2.solve(target=u_h)
+pprint(scheme2.parameterLog())
+
+# %% [markdown]
+# ### Hint
+#
+# to get information about available values for some parameters
+# (those with string arguments) a possible approach is to provide a non valid
+# string, e.g., 'help`.
+
+# %%
+scheme = galerkin( a==l, solver="cg", parameters=
+                   {"newton.linear.tolerance": 1e-12,
+                    "newton.linear.verbose": True,
+                    "newton.linear.preconditioning.method": "help",
+                    "fem.solver.newton.linear.errormeasure": "relative",
+                    "logging": "precon-amg"
+                   } )
+try:
+    scheme.solve(target=u_h)
+except RuntimeError as rte:
+    print(rte)
+
+# %% [markdown]
+# .. index::
+#    triple: Solvers; Available solvers; Parameters
 #
 # ## Available solvers and parameters
 # Upon creation of a discrete function space one also have to specifies the
