@@ -11,6 +11,7 @@ pandoc
 pyqt5
 sparkmonitor
 sphinx-autobuild
+sphinx-multitoc-numbering
 sphinx_rtd_theme
 sphinxcontrib-bibtex
 sortedcontainers

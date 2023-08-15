@@ -1,9 +1,10 @@
+# furtherexamples.rst nextsteps.rst furthertopics.rst
 include(DuneSphinxDoc)
 add_sphinx_targets(sphinx)
 dune_symlink_to_source_files(FILES
 additional.rst index.rst twophaseflow_descr.rst contributions.rst mmesh_descr.rst
 corepy.rst installation.rst vemdemo_descr.rst
-furtherexamples.rst nextsteps.rst furthertopics.rst extensionmodules.rst inforesources.rst userprojects.rst
+extensionmodules.rst inforesources.rst userprojects.rst
 gridviews.rst cpp.rst femdg.rst developers.rst slurmbatchscript.rst
 changelog.rst changelog290.rst
 3dexample.py          limit.py              spiral.py

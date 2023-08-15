@@ -133,59 +133,67 @@ where the scripts can be found in the demo folder.
 .. _RefElem: https://dune-project.org/doxygen/master/group__GeometryReferenceElements.html#details
 
 .. toctree::
-   :maxdepth: 1
    :caption: Changes and new features
 
    changelog
 
 .. toctree::
-   :maxdepth: 2
-   :numbered:
    :caption: Installation
 
    installation
 
 .. toctree::
-   :maxdepth: 3
+   :numbered:
    :caption: Getting Started
 
    dune-fempy_nb
    concepts_nb
 
-
 .. toctree::
-   :maxdepth: 2
    :caption: Next Steps
+   :numbered:
 
-   nextsteps
+   boundary_nb
+   solvers_nb
+   othergrids_nb
+   parallelization_nb
+   backuprestore_nb
+   corepy
 
 .. toctree::
-   :maxdepth: 2
    :caption: Further Examples
+   :numbered:
 
-   furtherexamples
+   discontinuousgalerkin_nb
+   elasticity_nb
+   spiral_nb
+   wave_nb
+   monolithicStokes_nb
+   uzawa-scipy_nb
+   evalues_laplace_nb
+
+.. todo:: Give some details on the Uzawa algorithm, add dune-fempy version and an algorithm implementation
+.. todo:: Add an example using mass lumping to show how to change quadrature
 
 .. toctree::
-   :maxdepth: 3
+   :numbered:
    :caption: Further Topics
 
-   furthertopics
+   gridviews
+   cpp
 
 .. toctree::
-   :maxdepth: 3
    :caption: Extension Modules
 
    extensionmodules
 
 .. toctree::
-   :maxdepth: 1
    :caption: User Projects
    :name: userprojects
 
    userprojects
 
 .. toctree::
-   :maxdepth: 2
    :caption: Information and Resources
 
    inforesources
