@@ -1,5 +1,6 @@
 # %% [markdown]
-# .. index:: I/O; Sampling
+# .. index::
+#    triple: I/O; Sampling (line/point); Plotting
 #
 # # Sampling the Solution over a Line
 # Let us revisit our simple 3d example from the introduction
@@ -112,3 +113,13 @@ pyplot.plot(x,dy)
 from dune.fem.utility import lineSample
 x,y = lineSample(uh3d,[0,0,0],[0,0,1],100)
 pyplot.plot(x,y)
+
+# %% [markdown]
+# The functions takes the two endpoints of the line and the number of
+# (equidistant) sample points as arguments. By default the method throws an
+# exception if part of the line is outside of the computational domain.
+# This behavior can be disabled by setting the additional optional
+# :code:`bool` parameter :code:`allowOutside` to :code:`True`.
+#
+# Similar functions are available to obtain a :code:`pointSample` and to
+# sample a grid function along the boundary (:code:`boundarySample`).
