@@ -1,5 +1,9 @@
 .. title:: Changes and new features
 
+#########
+Changelog
+#########
+
 .. toctree::
    :maxdepth: 1
 

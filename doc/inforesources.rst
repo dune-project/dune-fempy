@@ -6,6 +6,7 @@
    developers
    contributions
    additional
+   changelog
 
 
 #############
