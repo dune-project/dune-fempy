@@ -131,6 +131,7 @@ where the scripts can be found in the demo folder.
 .. _tutorial compatible with the 2.7 release: https://dune-project.org/sphinx/content/sphinx/dune-fem-2.7/
 .. _UFL: https://bitbucket.org/fenics-project/ufl
 .. _RefElem: https://dune-project.org/doxygen/master/group__GeometryReferenceElements.html#details
+.. _NumtourCFD: https://numtourcfd.pages.math.cnrs.fr/doc/NumtourCFD/v1.0.1-alpha.2/applications/validation/bercovier-engelman.html
 
 .. toctree::
    :caption: Changes and new features
@@ -201,8 +202,8 @@ where the scripts can be found in the demo folder.
 .. API reference <api/modules>
 
 .. index::
-   see: Mesh construction; Grid construction
-   see: Load Balancing; Parallelization
+    pair: Mesh construction; Grid construction
+    pair: Load Balancing; Parallelization
 
 ############
 Bibliography
