@@ -51,6 +51,7 @@ spatial_coordinate = SpatialCoordinate(cell(dim_space))
 # %% [markdown]
 # A weak form of stationary stokes problem reads
 # $$ \mu\int_{\Omega_h} \nabla\mathbf{u_h}:\nabla\mathbf{v_h}\,\mathrm{d}x - \underline{\int_{\partial\Omega_h} (\nabla\mathbf{u_h}\cdot \mathbf{n})\cdot\mathbf{v}_h \, \mathrm{d}s} - \int_{\Omega_h} p_h\,\nabla\cdot\mathbf{v_h} \,\mathrm{d}x + \underline{\int_{\partial\Omega_h} p_h\,\mathbf{v}_h\cdot\mathbf{n}\, \mathrm{d}s} = \int_\Omega \mathbf{f}\cdot\mathbf{v}_h\,\mathrm{d}x $$
+#
 # $$  \int_{\Omega_h} \nabla\cdot\mathbf{u_h}\, q_h\,\mathrm{d}x = 0 $$
 #
 # where the underlined terms vanish if $\mathbf{v_h} \in H_0^1(\Omega_h)$.
@@ -139,6 +140,7 @@ def weak_form_stationary_stokes(u,v,p,q, f,mu, dirichlet_velocity=None):
 #
 #
 # $$ \Omega = [0,\,1]^2$$
+#
 # With $\mu\equiv 1$ the problem has the analytical solution
 # \begin{align*}
 # u(x,y) &= -256\,y\,(y-1)\,(2\,y -1)\,x^2\,(x-1)^2 \\
