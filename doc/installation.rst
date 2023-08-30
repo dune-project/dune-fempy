@@ -129,7 +129,7 @@ Requirements
 
 The following dependencies are needed for Dune-Fem python binding:
 
-* At least C++17 compatible C++ compiler (e.g. g++ 7 or later)
+* At least C++17 compatible C++ compiler (e.g. g++ 9 or later)
 * python (3.7 or later)
 
 * Required Dune modules (release 2.9 or later)

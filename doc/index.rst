@@ -38,15 +38,15 @@ started on solving complex partial differential equations using the
 `Dune-Fem`_ python bindings. Some parts are still quite raw and we would
 greatly appreciate any help improving this document. In addition if you
 would like to promote your own work then please upload a script showcasing
-some simulation you did bases on this package - it is possibly as easy as
+some simulation you did based on this package - it is possibly as easy as
 providing us with a Python script. More details on how to help
 us improve and extend this document see the section on :ref:`contributing`.
 
 The Python bindings are based on `pybind11`_ :cite:`Pybind11-Paper` and a detailed
 description on how we export the polymorphic interfaces in `Dune`_ is
-provided in :cite:`Dune-Python-Paper` which describes the dune module
+provided in :cite:`Dune-Python-Paper` which describes the Dune module
 `Dune-Python`_ which after the Dune 2.7 release has been directly
-integrated into the Dune core modules. If you have a version newer then 2.8
+integrated into the Dune core modules. If you have a version newer than 2.8
 then note that the `Dune-Python`_ module is obsolete.
 
 Here is a quick summary of the different parts of this document - all of

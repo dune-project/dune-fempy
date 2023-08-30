@@ -72,8 +72,9 @@ passed to the `dune.fem.adapt` method:
 
 The module `dune.fem` also provides a `globalRefine(level,*dfs)` method,
 where a negative level globally coarsens the grid. If discrete functions
-are passed in they will be prolong (restricted), the dof vectors of all
-other dof vectors will be resized.
+are passed in they will be prolonged (restricted) and resized correctly, 
+the dof vectors of all other discrete functions will only be resized, i.e. 
+stored data will be lost.
 
 .. note::
 
