@@ -97,13 +97,11 @@ uh.plot()
 #
 # We now use a DG space to approximate the solution to the transport problem
 # $$ \partial_t u + b\cdot \nabla u = f $$
+#
 # with a constant transport velocity vector $b$. We will solve the problem
 # in one space dimension taking $b=\frac{1}{2}$.
 #
-
-# %%
-
-# %% [markdown]
+#
 # We first setup the 1D grid and the Discontinuous Galerkin space.
 # %%
 # remove later, shows same error: from dune.fem.space import dgonb as dgSpace
@@ -116,10 +114,12 @@ space    = dgSpace(gridView, order=1)
 # Advection-Diffusion problem in a previous example. This can be written as
 # an ODE
 # $$ \int_\Omega \partial_t u(t)\varphi_i = F_i(u(t)) $$
+#
 # where $(\varphi_i)_i$ is a basis of a DG space, i.e.,
 # $\varphi_i=\varphi^E_l$ only has support on one element $E$ of the grid.
 # This leads to the matrix vector problem
 # $$ M\frac{d}{dt} \vec{u}(t) = \vec{F}(\vec{u}(t)) $$
+#
 # where $M$ is the mass matrix which in the case of a DG space is block
 # diagonal - in fact with the `dune.fem.space.dglegendre` space the mass
 # matrix is even diagonal. The ODE is thus of the form
@@ -128,8 +128,8 @@ space    = dgSpace(gridView, order=1)
 # We discretize this ODE using an explicit two-step Runge-Kutta method with
 # a fixed time-step $\tau$. Given $\vec{u}^n$ we define the solution at the
 # next time step by
-# $$ \vec{u}^{n+1} := \frac{1}{2}\Big(
-#         \vec{u}_1^{n+1} + \vec{u}_2^{n+1} \Big) $$
+# $$ \vec{u}^{n+1} := \frac{1}{2}\Big(\vec{u}_1^{n+1} + \vec{u}_2^{n+1} \Big) $$
+#
 # with
 # \begin{align*}
 # \vec{u}_1^{n+1} &= \vec{u}^n   + \tau M^{-1}\vec{F}(\vec{u}^n) \\
@@ -178,6 +178,7 @@ op = molOperator(form)
 # The remaining code is a rather standard time loop where we compute for a
 # given old time step vector $\vec{u}$ the new vector
 # $$ \frac{1}{2}\Big( \vec{u}_1^{n+1} + \vec{u}_2^{n+1} \Big) $$
+#
 # by applying the above operator twice.
 #
 # We show the transport of a a simple discontinuety:
