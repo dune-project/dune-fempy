@@ -57,9 +57,12 @@ gridView.plot()
 #    pair: Functions; Grid Functions
 #
 # ## Grid Functions
-# These are function that are defined over a given grid and are evaluated
-# by using an element of the grid and local coordinated within that
-# element:
+#
+# .. note:: **Grid functions** are functions that are defined
+# over a given grid and are evaluated by using an element
+# of the grid and local coordinate within that element.
+#
+# For example:
 # ```
 #    value = gridFunction(element,localCoordinate)
 # ```
@@ -178,9 +181,12 @@ exactGlobal.plot(figure=(fig,122))
 #    pair: Spaces; Lagrange Space
 #
 # ## Discrete Functions
-# Note that the grid functions set up so far did not involve any
+#
+# The grid functions set up so far did not involve any
 # discretization, they are exactly evaluated at the given point.
-# A special type of grid functions are discrete functions living in a
+#
+# .. note::
+# A special type of grid functions are **discrete functions** living in a
 # discrete (finite dimensional) space.
 
 # %%
