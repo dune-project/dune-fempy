@@ -41,6 +41,7 @@ This has been tested with different Linux distributions, MacOS, and using
 the *Windows Subsystem for Linux*.
 
 .. note::
+
    the current installation requires MPI to be available.
 
 *****************
@@ -119,6 +120,7 @@ From Source
 ###########
 
 .. note::
+
    We strongly encourage the use of a python virtual environment and the
    following instructions are written assuming that a virtual environment is
    activated.
@@ -183,9 +185,19 @@ get a colored figure and are hopefully ready to go...
 Troubleshooting
 ###############
 
-* The compiler version needs to be 7 or later. This can be checked in terminal with ::
+* If you are using ``Python 3.11`` or above the version of ``Pybind11``
+  shipped with the release version of ``Dune`` is not recent enough.
+  Please try the prerelease version by using
 
-  $ g++ --version
+  .. code-block:: bash
+
+    $ pip install --pre dune-fem
+
+* The compiler version needs to be 7 or later. This can be checked in terminal with
+
+  .. code-block:: bash
+
+    $ g++ --version
 
   If your version is out of date, you will need to upgrade your system to use Dune
 
@@ -201,9 +213,11 @@ Troubleshooting
 
   $ sudo apt-get install libpython3-dev
 
-* One other problem is that a default version of Open MPI may already be installed. This will lead to errors where Dune appears to be looking in the wrong directory for Open MPI (e.g. usr/lib/openmpi instead of the home directory where the script installs it). This can be solved by running ::
+* One other problem is that a default version of Open MPI may already be installed. This will lead to errors where Dune appears to be looking in the wrong directory for Open MPI (e.g. usr/lib/openmpi instead of the home directory where the script installs it). This can be solved by running
 
-  $ make uninstall
+  .. code-block:: bash
+
+    $ make uninstall
 
   in the original MPI install directory, followed by removing the folder. It will then be necessary to reinstall Open MPI and Dune. It may also be necessary to direct mpi4py to the new MPI installation. It is possible to check whether this is a problem by running python and trying out 
 
@@ -211,12 +225,14 @@ Troubleshooting
 
     from mpi4py import MPI
 
-  If it comes up with an error, this can be fixed by installing mpi4py manually using the following commands ::
+  If it comes up with an error, this can be fixed by installing mpi4py manually using the following commands
 
-  $ git clone https://bitbucket.org/mpi4py/mpi4py.git
-  $ cd mpi4py
-  $ python setup.py build --mpicc=/path/to/openmpi/bin/mpicc
-  $ python setup.py install --user
+  .. code-block:: bash
+
+    $ git clone https://bitbucket.org/mpi4py/mpi4py.git
+    $ cd mpi4py
+    $ python setup.py build --mpicc=/path/to/openmpi/bin/mpicc
+    $ python setup.py install --user
 
 * User warning from numpy
 
