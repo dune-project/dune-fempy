@@ -44,6 +44,16 @@ the *Windows Subsystem for Linux*.
 
    the current installation requires MPI to be available.
 
+.. note::
+
+   The first time you construct an object of a specific realization of one
+   of the Dune interfaces (e.g. here a structured grid),
+   the just in time compiler needs to be invoked. This can take quite some
+   time - especially for grid realizations. This needs to be done only once
+   so rerunning the above code a second time (even using other parameters
+   in the `structuredGrid` function) should execute almost instantaniously.
+
+
 *****************
 Hints for Windows
 *****************
@@ -139,13 +149,10 @@ The following dependencies are needed for Dune-Fem python binding:
   * dune-common (https://gitlab.dune-project.org/core/dune-common.git)
   * dune-geometry (https://gitlab.dune-project.org/core/dune-geometry.git)
   * dune-grid (https://gitlab.dune-project.org/core/dune-grid.git)
-  * dune-fem (https://gitlab.dune-project.org/dune-fem/dune-fem.git)
-
-* Recommended Dune modules (releases 2.9 or later)
-
   * dune-istl (https://gitlab.dune-project.org/core/dune-istl.git)
   * dune-localfunctions (https://gitlab.dune-project.org/core/dune-localfunctions.git)
   * dune-alugrid  (https://gitlab.dune-project.org/extensions/dune-alugrid.git)
+  * dune-fem (https://gitlab.dune-project.org/dune-fem/dune-fem.git)
 
 **********************************
 Building the Required Dune Modules
@@ -172,14 +179,6 @@ Test your completed installation by opening a Python terminal and running
 
 If you have everything set up correctly (and have `matplotlib`) you should
 get a colored figure and are hopefully ready to go...
-
-.. note::
-   The first time you construct an object of a specific realization of one
-   of the Dune interfaces (e.g. here a structured grid),
-   the just in time compiler needs to be invoked. This can take quite some
-   time - especially for grid realizations. This needs to be done only once
-   so rerunning the above code a second time (even using other parameters
-   in the `structuredGrid` function) should execute almost instantaniously.
 
 ###############
 Troubleshooting
