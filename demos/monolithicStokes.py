@@ -19,7 +19,8 @@
 # \end{align}
 #
 # The problem is closed with Dirichlet boundary conditions
-# $$u = u_D \quad \text{on} \partial\Omega $$
+# $$u = u_D \quad \text{on} \partial\Omega$$
+#
 # where $u_D = u_D(x,y)$ will be taken from the analytical solution of the testcase defined later.
 # Please note that the weak forms defined here assume Dirichlet velocity boundary conditions on
 # the entire domain boundary $\partial \Omega$ and we thus avoid having to distinguish between
@@ -129,7 +130,7 @@ def weak_form_stationary_stokes(u,v,p,q, f,mu, dirichlet_velocity=None):
 # Reference case with analytical solution from:
 # https://numtourcfd.pages.math.cnrs.fr/doc/NumtourCFD/v1.0.1-alpha.2/applications/validation/bercovier-engelman.html
 # Original Work: https://doi.org/10.1016/0021-9991(79)90098-6
-# Equations for $f$ from the benchmark document with DOI: 10.1007/978-3-319-57397-7_12
+# Equations for $f$ from the benchmark document with DOI: [10.1007/978-3-319-57397-7_12](https://doi.org/10.1007/978-3-319-57397-7_12)
 #
 #
 # $$ \Omega = [0,\,1]^2$$
@@ -138,7 +139,7 @@ def weak_form_stationary_stokes(u,v,p,q, f,mu, dirichlet_velocity=None):
 # u(x,y) &= -256\,y\,(y-1)\,(2\,y -1)\,x^2\,(x-1)^2 \\
 # v(x,y) &= 256\,x\,(x-1)\,(2\,x-1)\,y^2\,(y-1)^2 \\
 # p &= (x-0.5)\,(y-0.5) \\
-# \mathbf{f} &= (f_1(x,\,y) + (y-0.5), -f_1(y,\,x) + (x-0.5))^T \\
+# \mathbf{f} &= (f_1(x,\,y) + (y-0.5), -f_1(y,\,x) + (x-0.5))^T
 # \end{align*}
 # where $f_1(x,\,y) = 256\,[x^2\,(x-1)^2\,(12\,y-6) + y\,(y-1)\,(2\,y-1)(12\,x^2 -12\,x + 2) ]$
 #

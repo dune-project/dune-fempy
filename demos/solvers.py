@@ -499,7 +499,7 @@ info = scheme2.solve(target=u_h)
 pprint(scheme2.parameterLog())
 
 # %% [markdown]
-# ### Hint
+# ### Parameter hints
 #
 # to get information about available values for some parameters
 # (those with string arguments) a possible approach is to provide a non valid
