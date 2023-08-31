@@ -1,6 +1,9 @@
 # %% [markdown]
 # .. index:: Solvers; Uzawa Saddle Point (Scipy)
 #
+# .. index::
+#    triple: Equations; Stokes; Saddle-Point;
+#
 # # (Quasi) Stokes equations (Scipy based Uzawa scheme)
 # %%
 from matplotlib import pyplot

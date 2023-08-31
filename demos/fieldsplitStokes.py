@@ -3,8 +3,11 @@
 # # Stokes problem with fieldsplit preconditioner (PETSc)
 # .. index::
 #    triple: Equations; Stokes; Saddle-Point;
+#
 # .. index:: Methods; Mixed FEM
+#
 # .. index:: Spaces; Taylor-Hood
+#
 # .. index:: Solvers; PETSc fieldsplit
 #
 # Using Bercovier-Engelmann Testcase
