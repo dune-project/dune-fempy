@@ -186,7 +186,7 @@ exactGlobal.plot(figure=(fig,122))
 # discretization, they are exactly evaluated at the given point.
 #
 # .. note::
-# A special type of grid functions are **discrete functions** living in a
+# A special type of grid function are **discrete functions** living in a
 # discrete (finite dimensional) space.
 
 # %%

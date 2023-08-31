@@ -202,8 +202,8 @@ where the scripts can be found in the demo folder.
 .. API reference <api/modules>
 
 .. index::
-    pair: Mesh construction; Grid construction
-    pair: Load Balancing; Parallelization
+    see: Mesh construction; Grid construction
+    see: Load Balancing; Parallelization
 
 ############
 Bibliography

@@ -67,7 +67,7 @@ num_sols = 10
 eigvals, eigvecs = eigs(A, M = M, sigma = 0, k = num_sols)
 # %% [markdown]
 # sigma = 0 is used to find eigenvalues near 0, using shift-invert mode,
-# see [scipy docu](https://docs.scipy.org/doc/scipy/reference/generated/scipy.sparse.linalg.eigs.html).
+# see [scipy.sparse.linalg.eigs](https://docs.scipy.org/doc/scipy/reference/generated/scipy.sparse.linalg.eigs.html).
 # For more complex problems it may be desirable to use slepc4py.
 # Let us compare the computed eigenvalues with known eigenvalues.
 # %%
