@@ -232,7 +232,7 @@ print(info)
 u_h.plot()
 
 # %% [markdown]
-# A wide range of problems a covered in in the
+# A wide range of problems a covered in the
 # [further examples](furtherexamples.rst) section.
 # In the [next section](concepts_nb.ipynb) we explain the main concepts
 # we use to solve PDE using finite-element approximations which we end with

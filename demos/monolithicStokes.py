@@ -1,9 +1,16 @@
 # %% [markdown]
 #
 # # Saddle point solver for the stationary Stokes problem
-# .. index:: Equations; Stokes; Saddle-Point;
-# .. index:: Methods; Mixed FEM
+#
+# .. index:: Equations; Stokes
+#
+# .. index:: Equations; Saddle-Point
+#
+# .. index:: Methods; Mixed Finite Elements
+#
 # .. index:: Spaces; Taylor-Hood
+#
+# .. index:: Spaces; Combined
 #
 # .. sectionauthor:: contribution by Benjamin Terschanski
 #
@@ -19,7 +26,8 @@
 # \end{align}
 #
 # The problem is closed with Dirichlet boundary conditions
-# $$u = u_D \quad \text{on} \partial\Omega $$
+# $$u = u_D \quad \text{on} \partial\Omega$$
+#
 # where $u_D = u_D(x,y)$ will be taken from the analytical solution of the testcase defined later.
 # Please note that the weak forms defined here assume Dirichlet velocity boundary conditions on
 # the entire domain boundary $\partial \Omega$ and we thus avoid having to distinguish between
@@ -45,10 +53,11 @@ spatial_coordinate = SpatialCoordinate(cell(dim_space))
 # %% [markdown]
 # A weak form of stationary stokes problem reads
 # $$ \mu\int_{\Omega_h} \nabla\mathbf{u_h}:\nabla\mathbf{v_h}\,\mathrm{d}x - \underline{\int_{\partial\Omega_h} (\nabla\mathbf{u_h}\cdot \mathbf{n})\cdot\mathbf{v}_h \, \mathrm{d}s} - \int_{\Omega_h} p_h\,\nabla\cdot\mathbf{v_h} \,\mathrm{d}x + \underline{\int_{\partial\Omega_h} p_h\,\mathbf{v}_h\cdot\mathbf{n}\, \mathrm{d}s} = \int_\Omega \mathbf{f}\cdot\mathbf{v}_h\,\mathrm{d}x $$
+#
 # $$  \int_{\Omega_h} \nabla\cdot\mathbf{u_h}\, q_h\,\mathrm{d}x = 0 $$
 #
 # where the underlined terms vanish if $\mathbf{v_h} \in H_0^1(\Omega_h)$.
-# Here, $u_h$ and $v_h$ $\in V_h$ denote vector-valued (in our case 2D) trial- and test-functions for the velocity,
+# Here, $\mathbf{u_h}$ and $\mathbf{v_h}$ $\in V_h$ denote vector-valued (in our case 2D) trial- and test-functions for the velocity,
 # $p_h$ and $q_h$ $\in Q_h$ denote trial- and test-function for the pressure.
 # In this example we will chose $V_h$ and $Q_h$ as polynomial spaces of order $P^k$ and $P^{k-1}$ for velocity
 # and pressure respectively ("Taylor-Hood Elements"). This combination is well-known for being LBB-stable / satisfying
@@ -71,7 +80,7 @@ n  = FacetNormal(cell(dim_space))
 # each element facet has sides + | - with normal ne=n('+') pointing
 # from + to - ( meaning + |-> -)
 # in the notation of the paper: superscript "int" == ('+'), "ext" == ('-')
-# TODO: add paper reference
+# see (BDK12) for more details
 ne = n('+')
 
 # Representative element length for interior facets
@@ -126,19 +135,19 @@ def weak_form_stationary_stokes(u,v,p,q, f,mu, dirichlet_velocity=None):
 # %% [markdown]
 # ### Bercovier-Engelmann Testcase
 #
-# Reference case with analytical solution from:
-# https://numtourcfd.pages.math.cnrs.fr/doc/NumtourCFD/v1.0.1-alpha.2/applications/validation/bercovier-engelman.html
-# Original Work: https://doi.org/10.1016/0021-9991(79)90098-6
-# Equations for $f$ from the benchmark document with DOI: 10.1007/978-3-319-57397-7_12
-#
+# [Reference case with analytical solution](https://numtourcfd.pages.math.cnrs.fr/doc/NumtourCFD/v1.0.1-alpha.2/applications/validation/bercovier-engelman.html) which was
+# originally published in <cite data-cite="BERCOVIER79"></cite>.
+# Equations for $f$ are taken from the benchmark document
+# <cite data-cite="TrioCFD"></cite>:
 #
 # $$ \Omega = [0,\,1]^2$$
+#
 # With $\mu\equiv 1$ the problem has the analytical solution
 # \begin{align*}
 # u(x,y) &= -256\,y\,(y-1)\,(2\,y -1)\,x^2\,(x-1)^2 \\
 # v(x,y) &= 256\,x\,(x-1)\,(2\,x-1)\,y^2\,(y-1)^2 \\
 # p &= (x-0.5)\,(y-0.5) \\
-# \mathbf{f} &= (f_1(x,\,y) + (y-0.5), -f_1(y,\,x) + (x-0.5))^T \\
+# \mathbf{f} &= (f_1(x,\,y) + (y-0.5), -f_1(y,\,x) + (x-0.5))^T
 # \end{align*}
 # where $f_1(x,\,y) = 256\,[x^2\,(x-1)^2\,(12\,y-6) + y\,(y-1)\,(2\,y-1)(12\,x^2 -12\,x + 2) ]$
 #
@@ -646,8 +655,8 @@ convergence_study(scheme=scheme_taylor_hood_dg,
 
 # %% [markdown]
 # As a sanity check for the construction of the combined DG spaces
-# we can count the degrees of freedom of the `solution_vector`. *Each quad has $(k + 1)^2$
-# degrees of freedom per dimension, with $k$ = polynomial order of the approximation function*
+# we can count the degrees of freedom of the `solution_vector`.
+# Each quad has $(k + 1)^2$ degrees of freedom per dimension, with $k=$ polynomial order of the approximation function.
 
 # %%
 def dof_count_taylor_hood_quad_mesh(velocity_order=2):

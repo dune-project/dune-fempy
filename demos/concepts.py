@@ -57,9 +57,12 @@ gridView.plot()
 #    pair: Functions; Grid Functions
 #
 # ## Grid Functions
-# These are function that are defined over a given grid and are evaluated
-# by using an element of the grid and local coordinated within that
-# element:
+#
+# .. note:: **Grid functions** are functions that are defined
+# over a given grid and are evaluated by using an element
+# of the grid and local coordinate within that element.
+#
+# For example:
 # ```
 #    value = gridFunction(element,localCoordinate)
 # ```
@@ -178,9 +181,12 @@ exactGlobal.plot(figure=(fig,122))
 #    pair: Spaces; Lagrange Space
 #
 # ## Discrete Functions
-# Note that the grid functions set up so far did not involve any
+#
+# The grid functions set up so far did not involve any
 # discretization, they are exactly evaluated at the given point.
-# A special type of grid functions are discrete functions living in a
+#
+# .. note::
+# A special type of grid function are **discrete functions** living in a
 # discrete (finite dimensional) space.
 
 # %%
@@ -310,6 +316,7 @@ print()
 # recompilation is crucial for an efficient code. We will demonstrate this
 # here by considering
 # $$ -\triangle u + \alpha u = f $$
+#
 # where $\alpha$ is a real valued parameter.
 # We choose $f,g_N,g_D$ so that the exact solution for $\alpha=0$
 # is given by
@@ -347,6 +354,7 @@ print("Number of elements:",gridView.size(0),
       "number of dofs:",space.size,"H^1 error:", error)
 
 # %% [markdown]
+#
 # Note that $\alpha=1$ so we do not have the correct exact solution.
 # We can print the value of a `Constant` with name `foo` via
 # `scheme.model.foo` and change it's value using the same attribute:
@@ -383,6 +391,7 @@ print("Number of elements:",gridView.size(0),
 # and initial conditions $u=u_0$.
 #
 # We will solve this problem in variational form and using Crank Nicolson in time
+#
 # \begin{equation}
 # \begin{split}
 # \int_{\Omega} \frac{u^{n+1}-u^n}{\Delta t} \varphi
@@ -393,6 +402,7 @@ print("Number of elements:",gridView.size(0),
 # = 0.
 # \end{split}
 # \end{equation}
+#
 # on a domain $\Omega=[0,1]^2$. We choose $f,g$ so that the exact solution
 # is given by
 # \begin{align*}
@@ -454,8 +464,9 @@ b = 0.5*(f(t)+f(t+dt))*v*dx + 0.5*dot(g(t)+g(t+dt),n)*v*ds
 scheme = solutionScheme(a == b, solver='cg')
 
 # %% [markdown]
+#
 # Optionally, we may want to increase the default quadrature orders which are
-# '2 * space.order' for element integrals and '2 * space.order + 1' for surface
+# `2 * space.order` for element integrals and `2 * space.order + 1` for surface
 # integrals. Depending on the data this might not be enough. Then we simply
 # set the integration orders by hand like in the following example, by calling
 # the method setQuadratureOrders(interiorOrder, surfaceOrder).
@@ -464,6 +475,9 @@ scheme = solutionScheme(a == b, solver='cg')
 #scheme.setQuadratureOrders( 2*space.order, 2*space.order+1 )
 
 # %% [markdown]
+#
+# .. index:: Experimental Order of Convergence (EOC)
+#
 # Since we have forced the system towards a given solution, we can compute
 # the discretization error. First we define ufl expressions for the $L^2$
 # and $H^1$ norms and will use those to compute the experimental order of

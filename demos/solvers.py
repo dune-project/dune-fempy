@@ -490,7 +490,7 @@ pprint(scheme.parameterLog())
 # `parameterLog` method on the scheme.
 
 # %%
-param = dict(scheme.parameterLog())
+param = dict(scheme.parameterLog()) # this method returns a set of pairs which we can convert to a dictionary
 param["logging"] = "Dirichlet" # only needed to use the `parameterLog` method
 param["newton.linear.verbose"] = False
 scheme2 = galerkin( [a==l,DirichletBC(space,0)], parameters=param )
@@ -499,7 +499,7 @@ info = scheme2.solve(target=u_h)
 pprint(scheme2.parameterLog())
 
 # %% [markdown]
-# ### Hint
+# ### Parameter hints
 #
 # to get information about available values for some parameters
 # (those with string arguments) a possible approach is to provide a non valid

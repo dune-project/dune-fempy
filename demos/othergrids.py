@@ -167,7 +167,7 @@ if meshio:
 # %% [markdown]
 #
 # ## 1D example
-# We can also do 1D
+# It's also possible to create grids in 1D
 
 # %%
 from dune.grid import onedGrid

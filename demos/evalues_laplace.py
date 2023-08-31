@@ -42,6 +42,7 @@ v = TestFunction(space)
 # given matrices $A, M \in \mathbb{R}^{N\times N}$,
 # we are interested in finding pairs $(X,\lambda) \in \mathbb{R}^N \times \mathbb{R}$ such that
 # $$ A X = \lambda M X$$
+#
 # as such, we wish to set up the finite element matrices which correspond to the problem outlined.
 # That is, $A$ is the stiffness matrix, $M$ the mass matrix, and $X$ will be the degrees of freedom vector.
 # We now construct the operators
@@ -66,7 +67,7 @@ num_sols = 10
 eigvals, eigvecs = eigs(A, M = M, sigma = 0, k = num_sols)
 # %% [markdown]
 # sigma = 0 is used to find eigenvalues near 0, using shift-invert mode,
-# see \url{https://docs.scipy.org/doc/scipy/reference/generated/scipy.sparse.linalg.eigs.html}.
+# see [scipy.sparse.linalg.eigs](https://docs.scipy.org/doc/scipy/reference/generated/scipy.sparse.linalg.eigs.html).
 # For more complex problems it may be desirable to use slepc4py.
 # Let us compare the computed eigenvalues with known eigenvalues.
 # %%
@@ -183,6 +184,7 @@ pairs.sort()
 reference_eigvals = [math.pi**2 * pair for pair in pairs[:num_sols] ]
 reference_eigvals
 # %% [markdown]
+#
 # We include numpy so that perform the 'renormalisation' required.
 # It is often unnecessary to do so as this will not be the dominating contribution to the error.
 # %%

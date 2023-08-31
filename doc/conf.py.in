@@ -40,6 +40,7 @@ extensions = [
     'sphinx.ext.mathjax',
     'sphinx.ext.ifconfig',
     'sphinx.ext.viewcode',
+    'sphinx_multitoc_numbering',
     'nbsphinx',
 #    'sphinxcontrib.apidoc',
     'sphinxcontrib.bibtex',
@@ -48,14 +49,17 @@ extensions = [
 bibtex_bibfiles = ['dune-fempy.bib']
 
 html_theme = "sphinx_rtd_theme"   # 'sphinxdoc'
+#html_theme = "piccolo_theme"   # 'sphinxdoc'
 html_theme_options = {
     'logo_only': True,
     'display_version': True,
     'prev_next_buttons_location': 'both',
     'style_external_links': True,
     'sticky_navigation': False,
+    #'sticky_navigation': True,
     'collapse_navigation': False,
     'navigation_depth': -1,
+    #'navigation_depth': 3,
     'titles_only': False,
 }
 
@@ -147,7 +151,7 @@ pygments_style = 'sphinx'
 
 # The name for this set of Sphinx documents.  If None, it defaults to
 # "<project> v<release> documentation".
-html_title = 'Tutorial for version |version|'
+html_title = 'Tutorial for version ' + str(version)
 
 # A shorter title for the navigation bar.  Default is the same as html_title.
 #html_short_title = None
