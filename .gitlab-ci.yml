@@ -43,4 +43,4 @@ code-spelling-check:
   # should be fine as well
   - codespell
     --ignore-words-list dof,te,inout,incrementall,iif,\trun,referr,ba
-    --skip "*.ipynb" "*.bib"
+    --skip "*.ipynb,*.bib"
