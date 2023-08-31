@@ -141,10 +141,10 @@ Requirements
 
 The following dependencies are needed for Dune-Fem python binding:
 
-* At least C++17 compatible C++ compiler (e.g. g++ 7 or later)
+* At least C++17 compatible C++ compiler (e.g. g++ 9 or later)
 * python (3.7 or later)
 
-* Required Dune modules (release 2.9 or later)
+* **Required** Dune modules (release 2.9 or later)
 
   * dune-common (https://gitlab.dune-project.org/core/dune-common.git)
   * dune-geometry (https://gitlab.dune-project.org/core/dune-geometry.git)
@@ -154,6 +154,13 @@ The following dependencies are needed for Dune-Fem python binding:
   * dune-alugrid  (https://gitlab.dune-project.org/extensions/dune-alugrid.git)
   * dune-fem (https://gitlab.dune-project.org/dune-fem/dune-fem.git)
 
+
+* **Optional** Dune modules (release 2.9 or later)
+   
+  * dune-fem-dg (https://gitlab.dune-project.org/dune-fem/dune-fem-dg.git)
+  * dune-vem (https://gitlab.dune-project.org/dune-fem/dune-vem.git)
+  
+  
 **********************************
 Building the Required Dune Modules
 **********************************
@@ -162,7 +169,11 @@ Read the instructions on how to `build Dune with Python support`_ which also
 links to general instructions on how to `build Dune modules`_.
 
 .. _build Dune modules: https://dune-project.org/doc/installation
-.. _build Dune with Python support: https://dune-project.org/doc/pythonbindings
+.. _build Dune with Python support: https://dune-project.org/doc/installation/installation-pythonbindings/
+.. _dune-fem-dg: https://gitlab.dune-project.org/dune-fem/dune-fem-dg
+.. _example script: https://gitlab.dune-project.org/dune-fem/dune-fem-dg/-/blob/master/scripts/build-dune-fem-dg.sh?ref_type=heads
+   
+The `dune-fem-dg`_ module offers an `example script`_ to build all required modules from source. 
 
 Test your completed installation by opening a Python terminal and running
 
