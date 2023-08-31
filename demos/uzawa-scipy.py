@@ -1,7 +1,7 @@
 # %% [markdown]
-# .. index:: Solvers; Saddle Point (Uzawa)
+# .. index:: Solvers; Uzawa Saddle Point (Scipy)
 #
-# # Schur complement solver for the (Quasi) Stokes equations (Uzawa scheme)
+# # (Quasi) Stokes equations (Scipy based Uzawa scheme)
 # %%
 from matplotlib import pyplot
 import numpy
