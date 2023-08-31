@@ -161,6 +161,8 @@ The following dependencies are needed for Dune-Fem python binding:
   * dune-polygongrid (https://gitlab.dune-project.org/extensions/dune-polygongrid.git)
   * dune-fem-dg (https://gitlab.dune-project.org/dune-fem/dune-fem-dg.git)
   * dune-vem (https://gitlab.dune-project.org/dune-fem/dune-vem.git)
+
+The optional Dune modules are only need for the parts of the tutorial discussing extension modules.
   
   
 **********************************
