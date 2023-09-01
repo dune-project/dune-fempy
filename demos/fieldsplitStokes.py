@@ -8,7 +8,7 @@
 #
 # .. index:: Spaces; Taylor-Hood
 #
-# .. index:: Solvers; PETSc fieldsplit
+# .. index:: Solvers; Petsc fieldsplit
 #
 # Using Bercovier-Engelmann Testcase
 # Reference case with analytical solution from:

@@ -1,5 +1,5 @@
 # %% [markdown]
-# .. index:: Solvers; Uzawa Saddle Point (Scipy)
+# .. index:: Solvers; Sicpy (Uzawa Saddle Point)
 #
 # .. index::
 #    triple: Equations; Stokes; Saddle-Point;
