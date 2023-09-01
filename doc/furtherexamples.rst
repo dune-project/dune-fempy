@@ -8,6 +8,7 @@
    spiral_nb
    wave_nb
    monolithicStokes_nb
+   fieldsplitStokes_nb
    uzawa-scipy_nb
    evalues_laplace_nb
    crystal_nb

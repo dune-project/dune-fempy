@@ -1,10 +1,8 @@
 # %% [markdown]
 #
 # # Saddle point solver for the stationary Stokes problem
-#
-# .. index:: Equations; Stokes
-#
-# .. index:: Equations; Saddle-Point
+# .. index::
+#    triple: Equations; Stokes; Saddle-Point;
 #
 # .. index:: Methods; Mixed Finite Elements
 #
@@ -533,7 +531,7 @@ from ufl import sqrt
 from dune.fem.function import integrate
 import numpy
 
-def convergence_study(scheme, solution_vector, refinement_steps=3, penalty = 20):
+def convergence_study(scheme, solution_vector, refinement_steps=2, penalty = 20):
     """
     Executes a sequence of solves with the mesh uniformly refined `refinement_steps` times and
     computes the experimental order of convergence (EOC)
@@ -626,7 +624,7 @@ print("Pressure polynomial order: " + str(taylor_hood_space.components[1].order)
 
 convergence_study(scheme=scheme_taylor_hood_cg,
                   solution_vector=solution_vector_cg,
-                  refinement_steps=3,
+                  refinement_steps=2,
                   penalty=1000)
 
 
@@ -649,7 +647,7 @@ gamma_stab_cburn.value = 0.0
 # Careful with penalty, sigma = 20 works for P3/P2 elements
 convergence_study(scheme=scheme_taylor_hood_dg,
                   solution_vector=solution_vector_dg,
-                  refinement_steps=3,
+                  refinement_steps=2,
                   penalty=20)
 
 
