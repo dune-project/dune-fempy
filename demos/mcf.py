@@ -1,8 +1,15 @@
 # %% [markdown]
 # .. index:: Equations; Mean Curvature Flow
 #
+# .. index:: Equations; Surface PDE
+#
+# .. index:: Methods; Moving domains
+#
 # # Mean Curvature Flow
 #
+# This example uses a
+# [moving grid](gridviews.rst#Evolving-Domains).
+
 # Mean curvature flow is a specific example of a geometric evolution
 # equation where the evolution is governed by the mean curvature $H$.
 # One real-life example of this is in how soap films change over time,

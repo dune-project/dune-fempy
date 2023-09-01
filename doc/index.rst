@@ -106,3 +106,5 @@ Bibliography
 
 .. bibliography:: dune-fempy.bib
    :all:
+
+.. index:: see: Models; Equations
