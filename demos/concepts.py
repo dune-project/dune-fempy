@@ -116,7 +116,7 @@ print(mass)
 
 # %% [markdown]
 # .. index::
-#    triple: Functions; Grid Functions; decorator
+#    triple: Functions; Grid Functions; Decorator
 #
 # Another way to obtain a grid function is to use the `gridFunction`
 # decorator. This can be obtained from `dune.grid` but then without UFL

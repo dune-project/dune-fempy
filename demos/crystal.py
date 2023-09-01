@@ -1,8 +1,12 @@
 # %% [markdown]
 # .. index:: Equations; Phase Field
 #
+# .. index:: Adaptation; Phase Field
+#
 # # Crystal Growth (Phase Field model)
 # Here we demonstrate crystallisation on the surface of a liquid due to cooling from [@Guyer].
+# This example uses
+# [dynamic grid refinement](gridviews.rst#Dynamic-Local-Grid-Refinement-and-Coarsening).
 #
 # Let us first set up the grid and the function space. We use the default DoF storage available in ```dune-fem``` - this can be changed for example to ```istl``` or ```petsc```.
 
@@ -13,6 +17,8 @@ from dune.grid import cartesianDomain
 from dune.alugrid import aluConformGrid as leafGridView
 from dune.fem.view import adaptiveLeafGridView as adaptiveGridView
 from dune.fem.space import lagrange as solutionSpace
+from dune.fem import threading
+threading.use = max(4,threading.max) # use at most 4 threads
 
 order = 1
 dimDomain = 2     # we are solving this in 2D
@@ -207,6 +213,7 @@ def vtk():
 # loop will write files `crystalXXXX.vtu` where the sequence counter `XXXX`
 # is automatically increased by one each time `vtk()` is called.
 
+import matplotlib
 matplotlib.rcParams.update({'font.size': 10})
 matplotlib.rcParams['figure.figsize'] = [10, 5]
 plotComponents(u_h, cmap=pyplot.cm.jet, show=[0], contours=[0.5],contourWidth=3)
