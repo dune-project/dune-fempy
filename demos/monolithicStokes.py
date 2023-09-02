@@ -1,6 +1,7 @@
 # %% [markdown]
 #
-# # Saddle point solver for the stationary Stokes problem
+# # Monolithic solver (Lagrange and DG formulation)
+#
 # .. index::
 #    triple: Equations; Stokes; Saddle-Point;
 #
@@ -519,7 +520,7 @@ print("number linear iterations: " + str(output['linear_iterations']))
 
 
 # %% [markdown]
-# ### Convergence rate check
+# ## Convergence rate check
 #
 # To validate our method we conduct a small experimental convergence study. The method
 # `convergence_study` takes a scheme and executes a series of solves on a uniformly refined mesh.

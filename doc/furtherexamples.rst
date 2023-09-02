@@ -7,9 +7,7 @@
    elasticity_nb
    spiral_nb
    wave_nb
-   monolithicStokes_nb
-   fieldsplitStokes_nb
-   uzawa-scipy_nb
+   stokes
    evalues_laplace_nb
    crystal_nb
    mcf_nb

@@ -38,59 +38,58 @@ This version describes the bindings for the development version
 .. _UFL: https://bitbucket.org/fenics-project/ufl
 
 .. toctree::
-   :maxdepth: 1
    :caption: Overview
 
    overview
 
 .. toctree::
-   :maxdepth: 2
    :caption: Installation
+   :maxdepth: 2
 
    installation
 
 .. toctree::
-   :maxdepth: 3
    :caption: Getting Started
+   :maxdepth: 3
 
    dune-fempy_nb
    concepts_nb
 
 
 .. toctree::
-   :maxdepth: 2
    :caption: Next Steps
+   :maxdepth: 2
 
    nextsteps
 
 .. toctree::
-   :maxdepth: 2
    :caption: Further Examples
+   :maxdepth: 2
 
    furtherexamples
 
 .. toctree::
-   :maxdepth: 3
    :caption: Further Topics
+   :maxdepth: 2
 
    furthertopics
 
 .. toctree::
-   :maxdepth: 3
    :caption: Extension Modules
+   :maxdepth: 1
 
    extensionmodules
 
 .. toctree::
-   :maxdepth: 1
    :caption: User Projects
    :name: userprojects
+   :maxdepth: 1
 
    userprojects
 
 .. toctree::
-   :maxdepth: 2
    :caption: Information and Resources
+   :maxdepth: 2
 
    inforesources
 
