@@ -45,15 +45,17 @@ VEM method for Cahn-Hilliard                      :download:`notebook <chimpl_nb
 Mesh Files used in the Examples
 ###############################
 
-This script can be used to
-:download:`convert gmsh file to dgf format <gmsh2dgf.py>`.
+================================================= =====================================================
+Description                                       Grid (mesh) file
+================================================= =====================================================
+Unit cube grid file                               :download:`unit cube grid file <unitcube-2d.dgf>`
+Sphere grid file                                  :download:`sphere grid file <sphere.dgf>`
+Three quarters sphere grid with boundary          :download:`three quarters sphere grid with boundary <soap.dgf>`
+Slit domain mesh                                  :download:`slit domain mesh <wave_tank.msh>`
+Quadrilateral mesh                                :download:`quadrilateral mesh <quads.msh>`
+Converter Gmsh-to-DGF                             :download:`convert gmsh file to dgf format <gmsh2dgf.py>`.
+================================================= =====================================================
 
-:download:`unit cube grid file <unitcube-2d.dgf>`
-:download:`sphere grid file <sphere.dgf>`
-:download:`three quarters sphere grid with boundary <soap.dgf>`
-:download:`slit domain mesh <wave_tank.msh>`
-:download:`quadrilateral mesh <quads.msh>`
- 
 ###################
 Citing this project
 ###################

@@ -99,6 +99,7 @@ This version describes the bindings for the development version
 .. index::
    see: Mesh construction; Grid construction
    see: Load Balancing; Parallelization
+   see: Models; Equations
 
 ############
 Bibliography
@@ -106,5 +107,3 @@ Bibliography
 
 .. bibliography:: dune-fempy.bib
    :all:
-
-.. index:: see: Models; Equations

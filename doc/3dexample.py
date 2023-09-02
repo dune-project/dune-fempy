@@ -24,12 +24,6 @@ renderView1.Background = [1.0, 1.0, 1.0]
 renderView1.CenterAxesVisibility = 0
 renderView1.OrientationAxesVisibility = 0
 
-try:
-    # this is not available in newer paraview versions
-    renderView1.UseGradientBackground = False
-except:
-    pass
-
 # init the 'GridAxes3DActor' selected for 'AxesGrid'
 renderView1.AxesGrid.XTitleColor = [0.0, 0.0, 0.0]
 renderView1.AxesGrid.YTitleColor = [0.0, 0.0, 0.0]

@@ -7,15 +7,15 @@ started on solving complex partial differential equations using the
 `Dune-Fem`_ python bindings. Some parts are still quite raw and we would
 greatly appreciate any help improving this document. In addition if you
 would like to promote your own work then please upload a script showcasing
-some simulation you did bases on this package - it is possibly as easy as
+some simulation you did based on this package - it is possibly as easy as
 providing us with a Python script. More details on how to help
 us improve and extend this document see the section on :ref:`contributing`.
 
 The Python bindings are based on `pybind11`_ :cite:`Pybind11-Paper` and a detailed
 description on how we export the polymorphic interfaces in `Dune`_ is
-provided in :cite:`Dune-Python-Paper` which describes the dune module
+provided in :cite:`Dune-Python-Paper` which describes the Dune module
 `Dune-Python`_ which after the Dune 2.7 release has been directly
-integrated into the Dune core modules. If you have a version newer then 2.8
+integrated into the Dune core modules. If you have a version newer than 2.8
 then note that the `Dune-Python`_ module is obsolete.
 
 Here is a quick summary of the different parts of this document - all of
@@ -85,12 +85,13 @@ where the scripts can be found in the demo folder.
 .. _paraview: https://www.paraview.org
 .. _matplotlib: https://matplotlib.org
 .. _gmsh: https://pypi.org/project/pygmsh
+.. _DGF: https://dune-project.org/doxygen/master/group__DuneGridFormatParser.html#details
+.. _tutorial compatible with the 2.7 release: https://dune-project.org/sphinx/content/sphinx/dune-fem-2.7/
 .. _scipy: https://www.scipy.org
 .. _PETSc: https://www.mcs.anl.gov/petsc
 .. _petsc4py: https://bitbucket.org/petsc/petsc4py
 .. _docker: https://www.docker.com
 .. _pybind11: https://github.com/pybind/pybind11
-.. _DGF: https://dune-project.org/doxygen/master/group__DuneGridFormatParser.html#details
 .. _Dune: https://www.dune-project.org
 .. _Dune-Python: https://www.dune-project.org/modules/dune-python/
 .. _Dune-Istl: https://www.dune-project.org/modules/dune-istl/
@@ -98,7 +99,5 @@ where the scripts can be found in the demo folder.
 .. _Dune-Vem: https://www.dune-project.org/modules/dune-vem/
 .. _Dune-Fem-Dg: https://www.dune-project.org/modules/dune-fem-dg/
 .. _UFL: https://bitbucket.org/fenics-project/ufl
-.. _tutorial compatible with the 2.7 release: https://dune-project.org/sphinx/content/sphinx/dune-fem-2.7/
 .. _RefElem: https://dune-project.org/doxygen/master/group__GeometryReferenceElements.html#details
-
-
+.. _NumtourCFD: https://numtourcfd.pages.math.cnrs.fr/doc/NumtourCFD/v1.0.1-alpha.2/applications/validation/bercovier-engelman.html
