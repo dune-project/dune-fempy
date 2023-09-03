@@ -37,6 +37,10 @@ This version describes the bindings for the development version
 .. _Dune-Fem-Dg: https://www.dune-project.org/modules/dune-fem-dg/
 .. _UFL: https://bitbucket.org/fenics-project/ufl
 
+################
+Table of Content
+################
+
 .. toctree::
    :caption: Overview
 
@@ -44,7 +48,7 @@ This version describes the bindings for the development version
 
 .. toctree::
    :caption: Installation
-   :maxdepth: 2
+   :maxdepth: 1
 
    installation
 

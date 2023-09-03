@@ -175,7 +175,20 @@ squaredErrors = integrate(gridView, [e_h**2,inner(grad(e_h),grad(e_h))], order=5
 print("L^2 and H^1 errors:",[np.sqrt(e) for e in squaredErrors])
 
 # %% [markdown]
-# ## A Non-linear elliptic problem
+# It is straightforward to solve a problem with a different right hand side
+# and different boundary values. Assuming the type of the boundary
+# conditions remains the same, the system matrix does not change we
+# only need to reassemble the right hand side:
+
+# %%
+l   = conditional(dot(x,x)<0.1,1,0)*v*dx
+dbc = DirichletBC(space,x[1]*(1-x[1]),x[0]<=1e-8)
+rhs = assemble([l,dbc])
+u_h.as_numpy[:] = solver(mat.as_numpy, rhs.as_numpy)
+u_h.plot()
+
+# %% [markdown]
+# ## A non-linear elliptic problem
 # .. index:: Equations; Non-linear elliptic
 #
 # It is very easy to solve a non-linear elliptic problem with very few
