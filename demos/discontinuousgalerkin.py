@@ -20,7 +20,7 @@
 # constant and $b$ a given vector.
 
 # %%
-import numpy, math
+import numpy, math, sys
 from matplotlib import pyplot
 from dune.grid import structuredGrid as leafGridView
 from dune.fem.space import dglegendre as dgSpace
@@ -30,8 +30,13 @@ from ufl import ( TestFunction, TrialFunction, SpatialCoordinate, triangle, Face
                   dx, ds, grad, div, grad, dot, inner, sqrt, exp, conditional,
                   as_vector, avg, jump, dS, CellVolume, FacetArea, atan )
 
-gridView = leafGridView([-1, -1], [1, 1], [20, 20])
+# overlap=1 is needed for parallel computations
+gridView = leafGridView([-1, -1], [1, 1], [20, 20], overlap=1)
 space    = dgSpace(gridView, order=2)
+
+
+# check if computation is parallel
+parallel = gridView.comm.size > 1
 
 # %% [markdown]
 #
@@ -72,10 +77,17 @@ form          = aInternal + diffSkeleton + advSkeleton
 
 # %%
 scheme = solutionScheme(form==0, solver="gmres",
-            parameters={"newton.linear.preconditioning.method":"jacobi"})
+            parameters={"newton.linear.preconditioning.method":"jacobi",
+                       # "newton.verbose": True,
+                       }
+                        )
 uh = space.interpolate(0, name="solution")
 info = scheme.solve(target=uh)
-uh.plot()
+
+if parallel:
+    gridView.writeVTK("u_h", pointdata=[uh])
+else:
+    uh.plot()
 
 # %% [markdown]
 # So far the example was not really advection dominated so we now
@@ -85,7 +97,15 @@ uh.plot()
 eps.value = 1e-5 # could also use scheme.model.eps = 1e-5
 uh.interpolate(0)
 scheme.solve(target=uh)
-uh.plot()
+
+if parallel:
+    gridView.writeVTK("u_h", pointdata=[uh])
+else:
+    uh.plot()
+
+# for parallel runs skip 1d part
+if parallel:
+    sys.exit(0)
 
 # %% [markdown]
 # ## A linear transport problem
@@ -106,7 +126,7 @@ uh.plot()
 # %%
 # remove later, shows same error: from dune.fem.space import dgonb as dgSpace
 N = 200
-gridView = leafGridView([0], [1], [N])
+gridView = leafGridView([0], [1], [N], overlap=1)
 space    = dgSpace(gridView, order=1)
 
 # %% [markdown]
