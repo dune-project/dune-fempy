@@ -18,7 +18,7 @@
 # ## Setting up the Grid
 #
 # .. note:: The goal of a Dune **grid** is to provide an
-# interface to describe subdivisions (elements) of the computational domain $\Omega$
+# interface to describe subdivisions (entities or elements for codim 0) of the computational domain $\Omega$
 # in a generic way. See <cite data-cite="DuneReview"></cite>, Section 3.1 for
 # more details.
 #
