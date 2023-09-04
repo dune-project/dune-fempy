@@ -19,7 +19,7 @@
 #
 # .. note:: The goal of a Dune **grid** is to provide an
 # interface to describe subdivisions (entities or elements for codim 0) of the computational domain $\Omega$
-# in a generic way. See <cite data-cite="DuneReview"></cite>(Section 3.1) for
+# in a generic way. See <cite data-cite="DuneReview"></cite>, Section 3.1, for
 # more details.
 #
 # After some general import statements we start our tutorial by setting up
