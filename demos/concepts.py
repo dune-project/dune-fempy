@@ -4,17 +4,26 @@
 # a finite element method ending the first part with solving a simple Laplace
 # problem. The required steps are:
 #
-# *  constructing a tessellation of the computational domain
-# *  working with functions defined over the grid (grid functions)
-# *  setting up discrete functions
-# *  defining the mathematical model to solve
+# *  constructing a tessellation of the computational domain (**grid**)
+# *  working with functions defined over the grid (**grid functions**)
+# *  setting up **discrete functions**
+# *  defining the mathematical model to solve (**ufl**)
 # *  solving the (non linear) system arising from the discretization of the
-#    model by the Galerkin method
+#    model by the Galerkin method (**scheme**)
 
 # %% [markdown]
-# ## Setting up the Mesh
+# .. index::
+#    pair: Grids; Grid Definition
+#
+# ## Setting up the Grid
+#
+# .. note:: The goal of a Dune **grid** is to provide an
+# interface to describe subdivisions (elements) of the computational domain $\Omega$
+# in a generic way. See <cite data-cite="DuneReview"></cite>, Section 3.1 for
+# more details.
+#
 # After some general import statements we start our tutorial by setting up
-# a simple Cartesian grid over the domain $[0,1]^2$ subdivided into four
+# a simple Cartesian grid over the domain $\Omega = [0,1]^2$ subdivided into four
 # intervals in each dimension. We can then show the grid using the `plot`
 # method - note that direct plotting with MatPlotLib is only supported in
 # 2D, other options for visualization, e.g., using ParaView will be
