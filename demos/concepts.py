@@ -19,7 +19,7 @@
 #
 # .. note:: The goal of a Dune **grid** is to provide an
 # interface to describe subdivisions (entities or elements for codim 0) of the computational domain $\Omega$
-# in a generic way. See <cite data-cite="DuneReview"></cite>, Section 3.1 for
+# in a generic way. See <cite data-cite="DuneReview"></cite>(Section 3.1) for
 # more details.
 #
 # After some general import statements we start our tutorial by setting up
@@ -195,7 +195,7 @@ exactGlobal.plot(figure=(fig,122))
 # discretization, they are exactly evaluated at the given point.
 #
 # .. note::
-# A special type of grid function are **discrete functions** living in a
+# A special type of grid function is a **discrete functions** living in a
 # discrete (finite dimensional) space.
 
 # %%
