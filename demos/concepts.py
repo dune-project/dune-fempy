@@ -334,8 +334,14 @@ print()
 # \end{align*}
 # which is the grid function ``exact`` we have already defined above.
 #
+# .. index:: Scheme; Scheme Definition
+#
 # Although the problem is linear and we could just use
-# ``dune.fem.assemble`` and Scipy to solve, we use a ``scheme`` instead:
+# ``dune.fem.assemble`` and Scipy to solve, we use a ``scheme`` instead.
+#
+# .. note:: A **scheme** implements the weak form a specific type of equation,
+# where the mathematical model (integrands) is provided as ufl form.
+#
 
 # %%
 from ufl import (TestFunction, TrialFunction, SpatialCoordinate, FacetNormal,
@@ -594,7 +600,7 @@ components("space")
 components("function")
 
 # %% [markdown]
-# .. index:: Schemes; Available Schemes
+# .. index:: Scheme; Available Schemes
 #
 # Available schemes:
 
