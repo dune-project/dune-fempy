@@ -1,6 +1,5 @@
 # %% [markdown]
 #
-# # Stokes problem with fieldsplit preconditioner (PETSc)
 # .. index::
 #    triple: Equations; Stokes; Saddle-Point;
 #
@@ -10,11 +9,13 @@
 #
 # .. index:: Solvers; Petsc fieldsplit
 #
-# Using Bercovier-Engelmann Testcase
-# Reference case with analytical solution from:
-# https://numtourcfd.pages.math.cnrs.fr/doc/NumtourCFD/v1.0.1-alpha.2/applications/validation/bercovier-engelman.html
-# Original Work: https://doi.org/10.1016/0021-9991(79)90098-6
-# Equations for $f$ from the benchmark document with DOI: 10.1007/978-3-319-57397-7_12
+# # Stokes problem with fieldsplit preconditioner (PETSc)
+#
+# Using the Bercovier-Engelmann test case
+# [Reference case with analytical solution](https://numtourcfd.pages.math.cnrs.fr/doc/NumtourCFD/v1.0.1-alpha.2/applications/validation/bercovier-engelman.html) which was
+# originally published in <cite data-cite="BERCOVIER79"></cite>.
+# Equations for $f$ are taken from the benchmark document
+# <cite data-cite="TrioCFD"></cite>:
 
 # %%
 from matplotlib import pyplot

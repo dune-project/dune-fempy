@@ -311,9 +311,10 @@ print()
 # we will see how to extract the underlying dof vector in the form of a `numpy` or a `petsc` vector.
 
 # %% [markdown]
-# ## Handling constant parameters
 # .. index::
 #    pair: Models; Constants
+#
+# ## Handling constant parameters
 #
 # We have already seen how grid function can be used within UFL expressions
 # and forms - in the [next section](dune-fempy_nb.ipynb) we will give another example for this in the
