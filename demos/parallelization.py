@@ -1,12 +1,14 @@
 # %% [markdown]
-# # Parallelization
 # .. index:: Parallelization
+#
+# # Parallelization
 #
 # Parallelization is available using either distributed memory based on **MPI**
 # or multithreading using **OpenMP**.
 #
-# ## OpenMP
 # .. index:: Parallelization; OpenMP
+#
+# ## OpenMP
 #
 # It is straightforward to enable some multithreading support. Note that
 # this will speedup assembly and evaluation of the spatial operators but
@@ -38,9 +40,10 @@ threading.useMax()
 print("Using",threading.use,"threads")
 
 # %% [markdown]
-
-# ## MPI
+#
 # .. index:: Parallelization; MPI
+#
+# ## MPI
 #
 # It is straightforward to use **MPI** for parallelization. It requires a
 # parallel grid, in fact most of the DUNE grids work in parallel except `albertaGrid` or `polyGrid`.
@@ -60,9 +63,9 @@ print("Using",threading.use,"threads")
 # done by copying an existing cache with pre-compiled modules. See this [SLURM batch script](slurmbatchscript.rst)
 # for an example on how to do this.
 #
-# ### Load balancing
-#
 # .. index:: Parallelization; Load Balancing
+#
+# ### Load balancing
 #
 # When running distributed memory jobs load balancing is an issue. The specific
 # load balancing method used, depends on the grid implementation.
