@@ -4,9 +4,9 @@
 # a finite element method ending the first part with solving a simple Laplace
 # problem. The required steps are:
 #
-# *  constructing a tessellation of the computational domain (**grid**)
+# *  constructing a tessellation of the computational domain (**hierarchical grid** and **grid view**)
 # *  working with functions defined over the grid (**grid functions**)
-# *  setting up **discrete functions**
+# *  setting up **discrete spaces** and **discrete functions**
 # *  defining the mathematical model to solve (**ufl**)
 # *  solving the (non linear) system arising from the discretization of the
 #    model by the Galerkin method (**scheme**)
@@ -17,9 +17,9 @@
 #
 # ## Setting up the Grid
 #
-# .. note:: The goal of a Dune **grid** is to provide an
+# .. note:: The goal of a Dune **grid** or **hierarchical grid** is to provide an
 # interface to describe subdivisions (entities or elements for codim 0) of the computational domain $\Omega$
-# in a generic way. See <cite data-cite="DuneReview"></cite>, Section 3.1, for
+# in a generic way. In the following this is referred to as `hierarchicalGrid`. See <cite data-cite="DuneReview"></cite>, Section 3.1, for
 # more details.
 #
 # After some general import statements we start our tutorial by setting up
@@ -51,10 +51,16 @@ gridView.plot()
 # %% [markdown]
 # Often the initial grid is a bit coarse - it is very easy to refine it
 # globally.
+# Grids can be refined in a hierarchic manner, meaning that elements are subdivided into several smaller elements. The
+# element to be refined is kept in the grid and remains accessible.
 # We will discuss [local refinement](gridviews.rst#Dynamic-Local-Grid-Refinement-and-Coarsening)
 # in a later section.
+#
+# .. note:: A **grid view** object provides read-only access to the entities of all codimensions in the view, i.e. a subset of the hierarchical grid.
+# In the following this is called `gridView` and sometimes abbreviated as `grid`. See <cite data-cite="DuneReview"></cite>, Section 3.1.1, for more details.
+#
 # Note that the ``gridView`` we have constructed can not be changed
-# directly, we need to access the underlying ``hierarchicalGrid``:
+# directly (i.e. read-only access), we need to access the underlying ``hierarchicalGrid``:
 
 # %%
 from dune.fem import globalRefine
@@ -67,9 +73,9 @@ gridView.plot()
 #
 # ## Grid Functions
 #
-# .. note:: **Grid functions** are functions that are defined
-# over a given grid and are evaluated by using an element
-# of the grid and local coordinate within that element.
+# .. note:: A **grid functions** is a functions that is defined
+# over a given grid view and is evaluated by using an element
+# of this view and local coordinate within that element, i.e. a quadrature point.
 #
 # For example:
 # ```
@@ -183,31 +189,45 @@ exactGlobal.plot(figure=(fig,122))
 # [C++ Based Grid Functions](cppfunctions_nb.ipynb).
 
 # %% [markdown]
+#
 # .. index::
 #    pair: Functions; Discrete Functions
 #
 # .. index::
 #    pair: Spaces; Lagrange Space
 #
-# ## Discrete Functions
+# ## Discrete Spaces and Discrete Functions
 #
 # The grid functions set up so far did not involve any
 # discretization, they are exactly evaluated at the given point.
 #
 # .. note::
-# A special type of grid function is a **discrete functions** living in a
-# discrete (finite dimensional) space.
+# A **discrete (function) space** is a finite dimensional function space defined over a given grid view,
+# typically the Finite Element space involved.
+#
 
 # %%
 from dune.fem.space import lagrange as solutionSpace
 space = solutionSpace(gridView, order=2)
 
 # %% [markdown]
-# The easiest way to construct a discrete function is to use the interpolate
-# method on the discrete function space.
+#
+# A list of available spaces is shown at the bottom of this page.
+#
+# .. note::
+# A special type of grid function is a **discrete function** living in a
+# discrete (finite dimensional) space.
+#
+# The easiest way to construct a discrete function is to use the `interpolate`
+# method on the discrete function space to create an initialized discrete
+# function or `function` to create an uninitialized discrete function.
 
 # %%
+# initialized
 u_h = space.interpolate(exact, name='u_h')
+
+# uninitialized
+u_h = space.function(name='u_h')
 
 # %% [markdown]
 # On an existing discrete function the `interpolate` method can be used to
