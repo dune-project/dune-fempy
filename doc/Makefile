@@ -21,6 +21,10 @@ NBS = spiral_nb.ipynb elasticity_nb.ipynb wave_nb.ipynb \
 export DUNE_LOG_LEVEL=WARNING
 export ALUGRID_VERBOSITY_LEVEL=0
 export IPYTHONDIR=.
+# ignore SAVE_BUILD since this will appear in notebooks
+export DUNE_SAVE_BUILD=none
+# ignore Python warnings since these will appear in notebooks
+export PYTHONWARNINGS=ignore
 
 all: $(NBS) $(FIGURES)
 
