@@ -484,4 +484,4 @@
 #c.Session.unpacker = 'json'
 
 ## Username for the Session. Default is your system username.
-c.InteractiveShellApp.extensions.append('sparkmonitor.kernelextension')
+# c.InteractiveShellApp.extensions.append('sparkmonitor.kernelextension')
