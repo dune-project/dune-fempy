@@ -11,8 +11,7 @@
 #
 # # Stokes problem with fieldsplit preconditioner (PETSc)
 #
-# Using the Bercovier-Engelmann test case
-# [Reference case with analytical solution](https://numtourcfd.pages.math.cnrs.fr/doc/NumtourCFD/v1.0.1-alpha.2/applications/validation/bercovier-engelman.html) which was
+# Using the [Bercovier-Engelmann test case with analytical solution](https://numtourcfd.pages.math.cnrs.fr/doc/NumtourCFD/v1.0.1-alpha.2/applications/validation/bercovier-engelman.html) which was
 # originally published in <cite data-cite="BERCOVIER79"></cite>.
 # Equations for $f$ are taken from the benchmark document
 # <cite data-cite="TrioCFD"></cite>:

@@ -1,5 +1,7 @@
 # %% [markdown]
 #
+# ## Converting gmsh to DGF
+#
 # A simple gmsh to DGF converter allowing to specify boundary conditions.
 # A complete description of the DGF format is found [here](https://dune-project.org/doxygen/master/group__DuneGridFormatParser.html#details).
 #
