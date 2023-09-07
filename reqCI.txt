@@ -9,7 +9,6 @@ pandas
 matplotlib
 pandoc
 pyqt5
-sparkmonitor
 sphinx-autobuild
 sphinx_rtd_theme
 sphinxcontrib-bibtex
