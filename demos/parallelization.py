@@ -102,3 +102,11 @@ vtk()
 # For load balancing with re-distribution of user data the function
 # `dune.fem.loadBalance` should be used. See
 # the [crystal growth](crystal_nb.ipynb) or [Re-entrant Corner Problem](laplace-adaptive_nb.ipynb) examples.
+#
+# .. index:: Parallelization; Batch script
+# ## Example: Slurm Batch Script
+#
+# On a cluster where multiple parallel jobs are run simultaneously, it's
+# advisable to use one separate cache per job. This can be easily
+# done by copying an existing cache with pre-compiled modules as demonstrated
+# in this [slurm batch script]().
