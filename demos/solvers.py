@@ -145,13 +145,12 @@ for eocLoop in range(loops):
 # over to the C++ side.
 
 # %%
-from dune.fem.operator import linear as linearOperator
 import numpy as np
 from scipy.sparse.linalg import spsolve as solver
 class Scheme:
   def __init__(self, scheme):
       self.model = scheme.model
-      self.jacobian = linearOperator(scheme)
+      self.jacobian = scheme.linear()
 
   def solve(self, target):
       # create a copy of target for the residual
@@ -207,7 +206,8 @@ class Scheme2:
             self.shape = (x_coeff.shape[0], x_coeff.shape[0])
             self.dtype = x_coeff.dtype
             x = space.function("tmp", dofVector=x_coeff)
-            self.jacobian = linearOperator(scheme, ubar=x)
+            self.jacobian = scheme.linear()
+            self.update(x_coeff,None)
         # reassemble the matrix DF(u) given a DoF vector for u
         def update(self, x_coeff, f):
             x = space.function("tmp", dofVector=x_coeff)
@@ -263,11 +263,10 @@ model  = ( inner(grad(u), grad(v)) -
 dbcs   = [ DirichletBC(space,-1,1),
            DirichletBC(space, 1,2) ]
 op     = galerkin([model, *dbcs], space)
-A = linearOperator(op).as_numpy
+lin    = op.linear()
 sol = space.interpolate(0, name="u_h")
 rhs = sol.copy()
-op(sol, rhs)
-rhs.as_numpy[:] *= -1
+op.jacobian(lin,rhs)
 
 # %% [markdown]
 # So far everything is as before. Dirichlet boundary conditions
@@ -289,7 +288,7 @@ def cb(xk): # a callback to print the residual norm in each step
     x_h = space.function("iterate", dofVector=xk)
     op(x_h,rk)
     print(rk.as_numpy[:].dot(rk.as_numpy[:]), flush=True, end='\t')
-sol.as_numpy[:], _ = solver(A, rhs.as_numpy, x0=sol.as_numpy,
+sol.as_numpy[:], _ = solver(lin.as_numpy, rhs.as_numpy, x0=sol.as_numpy,
                             callback=cb, tol=1e-10)
 sol.plot()
 
@@ -340,7 +339,8 @@ if petsc4py is not None and spacePetsc is not None:
     class Scheme3:
       def __init__(self, scheme):
           self.model = scheme.model
-          self.jacobian = linearOperator(scheme)
+          self.jacobian = scheme.linear()
+          scheme.jacobian(self.rangeSpace.zero,self.jacobian)
           self.ksp = PETSc.KSP()
           self.ksp.create(PETSc.COMM_WORLD)
           # use conjugate gradients method
@@ -380,7 +380,8 @@ if petsc4py is not None and spacePetsc is not None:
             self.model = scheme.model
             self.res = scheme.space.interpolate([0],name="residual")
             self.scheme = scheme
-            self.jacobian = linearOperator(self.scheme)
+            self.jacobian = scheme.linear()
+            self.jacobian(scheme.rangeSpace.zero,self.jacobian)
             self.snes = PETSc.SNES().create()
             self.snes.setFunction(self.f, self.res.as_petsc.duplicate())
             self.snes.setUseMF(False)

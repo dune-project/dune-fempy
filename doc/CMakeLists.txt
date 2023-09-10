@@ -6,7 +6,7 @@ corepy.rst installation.rst vemdemo_descr.rst overview.rst
 stokes.rst furtherexamples.rst nextsteps.rst furthertopics.rst
 extensionmodules.rst inforesources.rst userprojects.rst
 gridviews.rst cpp.rst femdg.rst developers.rst slurmbatchscript.rst
-changelog.rst changelog290.rst
+changelog.rst changelog290.rst scheme_api.rst
 3dexample.py          limit.py              spiral.py
 crystal.py            lineplot.py           svg2pdf.py            cppfunctions.py
 dune-corepy.py        mcf-algorithm.py      twophaseflow.py       chemical.py

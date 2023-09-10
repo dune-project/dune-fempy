@@ -109,9 +109,9 @@ p_in = Constant(0.0, name="g")
 # bc   = DirichletBC(V, p_in, conditional(x[0]<1e-10,1,0))
 bc   = BoxDirichletBC(V, p_in, [None,None],[0,None], eps=1e-10)
 
-from dune.fem.operator import galerkin,linear
+from dune.fem.operator import galerkin, _linear
 op        = galerkin([dot(grad(u),grad(v))*dx,bc])
-S         = linear(op).as_numpy
+S         = _linear(op).as_numpy   # CHECK THIS
 lapPhi    = V.interpolate(1,name="e")
 lapPhiVec = lapPhi.as_numpy
 

@@ -86,7 +86,7 @@ Now one can use `gdb` to debug the C++ code
 Other available environment variables are
 
 * `DUNE_LOG_LEVEL`: set to `info` or `debug` to get more verbose output
-  during module building/
+  during module building.
 * `DUNE_SAVE_BUILD`: show full output from compiler during JIT compilation.
   Set to `terminal` to obtain output to console or set to `write` to obtain
   log files in current folder.

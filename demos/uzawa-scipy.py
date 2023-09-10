@@ -17,7 +17,7 @@ from ufl import SpatialCoordinate, CellVolume, TrialFunction, TestFunction,\
                 inner, dot, div, grad, dx, as_vector, transpose, Identity
 from dune.ufl import Constant, DirichletBC
 import dune.fem
-from dune.fem.operator import linear as linearOperator
+from dune.fem.operator import _linear as linearOperator # CHECK THIS
 
 muValue = 1
 nuValue = 0
@@ -51,7 +51,7 @@ gradOp      = galerkinOperator( gradModel, spcP,spcU)
 divOp       = galerkinOperator( divModel, spcU,spcP)
 massOp      = galerkinOperator( massModel, spcP)
 
-A = linearOperator(mainOp).as_numpy
+A = linearOperator(mainOp).as_numpy  # CHECK THIS
 def Ainv(rhs,target): target[:] = linalg.spsolve(A,rhs)
 G = linearOperator(gradOp).as_numpy
 D = linearOperator(divOp).as_numpy
