@@ -13,7 +13,7 @@
 
 # %% [markdown]
 # .. index::
-#    pair: Grids; Grid Definition
+#    triple: Grids; Hierarchical Grids; Grid Definition
 #
 # ## Setting up the Grid
 #
@@ -56,11 +56,21 @@ gridView.plot()
 # We will discuss [local refinement](gridviews.rst#Dynamic-Local-Grid-Refinement-and-Coarsening)
 # in a later section.
 #
-# .. note:: A **grid view** object provides read-only access to the entities of all codimensions in the view, i.e. a subset of the hierarchical grid.
-# In the following this is called `gridView` and sometimes abbreviated as `grid`. See <cite data-cite="DuneReview"></cite>, Section 3.1.1, for more details.
+# .. index::
+#    pair: Grid view; Grid view Definition
 #
-# Note that the ``gridView`` we have constructed can not be changed
-# directly (i.e. read-only access), we need to access the underlying ``hierarchicalGrid``:
+# .. note:: A **grid view** object provides read-only access to the entities of all codimensions
+# of a subset of the `hierarchical grid`.
+# In the following this is called `gridView` and sometimes simply `grid`.
+# See <cite data-cite="DuneReview"></cite>, Section 3.1.1, for more details.
+# Since a `gridView` can not be changed
+# directly we need to access the underlying `hierarchicalGrid` to perform
+# e.g. grid refinement.
+#
+# .. note:: The functions constructing a grid generally return a **leaf grid view**.
+# We also provide some special grid views to for example simulate on
+# evolving domains gridviews rst Evolving-Domains or
+# to simplify efficient [local grid adaptivity](gridviews.rst#Dynamic-Local-Grid-Refinement-and-Coarsening).
 
 # %%
 from dune.fem import globalRefine
@@ -239,7 +249,11 @@ space = solutionSpace(gridView, order=2)
 #
 # .. note::
 # A special type of grid function is a **discrete function** living in a
-# discrete (finite dimensional) space.
+# discrete (finite dimensional) space. The main property of a discrete
+# function is that it contains a **dof vector**.
+# [In a later section](solvers_nb.ipynb)
+# we will see how to extract the underlying dof vector in the form of a `numpy` or a `petsc` vector.
+
 #
 # The easiest way to construct a discrete function is to use the `interpolate`
 # method on the discrete function space to create an initialized discrete
@@ -351,26 +365,26 @@ for d in u_h.dofVector:
 print()
 
 # %% [markdown]
-# [In a later section](solvers_nb.ipynb)
-# we will see how to extract the underlying dof vector in the form of a `numpy` or a `petsc` vector.
-
-# %% [markdown]
 # .. index::
-#    pair: Models; Constants
 #
-# ## Handling constant parameters
+#    triple: Models; Schemes; Constants
 #
-# We have already seen how grid function can be used within UFL expressions
-# and forms - in the [next section](dune-fempy_nb.ipynb) we will give another example for this in the
+# ## Operators and Schemes
+#
+# In the [previous section](dune-fempy_nb.ipynb) we have already seen how to
+# assemble system matrices for linear PDEs and how to construct schemes for
+# non-linear problems. We also discussed that we can directly use grid
+# functions and `dune.ufl.Constant` instances within UFL expressions
+# and forms - in the final example of this section we will give an example for this in the
 # context of a time dependent problems.
 #
-# .. tip:: Use the `Constant` class to add constants to UFL expressions/forms
-# which then can be changed without requiring any recompilation of the model.
+# .. tip:: The main advantage of using
+# `dune.ufl.Constant` and grid functions is to be able to change details in
+# a form without requiring any recompilation of the model. An example
+# would be in a time dependent problem a time varying coefficient or
+# changing the time step adaptively during the simulation.
 #
-# An example would again be in a time dependent problem a time varying coefficient.
-# Being able to change the value of the time in the model without
-# recompilation is crucial for an efficient code. We will demonstrate this
-# here by considering
+# Consider
 # $$ -\triangle u + \alpha u = f $$
 #
 # where $\alpha$ is a real valued parameter.
@@ -383,12 +397,21 @@ print()
 #
 # .. index:: Scheme; Scheme Definition
 #
-# Although the problem is linear and we could just use
-# ``dune.fem.assemble`` and Scipy to solve, we use a ``scheme`` instead.
-#
 # .. note:: A **scheme** implements the weak form a specific type of equation,
 # where the mathematical model (integrands) is provided as ufl form.
+# Mathematically a `scheme` implements an operator $L\colon V_h\to V_h$
+# with equal (discrete) domain and range space. The `scheme`
+# provides a `solve` method which computes $u=L^{-1}(g)$ for
+# given $g$. As default computes a root of $L$
+# but it is possible to provide a right hand side $g$, i.e., solve $L[u_h]=g$.
 #
+# .. index:: Operator; Operator Definition
+#
+# .. note:: The more general case is
+# covered by classes in `dune.fem.operator` for **operators** $L\colon V_h\to W_h$
+# with different domain and range spaces. See
+# [here](scheme_api.rst) for a summary of the API for operators and
+# schemes.
 
 # %%
 from ufl import (TestFunction, TrialFunction, SpatialCoordinate, FacetNormal,
@@ -417,6 +440,15 @@ print("Number of elements:",gridView.size(0),
 
 # %% [markdown]
 #
+# .. index:: Constant; Constant Definition
+#
+# .. note:: The **dune.ufl.Constant** class implements a scalar or vector
+# valued constant with a name. This constant can be used within a ufl form
+# and after the ufl form was converted into a `scheme` or `operator` the
+# given name can be used to change the constant within the form
+# efficiently, e.g., we can adapt the point in time or time step during the
+# simulation without requiring and just in time compilation.
+#
 # Note that $\alpha=1$ so we do not have the correct exact solution.
 # We can print the value of a `Constant` with name `foo` via
 # `scheme.model.foo` and change it's value using the same attribute:
@@ -438,7 +470,7 @@ print("Number of elements:",gridView.size(0),
 #
 # ## A Nonlinear Time Dependent Problem
 #
-# As a second example we will study the Forchheimer problem
+# As a final example in this section we will study the Forchheimer problem
 # <cite data-cite="Kieu"></cite>
 # which is a scalar, nonlinear parabolic equation
 # \begin{equation}
@@ -491,7 +523,8 @@ initial = 1/2*(x[0]**2+x[1]**2) - 1/3*(x[0]**3 - x[1]**3) + 1
 # mutable scalar and can be used within a ufl expression:
 
 # %%
-from ufl import FacetNormal, ds, div, dot, sqrt, exp
+from dune.fem.scheme import galerkin as solutionScheme
+from ufl import FacetNormal, ds, dx, inner, dot, div, grad, sqrt, exp, TrialFunction, TestFunction
 from dune.ufl import Constant
 dt = Constant(0, name="dt")    # time step
 t  = Constant(0, name="t")     # current time

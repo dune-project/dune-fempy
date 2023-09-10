@@ -285,6 +285,84 @@ print(info)
 u_h.plot()
 
 # %% [markdown]
+# .. index::
+#    pair: Models; Constants
+#
+# ## Adding `Constant` parameters and grid functions
+#
+# Every time we call `assemble` or construct a new `scheme` as show above,
+# some code must be compiled which leads to some extra time. In time
+# critical points of the simulation, e.g., in loops, this extra cost is not
+# acceptable. To avoid recompilation general [grid functions](concepts_nb.ipynb)
+# and placeholders for scalar or vector valued [constants](concepts_nb.ipynb)
+# can be used within the ufl forms.
+# In the [next section](concepts_nb.ipynb) we will give a full example for this in the
+# context of a time dependent problems.
+#
+# As a simple introduction we consider a linear version of the elliptic problem
+# considered previously
+# $$ -\varepsilon \triangle u(x) + m(x) u(x) = f(x) $$
+# with Neuman boundary conditions.
+# We also added a real valued constant $\varepsilon$ and we want to able to
+# change $m$ easily. Assuming $\bar{u}$ is the exact solution of the
+# non-linear elliptic problem from above then $\bar{u}$ will also solve the
+# above equation if $\varepsilon=1$ and we chose
+# $ m(x) = (1+\bar{u})^2$. We will use the discrete solution $u_h$ which
+# from above and chose $m(x) = (1+u_h)^2$. Later will will want to solve
+# the same linear problem but with different $\varepsilon=0$ and $m(x)=1$
+# so that we are simply looking at the $L^2$ projection of $f$:
+# $$ \int_\Omega uv = \int_\Omega fv~. $$
+#
+# Although the problem is linear and we could just use
+# ``dune.fem.assemble`` and Scipy to solve it, we will again use a ``scheme`` instead.
+# Details on schemes and operators will be provided in the following
+# section. For this example the important characteristic of a `scheme` is
+# that we can still access some information contained in the underlying UFL
+# form, e.g., the `Constants` used. This allows us to change these without
+# efficiently during the simulation as shown below.
+
+# %%
+from ufl import (TestFunction, TrialFunction, SpatialCoordinate, FacetNormal,
+                 dx, ds, grad, div, inner, dot, sin, cos, pi, conditional)
+from dune.ufl import Constant, DirichletBC
+from dune.fem.scheme import galerkin as solutionScheme
+
+epsilon = Constant(1,name="eps")   # start with epsilon=1
+x,u,v   = SpatialCoordinate(space), TrialFunction(space), TestFunction(space)
+f       = dot(x,x)
+a       = epsilon*dot(grad(u), grad(v)) * dx + (1+u_h)**2*u*v * dx
+b       = f*v*dx
+
+scheme = solutionScheme(a == b, solver='cg')
+w_h    = space.interpolate(0,name="w_h")
+scheme.solve(target = w_h)
+w_h.plot()
+
+# %% [markdown]
+#
+# Note that since $\varepsilon=1$ and we use the previously computed approximation $u_h$
+# the new discrete function $w_h$ is close to $u_h$.
+#
+# We can print the value of a `Constant` with name `foo` via
+# `scheme.model.foo` and change it's value using the same attribute:
+
+# %%
+print(scheme.model.eps)
+scheme.model.eps = 0          # change to the problem which matches our exact solution
+print(scheme.model.eps)
+
+# %% [markdown]
+# To switch to a standard $L^2$ projection we will also change
+# $m=(1+u_h)^2$ to $m\equiv 1$. This can be easily done by changing $u_h$
+# to be zero everywhere. This can be either done using `u_h.interpolate(0)` or
+# by using `u_h.clear()`.
+
+# %%
+u_h.interpolate(0)
+scheme.solve(target = w_h)
+w_h.plot()
+
+# %% [markdown]
 # A wide range of problems a covered in the
 # [further examples](furtherexamples.rst) section.
 # In the [next section](concepts_nb.ipynb) we explain the main concepts
