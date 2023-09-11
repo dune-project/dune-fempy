@@ -92,25 +92,49 @@ can be specified. So for example
   CXXFLAGS=-g python -m dune make -j8 hierarchicalgrid
 
 will rebuild all `hierarchicalgrid` which are out of date with debug flags.
-Note that after debugging the code one should use 
+One can force remaking, e.g., to change the compiler flags by providing the
+`--force` (or `-B`) flag. Note that after debugging the code one should
+rebuild to get optimized modules:
 
 .. code-block::
 
-  python -m dune remove hierarchicalgrid
-  python -m dune make hierarchicalgrid
+  python -m dune make --force -j8 hierarchicalgrid
 
-to get optimized modules.
+One can also remove or rebuild all modules used in a given script by first
+adding
+
+.. code-block::
+
+  dune.common.requiredModules("moduleslist.txt")
+
+to the end of the script. This will produce a file `moduleslist.txt`
+containing all dune jit modules loaded during the run of the script.
+Then one can rebuild (or remove) all modules by for example running
+
+.. code-block::
+
+  python -m dune remove --file moduleslist.txt
+
+or to force rebuilding all required modules with debug flags
+
+.. code-block::
+
+  CXXFLAGS=-g python -m dune make -j12 -B --file moduleslist.txt
 
 Using a debugger
 ----------------
 
-After rebuilding a module with debug flags as discussed above, we can
+After rebuilding a module, which is producing an error, with debug flags as discussed above, we can
 use something like `gdb` to debug the C++ code
 
 .. code-block::
 
   gdb python
   (gdb) r test.py
+
+
+List of build specific environment variables
+--------------------------------------------
 
 Other available environment variables are
 
