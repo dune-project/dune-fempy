@@ -13,6 +13,7 @@ manipulate this module using the `dune` main script:
   usage: dune [-h] {info,configure,list,remove,fix-dunepy,dunetype,checkbuilddirs}
 
   remove              Remove generated modules
+  make                Remake already existing modules in parallel
   info                Print information about dune-py
   list                List all generated modules
   dunetype            Show dune types for given modules
@@ -20,6 +21,9 @@ manipulate this module using the `dune` main script:
   fix-dunepy          Find inconsistencies in dune-py and try to fix automatically. This will potentially delete all generated modules.
   configure           Tag dune-py to be reconfigured before next use
   checkbuilddirs      (internal use) Check build directories
+
+Remove and rebuild existing modules
+-----------------------------------
 
 Probably the most important option here is `remove` which simplifies
 removing specific modules from `dune-py`. This is important to debug C++
@@ -76,7 +80,32 @@ Alternatively, we can set the flags from within a Python script
   algorithm(...)
   generator.reset()
 
-Now one can use `gdb` to debug the C++ code
+Another useful command is `make` which can be used to rebuild existing
+modules after some source code change. The `modules` argument is the same
+as for the `remove` command described above. In addition `-jN` can be used
+to fix the number of threads to use for making multiple modules in
+parallel. By default four threads are used. As described above `CXXFLAGS`
+can be specified. So for example
+
+.. code-block::
+
+  CXXFLAGS=-g python -m dune make -j8 hierarchicalgrid
+
+will rebuild all `hierarchicalgrid` which are out of date with debug flags.
+Note that after debugging the code one should use 
+
+.. code-block::
+
+  python -m dune remove hierarchicalgrid
+  python -m dune make hierarchicalgrid
+
+to get optimized modules.
+
+Using a debugger
+----------------
+
+After rebuilding a module with debug flags as discussed above, we can
+use something like `gdb` to debug the C++ code
 
 .. code-block::
 
