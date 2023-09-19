@@ -261,10 +261,19 @@ l = dot(x,x)*v * dx
 # To solve the non-linear problem we need to use something like a Newton
 # solver. We could use
 # [the implementation available in Scipy](solvers_nb.ipynb)
-# but ``dune-fem`` provides so called ``schemes`` that have a ``solve`` method
-# which can handle both linear and non-linear models. The default method is
-# a Newton-Krylov solver using a ``gmres`` method to solve the intermediate
-# linear problems. Since the problem here is symmetric we can use a ``cg``
+# but ``dune-fem`` provides so called
+# [``schemes``](concepts_nb.ipynb#Operators-and-Schemes)
+# that have a ``solve`` method which can handle both linear and non-linear models.
+# The default solver is based on a Newton-Krylov solver using a
+# ``gmres`` method to solve the intermediate linear problems.
+# These ``schemes`` are quite central to solving PDE is different ways,
+# including writting your own linear or non-linear solvers, accessing
+# degrees of freedom on the boundary etc. A detailed description on the
+# API is given [here](scheme_api.rst) and how to use the schemes in
+# different context to solve the problems on the Python side is available
+# [here](solvers_nb.ipynb).
+
+# Since the problem here is symmetric we can use a ``cg``
 # method. A full list of available solvers, preconditioners, and how
 # to customize them is available in the [Alternative Linear Solvers](solvers_nb.ipynb#Available-solvers-and-parameters) section.
 
@@ -288,13 +297,15 @@ u_h.plot()
 # .. index::
 #    pair: Models; Constants
 #
-# ## Adding `Constant` parameters and grid functions
+# ## Using `Constant` parameters and grid functions in PDEs
 #
 # Every time we call `assemble` or construct a new `scheme` as show above,
-# some code must be compiled which leads to some extra time. In time
+# some code must be compiled which leads to some extra cost. In time
 # critical points of the simulation, e.g., in loops, this extra cost is not
-# acceptable. To avoid recompilation general [grid functions](concepts_nb.ipynb)
-# and placeholders for scalar or vector valued [constants](concepts_nb.ipynb)
+# acceptable. To avoid recompilation general
+# [grid functions](concepts_nb.ipynb#Grid-Functions)
+# and placeholders for scalar or vector valued
+# [constants](concepts_nb.ipynb#Operators-and-Schemes)
 # can be used within the ufl forms.
 # In the [next section](concepts_nb.ipynb) we will give a full example for this in the
 # context of a time dependent problems.

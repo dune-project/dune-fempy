@@ -17,7 +17,7 @@
 # also available to retrieve the underlying matrix structures of linear
 # operators.
 #
-# We will revisit the nonlinear time dependent problem studied in the
+# We will mostly revisit the nonlinear time dependent problem studied in the
 # introduction which after discretizing in time had the variational formulation
 # \begin{equation}
 # \begin{split}
@@ -38,6 +38,7 @@
 
 # %%
 import numpy, sys, io
+import matplotlib.pyplot as plt
 
 from dune.grid import structuredGrid as leafGridView
 from dune.fem.space import lagrange as solutionSpace
@@ -141,8 +142,60 @@ for eocLoop in range(loops):
 # We implement a simple Newton Krylov solver using a linear solver from
 # Scipy. We can use the `as_numpy` method to access the degrees of freedom as
 # Numpy vector based on the `python buffer protocol`. So no data is copied
-# and changes to the dofs made on the python side are automatically carried
+# and changes to the dofs made on the Python side are automatically carried
 # over to the C++ side.
+
+# [markdown]
+# The most important step is accessing the data structures setup on the C++
+# side in Python. In this case we would like to use vectors of dofs from
+# a discrete function as numpy arrays and system matrices assembled by the
+# schemes and operators as scipy sparse matrices.
+# For the first problem we [discussed](dune-fempy.py) the `as_numpy` method
+# already. So
+
+# %%
+vecu_h = u_h.as_numpy
+
+# [markdown]
+# provides access to the underlying dof vector without copying. So changes
+# to the numpy array `vecu_h` carries over to the discrete function `u_h`.
+# Just remember to make changes using `vecu_h[:]` to change the actual
+# memory buffer.
+#
+# A `scheme` describing an operator `L`
+# provides a method `linear` which returns an object that
+# stores a sparse matrix structure. The matrix is empty at this point. To
+# fill it one can use the `jacobian` method on the `scheme` that linearized
+# the the operator `L` around a given grid function `ubar` and fills the matrix
+# structure in the given linear operator:
+
+# %%
+linOp = scheme.linear()
+scheme.jacobian(space.zero, linOp)
+
+# [markdown]
+# Here we linearize around zero. But that argument could be any grid
+# function. A second version of this method will return an addition
+# discrete function `rhs` such that `DL[ubar] - rhs` are the first terms in
+# the Taylor expansion of the operator `L`:
+
+# %%
+rhs = u_h.copy()
+scheme.jacobian(u_h, linOp) # CHECK , rhs)
+
+# [markdown]
+# One can now easily access the underlying sparse matrix by again using
+# `as_numpy` (again the underlying data buffers are not copied):
+
+# %%
+A = linOp.as_numpy
+print(type(A))
+plt.spy(A, precision=1e-8, markersize=1)
+plt.show()
+
+# [markdown]
+# Now we have all the ingredients to write a simple Newton solver to solve
+# our example non-linear time dependent PDE.
 
 # %%
 import numpy as np
@@ -266,7 +319,7 @@ op     = galerkin([model, *dbcs], space)
 lin    = op.linear()
 sol = space.interpolate(0, name="u_h")
 rhs = sol.copy()
-op.jacobian(lin,rhs)
+op.jacobian(space.zero,lin,rhs)
 
 # %% [markdown]
 # So far everything is as before. Dirichlet boundary conditions
@@ -340,7 +393,7 @@ if petsc4py is not None and spacePetsc is not None:
       def __init__(self, scheme):
           self.model = scheme.model
           self.jacobian = scheme.linear()
-          scheme.jacobian(self.rangeSpace.zero,self.jacobian)
+          scheme.jacobian(scheme.rangeSpace.zero,self.jacobian)
           self.ksp = PETSc.KSP()
           self.ksp.create(PETSc.COMM_WORLD)
           # use conjugate gradients method
@@ -381,7 +434,7 @@ if petsc4py is not None and spacePetsc is not None:
             self.res = scheme.space.interpolate([0],name="residual")
             self.scheme = scheme
             self.jacobian = scheme.linear()
-            self.jacobian(scheme.rangeSpace.zero,self.jacobian)
+            scheme.jacobian(scheme.rangeSpace.zero,self.jacobian)
             self.snes = PETSc.SNES().create()
             self.snes.setFunction(self.f, self.res.as_petsc.duplicate())
             self.snes.setUseMF(False)

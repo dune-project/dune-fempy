@@ -105,7 +105,7 @@ adding
 
 .. code-block::
 
-  dune.common.requiredModules("moduleslist.txt")
+  dune.generated.requiredModules("moduleslist.txt")
 
 to the end of the script. This will produce a file `moduleslist.txt`
 containing all dune jit modules loaded during the run of the script.
@@ -120,6 +120,15 @@ or to force rebuilding all required modules with debug flags
 .. code-block::
 
   CXXFLAGS=-g python -m dune make -j12 -B --file moduleslist.txt
+
+Finally, this rebuilding of the required modules can be carried out at the
+beginning of the script by adding for example
+
+.. code-block::
+
+  dune.commands.makegenerated(fileName="moduleslist.txt", threads=12)
+
+The function also takes a boolean `force` argument.
 
 Using a debugger
 ----------------
