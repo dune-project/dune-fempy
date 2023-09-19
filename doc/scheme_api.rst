@@ -36,13 +36,13 @@ Scheme without DBC:
 - Missing on scheme:
    - gridSizeInterior:
 - New on scheme:  
-   - inverseLinearOperator:
+   - inverseLinearOperator: not sure if this is used
    - parameterHelp:
    - parameters:
    - preconditioning:
    - setErrorMeasure:
    - solve:
-   - space: (since domainSpace=rangeSpace)
+   - space: (keep since we know that domainSpace=rangeSpace)
 
 Scheme with DBC:
 ----------------

@@ -98,11 +98,13 @@ Table of Content
    inforesources
 
 .. toctree::
+   :caption: Additional pages
    :hidden:
 
    gmsh2dgf_nb
    slurmbatchscript
    scheme_api
+   todo
 
 .. API reference <api/modules>
 
