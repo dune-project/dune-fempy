@@ -267,7 +267,7 @@ l = dot(x,x)*v * dx
 # The default solver is based on a Newton-Krylov solver using a
 # ``gmres`` method to solve the intermediate linear problems.
 # These ``schemes`` are quite central to solving PDE is different ways,
-# including writting your own linear or non-linear solvers, accessing
+# including writing your own linear or non-linear solvers, accessing
 # degrees of freedom on the boundary etc. A detailed description on the
 # API is given [here](scheme_api.rst) and how to use the schemes in
 # different context to solve the problems on the Python side is available
@@ -333,10 +333,7 @@ u_h.plot()
 # efficiently during the simulation as shown below.
 
 # %%
-from ufl import (TestFunction, TrialFunction, SpatialCoordinate, FacetNormal,
-                 dx, ds, grad, div, inner, dot, sin, cos, pi, conditional)
-from dune.ufl import Constant, DirichletBC
-from dune.fem.scheme import galerkin as solutionScheme
+from dune.ufl import Constant
 
 epsilon = Constant(1,name="eps")   # start with epsilon=1
 x,u,v   = SpatialCoordinate(space), TrialFunction(space), TestFunction(space)
@@ -344,10 +341,14 @@ f       = dot(x,x)
 a       = epsilon*dot(grad(u), grad(v)) * dx + (1+u_h)**2*u*v * dx
 b       = f*v*dx
 
-scheme = solutionScheme(a == b, solver='cg')
+scheme = solutionScheme([a == b,DirichletBC(space,0)], solver='cg')
 w_h    = space.interpolate(0,name="w_h")
 scheme.solve(target = w_h)
 w_h.plot()
+
+from dune.fem.operator import galerkin
+op = galerkin(a == b)
+print(dir(op))
 
 # %% [markdown]
 #
