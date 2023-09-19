@@ -145,7 +145,7 @@ for eocLoop in range(loops):
 # and changes to the dofs made on the Python side are automatically carried
 # over to the C++ side.
 
-# [markdown]
+# %% [markdown]
 # The most important step is accessing the data structures setup on the C++
 # side in Python. In this case we would like to use vectors of dofs from
 # a discrete function as numpy arrays and system matrices assembled by the
@@ -156,7 +156,7 @@ for eocLoop in range(loops):
 # %%
 vecu_h = u_h.as_numpy
 
-# [markdown]
+# %% [markdown]
 # provides access to the underlying dof vector without copying. So changes
 # to the numpy array `vecu_h` carries over to the discrete function `u_h`.
 # Just remember to make changes using `vecu_h[:]` to change the actual
@@ -173,7 +173,7 @@ vecu_h = u_h.as_numpy
 linOp = scheme.linear()
 scheme.jacobian(space.zero, linOp)
 
-# [markdown]
+# %% [markdown]
 # Here we linearize around zero. But that argument could be any grid
 # function. A second version of this method will return an addition
 # discrete function `rhs` such that `DL[ubar] - rhs` are the first terms in
@@ -181,9 +181,9 @@ scheme.jacobian(space.zero, linOp)
 
 # %%
 rhs = u_h.copy()
-scheme.jacobian(u_h, linOp) # CHECK , rhs)
+scheme.jacobian(u_h, linOp, rhs)
 
-# [markdown]
+# %% [markdown]
 # One can now easily access the underlying sparse matrix by again using
 # `as_numpy` (again the underlying data buffers are not copied):
 
@@ -193,7 +193,7 @@ print(type(A))
 plt.spy(A, precision=1e-8, markersize=1)
 plt.show()
 
-# [markdown]
+# %% [markdown]
 # Now we have all the ingredients to write a simple Newton solver to solve
 # our example non-linear time dependent PDE.
 
