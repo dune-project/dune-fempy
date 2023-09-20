@@ -102,8 +102,9 @@ The resulting operator will have the same methods as before but both the
 ``__call__`` and the ``jacobian`` method will include handing of the
 Dirichlet boundary conditions:
 
-- ``__call__``: this method will as before compute :math:`w_h=L[v_h]` but
-  will in addition all components in :math:`w_h` associated with the
+- ``__call__``: this method will as before compute :math:`w_h=L[v_h]` 
+  (where :math:`v_h` can be a general grid function as pointed out above).
+  But in addition all components in :math:`w_h` associated with the
   Dirichlet boundary will be of the form :math:`w_i = v_i - g_i` where
   :math:`g_i` is the given boundary data evaluate at the corresponding
   degree of freedom.
@@ -117,16 +118,46 @@ Dirichlet boundary conditions:
             for each of these functionals.
 
 - ``jacobain``: the matrix assembled will contain a unit row for each row
-  associated with the Dirichlet constraints.
+  associated with the Dirichlet constraints. If the version with the right
+  hand side argument is used, the components for the Dirichlet degrees of
+  freedom will contain :math:`g_i`.
 
   .. note:: this corresponds to the correct linearization of :math:`w_i=u_i-g_i`.
 
 In addition to the methods from the standard operator these operators have
 additional methods:
 
-- ``setConstraints``:
-- ``subConstraints``:
-- ``dirichletBlocks``:
+- ``setConstraints``: in it's simplest version this method takes a single
+  discrete function :math:`w_h`. This changes the components of
+  :math:`w_h` at the Dirichlet boundary, i.e., :math:`w_i=g_i` where the
+  boundary data is taken from the ``DirichletBC`` instances. Another
+  version takes a general grid function as a first argument
+  ``op.setConstrains(v,w_h)`` which leads to
+  :math:`w_i=v_i` (i.e. :math:`\lambda(w)=\lambda(v)` with the boundary
+  degree functionals). Finally one can provide a single number as first
+  argument, e.g., ``op.setConstraint(0,w_h)`` which leads to
+  :math:`w_i=0`.
+- ``subConstraints``: there is only one version of this method
+  ``op.subConstrains(v,w_h)`` leading to :math:`w_i = w_i+v_i`.
+- ``dirichletBlocks``: this method provides indices of the degrees of
+  freedom on the Dirichlet boundary defined by the ``DirichletBC`` instances.
+  ``dblocks = op.dirichletBlocks``. The value ``dblock`` returned is a list
+  of lists....
+
+  .. todo::
+
+    dirichletBlocks method needs changing or some explanation here.
+    I don't want to explain blocked dofs here. And one actually needs a flat
+    list of boundary dof indices + dirichlet id. Currently one needs to write
+    something like
+
+    .. code:: python
+
+      for i,block in enumerate(dblock):         # a block is of size `dimRange` (for Lagrange)
+        for j,b in enumerate(block):            # iterate over the block
+            # 'b' is the `id` of the boundary as described below
+            if b > 0:                           # if b>0 it's a Dirichlet boundary
+                # do something
 
 .. index:: Scheme; Scheme API
 
