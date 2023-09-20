@@ -63,13 +63,13 @@ throughout the tutorial:
 The call to ``dune.fem.operator.galerkin`` could as mentioned above include
 the domain and ranges spaces to use.
 
-- `domainSpace`: the discrete domain space :math:`V_h` for the operator.
-- `rangeSpace`:  the discrete range space :math:`W_h` for the operator.
-- `linear`:      return a operator class that can store the linearization :math:`DL`.
+- ``domainSpace``: the discrete domain space :math:`V_h` for the operator.
+- ``rangeSpace``:  the discrete range space :math:`W_h` for the operator.
+- ``linear``:      return a operator class that can store the linearization :math:`DL`.
   This contains an underlying (sparse) matrix structure that
   will depend on the storage argument provided to the spaces.
-- `__call__`:    evaluate the operator.
-- `jacobian`:    perform the linearization constructing the matrix inside
+- ``__call__``:    evaluate the operator.
+- ``jacobian``:    perform the linearization constructing the matrix inside
   the provided linear operator. There are two versions for
   this call: ``op.jacobian(gf,linOp)`` and ``op.jacobian(gf,linOp,b_h)``.
   The first version was described above, the second version
@@ -80,10 +80,10 @@ the domain and ranges spaces to use.
   right hand side needed to solve the problem. For example
   if :math:`L[v_h]` is linear then :math:`DL[0]v_h = b_h` is the linear
   system that defines the solution to :math:`L[v_h]=0`.
-- `model`:
-- `setCommunicate`:
-- `setQuadratureOrders`:
-- `gridSizeInterior`:
+- ``model``:
+- ``setCommunicate``:
+- ``setQuadratureOrders``:
+- ``gridSizeInterior``:
 
 Operator with DBC:
 ------------------
@@ -100,11 +100,13 @@ during construction of the operator:
 
 The resulting operator will have the same methods as before but both the
 ``__call__`` and the ``jacobian`` method will include handing of the
-dirichlet boundary conditions:
+Dirichlet boundary conditions:
 
-- `__call__`: this method will as before compute :math:`w_h=L[v_h]` but
+- ``__call__``: this method will as before compute :math:`w_h=L[v_h]` but
   will in addition all components in :math:`w_h` associated with the
-  Dirichlet boundary will be of the form :math:`w_i = v_i - g`.
+  Dirichlet boundary will be of the form :math:`w_i = v_i - g_i` where
+  :math:`g_i` is the given boundary data evaluate at the corresponding
+  degree of freedom.
 
   .. note:: a more mathematical explanation is to consider all functionals
             :math:`\lambda` which are associated with the boundaries, i.e.,
@@ -114,15 +116,17 @@ dirichlet boundary conditions:
             :math:`\lambda(w_h) = \lambda(v_h-g) = \lambda(v_h)-\lambda(g)`
             for each of these functionals.
 
-- `jacobain`: the matrix assembled will contain a unit row for each row
+- ``jacobain``: the matrix assembled will contain a unit row for each row
   associated with the Dirichlet constraints.
+
+  .. note:: this corresponds to the correct linearization of :math:`w_i=u_i-g_i`.
 
 In addition to the methods from the standard operator these operators have
 additional methods:
 
-- `setConstraints`:
-- `subConstraints`:
-- `dirichletBlocks`:
+- ``setConstraints``:
+- ``subConstraints``:
+- ``dirichletBlocks``:
 
 .. index:: Scheme; Scheme API
 
@@ -138,16 +142,16 @@ available.
 
 All methods from operators are available on schemes. In addition we have
 
-- `space`: this is a convenience method made available since the domain and
+- ``space``: this is a convenience method made available since the domain and
   the range space are identical.
-- `solve`: this is the central new method available in ``schemes``. 
+- ``solve``: this is the central new method available in ``schemes``. 
   A call ``scheme.solve(target=v_h)`` returns a solution to the problem
   :math:`L[v_h]=0`. This is by default based on a Newton-Krylov solver.
-- `parameters`:
-- `parameterHelp`:
-- `preconditioning`:
-- `setErrorMeasure`:
-- `inverseLinearOperator`: not sure if this is used
+- ``parameters``:
+- ``parameterHelp``:
+- ``preconditioning``:
+- ``setErrorMeasure``:
+- ``inverseLinearOperator``: not sure if this is used
 
 Scheme with DBC:
 ----------------
@@ -159,14 +163,14 @@ well.
 Additional
 ----------
 
-- `virtualization`:
+- ``virtualization``:
 
 Unclear
 -------
 
-- `dimRange`: is available on schemes.
+- ``dimRange``: is available on schemes.
   The following should be removed or on operator (same as ``scheme.rangeSpace.dimRange``
   or even ``scheme.space.dimRange=scheme.domainSpace.dimRange``)
-- `gridSizeInterior`: is missing on scheme
+- ``gridSizeInterior``: is missing on scheme
 
 
