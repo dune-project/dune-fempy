@@ -6,38 +6,42 @@ API for schemes and operators
 Abstract concepts
 -----------------
 
-The following give a mathematical description of the operator concepts used
+In the following we give a short mathematical description of the operator concepts used
 in this module. This can be skipped and the description of the methods
-should still be understandable.
+further down should still be understandable.
 
-The operator classes represent an operator :math:`L\colon V_h\to W_h^*` where
-:math:`V_h,W_h` are discrete function spaces and :math:`W_h^*` is the dual of :math:`W_h`.
+The operator classes represent operators :math:`L\colon V_h\to W_h^*` where
+the domain and range space :math:`V_h,W_h` are discrete function spaces and
+:math:`W_h^*` is the dual of :math:`W_h`.
 We will in general not differentiate between duals and the actual function
-because it is finite dimensional.
-In the most common example these operators are given by form :math:`a(v_h,w_h)`
-which is linear in the second argument (test function) but can be nonlinear
+because the range space is finite dimensional.
+In the most common example these operators are given by forms :math:`a(v_h,w_h)`
+which are linear in the second argument (test function) but can be nonlinear
 in the first argument (trial function).
 In this case :math:`L[v_h] := a(v_h,\cdot)\in W_h^*` or for any
 :math:`w_h\in W_h\colon <L[v_h],w_h> := a(v_h,w_h)`.
-This is modelled by ``dune.fem.operator.galerkin`` for forms defined in ufl.
+This is provided by ``dune.fem.operator.galerkin`` for forms defined in ufl.
 
 Mainly operators can be evaluated, i.e., we can compute :math:`w_h:=L[v_h]` using
-the ``__call__`` method: `operator(v_h,w_h)`. In addition it is possible to
+the ``__call__`` method: ``operator(v_h,w_h)``. In addition it is possible to
 compute the linearization :math:`DL[\bar{v}_h]` around some function
 :math:`\bar{v}_h\in V_h`. This is done using the ``jacobian`` method on the operator.
 The linearization is now a bilinear form :math:`\bar{a}(v_h,w_h;\bar{v_h})`.
 
 .. note:: both the ``__call__`` and the ``jacobian`` method can be called using
-          grid function instead of discrete :math:`v_h` and :math:`\bar{v}_h`,
+          grid functions instead of discrete functions :math:`v_h` and :math:`\bar{v}_h`,
           respectively.
 
-In the following we focus on the operators returned by ``dune.fem.operator.galerkin``:
+Operator without DBC:
+---------------------
 
-The minimal requirements for the construction is to provide a ufl form
+In the following we focus on the operators returned by
+``dune.fem.operator.galerkin``.
+The minimal requirements for constructing such an operator is to provide a ufl form
 where the domain and range space is extracted from the trial and test
-function. In this case these have be constructed based on discrete function
+function. In this case these have to be constructed based on discrete function
 spaces $V_h,W_h$, respectively, so one can not use the abstract
-``dune.ufl.Space``. It is possible to provide discrete spaces as extra arguments
+``dune.ufl.Space``. It is instead possible to provide discrete spaces as extra arguments
 ``domainSpace,rangeSpace`` to override the spaces uses to construct the
 trial and test functions. Many examples like the one below can be found
 throughout the tutorial:
@@ -56,8 +60,8 @@ throughout the tutorial:
     linOp = op.linear()
     op.jacobian(gf,linOp) # gf is the function around which to linearize
 
-Operator without DBC:
----------------------
+The call to ``dune.fem.operator.galerkin`` could as mentioned above include
+the domain and ranges spaces to use.
 
 - `domainSpace`: the discrete domain space :math:`V_h` for the operator.
 - `rangeSpace`:  the discrete range space :math:`W_h` for the operator.
