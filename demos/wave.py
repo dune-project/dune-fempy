@@ -1,7 +1,7 @@
 # %% [markdown]
 # .. index:: Equations; Wave Equation
 #
-# # Wave Equation in a Slit Domain
+# # Wave Equation: double slit domain
 #
 # In the following we will consider the wave equation
 # \begin{align*}

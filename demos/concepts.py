@@ -224,12 +224,9 @@ exactGlobal.plot(figure=(fig,122))
 # %% [markdown]
 #
 # .. index::
-#    pair: Functions; Discrete Functions
-#
-# .. index::
 #    pair: Spaces; Lagrange Space
 #
-# ## Discrete Spaces and Discrete Functions
+# ## Discrete Spaces
 #
 # The grid functions set up so far did not involve any
 # discretization, they are exactly evaluated at the given point.
@@ -246,6 +243,43 @@ space = solutionSpace(gridView, order=2)
 # %% [markdown]
 #
 # A list of available spaces is shown at the bottom of this page.
+# The main method on the space is ``interpolate`` that returns an
+# element of the space (a discrete function) applying the natural
+# interpolation into the space to a given (ufl) expression.
+# This is explained in detail in the next section.
+#
+# Two other methods on the discrete spaces worth noting provide access to the local to global dof
+# mapper and evaluate the basis functions.
+#
+# First we have the ``mapper`` method. This returns a callable object which
+# for a given element in the grid, returns the vector of global indices for
+# the basis functions with support on the element:
+
+# %%
+mapper = space.mapper
+for i,element in enumerate(gridView.elements):
+    print( mapper(element) )
+    if i == 4: break # only show indices for first few elements
+
+# %% [markdown]
+#
+# To access the basis functions with support on an element we provide the
+# method ``evaluateBasis``, ``jacobianBasis``:
+
+# %%
+localPoint = [0.1,0.1] # this is in the reference element
+for i,element in enumerate(gridView.elements):
+    print( space.evaluateBasis(element, localPoint) )
+    if i == 4: break
+print("convert to a numpy array:", np.array( space.jacobianBasis(element, localPoint) ) )
+
+
+# %% [markdown]
+#
+# .. index::
+#    pair: Functions; Discrete Functions
+#
+# ## Discrete Functions
 #
 # .. note::
 # A special type of grid function is a **discrete function** living in a

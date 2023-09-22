@@ -31,7 +31,8 @@ from dune.fem.view import adaptiveLeafGridView as adaptiveGridView
 from dune.fem.space import lagrange as solutionSpace
 from dune.alugrid import aluConformGrid as leafGridView
 from ufl import *
-from dune.ufl import DirichletBC, expression2GF
+from dune.ufl import DirichletBC
+from dune.fem.function import uflFunction
 
 
 # set the angle for the corner (0<angle<=360)
@@ -91,13 +92,14 @@ uh, exact, laplace = setup()
 # to minimize the error. To compute the dwr estimator we need the solution
 # to the dual problem with right hand side $J(\varphi_i)$ for all basis
 # functions $\varphi_i$. This is not directly expressible in UFL and we
-# therefore implement this using a small C++ function which we then export
-# to Python:
-#
-# .. literalinclude:: laplace-dwr.hh
+# therefore need to implement this either using some lower level functions
+# on the space or using a small C++ function which we then export
+# to Python.
 
 # %%
 from dune.fem.scheme import galerkin as solutionScheme
+from dune.fem.utility import pointSample
+
 spaceZ = solutionSpace(uh.space.gridView, order=order+1)
 u = TrialFunction(spaceZ)
 v = TestFunction(spaceZ)
@@ -108,11 +110,31 @@ z = spaceZ.interpolate(0, name="dual")
 zh = uh.copy(name="dual_h")
 point = common.FieldVector([0.4,0.4])
 pointFunctional = z.copy("dual_rhs")
-eh = expression2GF( uh.space.gridView, abs(exact-uh), order=order+1 )
-computeFunctional = algorithm.load("pointFunctional", "laplace-dwr.hh",
-            point, pointFunctional, eh)
+eh = uflFunction(uh.space.gridView, "error", order+1, abs(exact-uh))
+if False: # use the C++ version
+    computeFunctional = algorithm.load("pointFunctional", "laplace-dwr.hh",
+                                  point, pointFunctional, eh)
+else: # this is the equivalent implementation using the bindings
+    def computeFunctional(point, pointFunctional, eh):
+        space = pointFunctional.space
+        en, xLoc = pointSample(space.gridView, point)
+        phiVal = numpy.array( space.evaluateBasis(en, xLoc) )[:,0] # issue here with scalar function spaces
+        idx = space.mapper(en)
+        lf = eh.localFunction()
+        lf.bind(en)
+        pointFunctional.as_numpy[ idx ] += phiVal
+        return lf(xLoc)
 
 # %% [markdown]
+#
+# Here is the corresponding C++ code
+#
+# .. literalinclude:: laplace-dwr.hh
+#
+
+# %% [markdown]
+# Next we define the actual estimator
+
 # %%
 from dune.fem.space import finiteVolume as estimatorSpace
 from dune.fem.operator import galerkin as estimatorOp
@@ -130,6 +152,7 @@ tolerance = 1e-6
 
 # %% [markdown]
 # Let us solve over a loop (solve,estimate,mark) and plot the solutions side by side.
+
 # %%
 h1error = dot(grad(uh - exact), grad(uh - exact))
 fig = pyplot.figure(figsize=(30,30))
@@ -183,3 +206,5 @@ plot(levels, figure=(fig, 132), xlim=(-0.1, 0.5), ylim=(-0.1, 0.5),
         gridLines="white", colorbar={"shrink": 0.75})
 plot(levels, figure=(fig, 133), xlim=(-0.02, 0.5), ylim=(-0.02, 0.5),
         gridLines="white", colorbar={"shrink": 0.75})
+
+pyplot.show()
