@@ -3,7 +3,8 @@ Tutorial for the Python Bindings of DUNE-FEM Module
 
 *Authors: Andreas Dedner, Martin Nolte, and Robert Kl&ouml;fkorn*
 
-**dune-fempy** provides Python scripts that form the [tutorial][tutlink] for the [dune-fem][femlink] discretization
+This repository for the **dune-fem** modules provides the Python scripts that form the
+[tutorial][tutlink] for the [dune-fem][femlink] discretization
 module. Here is an example:
 
 ```Python
@@ -23,7 +24,7 @@ domain = cartesianDomain([0, 0], [1, 1], [16, 16])
 gridView = aluConformGrid( domain, dimgrid=2)
 
 # set up a space and a conforming finite element scheme and solve the PDE
-space  = lagrange(gridView, dimrange=1, order=1)
+space  = lagrange(gridView, dimRange=1, order=1)
 uh = space.function(name="u_h")
 
 # set up a diffusion reaction model using UFL
