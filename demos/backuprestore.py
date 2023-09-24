@@ -21,26 +21,26 @@ import ufl
 
 order = 4
 def setup():
-    grid = view( aluConformGrid( cartesianDomain([-2,-2],[2,2],[10,10]) ) )
+    gridView = view( aluConformGrid( cartesianDomain([-2,-2],[2,2],[10,10]) ) )
 
-    @gridFunction(grid, name="gf", order=3)
+    @gridFunction(gridView, name="gf", order=3)
     def gf(x): return numpy.sqrt(1-(x[0]**2+x[1]**2)) if x[0]**2+x[1]**2<1 else 0
 
-    space = lagrange(grid, order=order)
+    space = lagrange(gridView, order=order)
     df = space.interpolate(gf,name="test")
 
-    grid.hierarchicalGrid.globalRefine(4)
+    gridView.hierarchicalGrid.globalRefine(4)
     for i in range(5):
-        grid.hierarchicalGrid.mark(lambda e:
+        gridView.hierarchicalGrid.mark(lambda e:
              Marker.refine if df.localFunction(e).jacobian([1./3.,1./3.]).infinity_norm > 1
              else Marker.coarsen)
-        adapt(grid.hierarchicalGrid)
+        adapt(gridView.hierarchicalGrid)
         df.interpolate( gf )
-    print("size of adapted grid:", grid.size(0))
+    print("size of adapted grid view:", gridView.size(0))
 
     t = Constant(0,"time")
     x = ufl.SpatialCoordinate(space)
-    gf = uflFunction(grid,order=2,name="tanh",
+    gf = uflFunction(gridView,order=2,name="tanh",
                      ufl=ufl.tanh(2*(t*x[0]-x[1]))*ufl.dot(x,x) )
     return df, space.interpolate(gf,name="tanh_h"),gf
 
@@ -134,7 +134,7 @@ class CheckPointer:
             i.read(d)
 
 # %% [markdown]
-# First test: construct the grid, some discrete function, and refine the mesh.
+# First test: construct the grid view, some discrete function, and refine the mesh.
 # The result is then store in a file.
 
 # %%
@@ -153,7 +153,7 @@ test1("dump.pickle")
 # %%
 checkPointer = CheckPointer("dump.pickle")
 gridView = checkPointer.gridView
-print("size of restored grid:", gridView.size(0))
+print("size of restored grid view:", gridView.size(0))
 space = lagrange(gridView, order=order)
 df1 = space.function(name="test")
 df2 = space.function(name="test")

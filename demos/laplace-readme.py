@@ -12,7 +12,7 @@ domain = cartesianDomain([0, 0], [1, 1], [16, 16])
 gridView = aluConformGrid( domain, dimgrid=2)
 
 # set up a space and a conforming finite element scheme and solve the PDE
-space  = lagrange(gridView, dimrange=1, order=1)
+space  = lagrange(gridView, dimRange=1, order=1)
 uh = space.function(name="u_h")
 
 # set up a diffusion reaction model using UFL
