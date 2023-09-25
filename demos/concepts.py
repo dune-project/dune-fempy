@@ -121,6 +121,20 @@ gridView.writeVTK('exact', pointdata={'exact': exact})
 # element in the grid ([in a later section](dune-corepy_nb.ipynb)
 # we provide more detail on how to access the grid interface).
 
+# .. index::
+#    pair: uflFunction; dune.fem
+#
+# .. note::
+# ``uflFunction`` is used to compile a module to evaluate an ufl
+# expression generating a grid function which can be
+# efficiently evaluated on both the Python and the C++ side.
+# Especially in time critical parts of the code the usage of
+# ``uflFunction`` is strongly encouraged to speed up simulations.
+# Like ``assemble`` and ``integrate`` this function takes two additional
+# arguments ``order`` and ``gridView``. See the
+# [introduction](dune-fempy_nb.ipynb) for more detail.
+#
+
 # %%
 from dune.fem.function import uflFunction
 exact_gf = uflFunction(gridView, name="ufl", order=1, ufl=exact)
