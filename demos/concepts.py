@@ -91,7 +91,7 @@ gridView.plot()
 #        localFunction.unbind()
 # ```
 # There are multiple ways to construct grid functions. The easiest way it
-# to use UFL expression. Many methods expecting grid functions are argument
+# to use UFL expression. Many methods expecting grid functions as argument
 # can also directly handle UFL expression.
 # We can for example integrate a UFL expression over the grid:
 
@@ -101,8 +101,8 @@ x = SpatialCoordinate(triangle)
 
 exact = 1/2*(x[0]**2+x[1]**2) - 1/3*(x[0]**3 - x[1]**3) + 1
 
-from dune.fem.function import integrate
-print( integrate(gridView, exact, order=5) )
+from dune.fem import integrate
+print( integrate(exact, gridView=gridView, order=5) )
 
 # %% [markdown]
 # .. index::
@@ -122,22 +122,31 @@ gridView.writeVTK('exact', pointdata={'exact': exact})
 # we provide more detail on how to access the grid interface).
 
 # .. index::
-#    pair: uflFunction; dune.fem
+#    pair: Functions; dune.fem.function.gridFunction
 #
 # .. note::
-# ``uflFunction`` is used to compile a module to evaluate an ufl
-# expression generating a grid function which can be
-# efficiently evaluated on both the Python and the C++ side.
+# ``dune.fem.function.gridFunction`` provides different options for
+# constructing grid functions: it can be used as decorator of Python
+# function, provided with a C++ code snippet, or an ufl expression.
+#
+# .. index::
+#    triple: Functions; Grid Functions; ufl grid function
+#
+# We will discuss the second usages later and have some example for using
+# C++ code snippets [in a later section](cppfunctions_nb.ipynb).
+# If the first argument `expr`
+# is a ufl expression then a grid function is generated
+# which can be efficiently evaluated on both the Python and the C++ side.
 # Especially in time critical parts of the code the usage of
-# ``uflFunction`` is strongly encouraged to speed up simulations.
-# Like ``assemble`` and ``integrate`` this function takes two additional
+# ``gridFunction`` is strongly encouraged to speed up simulations.
+# Like ``assemble`` and ``integrate`` `gridFunction` takes two additional
 # arguments ``order`` and ``gridView``. See the
 # [introduction](dune-fempy_nb.ipynb) for more detail.
 #
 
 # %%
-from dune.fem.function import uflFunction
-exact_gf = uflFunction(gridView, name="ufl", order=1, ufl=exact)
+from dune.fem.function import gridFunction
+exact_gf = gridFunction(exact, gridView, name="ufl", order=1)
 mass = 0
 for element in gridView.elements:
     mass += exact_gf(element,[0.5,0.5]) * element.geometry.volume
@@ -147,7 +156,7 @@ print(mass)
 # .. index::
 #    triple: Functions; Grid Functions; Decorator
 #
-# Another way to obtain a grid function is to use the `gridFunction`
+# Another way to obtain a grid function is to use the `gridFunction` as
 # decorator. This can be obtained from `dune.grid` but then without UFL
 # support. Using the decorator from `dune.fem.function` the resulting grid
 # function can be used seamlessly within UFL expressions:
@@ -185,8 +194,8 @@ print(mass)
 # UFL coefficient to form UFL expressions:
 
 # %%
-print( integrate(gridView, abs(exact-exactLocal), order=5) )
-gf = uflFunction(gridView, name="ufl", order=1, ufl=exact+exactLocal*exactGlobal)
+print( integrate(abs(exact-exactLocal)) )
+gf = gridFunction(exact+exactLocal*exactGlobal, name="ufl")
 fig = plt.figure(figsize=(20,10))
 gf.plot(figure=(fig,121))
 exactGlobal.plot(figure=(fig,122))
@@ -309,7 +318,7 @@ gridView.writeVTK('uh', pointdata=[u_h])
 # Of course a discrete function can also be used as a coefficient in a UFL expression
 
 # %%
-print( integrate(gridView, abs(exact-u_h), order=5) )
+print( integrate(abs(exact-u_h)) )
 
 # %% [markdown]
 # The main difference between a grid function and a discrete function is
@@ -399,7 +408,7 @@ scheme = solutionScheme([a == b, dbc], solver='cg')
 scheme.solve(target = u_h)
 
 h1error = dot(grad(u_h - exact), grad(u_h - exact))
-error = np.sqrt(integrate(gridView, h1error, order=5))
+error = np.sqrt(integrate(h1error))
 print("Number of elements:",gridView.size(0),
       "number of dofs:",space.size,"H^1 error:", error)
 
@@ -417,7 +426,7 @@ print(scheme.model.mass)
 scheme.solve(target = u_h)
 
 h1error = dot(grad(u_h - exact), grad(u_h - exact))
-error = np.sqrt(integrate(gridView, h1error, order=5))
+error = np.sqrt(integrate(h1error))
 print("Number of elements:",gridView.size(0),
       "number of dofs:",space.size,"H^1 error:", error)
 
@@ -532,17 +541,15 @@ scheme = solutionScheme(a == b, solver='cg')
 # the discretization error. First we define ufl expressions for the $L^2$
 # and $H^1$ norms and will use those to compute the experimental order of
 # convergence of the scheme by computing the time evolution on different grid
-# levels. We use ``dune.fem.function.uflFunction`` to generate code for the
+# levels. We use ``dune.fem.function.gridFunction`` to generate code for the
 # errors which can be more efficient than using the ufl expressions
 # directly.
 
 # %%
 endTime    = 0.25
 exact_end  = exact(endTime)
-l2error = uflFunction(gridView, name="l2error", order=u_h.space.order,
-                      ufl=dot(u_h - exact_end, u_h - exact_end))
-h1error = uflFunction(gridView, name="h1error", order=u_h.space.order,
-                      ufl=dot(grad(u_h - exact_end), grad(u_h - exact_end)))
+l2error = gridFunction(dot(u_h - exact_end, u_h - exact_end), name="l2error")
+h1error = gridFunction(dot(grad(u_h - exact_end), grad(u_h - exact_end)), name="h1error")
 
 # %% [markdown]
 # .. index::
@@ -565,7 +572,7 @@ while time < (endTime - 1e-6):
     scheme.solve(target=u_h)
     time += scheme.model.dt
 
-errors = [np.sqrt(e) for e in integrate(gridView, [l2error,h1error], order=5)]
+errors = [np.sqrt(e) for e in integrate([l2error,h1error])]
 print('grid size:', gridView.size(0))
 print('\t | u_h - u | =', '{:0.5e}'.format(errors[0]))
 print('\t | grad(uh - u) | =', '{:0.5e}'.format(errors[1]))
@@ -586,7 +593,7 @@ while time < (endTime - 1e-6):
     scheme.solve(target=u_h)
     time += scheme.model.dt
 
-errorsFine = [np.sqrt(e) for e in integrate(gridView, [l2error,h1error], order=5)]
+errorsFine = [np.sqrt(e) for e in integrate([l2error,h1error])]
 print('grid size:', gridView.size(0))
 print('\t | u_h - u | =', '{:0.5e}'.format(errorsFine[0]))
 print('\t | grad(uh - u) | =', '{:0.5e}'.format(errorsFine[1]))

@@ -31,7 +31,8 @@ from matplotlib import pyplot
 import numpy
 from dune.grid import cartesianDomain, gridFunction
 from dune.fem.plotting import plotPointData as plot
-from dune.fem.function import integrate, discreteFunction
+from dune.fem.function import discreteFunction
+from dune.fem import integrate
 import dune.fem
 
 from ufl import *
@@ -199,7 +200,7 @@ def compute(grid, space,spaceArgs, schemeName,schemeArgs):
     edf = exact-df
     err = [inner(edf,edf),
            inner(grad(edf),grad(edf))]
-    errors = [ numpy.sqrt(e) for e in integrate(grid, err, order=8) ]
+    errors = [ numpy.sqrt(e) for e in integrate(err) ]
 
     return df, errors, info
 
@@ -237,7 +238,7 @@ solution = space.interpolate([0], name="solution")
 info = scheme.solve(target=solution)
 edf = exact-solution
 errors = [ numpy.sqrt(e) for e in
-           integrate(polyGrid, [inner(edf,edf),inner(grad(edf),grad(edf))], order=5) ]
+           integrate([inner(edf,edf),inner(grad(edf),grad(edf))]) ]
 print("non linear problem:", errors )
 solution.plot(gridLines=None)
 
@@ -369,6 +370,6 @@ solution = discreteFunction(space, name="solution")
 info = scheme.solve(target=solution)
 edf = exact-solution
 errors = [ numpy.sqrt(e) for e in
-           integrate(polyGrid, [inner(edf,edf),inner(grad(edf),grad(edf))], order=5) ]
+           integrate([inner(edf,edf),inner(grad(edf),grad(edf))]) ]
 print("bi-laplace errors:", errors )
 solution.plot(gridLines=None)

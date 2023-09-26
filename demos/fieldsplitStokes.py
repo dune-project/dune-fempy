@@ -35,7 +35,7 @@ from ufl import div, grad, inner, dx, conditional, as_vector, eq, conditional
 from ufl import SpatialCoordinate, TrialFunction, TestFunction
 from ufl.constantvalue import Zero
 from dune.ufl import DirichletBC, BoundaryId
-from dune.fem.function import uflFunction
+from dune.fem.function import gridFunction
 from dune.fem.space import lagrange, combined
 from dune.fem import assemble
 
@@ -58,16 +58,24 @@ def weak_form_stationary_stokes(u,v,p,q, f,mu, dirichlet_velocity=None):
     else:
         return lhs_terms == inner(f, v)*dx
 
-u_exact = uflFunction(gridView, name="analytical_solution_x", order=5,
-                      ufl=-256*y*(y-1)*(2*y-1)*x**2*(x-1)**2)
-v_exact = uflFunction(gridView, name="analytical_solution_y", order=5,
-                      ufl=256*x*(x-1)*(2*x-1)*y**2*(y-1)**2)
-p_exact = uflFunction(gridView, name="analytical_solution_pressure", order=5,
-                      ufl=(x-0.5)*(y-0.5))
+u_exact = gridFunction(256*y*(y-1)*(2*y-1)*x**2*(x-1)**2,
+                      gridView,
+                      name="analytical_solution_x",
+                      order=5)
+v_exact = gridFunction(256*x*(x-1)*(2*x-1)*y**2*(y-1)**2,
+                      gridView,
+                      name="analytical_solution_y",
+                      order=5)
+p_exact = gridFunction((x-0.5)*(y-0.5),
+                      gridView,
+                      name="analytical_solution_pressure",
+                      order=5)
 def f_1(x,y):
     return 256*(x**2*(x-1)**2*(12*y-6) + y*(y-1)*(2*y-1)*(12*x**2 -12*x + 2))
-f_exact = uflFunction(gridView, name="analytical_solution_force_term", order=5,
-                      ufl=as_vector([f_1(x,y) + (y-0.5), -f_1(y,x) +(x-0.5)]) )
+f_exact = gridFunction(as_vector([f_1(x,y) + (y-0.5), -f_1(y,x) +(x-0.5)]),
+                      gridView,
+                      name="analytical_solution_force_term",
+                      order=5)
 
 # %%
 U,V      = TrialFunction(taylor_hood_space), TestFunction(taylor_hood_space)

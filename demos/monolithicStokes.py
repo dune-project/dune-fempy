@@ -154,31 +154,29 @@ def weak_form_stationary_stokes(u,v,p,q, f,mu, dirichlet_velocity=None):
 # %%
 from dune.ufl import DirichletBC, BoundaryId
 from ufl import as_vector
-from dune.fem.function import uflFunction
+from dune.fem.function import gridFunction
 
 x = spatial_coordinate[0]
 y = spatial_coordinate[1]
 
-u_exact = uflFunction(gridView,
+u_exact = gridFunction(256*y*(y-1)*(2*y-1)*x**2*(x-1)**2,
+                      gridView,
                       name="analytical_solution_x",
-                      order=5,
-                      ufl=-256*y*(y-1)*(2*y-1)*x**2*(x-1)**2)
-v_exact = uflFunction(gridView,
+                      order=5)
+v_exact = gridFunction(256*x*(x-1)*(2*x-1)*y**2*(y-1)**2,
+                      gridView,
                       name="analytical_solution_y",
-                      order=5,
-                      ufl=256*x*(x-1)*(2*x-1)*y**2*(y-1)**2)
-p_exact = uflFunction(gridView,
+                      order=5)
+p_exact = gridFunction((x-0.5)*(y-0.5),
+                      gridView,
                       name="analytical_solution_pressure",
-                      order=5,
-                      ufl=(x-0.5)*(y-0.5))
-
+                      order=5)
 def f_1(x,y):
     return 256*(x**2*(x-1)**2*(12*y-6) + y*(y-1)*(2*y-1)*(12*x**2 -12*x + 2))
-
-f_exact = uflFunction(gridView,
+f_exact = gridFunction(as_vector([f_1(x,y) + (y-0.5), -f_1(y,x) +(x-0.5)]),
+                      gridView,
                       name="analytical_solution_force_term",
-                      order=5,
-                      ufl=as_vector([f_1(x,y) + (y-0.5), -f_1(y,x) +(x-0.5)]) )
+                      order=5)
 
 mu = 1
 
@@ -529,7 +527,7 @@ print("number linear iterations: " + str(output['linear_iterations']))
 
 # %%
 from ufl import sqrt
-from dune.fem.function import integrate
+from dune.fem import integrate
 import numpy
 
 def convergence_study(scheme, solution_vector, refinement_steps=2, penalty = 20):
@@ -587,8 +585,8 @@ def convergence_study(scheme, solution_vector, refinement_steps=2, penalty = 20)
         l2_errors_old = l2_errors
         h1_errors_old = h1_errors
 
-        l2_errors = np.array( [sqrt(e) for e in integrate(gridView, [l2_error_pressure,l2_error_velocity], order=8)] )
-        h1_errors = np.array( [sqrt(e) for e in integrate(gridView, [h1_error_pressure,h1_error_velocity], order=8)] )
+        l2_errors = np.array( [sqrt(e) for e in integrate([l2_error_pressure,l2_error_velocity])] )
+        h1_errors = np.array( [sqrt(e) for e in integrate([h1_error_pressure,h1_error_velocity])] )
         # h1_errors += l2_errors
         error = solution_vector - as_vector( [u_exact, v_exact, p_exact+avg_pressure.value] )
 
