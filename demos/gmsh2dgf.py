@@ -6,14 +6,15 @@
 # A complete description of the DGF format is found [here](https://dune-project.org/doxygen/master/group__DuneGridFormatParser.html#details).
 #
 # %%
-def gmsh2DGF(points, cells, bndDomain = None, periodic = None, dim = None):
+def gmsh2DGF(points, cells, bndDomain = None, bndSegments=None, periodic = None, dim = None):
     """
     Parameter:
-       points     array(list) of points of length dim
-       cells      dict containing element vertex numbers
-       bndDomain  dict id -> str containing possible boundary domains
-       periodic   string containing periodic boundary transformation
-       dim        dimension of grid
+       points      array(list) of points of length dim
+       cells       dict containing element vertex numbers
+       bndDomain   dict id -> str containing possible boundary domains
+       bndSegments dict id -> list of lists containing vertex numbers of boundary segments
+       periodic    string containing periodic boundary transformation
+       dim         dimension of grid
 
     Returns
         String containing the mesh description in DGF format.
@@ -56,6 +57,19 @@ def gmsh2DGF(points, cells, bndDomain = None, periodic = None, dim = None):
             dgf += "\n"
         dgf += "#\n\n"
 
+    # boundary segments
+    if bndSegments is not None:
+        assert isinstance(bndSegments, dict), "Expecting a dictionary for boundary domain"
+        dgf += "BoundarySegments\n"
+        for bndid,bndsegs in bndSegments.items():
+            for segment in bndsegs:
+                dgf += str(bndid)
+                for vx in segment:
+                    dgf += " " + str(vx)
+                dgf += "\n"
+        dgf += "#\n\n"
+
+    # boundary domain section
     if bndDomain is not None:
         assert isinstance(bndDomain, dict), "Expecting a dictionary for boundary domain"
         dgf += "BoundaryDomain\n"
@@ -65,7 +79,9 @@ def gmsh2DGF(points, cells, bndDomain = None, periodic = None, dim = None):
             else:
                 dgf += str(bndid) + " " + bnd +"\n"
 
-        dgf += "#\n\n"
+        dgf += "#\n"
+
+    # periodic boundaries
     if periodic is not None:
         dgf += periodic
 
