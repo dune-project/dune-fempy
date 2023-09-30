@@ -237,7 +237,9 @@ bndIds.plot()
 # returned as 3D points so we need to remove the final columns containing
 # only zeros. We have already seen this grid above so let's zoom in to the
 # 'slit' region...
-
+#
+# .. todo:: Add a way to describe boundary data when using `meshio`.
+#
 # %%
 try:
     import numpy as np
