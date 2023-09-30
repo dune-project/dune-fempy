@@ -362,10 +362,12 @@ print()
 #
 # We have already seen how grid function can be used within UFL expressions
 # and forms - in the [next section](dune-fempy_nb.ipynb) we will give another example for this in the
-# context of a time dependent problems. In addition we can also use the
-# `Constant` class to add constants to UFL expressions/forms which then can
-# be changed without requiring any recompilation of the model. An example
-# would again be in a time dependent problem a time varying coefficient.
+# context of a time dependent problems.
+#
+# .. tip:: Use the `Constant` class to add constants to UFL expressions/forms
+# which then can be changed without requiring any recompilation of the model.
+#
+# An example would again be in a time dependent problem a time varying coefficient.
 # Being able to change the value of the time in the model without
 # recompilation is crucial for an efficient code. We will demonstrate this
 # here by considering
