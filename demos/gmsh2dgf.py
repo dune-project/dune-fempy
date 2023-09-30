@@ -6,7 +6,7 @@
 # A complete description of the DGF format is found [here](https://dune-project.org/doxygen/master/group__DuneGridFormatParser.html#details).
 #
 # %%
-def gmsh2DGF(points, cells, bndDomain = None, bndSegments=None, periodic = None, dim = None):
+def gmsh2DGF(points, cells, bndDomain = None, bndSegments=None, periodic = None, dim = None, computeFirstIndex = True):
     """
     Parameter:
        points      array(list) of points of length dim
@@ -15,10 +15,12 @@ def gmsh2DGF(points, cells, bndDomain = None, bndSegments=None, periodic = None,
        bndSegments dict id -> list of lists containing vertex numbers of boundary segments
        periodic    string containing periodic boundary transformation
        dim         dimension of grid
+       computeFirstIndex if true, first vertex index is computed bases on all cells vertices (default is on)
 
     Returns
         String containing the mesh description in DGF format.
     """
+    import numpy as np
 
     if dim is None:
         if "tetra" in cells or "hexa" in cells:
@@ -32,7 +34,16 @@ def gmsh2DGF(points, cells, bndDomain = None, bndSegments=None, periodic = None,
     if dim == 3 and "tetra" in cells:
         simplex = "tetra"
 
+    # default numbering is 0 based
+    firstVertexIndex = 0
+    for key, cellVertices in cells.items():
+        firstVertexIndex = min(firstVertexIndex, np.min(cellVertices))
+
     dgf="DGF\nVertex\n"
+    # if first vertex index is not 0 we need to add this here
+    if firstVertexIndex > 0:
+        dgf += f"firstindex {firstVertexIndex}\n"
+
     for p in points:
         for i in range(dim):
             dgf += str(p[i]) + " "
