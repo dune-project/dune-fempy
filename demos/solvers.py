@@ -143,7 +143,6 @@ for eocLoop in range(loops):
 # Numpy vector based on the `python buffer protocol`. So no data is copied
 # and changes to the dofs made on the python side are automatically carried
 # over to the C++ side.
-# from Scipy.
 
 # %%
 from dune.fem.operator import linear as linearOperator
@@ -247,9 +246,9 @@ print("Forchheimer(scipy) size: ", gridView.size(0), "L^2, H^1 error:",'{:0.5e},
 # we prescribe trivial Neuman at the top and bottom boundaries
 # and Dirichlet values $u=-1$ and $u=1$ at the left and right
 # boundaries, respectively.
-# We will use the CG solver from `scipy.sparse.linalg`:
+# We will use the CG solver from `scipy.sparse.linalg`.
 #
-# Note: since we are not needing to invert the operator
+# .. tip:: Since we are not needing to invert the operator
 # we will use the `dune.fem.operator.galerkin` class
 # to setup the problem. This is similar to `dune.fem.scheme.galerkin`
 # we have been using so far but can be used to model
@@ -310,7 +309,6 @@ try:
     from petsc4py import PETSc
     spacePetsc = solutionSpace(gridView, order=2, storage='petsc')
 except ModuleNotFoundError:
-    print("petsc4py not found: skipping example")
     print("petsc4py module not found so skipping example - ignored")
     petsc4py = None
 except ConfigurationError:
@@ -487,7 +485,7 @@ pprint(scheme.parameterLog())
 # As an example change the above problem to a PDE with Dirichlet conditions
 # but turn of verbose output of the solver.
 #
-# __Note__: the `logging` parameter has to be set if we want to use the
+# .. note:: the `logging` parameter has to be set if we want to use the
 # `parameterLog` method on the scheme.
 
 # %%
@@ -502,9 +500,9 @@ pprint(scheme2.parameterLog())
 # %% [markdown]
 # ### Parameter hints
 #
-# to get information about available values for some parameters
+# .. tip:: To get information about available values for some parameters
 # (those with string arguments) a possible approach is to provide a non valid
-# string, e.g., 'help`.
+# string, e.g., `"help"`.
 
 # %%
 scheme = galerkin( a==l, solver="cg", parameters=
@@ -547,7 +545,7 @@ space = solutionSpace(gridView, order=2, storage='numpy')
 # |           | To change the underlying vector of a discrete function 'u_h' use    |
 # |           | 'uh.as_numpy[:]'.                                                   |
 # |           | As shown in the examples, linear operators return a                 |
-# |           | scipy.sparse_matrix through the 'as_numpy' property.                |
+# |           | `scipy.sparse.csr_matrix` through the 'as_numpy' property.          |
 # | istl      | data is stored in a block vector/matrix from the dune.istl package  |
 # |           | Access through 'as_istl'                                            |
 # | petsc     | data is stored in a petsc vector/matrix which can also be used with |

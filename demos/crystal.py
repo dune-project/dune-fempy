@@ -68,8 +68,8 @@ N            = 6.
 
 
 # %% [markdown]
-# We define the initial data and create a function from it. We use this value to set up our solution.
-
+# We define the initial data and create a function from it.
+# We use this value to set up our solution.
 
 # %%
 from dune.fem.function import globalFunction
@@ -82,8 +82,10 @@ u_h_n = u_h.copy()
 
 
 # %% [markdown]
-# As we will be discretizing in time, we define the unknown data as $u = (\phi_1, \Delta T_1)$, while given data (from the previous time step) is $u_n = (\phi_0, \Delta T_0)$ and test function $v = (v_0, v_1)$.
-
+# As we will be discretizing in time,
+# we define the unknown data as $u = (\phi_1, \Delta T_1)$,
+# while given data (from the previous time step)
+# is $u_n = (\phi_0, \Delta T_0)$ and test function $v = (v_0, v_1)$.
 
 # %%
 from ufl import TestFunction, TrialFunction
@@ -91,7 +93,6 @@ from dune.ufl import Constant
 u = TrialFunction(space)
 v = TestFunction(space)
 dt = Constant(0, "dt")    # time step
-
 
 # %% [markdown]
 # For the numerical scheme, we discretize the time derivatives in the usual way, and we obtain the weak form by multiplying by a test function and integrating by parts. We also express the system using vectors.
@@ -116,15 +117,12 @@ dt = Constant(0, "dt")    # time step
 #
 # First we put in the right hand side which only contains explicit data.
 
-
 # %%
 from ufl import inner, dx
 a_ex = (inner(u_h_n, v) - inner(u_h_n[0], v[1])) * dx
 
-
 # %% [markdown]
 # For the left hand side we have the spatial derivatives and the implicit parts.
-
 
 # %%
 from ufl import pi, atan, atan_2, tan, grad, inner
@@ -213,6 +211,7 @@ def vtk():
 # loop will write files `crystalXXXX.vtu` where the sequence counter `XXXX`
 # is automatically increased by one each time `vtk()` is called.
 
+# %%
 import matplotlib
 matplotlib.rcParams.update({'font.size': 10})
 matplotlib.rcParams['figure.figsize'] = [10, 5]
@@ -228,10 +227,11 @@ vtk()
 scheme.model.dt = 0.0005
 t = 0.0
 
-
 # %% [markdown]
-# Finally we set up the time loop and solve the problem - each time this cell is run the simulation will progress to the given ```endTime``` and then the result is shown. The simulation can be progressed further by rerunning the cell while increasing the ```endTime```.
-
+# Finally, we set up the time loop and solve the problem -
+# each time this cell is run the simulation will progress to
+# the given ```endTime``` and then the result is shown.
+# The simulation can be progressed further by rerunning the cell while increasing the ```endTime```.
 
 # %%
 from dune.fem.plotting import plotPointData

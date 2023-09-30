@@ -249,8 +249,9 @@ scheme_taylor_hood_cg = solutionScheme(eqns,
 
 
 # %% [markdown]
-# A note on linear solvers and preconditioning: The matrix arising from the stokes discretization with mixed fem
-# is indefinite and solving the linear system with iterative solvers can become challening (to impossible)
+#
+# .. note:: **Linear solvers and preconditioning**: The matrix arising from the stokes discretization with mixed fem
+# is indefinite and solving the linear system with iterative solvers can become challenging (to impossible)
 # without proper preconditioning. For this toy problem, a combination of incomplete LU preconditioning
 # and `bicgstab` works well. Other options include direct solvers or using Schur-complement preconditioners,
 # due to the block structure of the Stokes matrix
@@ -609,8 +610,8 @@ def convergence_study(scheme, solution_vector, refinement_steps=2, penalty = 20)
         if eocLoop < refinement_steps-1:
             gridView.hierarchicalGrid.globalRefine(1)
 
-
-# %%[markdown]
+# %% [markdown]
+#
 # Convergence Test Continuous Galerkin:
 
 # %%
@@ -627,7 +628,8 @@ convergence_study(scheme=scheme_taylor_hood_cg,
                   penalty=1000)
 
 
-# %%[markdown]
+# %% [markdown]
+#
 # Convergence Test DG: *You can increase the number of refinement steps but expect a longer wait
 # for serial runs*
 

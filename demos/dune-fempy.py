@@ -132,13 +132,15 @@ print("L^2 and H^1 errors:",[np.sqrt(e) for e in squaredErrors])
 #
 # .. _label-on-gridview-detection:
 #
-# .. note::
+# .. tip::
 #    Both ``assemble`` and ``integrate`` take extra arguments ``gridView``
 #    and ``order``. The latter allows to fix the order of the quadrature used
 #    to integrate the function - if it is not provided (``None``) a reasonable
 #    order is determined heuristically.  The first argument is required in
 #    cases where the ``gridView`` can not be determined from
-#    the ufl expression. In the above example ``gridView`` can be extracted from
+#    the ufl expression.
+#
+# In the above example ``gridView`` can be extracted from
 #    the discrete function ``u_h``, in contrast to the following example:
 #
 
@@ -168,12 +170,13 @@ print("average:",assemble(exact*dx,gridView=gridView) )
 # - \int_{\Gamma_N} g_N(x) v\ ds
 # = 0.
 # \end{align*}
+#
 # We choose $f,g_N,g_D$ so that the exact solution is
 # \begin{align*}
 # u(x) = \left(\frac{1}{2}(x_1^2 + x_2^2) - \frac{1}{3}(x_1^3 - x_2^3)\right) + 1~.
 # \end{align*}
-# Note: [in a later section](boundary_nb.ipynb) we discuss more general boundary
-# conditions.
+#
+# More [general boundary conditions](boundary_nb.ipynb) are discussed in a later section.
 #
 # The setup of the model using ufl is very similar to the previous example
 # but we need to include the non trivial Neumann boundary conditions:
@@ -263,8 +266,7 @@ l = dot(x,x)*v * dx
 # a Newton-Krylov solver using a ``gmres`` method to solve the intermediate
 # linear problems. Since the problem here is symmetric we can use a ``cg``
 # method. A full list of available solvers, preconditioners, and how
-# to customize them is available
-# [here](solvers_nb.ipynb#Available-solvers-and-parameters)
+# to customize them is available in the [Alternative Linear Solvers](solvers_nb.ipynb#Available-solvers-and-parameters) section.
 
 # %%
 from dune.fem.scheme import galerkin as solutionScheme

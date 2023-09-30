@@ -157,7 +157,7 @@ plotComponents(vec, gridLines=None, level=2,
 #    to the boundary data provided in the `DirichletBC` structure.
 # 2. The second version takes a range vector and a discrete function;
 #    this version can used for example to set the values at the boundary to
-#    zero, e.g., :code:`op.setConstraints(0, uh)` or for a vector
+#    zero, e.g., `op.setConstraints(0, uh)` or for a vector
 #    function `op.setConstraints([0,]*space.dimension, vec_h)`.
 # 3. Finally there is a version taking a grid function and a
 #    discrete function `op.setConstraints(g, uh)` which sets
@@ -165,7 +165,7 @@ plotComponents(vec, gridLines=None, level=2,
 #
 # We use the first version to set the data at the boundary first having
 # cleared the discrete function. As second
-# example we interpolate the :code:`bnd` grid function and then set all
+# example we interpolate the `bnd` grid function and then set all
 # boundary dofs to 0. Recall that the second component has no Dirichlet
 # boundary conditions set at the lower boundary.
 
@@ -238,9 +238,9 @@ plotComponents(vec, gridLines=None, level=2,
 # For grids implementing a true
 # Cartesian grids, like YaspGrid, this is fixed. Altering this numbering
 # can only be done by using an unstructured grid, e.g. ALUGrid.
+# See the [grid construction section](othergrids_nb.ipynb#Attaching-boundary-ids-to-a-grid-constructed-with-gmsh-using-DGF) to see how this is done.
 #
-#  **Boundary ids and refinement:**
-# Boundary ids only allow to tell apart intersections with the domain boundary
+# .. note:: **Boundary ids and refinement**: Boundary ids only allow to tell apart intersections with the domain boundary
 # on the macro level of a grid. Descendants of macro intersections on the domain
 # boundary inherit the boundary id of their parent.
 #

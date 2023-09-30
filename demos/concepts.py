@@ -73,7 +73,7 @@ gridView.plot()
 #
 # ## Grid Functions
 #
-# .. note:: A **grid functions** is a functions that is defined
+# .. note:: A **grid function** is a function that is defined
 # over a given grid view and is evaluated by using an element
 # of this view and local coordinate within that element, i.e. a quadrature point.
 #
@@ -311,7 +311,8 @@ from dune.grid import OutputType
 gridView.writeVTK('uh', pointdata=[u_h])
 
 # %% [markdown]
-# Note: the discrete function `u_h` already has a `name` attribute given in
+#
+# .. tip:: The discrete function `u_h` already has a `name` attribute given in
 # the `interpolate` call. This is used by default in the vtk file. An
 # alternative name can be given by using a dictionary as shown previously.
 #
@@ -457,8 +458,7 @@ print("Number of elements:",gridView.size(0),
 # + \frac{1}{2}K(\nabla u^{n+1}) \nabla u^{n+1} \cdot \nabla \varphi \
 # + \frac{1}{2}K(\nabla u^n) \nabla u^n \cdot \nabla \varphi v\ dx \\
 # - \int_{\Omega} \frac{1}{2}(f(x,t^n)+f(x,t^n+\Delta t) \varphi\ dx
-# - \int_{\partial \Omega} \frac{1}{2}(g(x,t^n)+g(x,t^n+\Delta t)) v\ ds
-# = 0.
+# - \int_{\partial \Omega} \frac{1}{2}(g(x,t^n)+g(x,t^n+\Delta t)) v\ ds = 0.
 # \end{split}
 # \end{equation}
 #
