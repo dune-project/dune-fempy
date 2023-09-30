@@ -23,10 +23,12 @@ from ufl import dx, grad, grad, dot, inner, conditional, sin
 #
 # Please read the [Dune Grid Format (DGF)](https://dune-project.org/doxygen/master/group__DuneGridFormatParser.html#details) for a detailed description of DGF.
 # The format works for 2d or 3d and most DUNE grids can be constructed using a DGF file.
-# The format allows easy description of boundary ids (see below and [boundary ids](boundary_nb.ipynb)) and parameters and is used as follows
+# The format allows easy description of boundary ids (see below) and parameters.
+# See the section about [boundary conditions](boundary_nb.ipynb) to learn how to
+# use these in a weak form.
 #
 # .. note:: The DGF is ASCII based and thus only meant for prototyping and
-# testing. For serious computations use `meshio` or the pickling approach.
+# testing. For serious computations use `meshio` or the [pickling approach](backuprestore_nb.ipynb).
 #
 # %%
 domain2d = (reader.dgf, "triangle.dgf")
@@ -213,7 +215,7 @@ gridView2d = leafGridView(domain2d, dimgrid=2)
 #
 # After construction of a grid we can visualize boundary ids with the
 # by assigning a piecewise constant function to hold the value of adjacent
-# boundaries. This is not necessarily unique but works is most cases.
+# boundaries. This is not necessarily unique but works in most cases.
 #
 
 # %%

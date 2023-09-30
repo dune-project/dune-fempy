@@ -97,7 +97,7 @@ phiVec = phi.as_numpy
 # $x\not\in\Gamma_D$, e.g., an ufl `conditional`.
 #
 # Note that the stiffness matrix does not depend on time so we can
-# assemble the matrix once and extract the corresponding sscipy*
+# assemble the matrix once and extract the corresponding `scipy`
 # sparse matrix.
 
 # %%
