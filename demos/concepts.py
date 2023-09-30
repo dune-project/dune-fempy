@@ -623,7 +623,6 @@ from dune.utility import components
 components()
 # to get for example all available grid implementations:
 components("grid")
-# %%
 
 # %% [markdown]
 # .. index:: Spaces; Available Spaces
