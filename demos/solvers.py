@@ -267,7 +267,7 @@ class Scheme2:
             scheme.jacobian(x, self.jacobian)
         # compute DS(u)^{-1}x for a given DoF vector x
         def _matvec(self, x_coeff):
-            return solver(self.jacobian.as_numpy, x_coeff, tol=1e-10)[0]
+            return solver(self.jacobian.as_numpy, x_coeff, tol=1e-10, atol=0)[0]
 
     def solve(self, target):
         sol_coeff = target.as_numpy
@@ -342,7 +342,7 @@ def cb(xk): # a callback to print the residual norm in each step
     op(x_h,rk)
     print(rk.as_numpy[:].dot(rk.as_numpy[:]), flush=True, end='\t')
 sol.as_numpy[:], _ = solver(lin.as_numpy, rhs.as_numpy, x0=sol.as_numpy,
-                            callback=cb, tol=1e-10)
+                            callback=cb, tol=1e-10, atol=0)
 sol.plot()
 
 # %% [markdown]

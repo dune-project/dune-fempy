@@ -310,6 +310,12 @@ u_h.plot()
 # In the [next section](concepts_nb.ipynb) we will give a full example for this in the
 # context of a time dependent problems.
 #
+# .. tip:: The main advantage of using
+# `dune.ufl.Constant` and grid functions is to be able to change details in
+# a form without requiring any recompilation of the model. An example
+# would be in a time dependent problem a time varying coefficient or
+# changing the time step adaptively during the simulation.
+#
 # As a simple introduction we consider a linear version of the elliptic problem
 # considered previously
 # $$ -\varepsilon \triangle u(x) + m(x) u(x) = f(x) $$
@@ -341,14 +347,13 @@ f       = dot(x,x)
 a       = epsilon*dot(grad(u), grad(v)) * dx + (1+u_h)**2*u*v * dx
 b       = f*v*dx
 
-scheme = solutionScheme([a == b,DirichletBC(space,0)], solver='cg')
+scheme = solutionScheme(a == b, solver='cg')
 w_h    = space.interpolate(0,name="w_h")
 scheme.solve(target = w_h)
 w_h.plot()
 
 from dune.fem.operator import galerkin
 op = galerkin(a == b)
-print(dir(op))
 
 # %% [markdown]
 #
