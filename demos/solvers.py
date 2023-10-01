@@ -150,7 +150,7 @@ for eocLoop in range(loops):
 # side in Python. In this case we would like to use vectors of dofs from
 # a discrete function as numpy arrays and system matrices assembled by the
 # schemes and operators as scipy sparse matrices.
-# For the first problem we [discussed](dune-fempy.py) the `as_numpy` method
+# For the first problem we [discussed](dune-fempy_nb.ipynb) the `as_numpy` method
 # already. So
 
 # %%
@@ -306,6 +306,8 @@ print("Forchheimer(scipy) size: ", gridView.size(0), "L^2, H^1 error:",'{:0.5e},
 # to setup the problem. This is similar to `dune.fem.scheme.galerkin`
 # we have been using so far but can be used to model
 # operators between different spaces.
+# See [here](scheme_api.rst) for a summary of the concepts and API for
+# operators and schemes.
 
 # %%
 from dune.ufl import DirichletBC

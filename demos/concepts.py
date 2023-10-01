@@ -436,7 +436,7 @@ print()
 # .. note:: The more general case is
 # covered by classes in `dune.fem.operator` for **operators** $L\colon V_h\to W_h$
 # with different domain and range spaces. See
-# [here](scheme_api.rst) for a summary of the API for operators and
+# [here](scheme_api.rst) for more details on the concepts and a summary of the API for operators and
 # schemes.
 
 # %%
