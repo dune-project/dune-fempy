@@ -36,7 +36,7 @@ from ufl import SpatialCoordinate, TrialFunction, TestFunction
 from ufl.constantvalue import Zero
 from dune.ufl import DirichletBC, BoundaryId
 from dune.fem.function import gridFunction
-from dune.fem.space import lagrange, combined
+from dune.fem.space import lagrange, composite
 from dune.fem import assemble
 
 # %%
@@ -45,7 +45,7 @@ gridView = structuredGrid([0, 0], [1, 1], [7, 7])
 velocity_order = 3
 space_velocity = lagrange(gridView, dimRange=2, order=velocity_order, storage="petsc")
 space_pressure = lagrange(gridView, order=velocity_order-1, storage="petsc")
-taylor_hood_space = combined(space_velocity, space_pressure, components=["velocity", "pressure"])
+taylor_hood_space = composite(space_velocity, space_pressure, components=["velocity", "pressure"])
 x,y = SpatialCoordinate(taylor_hood_space)
 
 def weak_form_stationary_stokes(u,v,p,q, f,mu, dirichlet_velocity=None):

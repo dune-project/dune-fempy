@@ -13,7 +13,7 @@
 #
 # .. sectionauthor:: contribution by Benjamin Terschanski
 #
-# This example shows how to work with combined spaces of different polynomial order
+# This example shows how to work with composite spaces of different polynomial order
 # to construct LBB stable pairs for velocity and pressure approximations.
 #
 # Consider the stationary stokes problem with Newtonian stress on a unit square $\Omega = [0,\,1]^2$.
@@ -186,8 +186,8 @@ mu = 1
 # %%
 print("\n")
 print("----------------------")
-print("Set up combined space and scheme in CG setting: \n")
-from dune.fem.space import lagrange, combined
+print("Set up composite space and scheme in CG setting: \n")
+from dune.fem.space import lagrange, composite
 from ufl import TrialFunction, TestFunction, as_vector, eq, conditional
 from dune.fem.scheme import galerkin as solutionScheme
 from dune.ufl import BoundaryId
@@ -203,7 +203,7 @@ space_pressure = lagrange(gridView,
                           order=velocity_order-1,
                           storage="numpy")
 
-taylor_hood_space = combined(space_velocity, space_pressure, components=["velocity", "pressure"])
+taylor_hood_space = composite(space_velocity, space_pressure, components=["velocity", "pressure"])
 
 U     = TrialFunction(taylor_hood_space)
 V     = TestFunction(taylor_hood_space)
@@ -439,13 +439,13 @@ def penalty_parameter_shabazi(view, order_discrete_space):
 # %% [markdown]
 # ### Bercovier-Engelmann Testcase
 #
-# We repeat the test from above using using a combined DG space with Lagrangian polynomial basis:
+# We repeat the test from above using using a composite DG space with Lagrangian polynomial basis:
 
 # %%
 print("\n")
 print("----------------------")
 print("Set up DG Scheme:")
-from dune.fem.space import dglagrange, combined
+from dune.fem.space import dglagrange, composite
 
 
 velocity_order = 3
@@ -460,7 +460,7 @@ space_pressure_dg = dglagrange(gridView,
                             storage="numpy")
 
 
-taylor_hood_space_dg = combined(space_velocity_dg, space_pressure_dg, components=["velocity", "pressure"])
+taylor_hood_space_dg = composite(space_velocity_dg, space_pressure_dg, components=["velocity", "pressure"])
 
 U     = TrialFunction(taylor_hood_space_dg)
 V     = TestFunction(taylor_hood_space_dg)
@@ -653,7 +653,7 @@ convergence_study(scheme=scheme_taylor_hood_dg,
 
 
 # %% [markdown]
-# As a sanity check for the construction of the combined DG spaces
+# As a sanity check for the construction of the composite DG spaces
 # we can count the degrees of freedom of the `solution_vector`.
 # Each quad has $(k + 1)^2$ degrees of freedom per dimension, with $k=$ polynomial order of the approximation function.
 
@@ -677,4 +677,4 @@ print("\n")
 print("----------------------")
 print("Count DOFs:")
 print("Expected dofs for taylor P" + str(velocity_order) + " / P" + str(pressure_order) + " TH elements: " + str(dof_count_taylor_hood_quad_mesh(velocity_order)))
-print("DOFS combined solution vector: " + str(len(solution_vector_dg.as_numpy)))
+print("DOFS composite solution vector: " + str(len(solution_vector_dg.as_numpy)))
