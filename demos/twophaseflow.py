@@ -28,8 +28,9 @@ import dune.fem as fem
 import dune.create as create
 from dune.generator import algorithm
 from dune.common import FieldVector
-from dune.grid import cartesianDomain, Marker, gridFunction
-from dune.fem.function import levelFunction, integrate
+from dune.grid import cartesianDomain, Marker
+from dune.fem.function import levelFunction, gridFunction
+from dune.fem import integrate
 from dune.plotting import plotPointData as plot
 
 from limit import createOrderRedcution, createLimiter
@@ -309,7 +310,7 @@ else:
 
 # %%
 def errorMeasure(w,dw):
-    rel = integrate(grid, [w[1]**2,dw[1]**2], 5)
+    rel = integrate([w[1]**2,dw[1]**2], order=5, gridView=grid)
     return numpy.sqrt(rel[1]) < tolerance * numpy.sqrt(rel[0])
 
 
@@ -492,7 +493,7 @@ pyplot.plot(x,y)
 
 # %%
 from dune.fem.function import levelFunction
-@gridFunction(grid,name="polOrder")
+@gridFunction(gridView=grid,name="polOrder",order=0)
 def polOrder(e,x):
     return [spc.localOrder(e)]
 plot(solution[0],figsize=(15,4))

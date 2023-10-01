@@ -13,7 +13,7 @@
 #
 # .. sectionauthor:: contribution by Benjamin Terschanski
 #
-# This example shows how to work with combined spaces of different polynomial order
+# This example shows how to work with composite spaces of different polynomial order
 # to construct LBB stable pairs for velocity and pressure approximations.
 #
 # Consider the stationary stokes problem with Newtonian stress on a unit square $\Omega = [0,\,1]^2$.
@@ -154,31 +154,29 @@ def weak_form_stationary_stokes(u,v,p,q, f,mu, dirichlet_velocity=None):
 # %%
 from dune.ufl import DirichletBC, BoundaryId
 from ufl import as_vector
-from dune.fem.function import uflFunction
+from dune.fem.function import gridFunction
 
 x = spatial_coordinate[0]
 y = spatial_coordinate[1]
 
-u_exact = uflFunction(gridView,
+u_exact = gridFunction(256*y*(y-1)*(2*y-1)*x**2*(x-1)**2,
+                      gridView,
                       name="analytical_solution_x",
-                      order=5,
-                      ufl=-256*y*(y-1)*(2*y-1)*x**2*(x-1)**2)
-v_exact = uflFunction(gridView,
+                      order=5)
+v_exact = gridFunction(256*x*(x-1)*(2*x-1)*y**2*(y-1)**2,
+                      gridView,
                       name="analytical_solution_y",
-                      order=5,
-                      ufl=256*x*(x-1)*(2*x-1)*y**2*(y-1)**2)
-p_exact = uflFunction(gridView,
+                      order=5)
+p_exact = gridFunction((x-0.5)*(y-0.5),
+                      gridView,
                       name="analytical_solution_pressure",
-                      order=5,
-                      ufl=(x-0.5)*(y-0.5))
-
+                      order=5)
 def f_1(x,y):
     return 256*(x**2*(x-1)**2*(12*y-6) + y*(y-1)*(2*y-1)*(12*x**2 -12*x + 2))
-
-f_exact = uflFunction(gridView,
+f_exact = gridFunction(as_vector([f_1(x,y) + (y-0.5), -f_1(y,x) +(x-0.5)]),
+                      gridView,
                       name="analytical_solution_force_term",
-                      order=5,
-                      ufl=as_vector([f_1(x,y) + (y-0.5), -f_1(y,x) +(x-0.5)]) )
+                      order=5)
 
 mu = 1
 
@@ -188,8 +186,8 @@ mu = 1
 # %%
 print("\n")
 print("----------------------")
-print("Set up combined space and scheme in CG setting: \n")
-from dune.fem.space import lagrange, combined
+print("Set up composite space and scheme in CG setting: \n")
+from dune.fem.space import lagrange, composite
 from ufl import TrialFunction, TestFunction, as_vector, eq, conditional
 from dune.fem.scheme import galerkin as solutionScheme
 from dune.ufl import BoundaryId
@@ -205,7 +203,7 @@ space_pressure = lagrange(gridView,
                           order=velocity_order-1,
                           storage="numpy")
 
-taylor_hood_space = combined(space_velocity, space_pressure, components=["velocity", "pressure"])
+taylor_hood_space = composite(space_velocity, space_pressure, components=["velocity", "pressure"])
 
 U     = TrialFunction(taylor_hood_space)
 V     = TestFunction(taylor_hood_space)
@@ -251,8 +249,9 @@ scheme_taylor_hood_cg = solutionScheme(eqns,
 
 
 # %% [markdown]
-# A note on linear solvers and preconditioning: The matrix arising from the stokes discretization with mixed fem
-# is indefinite and solving the linear system with iterative solvers can become challening (to impossible)
+#
+# .. note:: **Linear solvers and preconditioning**: The matrix arising from the stokes discretization with mixed fem
+# is indefinite and solving the linear system with iterative solvers can become challenging (to impossible)
 # without proper preconditioning. For this toy problem, a combination of incomplete LU preconditioning
 # and `bicgstab` works well. Other options include direct solvers or using Schur-complement preconditioners,
 # due to the block structure of the Stokes matrix
@@ -440,13 +439,13 @@ def penalty_parameter_shabazi(view, order_discrete_space):
 # %% [markdown]
 # ### Bercovier-Engelmann Testcase
 #
-# We repeat the test from above using using a combined DG space with Lagrangian polynomial basis:
+# We repeat the test from above using using a composite DG space with Lagrangian polynomial basis:
 
 # %%
 print("\n")
 print("----------------------")
 print("Set up DG Scheme:")
-from dune.fem.space import dglagrange, combined
+from dune.fem.space import dglagrange, composite
 
 
 velocity_order = 3
@@ -461,7 +460,7 @@ space_pressure_dg = dglagrange(gridView,
                             storage="numpy")
 
 
-taylor_hood_space_dg = combined(space_velocity_dg, space_pressure_dg, components=["velocity", "pressure"])
+taylor_hood_space_dg = composite(space_velocity_dg, space_pressure_dg, components=["velocity", "pressure"])
 
 U     = TrialFunction(taylor_hood_space_dg)
 V     = TestFunction(taylor_hood_space_dg)
@@ -529,7 +528,7 @@ print("number linear iterations: " + str(output['linear_iterations']))
 
 # %%
 from ufl import sqrt
-from dune.fem.function import integrate
+from dune.fem import integrate
 import numpy
 
 def convergence_study(scheme, solution_vector, refinement_steps=2, penalty = 20):
@@ -587,8 +586,8 @@ def convergence_study(scheme, solution_vector, refinement_steps=2, penalty = 20)
         l2_errors_old = l2_errors
         h1_errors_old = h1_errors
 
-        l2_errors = np.array( [sqrt(e) for e in integrate(gridView, [l2_error_pressure,l2_error_velocity], order=8)] )
-        h1_errors = np.array( [sqrt(e) for e in integrate(gridView, [h1_error_pressure,h1_error_velocity], order=8)] )
+        l2_errors = np.array( [sqrt(e) for e in integrate([l2_error_pressure,l2_error_velocity])] )
+        h1_errors = np.array( [sqrt(e) for e in integrate([h1_error_pressure,h1_error_velocity])] )
         # h1_errors += l2_errors
         error = solution_vector - as_vector( [u_exact, v_exact, p_exact+avg_pressure.value] )
 
@@ -611,8 +610,8 @@ def convergence_study(scheme, solution_vector, refinement_steps=2, penalty = 20)
         if eocLoop < refinement_steps-1:
             gridView.hierarchicalGrid.globalRefine(1)
 
-
-# %%[markdown]
+# %% [markdown]
+#
 # Convergence Test Continuous Galerkin:
 
 # %%
@@ -629,7 +628,8 @@ convergence_study(scheme=scheme_taylor_hood_cg,
                   penalty=1000)
 
 
-# %%[markdown]
+# %% [markdown]
+#
 # Convergence Test DG: *You can increase the number of refinement steps but expect a longer wait
 # for serial runs*
 
@@ -653,7 +653,7 @@ convergence_study(scheme=scheme_taylor_hood_dg,
 
 
 # %% [markdown]
-# As a sanity check for the construction of the combined DG spaces
+# As a sanity check for the construction of the composite DG spaces
 # we can count the degrees of freedom of the `solution_vector`.
 # Each quad has $(k + 1)^2$ degrees of freedom per dimension, with $k=$ polynomial order of the approximation function.
 
@@ -677,4 +677,4 @@ print("\n")
 print("----------------------")
 print("Count DOFs:")
 print("Expected dofs for taylor P" + str(velocity_order) + " / P" + str(pressure_order) + " TH elements: " + str(dof_count_taylor_hood_quad_mesh(velocity_order)))
-print("DOFS combined solution vector: " + str(len(solution_vector_dg.as_numpy)))
+print("DOFS composite solution vector: " + str(len(solution_vector_dg.as_numpy)))

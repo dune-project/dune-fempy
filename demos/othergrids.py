@@ -23,7 +23,12 @@ from ufl import dx, grad, grad, dot, inner, conditional, sin
 #
 # Please read the [Dune Grid Format (DGF)](https://dune-project.org/doxygen/master/group__DuneGridFormatParser.html#details) for a detailed description of DGF.
 # The format works for 2d or 3d and most DUNE grids can be constructed using a DGF file.
-# The format allows easy description of [boundary ids](boundary_nb.ipynb) and parameters and is used as follows
+# The format allows easy description of boundary ids (see below) and parameters.
+# See the section about [boundary conditions](boundary_nb.ipynb) to learn how to
+# use these in a weak form.
+#
+# .. note:: The DGF is ASCII based and thus only meant for prototyping and
+# testing. For serious computations use `meshio` or the [pickling approach](backuprestore_nb.ipynb).
 #
 # %%
 domain2d = (reader.dgf, "triangle.dgf")
@@ -101,19 +106,123 @@ gridView3d.writeVTK('3dexample', pointdata=[uh3d],
 # ## Converting gmsh to DGF
 #
 # Using the above convenient way of generating grids
-# in Python we can then store those as DGF and add boundary
-# ids for description of more complicated boundaries or
-# parameters for vertices or cells. Use `gmsh2DGF` from
+# in Python we can then store those as DGF which allows to
+# add boundary ids of vertex and element parameters
+# in a simple way. Use `gmsh2DGF` from
 # [gmsh2dgf](gmsh2dgf_nb.ipynb) to convert the above `points` and `cells`
+# to a string which can be read by `reader.dgfString`.
 #
 # %%
 from gmsh2dgf import gmsh2DGF
-bndDomain = {1:"-0.6 -0.6 -0.1  0.6 0.6 0.0", # lower bnd gets id 1
-             2:"-0.6 -0.6  1.0  0.6 0.6 1.1", # upper bnd gets id 2
-             3: "default"} # all other boundary faces get id 3
-dgf = gmsh2DGF(points, cells, bndDomain=bndDomain)
+from dune.grid import reader
+
+dgf = gmsh2DGF(points, cells)
+domain3d = (reader.dgfString, dgf)
+gridView3d  = leafGridView(domain3d, dimgrid=3)
+
+# %% [markdown]
+#
+# .. tip:: Store the DGF mesh to a file for later reuse with `reader.dgf`, see
+# above.
+
+# %%
 with open ("3dmesh.dgf", "w") as file:
     file.write(dgf)
+
+# %% [markdown]
+#
+# .. index:: Grid construction; Boundary Ids
+#
+#
+# ### Attaching boundary ids to a grid constructed with gmsh using DGF
+#
+# The [Dune Grid Format (DGF)](https://dune-project.org/doxygen/master/group__DuneGridFormatParser.html#details) allows
+# to either specify `BoundarySegments` or a `BoundaryDomain`. Boundary segments require to specify a boundary id
+# for a selection of intersections of an element with the boundary,
+# e.g. a collection of edges of triangles located on the boundary. For testing
+# and prototyping it is very convenient to use the boundary domain approach
+# instead, where for each boundary id (short: `bnd id`) a bounding box is described and each
+# boundary segment that is found inside this box is assigned the `bnd id`. This
+# approach also allows to specify a default value which is assigned to all
+# segments not found in any of the specified boxes. This approach works in 2d as
+# well as 3d.
+#
+# .. tip:: Specify the bounding box for simple boundaries such as outer walls
+# and straight lines and surfaces and use the default value to mark
+# a particularly complex boundary in the interior.
+
+# %%
+try:
+    with pygmsh.occ.Geometry() as geom:
+
+        # Define domain
+        L = 1; H = 1
+        # circles
+        c = 0.2; r = 0.05
+
+        # Grid size function
+        def size(dim, tag, x, y, z, lc):
+            resolution = 0.06
+            d = ((x - c)**2 + (y - c)**2)**0.5
+            if d < 3 * r:
+                return 0.25*resolution
+
+            d = ((x - (1-c))**2 + (y - (1-c))**2)**0.5
+            if d < 3 * r:
+                return 0.25*resolution
+
+            # default is a coarser mesh
+            return resolution
+
+        # create rectangle and circles
+        rectangle = geom.add_rectangle([0, 0, 0], L, H)
+        obs1 = geom.add_ball([c, c, 0], r)
+        obs2 = geom.add_ball([1-c, 1-c, 0], r)
+        # subtract the two obstacles from the volume to create holes
+        geom.boolean_difference(rectangle, [obs1, obs2])
+        geom.set_mesh_size_callback(size)
+        mesh = geom.generate_mesh(dim=2)
+
+        eps = 0.01 # tolerance
+        # lower left circle min and max
+        c1 = [c - r - eps, c + r + eps]
+        # upper right circle min and max
+        c2 = [(1-c) - r - eps, (1-c) + r + eps]
+
+        # dictionary containing id and a list containing the lower left and upper right corner of the bounding box
+        bndDomain = {1: [[-1.0 , -1.0 ], [0.0  , H+0.1]], # bounding box inflow
+                     2: [[   L , -1.0 ], [L+1.0, H+0.1]], # bounding box outflow
+                     4: [[c1[0], c1[0]], [c1[1], c1[1]]], # bounding box lower left circle
+                     5: [[c2[0], c2[0]], [c2[1], c2[1]]], # bounding box upper right circle
+                     3: "default"  # top and bottom wall,
+                     # which are all other segments not contained in the above bounding boxes
+                    }
+
+        # return dgf string which can be read by DGF parser or written to file for later use
+        dgf = gmsh2DGF(mesh.points, mesh.cells_dict, bndDomain=bndDomain, dim=2)
+        domain2d = (reader.dgfString, dgf)
+except ImportError: # pygmsh not installed - use a simple cartesian domain
+    print("pygmsh module not found using a simple Cartesian domain - ignored")
+    from dune.grid import cartesianDomain
+    domain2d = cartesianDomain([-0.25,-0.25],[0.25,0.25],[30,30])
+
+gridView2d = leafGridView(domain2d, dimgrid=2)
+# %% [markdown]
+#
+# .. index:: Grid construction; Visualize boundary Ids
+#
+# ### Visualizing Boundary Ids
+#
+# After construction of a grid we can visualize boundary ids with the
+# by assigning a piecewise constant function to hold the value of adjacent
+# boundaries. This is not necessarily unique but works in most cases.
+#
+
+# %%
+from gmsh2dgf import projectBoundaryIds
+
+bndIds = projectBoundaryIds( gridView2d )
+bndIds.plot()
 
 # %% [markdown]
 #
@@ -128,7 +237,9 @@ with open ("3dmesh.dgf", "w") as file:
 # returned as 3D points so we need to remove the final columns containing
 # only zeros. We have already seen this grid above so let's zoom in to the
 # 'slit' region...
-
+#
+# .. todo:: Add a way to describe boundary data when using `meshio`.
+#
 # %%
 try:
     import numpy as np

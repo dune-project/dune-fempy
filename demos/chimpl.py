@@ -18,7 +18,7 @@ import random
 from dune.grid import cartesianDomain, gridFunction
 import dune.fem
 from dune.fem.plotting import plotPointData as plot
-from dune.fem.function import integrate, discreteFunction
+from dune.fem.function import discreteFunction
 
 from ufl import *
 import dune.ufl
@@ -122,7 +122,7 @@ while t.value < 0.8:
     count += 1
     if count % 10 == 0:
         df.plot(figure=(fig,240+pos),colorbar=None,clim=[-1,1])
-        energy = integrate(polyGrid,Eint(df),order=5)
+        energy = dune.fem.integrate(Eint(df),order=3)
         print("[",pos,"]",t.value,tau.value,energy,info,flush=True)
         pos += 1
 
@@ -141,6 +141,6 @@ while t.value < 2.0:
     count += 1
     if count % 10 == 0:
         df.plot(figure=(fig,140+pos),colorbar=None,clim=[-1,1])
-        energy = integrate(polyGrid,Eint(df),order=5)
+        energy = dune.fem.integrate(Eint(df),order=3)
         print("[",pos,"]",t.value,tau.value,energy,info,flush=True)
         pos += 1

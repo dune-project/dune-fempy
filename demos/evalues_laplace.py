@@ -52,7 +52,7 @@ LHSOp = galerkin([inner(grad(u),grad(v))*dx])
 RHSOp = galerkin([inner(u,v)*dx])
 
 # %% [markdown]
-# It is now useful to convert these into matrices, this is done with the function \emph{linear}.
+# It is now useful to convert these into matrices, this is done with the function `linear`.
 # For convenience we will convert them to numpy matrices
 # %%
 from dune.fem.operator import linear

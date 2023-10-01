@@ -35,6 +35,14 @@ from dune.grid import structuredGrid
 gridView = structuredGrid([0, 0], [1, 1], [20, 20])
 
 # %% [markdown]
+#
+# .. note::
+# In the following we will often use the term ``gridView`` instead of grid.
+# The details of what a ``gridView`` is together with some other central
+# concepts is provided in the [next section](concepts_nb.ipynb).
+#
+
+# %% [markdown]
 # Next we define a linear Lagrange Finite-Element space over that grid
 # and setup a discrete function which we will store the discrete solution
 # to our PDE
@@ -97,17 +105,49 @@ u_h.plot()
 # approximation actually is
 
 # %%
-from dune.fem.function import integrate
+from dune.fem import integrate
 exact = cos(2*pi*x[0])*cos(2*pi*x[1])
 e_h = u_h-exact
-squaredErrors = integrate(gridView, [e_h**2,inner(grad(e_h),grad(e_h))], order=5)
+squaredErrors = integrate([e_h**2,inner(grad(e_h),grad(e_h))])
 print("L^2 and H^1 errors:",[np.sqrt(e) for e in squaredErrors])
 
 # %% [markdown]
-# <div class="alert alert-block alert-info">
-# <b>Note:</b>
-# using the assemble function with 'a==l' and 'a-l==0' produces the same result.
-# </div>
+#
+# .. index::
+#    pair: assemble function ; dune.fem
+#
+# .. index::
+#    pair: integrate function ; dune.fem
+#
+# .. note::
+#    The ``assemble`` function can be used to assemble bilinear forms as shown
+#    above, linear forms (functionals) as shown further down, and to compute scalar integrals.
+#    So we could compute the error using ``assemble(e_h**2*dx)``. We use the
+#    ``integrate`` function above since it allows to integrate vector valued
+#    expressions which is more efficient than calling ``assemble`` multiple times.
+#    Using the assemble function with 'a==l' and 'a-l==0' produces the same result.
+#
+
+# %% [markdown]
+#
+# .. _label-on-gridview-detection:
+#
+# .. tip::
+#    Both ``assemble`` and ``integrate`` take extra arguments ``gridView``
+#    and ``order``. The latter allows to fix the order of the quadrature used
+#    to integrate the function - if it is not provided (``None``) a reasonable
+#    order is determined heuristically.  The first argument is required in
+#    cases where the ``gridView`` can not be determined from
+#    the ufl expression.
+#
+# In the above example ``gridView`` can be extracted from
+#    the discrete function ``u_h``, in contrast to the following example:
+#
+
+# %%
+print("average:",integrate(exact,gridView=gridView) )
+# since the integrand is scalar, the following is equivalent:
+print("average:",assemble(exact*dx,gridView=gridView) )
 
 # %% [markdown]
 # .. index:: Equations; Boundary value problem
@@ -130,12 +170,13 @@ print("L^2 and H^1 errors:",[np.sqrt(e) for e in squaredErrors])
 # - \int_{\Gamma_N} g_N(x) v\ ds
 # = 0.
 # \end{align*}
+#
 # We choose $f,g_N,g_D$ so that the exact solution is
 # \begin{align*}
 # u(x) = \left(\frac{1}{2}(x_1^2 + x_2^2) - \frac{1}{3}(x_1^3 - x_2^3)\right) + 1~.
 # \end{align*}
-# Note: [in a later section](boundary_nb.ipynb) we discuss more general boundary
-# conditions.
+#
+# More [general boundary conditions](boundary_nb.ipynb) are discussed in a later section.
 #
 # The setup of the model using ufl is very similar to the previous example
 # but we need to include the non trivial Neumann boundary conditions:
@@ -171,7 +212,7 @@ mat,rhs = assemble([a==l,dbc])
 u_h.as_numpy[:] = solver(mat.as_numpy, rhs.as_numpy)
 u_h.plot()
 e_h = u_h-exact
-squaredErrors = integrate(gridView, [e_h**2,inner(grad(e_h),grad(e_h))], order=5)
+squaredErrors = integrate([e_h**2,inner(grad(e_h),grad(e_h))])
 print("L^2 and H^1 errors:",[np.sqrt(e) for e in squaredErrors])
 
 # %% [markdown]
@@ -225,8 +266,7 @@ l = dot(x,x)*v * dx
 # a Newton-Krylov solver using a ``gmres`` method to solve the intermediate
 # linear problems. Since the problem here is symmetric we can use a ``cg``
 # method. A full list of available solvers, preconditioners, and how
-# to customize them is available
-# [here](solvers_nb.ipynb#Available-solvers-and-parameters)
+# to customize them is available in the [Alternative Linear Solvers](solvers_nb.ipynb#Available-solvers-and-parameters) section.
 
 # %%
 from dune.fem.scheme import galerkin as solutionScheme

@@ -60,7 +60,7 @@ print("Using",threading.use,"threads")
 #
 # .. index:  Parallelization; SLURM Batch Script
 #
-# .. note:: On a cluster where multiple parallel jobs are run simultaneously, it's
+# .. tip:: On a cluster where multiple parallel jobs are run simultaneously, it's
 # advisable to use one separate cache per job. This can be easily
 # done by copying an existing cache with pre-compiled modules. See this [SLURM batch script](slurmbatchscript.rst)
 # for an example on how to do this.

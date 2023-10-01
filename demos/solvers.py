@@ -42,7 +42,8 @@ import numpy, sys, io
 from dune.grid import structuredGrid as leafGridView
 from dune.fem.space import lagrange as solutionSpace
 from dune.fem.scheme import galerkin as solutionScheme
-from dune.fem.function import gridFunction, integrate, uflFunction
+from dune.fem.function import gridFunction
+from dune.fem import integrate
 from dune.ufl import Constant
 from ufl import TestFunction, TrialFunction, SpatialCoordinate, FacetNormal, \
                 dx, ds, div, grad, dot, inner, sqrt, exp, sin,\
@@ -86,8 +87,8 @@ scheme = solutionScheme(a == b, solver='cg')
 
 endTime    = 0.25
 exact_end  = exact(endTime)
-l2error = uflFunction(gridView, name="l2error", order=u_h.space.order, ufl=dot(u_h - exact_end, u_h - exact_end))
-h1error = uflFunction(gridView, name="h1error", order=u_h.space.order, ufl=dot(grad(u_h - exact_end), grad(u_h - exact_end)))
+l2error = gridFunction(name="l2error", expr=dot(u_h - exact_end, u_h - exact_end))
+h1error = gridFunction(name="h1error", expr=dot(grad(u_h - exact_end), grad(u_h - exact_end)))
 
 # %% [markdown]
 # We define a function to evolve the solution from time 0 to the end time.
@@ -118,7 +119,7 @@ for eocLoop in range(loops):
     u_h.interpolate(initial)
     evolve(scheme, u_h, u_h_n, endTime)
     errors_old = errors
-    errors = [sqrt(e) for e in integrate(gridView, [l2error,h1error], order=5)]
+    errors = [sqrt(e) for e in integrate([l2error,h1error])]
     if eocLoop == 0:
         eocs = ['-','-']
     else:
@@ -142,7 +143,6 @@ for eocLoop in range(loops):
 # Numpy vector based on the `python buffer protocol`. So no data is copied
 # and changes to the dofs made on the python side are automatically carried
 # over to the C++ side.
-# from Scipy.
 
 # %%
 from dune.fem.operator import linear as linearOperator
@@ -177,7 +177,7 @@ u_h.interpolate(initial)                # reset u_h to initial
 evolve(scheme_cls, u_h, u_h_n, endTime)
 error = u_h - exact_end
 print("Forchheimer(numpy) size: ", gridView.size(0), "L^2, H^1 error:",'{:0.5e}, {:0.5e}'.format(
-  *[ sqrt(e) for e in integrate(gridView,[error**2,inner(grad(error),grad(error))], order=5) ]))
+  *[ sqrt(e) for e in integrate([error**2,inner(grad(error),grad(error))]) ]))
 
 # %% [markdown]
 # Using a non linear solver from the Scipy package
@@ -228,7 +228,7 @@ u_h.interpolate(initial)
 evolve(scheme2_cls, u_h, u_h_n, endTime)
 error = u_h - exact_end
 print("Forchheimer(scipy) size: ", gridView.size(0), "L^2, H^1 error:",'{:0.5e}, {:0.5e}'.format(
-  *[ sqrt(e) for e in integrate(gridView,[error**2,inner(grad(error),grad(error))], order=5) ]))
+  *[ sqrt(e) for e in integrate([error**2,inner(grad(error),grad(error))]) ]))
 
 # %% [markdown]
 # .. index::
@@ -246,9 +246,9 @@ print("Forchheimer(scipy) size: ", gridView.size(0), "L^2, H^1 error:",'{:0.5e},
 # we prescribe trivial Neuman at the top and bottom boundaries
 # and Dirichlet values $u=-1$ and $u=1$ at the left and right
 # boundaries, respectively.
-# We will use the CG solver from `scipy.sparse.linalg`:
+# We will use the CG solver from `scipy.sparse.linalg`.
 #
-# Note: since we are not needing to invert the operator
+# .. tip:: Since we are not needing to invert the operator
 # we will use the `dune.fem.operator.galerkin` class
 # to setup the problem. This is similar to `dune.fem.scheme.galerkin`
 # we have been using so far but can be used to model
@@ -309,7 +309,6 @@ try:
     from petsc4py import PETSc
     spacePetsc = solutionSpace(gridView, order=2, storage='petsc')
 except ModuleNotFoundError:
-    print("petsc4py not found: skipping example")
     print("petsc4py module not found so skipping example - ignored")
     petsc4py = None
 except ConfigurationError:
@@ -328,7 +327,7 @@ if petsc4py is not None:
     evolve(schemePetsc, u_h, u_h_n, endTime)
     error = u_h - exact_end
     print("Forchheimer(petsc) size: ", gridView.size(0), "L^2, H^1 error:",'{:0.5e}, {:0.5e}'.format(
-      *[ sqrt(e) for e in integrate(gridView,[error**2,inner(grad(error),grad(error))], order=5) ]))
+      *[ sqrt(e) for e in integrate([error**2,inner(grad(error),grad(error))]) ]))
 else:
     print("petsc module not found so skipping example - ignored")
     spacePetsc = None
@@ -370,7 +369,7 @@ if petsc4py is not None and spacePetsc is not None:
     evolve(scheme3_cls, u_h, u_h_n, endTime)
     error = u_h - exact_end
     print("Forchheimer(petsc) size: ", gridView.size(0), "L^2, H^1 error:",'{:0.5e}, {:0.5e}'.format(
-      *[ sqrt(e) for e in integrate(gridView,[error**2,inner(grad(error),grad(error))], order=5) ]))
+      *[ sqrt(e) for e in integrate([error**2,inner(grad(error),grad(error))]) ]))
 
 # %% [markdown]
 # Using the petsc4py bindings for the non linear KSP solvers from PETSc
@@ -410,7 +409,7 @@ if petsc4py is not None and spacePetsc is not None:
     evolve(scheme4_cls, u_h, u_h_n, endTime)
     error = u_h - exact_end
     print("Forchheimer(petsc4py) size: ", gridView.size(0), "L^2, H^1 error:",'{:0.5e}, {:0.5e}'.format(
-      *[ sqrt(e) for e in integrate(gridView,[error**2,inner(grad(error),grad(error))], order=5) ]))
+      *[ sqrt(e) for e in integrate([error**2,inner(grad(error),grad(error))]) ]))
 
 # %% [markdown]
 # .. index::
@@ -486,7 +485,7 @@ pprint(scheme.parameterLog())
 # As an example change the above problem to a PDE with Dirichlet conditions
 # but turn of verbose output of the solver.
 #
-# __Note__: the `logging` parameter has to be set if we want to use the
+# .. note:: the `logging` parameter has to be set if we want to use the
 # `parameterLog` method on the scheme.
 
 # %%
@@ -501,9 +500,9 @@ pprint(scheme2.parameterLog())
 # %% [markdown]
 # ### Parameter hints
 #
-# to get information about available values for some parameters
+# .. tip:: To get information about available values for some parameters
 # (those with string arguments) a possible approach is to provide a non valid
-# string, e.g., 'help`.
+# string, e.g., `"help"`.
 
 # %%
 scheme = galerkin( a==l, solver="cg", parameters=
@@ -546,7 +545,7 @@ space = solutionSpace(gridView, order=2, storage='numpy')
 # |           | To change the underlying vector of a discrete function 'u_h' use    |
 # |           | 'uh.as_numpy[:]'.                                                   |
 # |           | As shown in the examples, linear operators return a                 |
-# |           | scipy.sparse_matrix through the 'as_numpy' property.                |
+# |           | `scipy.sparse.csr_matrix` through the 'as_numpy' property.          |
 # | istl      | data is stored in a block vector/matrix from the dune.istl package  |
 # |           | Access through 'as_istl'                                            |
 # | petsc     | data is stored in a petsc vector/matrix which can also be used with |

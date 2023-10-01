@@ -4,7 +4,7 @@
 #    triple: Functions; Grid Functions; C++
 #
 # We discussed the [construction of grid functions](concepts_nb.ipynb)
-# based on ``uflFunction`` or the `dune.fem.gridFunction` decorator.
+# based on ``gridFunction``.
 # Sometimes ufl expressions are not flexible enough and the decorator
 # leads to callbacks from C++ to Python rendering that approach too
 # inefficient in some situations. To circumvent these issues a further
@@ -33,7 +33,7 @@ gridView = leafGridView([0, 0], [1, 1], [4, 4])
 # to `2`:
 
 # %%
-from dune.fem.function import cppFunction
+from dune.fem.function import gridFunction
 code="""
 #include <cmath>
 #include <dune/common/fvector.hh>
@@ -45,22 +45,20 @@ auto aTimesExact(double a) {
   };
 }
 """
-exactCpp = cppFunction(gridView, name="exactCpp", order=2,
-                       fctName="aTimesExact",includes=io.StringIO(code),
-                       args=[2.])
+exactCpp = gridFunction(code, gridView, name="aTimesExact", order=2, args=[2.])
 exactCpp.plot()
 
 # %% [markdown]
-# Let us implement the same function using `uflFunction` and compare the
-# two.
+# Let us implement the same function using `gridFunction` with an ufl
+# expression and compare the two.
 
 # %%
 from ufl import SpatialCoordinate, triangle
-from dune.fem.function import integrate, uflFunction
+from dune.fem import integrate
 x = SpatialCoordinate(triangle)
 exact = (x[0]**2+x[1]**2) - 1/3*(x[0]**3 - x[1]**3) + 1
-exact_gf = uflFunction(gridView, name="ufl", order=1, ufl=exact)
-print( integrate(gridView, abs(exact-exactCpp), order=5) )
+exact_gf = gridFunction(exact, gridView, name="ufl", order=1)
+print( integrate(abs(exact-exactCpp)) )
 
 # %% [markdown]
 # As the above example shows it is easy to pass in parameters to the C++
@@ -71,7 +69,7 @@ print( integrate(gridView, abs(exact-exactCpp), order=5) )
 # These parameters can also be more complex e.g. other grid function -
 # the generating function can be a template function as shown in the next
 # example.  Note that an UFL expression can not be directly passed in - it first needs
-# to be converted into a grid function using `uflFunction`:
+# to be converted into a grid function using `dune.fem.function.gridFunction`:
 
 # %%
 code2="""
@@ -87,10 +85,8 @@ auto aTimesExact(const GF &gf,Dune::FieldVector<double,1> &a) {
 """
 from dune.common import FieldVector
 a = FieldVector([2])
-exactCpp2 = cppFunction(gridView, name="exactCpp", order=2,
-                        fctName="aTimesExact",includes=io.StringIO(code2),
-                        args=[exact_gf,a])
-print( integrate(gridView, abs(exactCpp-exactCpp2), order=5) )
+exactCpp2 = gridFunction(code2, gridView, name="aTimesExact", order=2, args=[exact_gf,a])
+print( integrate(abs(exactCpp-exactCpp2)) )
 
 # %% [markdown]
 # We can now change the factor ``a`` on the Python side without having to
@@ -99,7 +95,7 @@ print( integrate(gridView, abs(exactCpp-exactCpp2), order=5) )
 # %%
 a[0] = -5.
 exactCpp2.plot()
-print( integrate(gridView, abs(exactCpp-exactCpp2), order=5) )
+print( integrate(abs(exactCpp-exactCpp2)) )
 
 # %% [markdown]
 # In the above example there is no advantage of using the
@@ -141,9 +137,7 @@ auto bnd(pybind11::array_t<double> &a, double h) {
 }
 """
 coeffVec = numpy.array([5.,-2.])
-bndCpp = cppFunction(gridView, name="bndCpp", order=2,
-                     fctName="bnd",includes=io.StringIO(code),
-                     args=[coeffVec,2.])
+bndCpp = gridFunction(code, gridView=gridView, name="bnd", order=2, args=[coeffVec,2.])
 bcBottom = DirichletBC(vecSpace,[sin(2*pi*(x[0]+x[1])),1],x[1]<1e-10)
 bc = DirichletBC(vecSpace,[bndCpp,None])
 vecScheme = solutionScheme( [a == 0, bc, bcBottom],

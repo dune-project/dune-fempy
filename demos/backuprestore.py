@@ -13,7 +13,7 @@ import numpy
 from dune.alugrid import aluConformGrid
 from dune.fem.view import adaptiveLeafGridView as view
 from dune.grid import cartesianDomain, Marker
-from dune.fem.function import gridFunction, uflFunction
+from dune.fem.function import gridFunction
 from dune.fem.space import lagrange
 from dune.fem import adapt
 from dune.ufl import Constant
@@ -40,8 +40,8 @@ def setup():
 
     t = Constant(0,"time")
     x = ufl.SpatialCoordinate(space)
-    gf = uflFunction(gridView,order=2,name="tanh",
-                     ufl=ufl.tanh(2*(t*x[0]-x[1]))*ufl.dot(x,x) )
+    gf = gridFunction(ufl.tanh(2*(t*x[0]-x[1]))*ufl.dot(x,x),
+                     gridView,order=2,name="tanh")
     return df, space.interpolate(gf,name="tanh_h"),gf
 
 # %% [markdown]
