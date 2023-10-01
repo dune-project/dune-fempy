@@ -411,6 +411,12 @@ print()
 # and forms - in the final example of this section we will give an example for this in the
 # context of a time dependent problems.
 #
+# .. tip:: The main advantage of using
+# `dune.ufl.Constant` and grid functions is to be able to change details in
+# a form without requiring any recompilation of the model. An example
+# would be in a time dependent problem a time varying coefficient or
+# changing the time step adaptively during the simulation.
+#
 # Let us first consider a simple linear elliptic problem
 # $$ -\triangle u + \alpha u = f $$
 # where $\alpha$ is a real valued parameter.

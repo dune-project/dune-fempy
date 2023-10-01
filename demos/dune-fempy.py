@@ -76,10 +76,7 @@ mat,rhs = assemble(a==l)
 # %% [markdown]
 # We solve the resulting linear system of equations $Ay=b$ using scipy.
 # To this end it is straightforward to expose the underlying data
-# structures in $A,b,u_h$ using the ``as_numpy`` attribute.
-# More details on how to use
-# [Scipy and also PetSC4py](solvers_nb.ipynb) will be discussed later
-# in the tutorial.
+# structures of ``mat,rhs`` and ``u_h`` using the ``as_numpy`` attribute.
 
 # %%
 from scipy.sparse.linalg import spsolve as solver
@@ -93,8 +90,12 @@ y[:] = solver(A,b)
 # Note the ``y[:]`` which guarantees that the result from the solver is
 # stored in the same buffer used for the discrete function. Consequently,
 # no copying is required.
-#
-# So that's it - to see the result we plot it using matplotlib
+# More details on how to use
+# [Scipy and also PetSC4py](solvers_nb.ipynb) will be discussed later
+# in the tutorial.
+
+# %% [markdown]
+# That's it - to see the result we plot it using matplotlib
 
 # %%
 u_h.plot()
@@ -122,7 +123,7 @@ print("L^2 and H^1 errors:",[np.sqrt(e) for e in squaredErrors])
 # .. note::
 #    The ``assemble`` function can be used to assemble bilinear forms as shown
 #    above, linear forms (functionals) as shown further down, and to compute scalar integrals.
-#    So we could compute the error using ``assemble(e_h**2*dx)``. We use the
+#    So we could compute the $L^2$ error using ``assemble(e_h**2*dx)``. We use the
 #    ``integrate`` function above since it allows to integrate vector valued
 #    expressions which is more efficient than calling ``assemble`` multiple times.
 #    Using the assemble function with 'a==l' and 'a-l==0' produces the same result.
@@ -135,13 +136,15 @@ print("L^2 and H^1 errors:",[np.sqrt(e) for e in squaredErrors])
 # .. tip::
 #    Both ``assemble`` and ``integrate`` take extra arguments ``gridView``
 #    and ``order``. The latter allows to fix the order of the quadrature used
-#    to integrate the function - if it is not provided (``None``) a reasonable
-#    order is determined heuristically.  The first argument is required in
+#    to integrate a function - if it is not provided (``None``) a reasonable
+#    order is determined heuristically.  The ``gridView`` argument is required in
 #    cases where the ``gridView`` can not be determined from
 #    the ufl expression.
 #
 # In the above example ``gridView`` can be extracted from
-#    the discrete function ``u_h``, in contrast to the following example:
+# the discrete function ``u_h`` which is part of the expression for
+# ``e_h``. Consider instead the following example where the ``gridView``
+# has to be provided to the integrate method
 #
 
 # %%
@@ -160,7 +163,7 @@ print("average:",assemble(exact*dx,gridView=gridView) )
 # u &= g_D & \text{on}\;\Gamma_D
 # \end{align*}
 # and $f=f(x)$ is some forcing term.
-# For the boundary conditions we set $\Gamma_D={0}\times[0,1]$ and take
+# For the boundary conditions we set $\Gamma_D=\{0\}\times[0,1]$ and take
 # $\Gamma_N$ to be the remaining boundary of $\Omega$.
 #
 # We will solve this problem in variational form
@@ -247,8 +250,7 @@ u_h.plot()
 # \begin{equation}
 # \int_\Omega \nabla u\cdot\nabla v + m(u)v = \int_\Omega fv~.
 # \end{equation}
-# We keep the same forcing $f(x)=|x|^2$ as before and choose
-# $m(u) = (1+u)^2u$.
+# We use $f(x)=|x|^2$ as forcing and choose $m(u) = (1+u)^2u$.
 # Most of the code is identical to the linear case, we can use the same
 # grid, discrete lagrange space, and the discrete function ``u_h``.
 # The model description using ufl is also very similar
@@ -262,7 +264,7 @@ l = dot(x,x)*v * dx
 # solver. We could use
 # [the implementation available in Scipy](solvers_nb.ipynb)
 # but ``dune-fem`` provides so called
-# [``schemes``](concepts_nb.ipynb#Operators-and-Schemes)
+# [schemes](concepts_nb.ipynb#Operators-and-Schemes)
 # that have a ``solve`` method which can handle both linear and non-linear models.
 # The default solver is based on a Newton-Krylov solver using a
 # ``gmres`` method to solve the intermediate linear problems.
@@ -286,8 +288,8 @@ info = scheme.solve(target=u_h)
 # %% [markdown]
 # That's it - we can plot the solution again - we don't know the exact
 # solution so we can't compute any errors in this case.
-# In addition the ``info`` structured returned by the ``solve`` method
-# gives some information on the solver step
+# In addition the ``info`` structure returned by the ``solve`` method
+# gives some information on the solver like number of iterations required
 
 # %%
 print(info)
@@ -310,12 +312,6 @@ u_h.plot()
 # In the [next section](concepts_nb.ipynb) we will give a full example for this in the
 # context of a time dependent problems.
 #
-# .. tip:: The main advantage of using
-# `dune.ufl.Constant` and grid functions is to be able to change details in
-# a form without requiring any recompilation of the model. An example
-# would be in a time dependent problem a time varying coefficient or
-# changing the time step adaptively during the simulation.
-#
 # As a simple introduction we consider a linear version of the elliptic problem
 # considered previously
 # $$ -\varepsilon \triangle u(x) + m(x) u(x) = f(x) $$
@@ -324,9 +320,10 @@ u_h.plot()
 # change $m$ easily. Assuming $\bar{u}$ is the exact solution of the
 # non-linear elliptic problem from above then $\bar{u}$ will also solve the
 # above equation if $\varepsilon=1$ and we chose
-# $ m(x) = (1+\bar{u})^2$. We will use the discrete solution $u_h$ which
-# from above and chose $m(x) = (1+u_h)^2$. Later will will want to solve
-# the same linear problem but with different $\varepsilon=0$ and $m(x)=1$
+# $m(x) = (1+\bar{u})^2$. We will use the discrete solution $u_h$
+# from above, which is an approximation to $\bar{u}$ and chose
+# $m(x) = (1+u_h)^2$. Later we want to solve
+# the same linear problem but with $\varepsilon=0$ and $m(x)=1$
 # so that we are simply looking at the $L^2$ projection of $f$:
 # $$ \int_\Omega uv = \int_\Omega fv~. $$
 #
@@ -335,7 +332,7 @@ u_h.plot()
 # Details on schemes and operators will be provided in the following
 # section. For this example the important characteristic of a `scheme` is
 # that we can still access some information contained in the underlying UFL
-# form, e.g., the `Constants` used. This allows us to change these without
+# form, e.g., the `Constants` used. This allows us to change these
 # efficiently during the simulation as shown below.
 
 # %%
