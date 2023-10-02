@@ -1,8 +1,8 @@
 # %% [markdown]
 # # General Concepts (with a time dependent problem)
 # In the following we introduce how to construct and use the basic components of
-# a finite element method ending the first part with solving a simple Laplace
-# problem. The required steps are:
+# a finite element method ending with solving a heat equation.
+# The required steps are:
 #
 # *  constructing a tessellation of the computational domain (**hierarchical grid** and **grid view**)
 # *  working with functions defined over the grid (**grid functions**)
@@ -18,9 +18,15 @@
 # ## Setting up the Grid
 #
 # .. note:: The goal of a Dune **grid** or **hierarchical grid** is to provide an
-# interface to describe subdivisions (entities or elements for codim 0) of the computational domain $\Omega$
-# in a generic way. In the following this is referred to as `hierarchicalGrid`. See <cite data-cite="DuneReview"></cite>, Section 3.1, for
-# more details.
+#    interface to describe subdivisions (entities or elements for codim 0) of the computational domain $\Omega$
+#    in a generic way. In the following this is referred to as `hierarchicalGrid`.
+#    See <cite data-cite="DuneReview"></cite>, Section 3.1, for more details.
+#
+# .. note:: Grids can be refined in a hierarchic manner, meaning that elements are subdivided into several smaller elements. The
+#    element to be refined is kept in the grid and remains accessible. One
+#    can either refine all elements (global refinement) as described below.
+#    We will discuss [local refinement](gridviews.rst#Dynamic-Local-Grid-Refinement-and-Coarsening)
+#    in a later section.
 #
 # After some general import statements we start our tutorial by setting up
 # a simple Cartesian grid over the domain $\Omega = [0,1]^2$ subdivided into four
@@ -29,7 +35,7 @@
 # 2D, other options for visualization, e.g., using ParaView will be
 # discussed later.
 #
-# Using the `dune.grid.structuredGrid` function, is the simplest way to construct
+# Using the `dune.grid.structuredGrid` function is the simplest way to construct
 # a grid, more complicated
 # (unstructured) grids can be constructed using a dictionary containing the
 # vertices and the element connectivity or by for example providing a
@@ -51,10 +57,6 @@ gridView.plot()
 # %% [markdown]
 # Often the initial grid is a bit coarse - it is very easy to refine it
 # globally.
-# Grids can be refined in a hierarchic manner, meaning that elements are subdivided into several smaller elements. The
-# element to be refined is kept in the grid and remains accessible.
-# We will discuss [local refinement](gridviews.rst#Dynamic-Local-Grid-Refinement-and-Coarsening)
-# in a later section.
 #
 # .. index::
 #    pair: Grid view; Grid view Definition
@@ -85,7 +87,7 @@ gridView.plot()
 #
 # .. note:: A **grid function** is a function that is defined
 # over a given grid view and is evaluated by using an element
-# of this view and local coordinate within that element, i.e. a quadrature point.
+# of this view and local coordinate within that element, e.g., a quadrature point.
 #
 # For example:
 # ```
@@ -147,16 +149,22 @@ gridView.writeVTK('exact', pointdata={'exact': exact})
 # If the first argument `expr`
 # is a ufl expression then a grid function is generated
 # which can be efficiently evaluated on both the Python and the C++ side.
-# Especially in time critical parts of the code the usage of
-# ``gridFunction`` is strongly encouraged to speed up simulations.
-# Like ``assemble`` and ``integrate`` `gridFunction` takes two additional
-# arguments ``order`` and ``gridView``. See the
+#
+# .. tip:: Especially in time critical parts of the code the usage of
+#    ``gridFunction`` is strongly encouraged to speed up simulations.
+#
+# Like ``assemble`` and ``integrate``, `gridFunction` takes two additional
+# arguments ``order`` and ``gridView``. These are required arguments if a
+# code snippet is used or the ``gridView`` is used as a decorator. If the
+# basis of the grid function is a ufl expression these can be omitted in
+# many cases where they can be determined from the expression itself. See the
 # [introduction](dune-fempy_nb.ipynb) for more detail.
 #
+# In the next example the ``gridView`` argument is required:
 
 # %%
 from dune.fem.function import gridFunction
-exact_gf = gridFunction(exact, gridView, name="ufl", order=1)
+exact_gf = gridFunction(exact, gridView, name="ufl")
 mass = 0
 for element in gridView.elements:
     mass += exact_gf(element,[0.5,0.5]) * element.geometry.volume
@@ -179,7 +187,7 @@ def exactLocal(element,xLocal):
     return 1/2.*(x[0]**2+x[1]**2) - 1/3*(x[0]**3 - x[1]**3) + 1
 
 # %% [markdown]
-# we can use the same approach but with a function using global
+# We can use the same approach but with a function using global
 # coordinates but can then be used like any other grid function:
 
 # %%
@@ -205,8 +213,8 @@ print(mass)
 
 # %%
 print( integrate(abs(exact-exactLocal)) )
-gf = gridFunction(exact+exactLocal*exactGlobal, name="ufl")
-fig = plt.figure(figsize=(20,10))
+gf = gridFunction(exact-exactLocal+exactGlobal, name="ufl")
+fig = plt.figure(figsize=(25,10))
 gf.plot(figure=(fig,121))
 exactGlobal.plot(figure=(fig,122))
 
@@ -229,12 +237,16 @@ exactGlobal.plot(figure=(fig,122))
 # ## Discrete Spaces
 #
 # The grid functions set up so far did not involve any
-# discretization, they are exactly evaluated at the given point.
+# discretization, they are exactly evaluated at the given point. We next
+# discuss functions over finite dimensional (discrete) spaces.
 #
 # .. note::
-# A **discrete (function) space** is a finite dimensional function space defined over a given grid view,
-# typically the Finite Element space involved.
+# A **discrete (function) space** is a finite dimensional function space
+# defined over a given grid view. Typically these are Finite Element
+# spaces.
 #
+# Let us start with a Lagrange finite element space consisting of piecewise
+# quadratic functions (``order=2``):
 
 # %%
 from dune.fem.space import lagrange as solutionSpace
@@ -247,6 +259,14 @@ space = solutionSpace(gridView, order=2)
 # element of the space (a discrete function) applying the natural
 # interpolation into the space to a given (ufl) expression.
 # This is explained in detail in the next section.
+#
+# .. tip::
+#    In addition to the ``order`` argument most spaces take an additional
+#    ``dimRange`` argument to construct vector valued spaces $V^n$. Note
+#    that by default a scalar space is constructed which differs in usage
+#    from the space with ``dimRange=1``. Discrete function over the latter
+#    have to be treated as vector valued functions of dimension one, e.g.,
+#    instead of ``uh*uh`` one needs ``uh[0]*uh[0]`` or ``ufl.dot(uh,uh)``.
 #
 # Two other methods on the discrete spaces worth noting provide access to the local to global dof
 # mapper and evaluate the basis functions.
@@ -419,6 +439,7 @@ print()
 #
 # Let us first consider a simple linear elliptic problem
 # $$ -\triangle u + \alpha u = f $$
+# with Dirichlet and Neuman boundary data given by $g_D,g_N$ and
 # where $\alpha$ is a real valued parameter.
 # We choose $f,g_N,g_D$ so that the exact solution for $\alpha=0$
 # is given by
@@ -429,21 +450,24 @@ print()
 #
 # .. index:: Scheme; Scheme Definition
 #
-# .. note:: A **scheme** implements the weak form a specific type of equation,
-# where the mathematical model (integrands) is provided as ufl form.
-# Mathematically a `scheme` implements an operator $L\colon V_h\to V_h$
-# with equal (discrete) domain and range space. The `scheme`
-# provides a `solve` method which computes $u=L^{-1}(g)$ for
-# given $g$. As default computes a root of $L$
-# but it is possible to provide a right hand side $g$, i.e., solve $L[u_h]=g$.
+# .. note::
+#    A **scheme** implements a Galerkin scheme for a given
+#    weak form for a wide range of equations,
+#    where the mathematical model (integrands) is provided as ufl form.
+#    Mathematically a `scheme` implements an operator $L\colon V_h\to V_h$
+#    with equal (discrete) domain and range space. The `scheme`
+#    provides a `solve` method which computes $u=L^{-1}(g)$ for
+#    given $g$. As default computes a root of $L$
+#    but it is possible to provide a right hand side $g$, i.e., solve $L[u_h]=g$.
 #
 # .. index:: Operator; Operator Definition
 #
-# .. note:: The more general case is
-# covered by classes in `dune.fem.operator` for **operators** $L\colon V_h\to W_h$
-# with different domain and range spaces. See
-# [here](scheme_api.rst) for more details on the concepts and a summary of the API for operators and
-# schemes.
+# .. note::
+#    The more general case is
+#    covered by classes in `dune.fem.operator` for **operators** $L\colon V_h\to W_h$
+#   with different domain and range spaces. See
+#   [here](scheme_api.rst) for more details on the concepts and a summary of the API for operators and
+#   schemes.
 
 # %%
 from ufl import (TestFunction, TrialFunction, SpatialCoordinate, FacetNormal,
@@ -479,7 +503,7 @@ print("Number of elements:",gridView.size(0),
 # and after the ufl form was converted into a `scheme` or `operator` the
 # given name can be used to change the constant within the form
 # efficiently, e.g., we can adapt the point in time or time step during the
-# simulation without requiring and just in time compilation.
+# simulation without requiring any additional just in time compilation.
 #
 # Note that $\alpha=1$ so we do not have the correct exact solution.
 # We can print the value of a `Constant` with name `foo` via
@@ -513,10 +537,11 @@ print("Number of elements:",gridView.size(0),
 # K(\nabla u) = \frac{2}{1+\sqrt{1+4|\nabla u|}}
 # \end{equation}
 # and $f=f(x,t)$ is some time dependent forcing term.
-# On the boundary we prescribe Neumann boundary as before
+# On the boundary we prescribe Neumann boundary
 # and initial conditions $u=u_0$.
 #
-# We will solve this problem in variational form and using Crank Nicolson in time
+# We will solve this problem in variational form and using the Crank
+# Nicolson method for the time discretization
 #
 # \begin{equation}
 # \begin{split}
