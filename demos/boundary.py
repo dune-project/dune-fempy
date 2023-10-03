@@ -1,12 +1,11 @@
 # %% [markdown]
 #
 # # More General Boundary Conditions
-# So far we only used natural boundary conditions. Here we discuss how to
-# impose other conditions like Neumann, Robin
-# and especially Dirichlet.
-# We will show how to add these to the model and how to
-# prescribe different conditions for
-# different components of the solution.
+# So far we have used Dirichlet and trivial Neumann boundary conditions. Here we discuss how to
+# impose other conditions like general Neumann, Robin and more general
+# Dirichlet conditions. We will show how to add these to the model and how to
+# prescribe different conditions for different components of the solution
+# in the case of vector valued PDEs.
 #
 # ## Dirichlet boundary conditions
 # .. index::
@@ -17,7 +16,7 @@
 # `dune.ufl.DirichletBC` which takes three arguments:
 # the discrete function space for $u$, the function $g$ given by a UFL
 # expression, and a description of $\Gamma$. There are different ways to
-# do this. If it is omitted or `None` the condition is applied to the whole
+# do this. If the final argument is omitted or `None` the condition is applied to the whole
 # domain, a integer $s>0$ can be provided which can be set to describe a
 # part of the boundary during grid construction as described at the end of
 # this section. Finally a UFL condition can be used, i.e., `x[0]<0`.
@@ -61,8 +60,8 @@ plotComponents(vec, gridLines=None, level=2,
                colorbar={"orientation":"horizontal", "ticks":ticker.MaxNLocator(nbins=4)})
 
 # %% [markdown]
-# To prescribe $u_2=1$ at the bottom boundary is also straightforward
-
+# To prescribe $u_2=1$ at the bottom boundary is easily achieve by
+# providing multiple instances of the `dune.ufl.DiricheltBC` class:
 
 # %%
 bcBottom = DirichletBC(vecSpace,[sin(2*pi*(x[0]+x[1])),1],x[1]<1e-10)
@@ -77,7 +76,7 @@ plotComponents(vec, gridLines=None, level=2,
 # for the boundary conditions in the same way we could use grid functions
 # anywhere within the UFL forms.
 # We could for example fix the boundary values of the first component using the discrete solution
-# from # the previous computation by writing
+# from the previous computation by writing
 # `bc = DirichletBC(vecSpace,[vec[0],None])`
 # Since this would just be an approximation to the actual boundary
 # condition the overall results would not be identical to the previous
@@ -112,8 +111,8 @@ assert sum([ abs(td-vd) for td,vd in zip(test.dofVector, vec.dofVector)] ) /\
 #
 # ## Accessing the Dirichlet degrees of freedom
 #
-# We provide a few method, to apply or otherwise access information about
-# the Dirichlet constraints from an existing  scheme.
+# We provide a few methods to apply or otherwise access information about
+# the Dirichlet constraints from an existing scheme.
 #
 # The following shows how to set all degrees of freedom on the Dirichlet
 # boundary to zero. For a more realistic example see the second approach in
@@ -185,11 +184,12 @@ plotComponents(vec, gridLines=None, level=2,
 #
 # ## Neumann and Robin boundary conditions
 #
-# Neumann boundary flux are added to the ufl form by using the measure # `ufl.ds`.
+# Neumann boundary flux are added to the ufl form by using the measure `ufl.ds`.
 # By default they will be added to all boundaries for which no Dirichlet
 # conditions have been prescribed. In the above example we prescribed no
 # Dirichlet conditions to the second component at both vertical
-# and the top boundary. This leads to zero fluxes being used there. To
+# and the top boundary using the `dune.ufl.DirichletBC` instance `bc`.
+# This leads to zero fluxes (natural boundary conditions) being used there.
 # To add some (here nonlinear) Neumann boundary conditions for the second
 # component at these three sides we can simply add an additional term to
 # `a`:
@@ -221,7 +221,8 @@ plotComponents(vec, gridLines=None, level=2,
 # to define where boundary conditions are to be applied.
 # At the moment to use boundary ids the grid has to be constructed using
 # the Dune Grid Format (dgf) reader. Please consult the [documentation of the
-# DGF file format](https://dune-project.org/doxygen/master/group__DuneGridFormatParser.html#details) for details.
+# DGF file format](https://dune-project.org/doxygen/master/group__DuneGridFormatParser.html#details) for details
+# and [other examples given for grid construction](othergrids_nb.ipynb).
 #
 
 # %% [markdown]

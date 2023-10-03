@@ -136,8 +136,7 @@ gridView.writeVTK('exact', pointdata={'exact': exact})
 # .. index::
 #    pair: Functions; dune.fem.function.gridFunction
 #
-# .. note::
-# ``dune.fem.function.gridFunction`` provides different options for
+# .. note:: ``dune.fem.function.gridFunction`` provides different options for
 # constructing grid functions: it can be used as decorator of Python
 # function, provided with a C++ code snippet, or an ufl expression.
 #
@@ -240,8 +239,7 @@ exactGlobal.plot(figure=(fig,122))
 # discretization, they are exactly evaluated at the given point. We next
 # discuss functions over finite dimensional (discrete) spaces.
 #
-# .. note::
-# A **discrete (function) space** is a finite dimensional function space
+# .. note:: A **discrete (function) space** is a finite dimensional function space
 # defined over a given grid view. Typically these are Finite Element
 # spaces.
 #
@@ -301,8 +299,7 @@ print("convert to a numpy array:", np.array( space.jacobianBasis(element, localP
 #
 # ## Discrete Functions
 #
-# .. note::
-# A special type of grid function is a **discrete function** living in a
+# .. note:: A special type of grid function is a **discrete function** living in a
 # discrete (finite dimensional) space. The main property of a discrete
 # function is that it contains a **dof vector**.
 # [In a later section](solvers_nb.ipynb)
@@ -427,15 +424,15 @@ print()
 # In the [previous section](dune-fempy_nb.ipynb) we have already seen how to
 # assemble system matrices for linear PDEs and how to construct schemes for
 # non-linear problems. We also discussed that we can directly use grid
-# functions and `dune.ufl.Constant` instances within UFL expressions
+# functions and ``dune.ufl.Constant`` instances within UFL expressions
 # and forms - in the final example of this section we will give an example for this in the
 # context of a time dependent problems.
 #
 # .. tip:: The main advantage of using
-# `dune.ufl.Constant` and grid functions is to be able to change details in
-# a form without requiring any recompilation of the model. An example
-# would be in a time dependent problem a time varying coefficient or
-# changing the time step adaptively during the simulation.
+#    ``dune.ufl.Constant`` and grid functions is to be able to change details in
+#    a form without requiring any recompilation of the model. An example
+#    would be in a time dependent problem a time varying coefficient or
+#    changing the time step adaptively during the simulation.
 #
 # Let us first consider a simple linear elliptic problem
 # $$ -\triangle u + \alpha u = f $$
@@ -448,22 +445,33 @@ print()
 # \end{align*}
 # which is the grid function ``exact`` we have already defined above.
 #
+# .. index:: DirichletBC; DirichletBC Definition
+#
+# .. note:: The class `dune.ufl.DirichletBC` is used to fix Dirichlet conditions
+#    $u=g$ on $\Gamma\subset\partial\Omega$.
+#    It constructor takes three arguments: the discrete space for $u$,
+#    the data $g$, and a discription of $\Gamma$. Multiple
+#    instances can be used to fix Dirichlet conditions on different parts of the boundary
+#    as described in the Section on [general boundary conditions](boundary_nb.ipynb).
+#
+# To assemble a system matrix from a ufl form one can either use
+# `dune.fem.assemble` which is especially useful for simple linear models
+# as discussed in the [previous section](dune-fempy_nb.ipynb). For more
+# control one should use `schemes` or `operators`:
+#
 # .. index:: Scheme; Scheme Definition
 #
-# .. note::
-#    A **scheme** implements a Galerkin scheme for a given
-#    weak form for a wide range of equations,
-#    where the mathematical model (integrands) is provided as ufl form.
+# .. note:: A **scheme** implements a Galerkin scheme for a given
+#    weak form for a wide range of PDEs, where the model (integrands) is provided as ufl form.
 #    Mathematically a `scheme` implements an operator $L\colon V_h\to V_h$
 #    with equal (discrete) domain and range space. The `scheme`
 #    provides a `solve` method which computes $u=L^{-1}(g)$ for
-#    given $g$. As default computes a root of $L$
-#    but it is possible to provide a right hand side $g$, i.e., solve $L[u_h]=g$.
+#    given $g$. By default a root of $L$ is computed but
+#    a right hand side $g$ can be provided to solve $L[u_h]=g$.
 #
 # .. index:: Operator; Operator Definition
 #
-# .. note::
-#    The more general case is
+# .. note:: The more general case is
 #    covered by classes in `dune.fem.operator` for **operators** $L\colon V_h\to W_h$
 #   with different domain and range spaces. See
 #   [here](scheme_api.rst) for more details on the concepts and a summary of the API for operators and
