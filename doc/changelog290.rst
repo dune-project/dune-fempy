@@ -15,10 +15,11 @@ Deprecation of ``dune.fem.function.uflFunction`` and ``dune.fem.function.cppFunc
 --------------------------------------------------------------------------------------
 To construct different versions of grid function use
 ``dune.fem.function.gridFunction``. The signature of the new function is
-``def gridFunction(expr=None,gridView=None,*,name=None,order=None, fctName=None, view=None, **kwargs)`.`
+``def gridFunction(expr=None,gridView=None,*,name=None,order=None, fctName=None, view=None, **kwargs)``.
 
 * If ``expr`` is a ``gridView`` or is ``None`` (and the ``gridView`` is not ``None``)
-  then the function acts like the decorator from 2.9 version.
+  then the function acts like the decorator from 2.9 version. Note that the
+  old ``view`` parameter is also deprecated and replaced by ``gridView``.
 
   .. note:: ``@gridFunction(gv,"name",5)`` will not work anymore since name and
      order need to be named arguments. So this will lead to an error instead
@@ -33,6 +34,8 @@ To construct different versions of grid function use
   heuristically from the expression if omitted. 
 
 * If ``expr`` is a string then the function acts as like the old ``cppFunction``.
+  If ``fctName`` is not provided the ``name`` argument is assumed to also
+  be the name of the cpp function to export.
 
 Deprecation of ``dune.fem.operator.linear``
 -------------------------------------------

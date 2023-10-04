@@ -16,14 +16,8 @@
     diamond.plot()
 
 
-.. parsed-literal::
 
-    /home/dedner/dunepy3.8-core/lib/python3.8/site-packages/matplotlib_inline/config.py:68: DeprecationWarning: InlineBackend._figure_format_changed is deprecated in traitlets 4.1: use @observe and @unobserve instead.
-      def _figure_format_changed(self, name, old, new):
-
-
-
-.. image:: geoview_nb_files/geoview_nb_2_1.jpg
+.. image:: geoview_nb_files/geoview_nb_2_0.jpg
 
 
 In a second example we embed a 1D interval into 3D:
