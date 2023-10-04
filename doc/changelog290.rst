@@ -44,7 +44,7 @@ empty linear operator which can be passed into ``jacobian`` to be filled.
 
 Extension of the ``jacobian`` method on schemes and operators
 -------------------------------------------------------------
-In addition to the exisitng ``jacobian`` method taking a linear operator
+In addition to the existing ``jacobian`` method taking a linear operator
 object a new overload is available taking a further `rhs` argument which
 returns the functional part of the operator as though it was on the right
 hand side. So if the ufl form is ``a(u,v)=l(v)`` then this method assembles
@@ -66,7 +66,7 @@ The function ``dune.fem.assemble`` takes a ufl form and returns their assembled 
   ``dune.fem.integrate``.
 
 * If the first function has arity one (i.e. contains a test function) then
-  the functional we be assembled returing a discrete function:
+  the functional we be assembled returning a discrete function:
   ``dune.fem.assemble(f*v*dx)``. Again if possible the grid view will be
   extracted from the form.
 
