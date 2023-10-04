@@ -16,7 +16,7 @@ elasticity.py         mcf.py
 uzawa-scipy.py        monolithicStokes.py   fieldsplitStokes.py
 othergrids.py         gitlab-formatting.py  gmsh2dgf.py pandoc-formatting.py  vemdemo.py            chimpl.py
 discontinuousgalerkin.py
-interpolation.py      wave.py               laplace-adaptive.py   laplace-dwr.py
+interpolation.py      wave.py               laplace-adaptive.py   laplace-dwr.py laplace-dwr-algorithm.py
 backuprestore.py      parallelization.py    boundary.py           solvers.py
 evalues_laplace.py    mmesh.py
 crystal_nb.ipynb           mcf_nb.ipynb               chemical_nb.ipynb
@@ -26,7 +26,8 @@ elasticity_nb.ipynb        uzawa-scipy_nb.ipynb       othergrids_nb.ipynb
 laplace-adaptive_nb.ipynb  vemdemo_nb.ipynb           chimpl_nb.ipynb
 discontinuousgalerkin_nb.ipynb gmsh2dgf_nb.ipynb
 monolithicStokes_nb.ipynb  fieldsplitStokes_nb.ipynb
-laplace-dwr_nb.ipynb       lineplot_nb.ipynb          wave_nb.ipynb
+laplace-dwr_nb.ipynb       laplace-dwr-algorithm_nb.ipynb
+lineplot_nb.ipynb          wave_nb.ipynb
 mcf-algorithm_nb.ipynb     parallelization_nb.ipynb   backuprestore_nb.ipynb
 boundary_nb.ipynb          solvers_nb.ipynb           mmesh_nb.ipynb
 cppfunctions_nb.ipynb      laplace-dwr.hh             utility.hh

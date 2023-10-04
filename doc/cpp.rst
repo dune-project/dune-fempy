@@ -29,4 +29,4 @@ section for some :ref:`hints for developers</developers.rst>`
    cppfunctions_nb
    lineplot_nb
    mcf-algorithm_nb
-   laplace-dwr_nb
+   laplace-dwr-algorithm_nb

@@ -26,9 +26,9 @@ from dune.fem.plotting import plotPointData as plot
 import dune.grid as grid
 import dune.fem as fem
 import dune.common as common
-import dune.generator.algorithm as algorithm
 from dune.fem.view import adaptiveLeafGridView as adaptiveGridView
 from dune.fem.space import lagrange as solutionSpace
+from dune.fem.scheme import galerkin as solutionScheme
 from dune.alugrid import aluConformGrid as leafGridView
 from ufl import *
 from dune.ufl import DirichletBC
@@ -67,7 +67,6 @@ def setup():
     gridView.hierarchicalGrid.globalRefine(2)
     space = solutionSpace(gridView, order=order)
 
-    from dune.fem.scheme import galerkin as solutionScheme
     u = TrialFunction(space)
     v = TestFunction(space)
     x = SpatialCoordinate(space.cell())
@@ -97,8 +96,6 @@ uh, exact, laplace = setup()
 # to Python.
 
 # %%
-from dune.fem.scheme import galerkin as solutionScheme
-from dune.fem.utility import pointSample
 
 spaceZ = solutionSpace(uh.space.gridView, order=order+1)
 u = TrialFunction(spaceZ)
@@ -112,29 +109,19 @@ point = common.FieldVector([0.4,0.4])
 pointFunctional = z.copy("dual_rhs")
 eh = gridFunction(abs(exact-uh),name="error", order=order+1)
 
-def getFunctional(cpp=True):
-    if cpp: # use the C++ version
-        computeFunctional = algorithm.load("pointFunctional", "laplace-dwr.hh",
-                                      point, pointFunctional, eh)
-    else: # this is the equivalent implementation using the bindings
-        def computeFunctional(point, pointFunctional, eh):
-            space = pointFunctional.space
-            en, xLoc = pointSample(space.gridView, point)
-            phiVal = numpy.array( space.evaluateBasis(en, xLoc) )[:,0] # issue here with scalar function spaces
-            idx = space.mapper(en)
-            lf = eh.localFunction()
-            lf.bind(en)
-            pointFunctional.as_numpy[ idx ] += phiVal
-            return lf(xLoc)
-    return computeFunctional
+from dune.fem.utility import pointSample
+def computeFunctional(point, pointFunctional, eh):
+    space = pointFunctional.space
+    en, xLoc = pointSample(space.gridView, point)
+    phiVal = numpy.array( space.evaluateBasis(en, xLoc) )[:,0] # issue here with scalar function spaces
+    idx = space.mapper(en)
+    lf = eh.localFunction()
+    lf.bind(en)
+    pointFunctional.as_numpy[ idx ] += phiVal
+    return lf(xLoc)
 
 # %% [markdown]
 #
-# Here is the corresponding C++ code
-#
-# .. literalinclude:: laplace-dwr.hh
-#
-
 # %% [markdown]
 # Next we define the actual estimator
 
@@ -158,7 +145,7 @@ estimator = estimatorOp(estimator_ufl)
 # %%
 h1error = dot(grad(uh - exact), grad(uh - exact))
 
-def compute(computeFunctional, tolerance):
+def compute(tolerance):
     fig = pyplot.figure(figsize=(60,30))
     count = 0
     errorVector    = []
@@ -191,18 +178,7 @@ def compute(computeFunctional, tolerance):
 # We first use a version based entirely on the available binding:
 
 # %%
-compute( getFunctional(cpp=False), tolerance=1e-4 )
-
-# %% [markdown]
-# We repeat the same simulation providing part of the code in a cpp code
-# snippet. We reduce the tolerance a bit to get a more accurate results.
-# Note that this is just to demonstrate the concept of using the
-# `algorithm` function, the same result could have been achieved using the
-# binding code used previously by reducing the tolerance in the first call
-# to ``compute``.
-
-# %%
-compute( getFunctional(cpp=True), tolerance=1e-6 )
+compute( tolerance=1e-6 )
 
 # %% [markdown]
 # Let's take a close up look of the refined region around the point of
