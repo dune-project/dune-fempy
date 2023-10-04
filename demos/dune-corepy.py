@@ -1,13 +1,5 @@
 # %% [markdown]
 # # Overview
-# .. index::
-#    pair: Overview; Dense Vectors
-#
-# .. index::
-#    pair: Overview; Geometries
-#
-# .. index::
-#    pair: Overview; Geometries
 #
 # To facilitate rapid prototyping, the Dune Python bindings
 # provide Python classes for all the core interfaces of Dune. This makes
@@ -29,13 +21,16 @@
 # In the following we briefly introduce the most important parts of the
 # Dune core interface
 #
+# .. index::
+#    pair: Overview; Dense Vectors
+#
+# .. index::
+#    pair: Overview; Geometries
+#
 # # Dense Vectors and the Geometry Classes
-# A quick survey of Dune-Common and Dune-Geometry
+# We start with a quick survey of Dune-Common and Dune-Geometry modules.
 # The core module Dune-Common provides some classes for dense linear algebra.
-# The `FieldVector` and `FieldMatrix` classes are heavily used in the grid
-# geometry realizations. The conceptional basis for these geometries is
-# provided by Dune-Geometry, providing, for example, reference elements and
-# quadrature rules.
+
 # %%
 import time, numpy, sys
 import matplotlib.pyplot as pyplot
@@ -43,22 +38,32 @@ import dune.fem
 
 from dune.common import FieldVector
 x = FieldVector([0.25,0.25,0.25])
+print(x)
+print(numpy.array(x))
 
+# %% [markdown]
+# The `FieldVector` and `FieldMatrix` classes are heavily used in the grid
+# geometry realizations. The conceptional basis for these geometries is
+# provided by Dune-Geometry, providing, for example, reference elements and
+# quadrature rules.
+
+# %%
 import dune.geometry
 geometryType = dune.geometry.simplex(2)
 referenceElement = dune.geometry.referenceElement(geometryType)
 print("\t".join(str(c) for c in referenceElement.corners))
 
 for p in dune.geometry.quadratureRule(geometryType, 3):
-    print(p.position, p.weight)
+    print("position:",p.position,f"({type(p.position)})", "weight:",p.weight,f"({type(p.weight)})")
 
 # %% [markdown]
 # We can also obtain all weights and points stored in numpy arrays which
 # can be useful to vectorize the computation of quadratures:
+
 # %%
 points,weights = dune.geometry.quadratureRule(geometryType, 3).get()
-print("quadrature points:",points)
-print("quadrature weights:",weights)
+print("quadrature points:",points,f"({type(points)},{points.shape})")
+print("quadrature weights:",weights,f"({type(weights)},{weights.shape})")
 
 # %% [markdown]
 # .. index::
@@ -67,31 +72,74 @@ print("quadrature weights:",weights)
 # # Grid Construction and Basic Interface
 # We now move on to the Dune-Grid module. First let us discuss different
 # possibilities of constructing a grid.
+#
+# #### Structured grids
+# We start with a structured grid. We saw in previous section the use of
+# `dune.grid.structuredGrid` which is just a shortcut for setting up a
+# Cartesian grid based on the `yaspGrid` grid manager which is part of
+# `dune.grid`.
 
 # %%
 from dune.grid import cartesianDomain, yaspGrid
 domain = cartesianDomain([0, 0], [1, 0.25], [15, 4])
 yaspView = yaspGrid(domain)
 
+# %% [markdown]
+# Let's visualize the grid and then globally refine it once
+
+# %%
 yaspView.plot()
 yaspView.hierarchicalGrid.globalRefine()
 yaspView.plot()
 
 # %% [markdown]
-# Let's visualize the grid and then globally refine it once
-# %%
+# The `dune.alugrid` module provides 2d and 3d unstructured grids (both
+# triangle and cubes). We can construct a triangle grid, visualize, and
+# refine it in exactly the same way as the structured grid used above.
+# We use `dune.alugrid.aluConformGrid` which uses newest vertex bisection
+# to refine the grid. So one step of refinement only reduces the grid width
+# by a factor of $\sqrt2$. We we need two steps to half the grid width:
 
+# %%
 from dune.alugrid import aluConformGrid
 aluView = aluConformGrid(domain)
 aluView.plot()
 aluView.hierarchicalGrid.globalRefine()
 aluView.plot()
+aluView.hierarchicalGrid.globalRefine()
+aluView.plot()
+
+# %% [markdown]
+# We can also provide the number of levels to refine to the `globalRefine`
+# method:
+
+# %%
+domain = cartesianDomain([0, 0], [1, 0.25], [8, 2])
+yaspView = yaspGrid(domain)
+aluView = aluConformGrid(domain)
+
+yaspView.hierarchicalGrid.globalRefine(2)
+yaspView.plot()
+aluView.hierarchicalGrid.globalRefine(4)
+aluView.plot()
+
+# %% [markdown]
+# The `dune.grid.yaspGrid` grid manager also provides the option to construct
+# tensor product grid. For a 2d grid one needs to provide a vector
+# of x-coordinates $x=(x_i)$ and y-coordinates $y=(y_j)$
+# resulting in a grid with points $(x_i,y_j)$:
+
+# %%
+from dune.grid import tensorProductCoordinates
+cst = dune.grid.tensorProductCoordinates([[1,2,4,8,16],[6,8,10,12,14,16]])
+yaspView = dune.grid.yaspGrid(cst)
+yaspView.plot()
 
 # %% [markdown]
 # .. index:: Grid construction; Dictionaries
 #
-# #### An unstructured grid
-# can be constructed by providing a dictionary containing vertex coordinate
+# #### Unstructured grids
+# General unstructured grids can be constructed by providing a dictionary containing vertex coordinate
 # and element connectivity
 
 # %%
@@ -105,13 +153,15 @@ aluView.plot(figsize=(5,5))
 # %% [markdown]
 
 # An unstructured grid can also be constructed from a file.
-# Currently [gmsh](othergrids_nb.ipynb) and [DGF](othergrids_nb.ipynb) are supported.
+# Currently [gmsh and DGF](othergrids_nb.ipynb) are supported.
 
 # %% [markdown]
 # .. index:: Adaptation; h-refinement
 #
+# #### Local grid adaptivity
 # In addition to global refinement we can also pre process the grid by
 # marking a subset of elements for local refinement.
+
 # %%
 from dune.grid import Marker
 aluView.plot(figsize=(5,5))
@@ -128,11 +178,22 @@ triangles = [aluView.indexSet.subIndices(e, 2) for e in aluView.elements]
 aluView = aluSimplexGrid({"vertices": vertices, "simplices": triangles})
 
 # %% [markdown]
+# .. tip:: If discrete functions based on the `dune.fem` spaces have been
+#    constructed before local or global grid refinement is performed, the
+#    degree of freedom (dof) vectors will be resized but the data will be
+#    lost. Use `dune.fem.adapt` and `dune.fem.globalRefine` if data is
+#    supposed to be retained during grid modification. This is described in
+#    detail in the section on
+#    [dynamic grid modification](gridviews.rst#Dynamic-Local-Grid-Refinement-and-Coarsening).
+
+# %% [markdown]
 # .. index::
 #    pair: Overview; Iterators
 #
+# ### Basic information and iterators
 # We next discuss how to retrieve basic information from a constructed grid
 # and iterate over its entities (i.e., elements, faces, edges, vertices, etc.).
+
 # %%
 vertices = [(0,0), (1,0), (1,1), (0,1)]
 triangles = [(2,0,1), (0,2,3)]
@@ -156,13 +217,20 @@ for edge in unitSquare.edges:
 # which is discussed in the next section.
 
 # %% [markdown]
-# # Using grid functions
+#
 # .. index::
 #    pair: Functions; Grid Functions
 #
+# # Using grid functions
 # This is a fundamental concept in any grid based discretization package.
 # These are functions that can be evaluated given an entity in the grid and
 # a local coordinate within the reference element of that entity.
+#
+# .. tip:: in the following we will use the `gridFunction` decorator
+#    provided by `dune.fem`. A very similar decorator is also available in
+#    `dune.grid` but the latter does not provide the option to use the grid
+#    functions in ufl expressions.
+
 # %%
 @dune.fem.function.gridFunction(aluView, name="cos", order=3)
 def f(x):
@@ -177,8 +245,9 @@ maxValue = max(f(e, hatx) for e in f.gridView.elements)
 
 maxValue = max(f(e.geometry.toGlobal(hatx)) for e in f.gridView.elements)
 
-f.plot()
 hat0.plot()
+f.plot()
+f.plot(level=3,xlim=[0,0.4], ylim=[0,0.4])
 
 # %% [markdown]
 # .. index::
@@ -259,17 +328,36 @@ print("integral of function 'g':",integral)
 # `IndexSet` which provides a consecutive, zero starting integer for the
 # set of entities of a given geometry type, i.e., entities sharing the same
 # reference element, like all triangles or all cubes. This can be used to attach
-# data to the these entities stored in random access containers like
+# data to these entities stored in random access containers like
 # `numpy` arrays. To simplify the process further a `mapper` can be used
 # which is initialized with the data layout, i.e., the number of degrees of
 # freedom that is supposed to be attached to every entity with a given
 # geometry type.
-# %%
-mapper = unitSquare.mapper([2, 0, 3])
 
+# In the following we first construct a mapper for a 2d cube grid
+# attaching 2 dofs to each
+# element (codimension 0), 4 to each edge (codimension 1), and 3 to each
+# vertex (codimension 2):
+
+# %%
+layout = [2,4,3]
+mapper = unitSquare.mapper([2, 4, 3])
+print( mapper.size, sum([layout[c]*unitSquare.size(c) for c in range(3)]) )
+
+# %% [markdown]
+# We can also use the reference element types from `dune.geometry` to
+# define the layout
+
+# %%
 layout = {dune.geometry.quadrilateral: 4, dune.geometry.triangle: 1}
 mapper = unitSquare.mapper(layout)
 
+# %% [markdown]
+# Finally here is an example of using the mapper to attach one degree of
+# freedom per vertex and using that to define a piecewise linear Lagrange
+# interpolation:
+
+# %%
 def interpolate(grid):
     mapper = grid.mapper({dune.geometry.vertex: 1})
     data = numpy.zeros(mapper.size)
@@ -284,11 +372,29 @@ def p12dEvaluate(e, x):
     idx = mapper.subIndices(e, 2)
     return sum(b * data[i] for b, i in zip(bary, idx))
 
+# %% [markdown]
+# We can use a grid function to compute the error of the Lagrange
+# interpolation at the barycenter of each triangle:
+
+# %%
 @dune.fem.function.gridFunction(aluView, name="error", order=3)
 def error(e, x):
     return abs(p12dEvaluate(e, x)-f(e, x))
 hatx = FieldVector([1./3., 1./3.])
 print(max(error(e, hatx) for e in aluView.elements))
+
+# %% [markdown]
+# .. tip:: the mapper describe here provides a slightly extended interface
+#    compared to the [mappers available from discrete spaces](concepts_nb.ipynb#Discrete-Spaces)
+#    in `dune.fem`. While the mappers from the grid provide methods like `subIndices` and
+#    similar the mapper from the space only provide a method to obtain all
+#    indices attached to a given (codimension 0) entity. This method
+#    is also available in the mappers from the grid.
+
+# %%
+for i,e in enumerate(aluView.elements):
+    print(mapper(e))
+    if i==4: break
 
 # %% [markdown]
 # .. index::
@@ -299,25 +405,43 @@ print(max(error(e, hatx) for e in aluView.elements))
 #
 # # Output of Grid and Visualization of Data
 # We already used `matplotlib` to plot the grid and grid functions. For more
-# flexible plotting Dune relies on `vtk` and Dune-Python makes it easy to
-# write suitable files.
-# %%
-p12dEvaluate.plot(figsize=(9,9), gridLines=None)
-p12dEvaluate.plot(figsize=(9,9), gridLines='black',
-             xlim=[0,0.4], ylim=[0,0.4])
-f.plot(level=2, figsize=(9,9), gridLines=None)
+# flexible plotting Dune relies on `vtk` and it easy to write suitable files.
 
+# %% [markdown]
+# #### Matplotlib
+# We have seen many examples already of using matplotlib to show the grid
+# and grid functions. The most straightforward way is to use the `plot`
+# method. We first show three plots using matplotlib
+#
+# .. tip:: the `plot` method will only work on 1d or 2d grids.
+
+# %%
+p12dEvaluate.plot(figsize=(9,9), gridLines=None, colorbar="horizontal")
+f.plot(level=2, figsize=(9,9), gridLines=None, colorbar="horizontal")
+error.plot(level=2, figsize=(9,9), gridLines=None, colorbar="horizontal")
+
+# %% [markdown]
+# #### Paraview (vtu/vtk files)
+# Now we write out vtu files and use ``pvpython`` to prduce similar but 3d
+# plots of the same functions
+
+# %%
 pd = {"exact": f, "discrete": p12dEvaluate, "error": error}
 aluView.writeVTK("interpolation", pointdata=pd)
 
 aluView.writeVTK("interpolation_subsampled", subsampling=2, pointdata=pd)
 
 # %% [markdown]
+# Here are pngs generated with paraview from the above output:
+# The discrete interpolation
 # ![interpolation](figures/interpolation_discrete.png)
+# A zoom in
 # ![exact solution](figures/interpolation_exact.png)
+# The interpolation error on the subsampled grid
 # ![interpolation error](figures/interpolation_error.png)
 
 # %% [markdown]
+# #### Mayavi
 # Mayavi can also be used to plot grid function in Python. This approach
 # relies on methods to extract `numpy` representations of the grid data
 # structure and values of a given grid function.
@@ -338,3 +462,42 @@ try:
 except ImportError:
     print("mayavi module not found so not rendering plot - ignored")
     pass
+
+# %% [markdown]
+# #### Low level output
+#
+# .. todo:: add some information on the ``tessellate`` and related methods, e.g.,
+#    ``coordinates`` , ``polygons`` , ``tessellate`` , ``triangulation``
+#
+# ```
+# gridView.triangulation(level=0, *, partition=...)  (for 2d grids)
+#      Returns: matplotlib.tri.Triangulation structure
+# ```
+# More general methods
+# ```
+# coordinates(...)
+#    Returns: `numpy` array with the coordinates of all vertices in the grid in
+#             the format `[ [x_1,y_1], [x_2,y_2], ..., [x_N,y_N] ]` for example
+#             in 2d (will be filled up by zeros if dimworld is larger
+#             than the world dimension of the view.
+# polygons(...)   Store the grid in numpy arrays.
+#    Returns: coordinate array storing the vertex coordinate of each polygon
+#             in the grid.
+# tessellate(level=0,dimworld=gv.dimensionworld) or tessellate(level=0,*,partition,dimworld=gv.dimensionworld)
+#   Generated a possibly refined tessellation using only simplices.
+#      Args: level: virtual refinement level to use to generate the tessellation
+#      Returns: (coordinates,simplices) where coordinates is a `numpy` array
+#               of the vertex coordinates (padded by to `dimworld` is needed)
+#               (e.g. in 2d `[ [x_1,y_1,0], [x_2,y_2,0], ..., [x_N,y_N],0 ]`
+#               if `dimworld` is set to 3 - default is no padding,
+#               `dimworld` less than actual world dimension of grid is ignored)
+#               and simplices is a `numpy` array of the vertices of the simplices
+#               (e.g. in 2d `[s_11,s_12,s_13], [s_21,s_22,s_23], ..., [s_N1,s_N2,s_N3] ]` )
+# ```
+# Partner methods on grid function:
+# ```
+# gridFunction.cellData, gridFunction.pointData, gridFunction.polygonData
+# ```
+#
+# .. todo:: add something on ``intersections``
+#

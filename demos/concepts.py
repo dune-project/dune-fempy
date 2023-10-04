@@ -450,7 +450,7 @@ print()
 # .. note:: The class `dune.ufl.DirichletBC` is used to fix Dirichlet conditions
 #    $u=g$ on $\Gamma\subset\partial\Omega$.
 #    It constructor takes three arguments: the discrete space for $u$,
-#    the data $g$, and a discription of $\Gamma$. Multiple
+#    the data $g$, and a description of $\Gamma$. Multiple
 #    instances can be used to fix Dirichlet conditions on different parts of the boundary
 #    as described in the Section on [general boundary conditions](boundary_nb.ipynb).
 #

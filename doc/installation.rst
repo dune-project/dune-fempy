@@ -18,7 +18,14 @@ coffee/tea at hand):
 
 .. code-block:: bash
 
-  pip install dune-fem
+  pip install --pre dune-fem
+
+.. note:: this tutorial is based on the upcomming 2.10 version of Dune. A
+   2.9 release version is available in the Python package index and can be
+   obtained by removing the `--pre` from the above install command. Note
+   that a few of the features described in this tutorial will not be
+   available and that the API has changed in some places. See the
+   description in the :doc:`changelog<changelog290>` for details.
 
 To test that everything works you can download all the scripts described
 in this tutorial and try them out

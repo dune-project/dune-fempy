@@ -17,8 +17,8 @@
 # also available to retrieve the underlying matrix structures of linear
 # operators.
 #
-# We will mostly revisit the nonlinear time dependent problem studied in the
-# introduction which after discretizing in time had the variational formulation
+# We will mostly revisit the nonlinear time dependent problem studied at the end of the
+# [concepts section](concepts_nb.ipynb) which after discretizing in time had the variational formulation
 # \begin{equation}
 # \begin{split}
 # \int_{\Omega} \frac{u^{n+1}-u^n}{\Delta t} \varphi
@@ -34,7 +34,7 @@
 # \begin{align*}
 # u(x,t) = e^{-2t}\left(\frac{1}{2}(x^2 + y^2) - \frac{1}{3}(x^3 - y^3)\right) + 1
 # \end{align*}
-# The following code was described in the introduction:
+# The following code was described in the [concepts section](concepts_nb.ipynb)
 
 # %%
 import numpy, sys, io
@@ -80,10 +80,9 @@ b = 0.5*(f(t)+f(t+dt))*v*dx + 0.5*dot(g(t)+g(t+dt),n)*v*ds
 # When creating a scheme, it is possible to set the linear solver as well as
 # parameters for the internal Newton solver and the linear solver
 # and preconditioning. See a list of available solvers and preconditioning
-# methods here.
+# methods at the end of this section.
 
 # %%
-
 scheme = solutionScheme(a == b, solver='cg')
 
 endTime    = 0.25
@@ -94,8 +93,8 @@ h1error = gridFunction(name="h1error", expr=dot(grad(u_h - exact_end), grad(u_h 
 # %% [markdown]
 # We define a function to evolve the solution from time 0 to the end time.
 # The first argument is a class with a `solve` method that moves the
-# solution from one time level to the next - i.e., solves for $u^{n+1}$
-# given $u^n$:
+# solution from one time level to the next - i.e., solves the non-linear
+# problem for $u^{n+1}$ given $u^n$:
 
 # %%
 def evolve(scheme, u_h, u_h_n, endTime):
@@ -107,7 +106,7 @@ def evolve(scheme, u_h, u_h_n, endTime):
         time += scheme.model.dt
 
 # %% [markdown]
-# We can simply use the `scheme` in this function to produce the solution
+# We can simply use the `galerkinScheme` instance `scheme` in this function to produce the solution
 # at the final time. We combine this with a loop to compute the error over
 # two grids and estimate the convergence rate:
 
@@ -147,11 +146,11 @@ for eocLoop in range(loops):
 
 # %% [markdown]
 # The most important step is accessing the data structures setup on the C++
-# side in Python. In this case we would like to use vectors of dofs from
+# side in Python. In this case we would like to use the underlying dof vector from
 # a discrete function as numpy arrays and system matrices assembled by the
 # schemes and operators as scipy sparse matrices.
-# For the first problem we [discussed](dune-fempy_nb.ipynb) the `as_numpy` method
-# already. So
+# In the [introduction](dune-fempy_nb.ipynb) we already discussed the `as_numpy` method.
+# So
 
 # %%
 vecu_h = u_h.as_numpy
@@ -176,7 +175,7 @@ scheme.jacobian(space.zero, linOp)
 # %% [markdown]
 # Here we linearize around zero. But that argument could be any grid
 # function. A second version of this method will return an addition
-# discrete function `rhs` such that `DL[ubar] - rhs` are the first terms in
+# discrete function `rhs` such that `DL[ubar](u-ubar) - rhs` are the first terms in
 # the Taylor expansion of the operator `L`:
 
 # %%
@@ -195,7 +194,7 @@ plt.show()
 
 # %% [markdown]
 # Now we have all the ingredients to write a simple Newton solver to solve
-# our example non-linear time dependent PDE.
+# our non-linear time dependent PDE.
 
 # %%
 import numpy as np
@@ -232,7 +231,7 @@ print("Forchheimer(numpy) size: ", gridView.size(0), "L^2, H^1 error:",'{:0.5e},
   *[ sqrt(e) for e in integrate([error**2,inner(grad(error),grad(error))]) ]))
 
 # %% [markdown]
-# Using a non linear solver from the Scipy package
+# We can also use a non linear solver from the Scipy package
 
 # %%
 from scipy.optimize import newton_krylov
@@ -332,8 +331,8 @@ op.jacobian(space.zero,lin,rhs)
 # and the initial guess for the iterative solver to include
 # the boundary values (to counter the missing symmetry).
 # We can use the first of the three versions of the
-# `setConstraints` methods on the scheme class discussed
-# [previously](boundary_nb.ipynb#Accessing-the-Dirichlet-degrees-of-freedom).
+# `setConstraints` methods on the scheme class discussed in the section on
+# [more general boundary conditions](boundary_nb.ipynb#Accessing-the-Dirichlet-degrees-of-freedom).
 
 # %%
 op.setConstraints(rhs)
@@ -351,26 +350,35 @@ sol.plot()
 # .. index::
 #    pair: Solvers; Petsc
 #
-# ## Using Petsc and Petsc4Py
-# Switching to a storage based on the PETSc solver package and solving the
-# system using the dune-fem bindings
+# ## Using PETSc and Petsc4Py
+# The following requires that a PETSc installation was found during the
+# configuration of ``dune``. Furthermore some examples make use of the
+# Python package ``petsc4py`.
 
 # %%
-from dune.generator import ConfigurationError
+from dune.common.checkconfiguration import assertCMakeHave, ConfigurationError
+try:
+    assertCMakeHave("HAVE_PETSC")
+    petsc = True
+except ConfigurationError:
+    print("Dune not configured with petsc - skipping example")
+    petsc = False
 try:
     import petsc4py
     petsc4py.init(sys.argv)
     from petsc4py import PETSc
-    spacePetsc = solutionSpace(gridView, order=2, storage='petsc')
 except ModuleNotFoundError:
-    print("petsc4py module not found so skipping example - ignored")
+    print("petsc4py module not found -- skipping example")
     petsc4py = None
-except ConfigurationError:
-    print("petsc4py found but petsc was not found during configuration of dune")
-    petsc4py = None
-    pass
 
-if petsc4py is not None:
+# %% [markdown]
+# Switching to a storage based on the PETSc solver package and solving the
+# system using the dune-fem bindings can be achieved by using the
+# ``storage`` argument to the space constructor
+
+# %%
+if petsc:
+    spacePetsc = solutionSpace(gridView, order=2, storage='petsc')
     # first we will use the petsc solver available in the `dune-fem` package
     # (using the sor preconditioner)
     schemePetsc = solutionScheme(a == b, space=spacePetsc,
@@ -382,15 +390,11 @@ if petsc4py is not None:
     error = u_h - exact_end
     print("Forchheimer(petsc) size: ", gridView.size(0), "L^2, H^1 error:",'{:0.5e}, {:0.5e}'.format(
       *[ sqrt(e) for e in integrate([error**2,inner(grad(error),grad(error))]) ]))
-else:
-    print("petsc module not found so skipping example - ignored")
-    spacePetsc = None
-    pass
 
 # %% [markdown]
 # Implementing a Newton Krylov solver using the binding provided by petsc4py
 # %%
-if petsc4py is not None and spacePetsc is not None:
+if petsc4py is not None and petsc:
     class Scheme3:
       def __init__(self, scheme):
           self.model = scheme.model
@@ -429,7 +433,7 @@ if petsc4py is not None and spacePetsc is not None:
 # %% [markdown]
 # Using the petsc4py bindings for the non linear KSP solvers from PETSc
 # %%
-if petsc4py is not None and spacePetsc is not None:
+if petsc4py is not None and petsc is not None:
     class Scheme4:
         def __init__(self, scheme):
             self.model = scheme.model

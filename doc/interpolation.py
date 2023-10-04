@@ -41,6 +41,7 @@ for current in ['discrete', 'exact', 'error']:
     colorbar.AutomaticLabelFormat = 0
     colorbar.LabelFormat = "%0.2f"
     colorbar.RangeLabelFormat = "%0.2f"
+    colorbar.Orientation = 'Horizontal'
     display.SetScalarBarVisibility(view, True)
 
     SaveScreenshot('figures/interpolation_%s.png' % current, magnification=1, quality=100, view=view)
