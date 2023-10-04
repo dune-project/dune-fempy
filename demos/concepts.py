@@ -41,7 +41,7 @@
 # vertices and the element connectivity or by for example providing a
 # `gmsh` file. This will be discussed in later section, see for example
 # here for [a 3d gmsh file](othergrids_nb.ipynb)
-# or here [for a simple example using a dictionary](dune-corepy_nb.ipynb#An-unstructured-grid).
+# or here [for a simple example using a dictionary](dune-corepy_nb.ipynb#Unstructured-grids).
 #
 # .. index::
 #    pair: Grids; Plotting
