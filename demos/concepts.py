@@ -124,7 +124,7 @@ print( integrate(exact, gridView=gridView, order=5) )
 
 # %%
 from dune.fem.plotting import plotPointData as plot
-plot(exact, grid=gridView)
+plot(exact, gridView=gridView)
 gridView.writeVTK('exact', pointdata={'exact': exact})
 
 # %% [markdown]

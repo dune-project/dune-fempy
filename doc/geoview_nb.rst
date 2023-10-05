@@ -37,7 +37,7 @@ but we can plot some grid function, e.g., given by ufl expressions
 .. code:: ipython3
 
     from dune.fem.plotting import plotPointData as plot
-    plot(theta, grid=spiral)
+    plot(theta, gridView=spiral)
 
 
 

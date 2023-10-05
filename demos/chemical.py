@@ -66,7 +66,7 @@ class Model:
     boundary = {range(1,5): as_vector([0,0,0])}
 
 fig = pyplot.figure(figsize=(20,20))
-plot(Model.transportVelocity, grid=gridView, gridLines=None, vectors=[0,1],figure=fig)
+plot(Model.transportVelocity, gridView=gridView, gridLines=None, vectors=[0,1],figure=fig)
 
 # %% [markdown]
 # Time evolution scheme
