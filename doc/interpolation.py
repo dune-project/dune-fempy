@@ -10,7 +10,12 @@ if GetParaViewVersion() < 5.5:
 view.CenterAxesVisibility = 0
 view.OrientationAxesVisibility = 0
 
-view.UseGradientBackground = False
+# this does not work with newer ParaView versions
+try:
+    view.UseGradientBackground = False
+except Exception:
+    pass
+
 view.Background = [1.0, 1.0, 1.0]
 
 camera = view.GetActiveCamera()
