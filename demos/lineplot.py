@@ -85,8 +85,8 @@ pyplot.plot(x,y)
 # automatic conversion from the ufl expression (available for example in the
 # plotting function) to a grid function, we need to do this explicitly:
 # %%
-from dune.ufl import expression2GF
-absGrad = expression2GF(gridView3d, sqrt(dot(grad(uh3d),grad(uh3d))), 2 )
+from dune.fem.function import gridFunction
+absGrad = gridFunction(sqrt(dot(grad(uh3d),grad(uh3d))))
 p,v = algorithm.run('sample', 'utility.hh', absGrad, x0, x1, 100)
 for i in range(len(x)):
     y[i] = v[i][0]
@@ -96,8 +96,7 @@ pyplot.plot(x,y)
 # Similar we can plot both partial derivatives of the solution over the
 # given line:
 # %%
-from dune.ufl import expression2GF
-absGrad = expression2GF(gridView3d, grad(uh3d), 2 )
+absGrad = gridFunction(grad(uh3d))
 p,v = algorithm.run('sample', 'utility.hh', absGrad, x0, x1, 100)
 dx,dy = numpy.zeros(len(p)), numpy.zeros(len(p))
 for i in range(len(x)):
