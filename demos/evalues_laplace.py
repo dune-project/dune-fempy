@@ -45,19 +45,11 @@ v = TestFunction(space)
 #
 # as such, we wish to set up the finite element matrices which correspond to the problem outlined.
 # That is, $A$ is the stiffness matrix, $M$ the mass matrix, and $X$ will be the degrees of freedom vector.
-# We now construct the operators
+# We now assemble the matrices which export as scipy sparse objects:
 # %%
-from dune.fem.operator import galerkin
-LHSOp = galerkin([inner(grad(u),grad(v))*dx])
-RHSOp = galerkin([inner(u,v)*dx])
-
-# %% [markdown]
-# It is now useful to convert these into matrices, this is done with the function `linear`.
-# For convenience we will convert them to numpy matrices
-# %%
-from dune.fem.operator import linear
-A = linear(LHSOp).as_numpy
-M = linear(RHSOp).as_numpy
+from dune.fem import assemble
+A = assemble( inner(grad(u),grad(v))*dx ).as_numpy
+M = assemble( inner(u,v)*dx ).as_numpy
 
 # %% [markdown]
 # We use scipy to solve the eigen-problem, however first we must choose how many to find
@@ -73,10 +65,9 @@ eigvals, eigvecs = eigs(A, M = M, sigma = 0, k = num_sols)
 # %%
 eigvals.real
 # %%
-import math
 pairs = [ n**2 + m**2 for n in range(num_sols) for m in range(num_sols)]
 pairs.sort()
-reference_eigvals = [math.pi**2 * pair for pair in pairs[:num_sols] ]
+reference_eigvals = [np.pi**2 * pair for pair in pairs[:num_sols] ]
 reference_eigvals
 
 # %% [markdown]
@@ -113,19 +104,23 @@ for k in range(rows):
 
 # For the moment, let us set up the new operators and save the original
 # mass matrix for later convenience:
-# %%
-from dune.ufl import DirichletBC
-dbc = DirichletBC(space,0)
-LHSOp = galerkin([inner(grad(u),grad(v))*dx, dbc])
-RHSOp = galerkin([inner(u,v)*dx, dbc])
-MassMatrix = M
-
-# %% [markdown]
 # The stiffness matrix can be setup as done previously. Note that the
 # Dirichlet constraints are applied by changing the corresponding rows to
 # unit vectors.
+#
+# We will need information about the dirichlet degrees of freedom later on
+# so will not use the `assemble` function but use an `operator` for the
+# left hand side:
 # %%
-A = linear(LHSOp).as_numpy
+MassMatrix = M
+from dune.fem.operator import galerkin
+from dune.ufl import DirichletBC
+dbc = DirichletBC(space,0)
+LHSOp = galerkin([inner(grad(u),grad(v))*dx, dbc])
+A = LHSOp.linear()
+LHSOp.jacobian(space.zero,A)
+A = A.as_numpy
+M = assemble([inner(u,v)*dx, dbc]).as_numpy
 
 # %% [markdown]
 # For the mass matrix we need the diagonal entries associated with
@@ -138,8 +133,7 @@ A = linear(LHSOp).as_numpy
 # two matrices achieves the desired outcome.
 # %%
 from dune.ufl import Constant
-RHSOpPerturbation = galerkin([Constant(0)*inner(u,v)*dx, dbc])
-M = linear(RHSOp).as_numpy - linear(RHSOpPerturbation).as_numpy
+M = M - assemble([Constant(0)*inner(u,v)*dx, dbc]).as_numpy
 
 # %% [markdown]
 # .. index::
@@ -155,8 +149,8 @@ M = linear(RHSOp).as_numpy - linear(RHSOpPerturbation).as_numpy
 # %%
 import scipy.sparse as sps
 import scipy.linalg as linalg
-M = linear(RHSOp).as_numpy
-dirichlet_zero_dofs = [i for i,b in enumerate(RHSOp.dirichletBlocks) if b[0]==1]
+M = assemble([inner(u,v)*dx, dbc]).as_numpy
+dirichlet_zero_dofs = [i for i,b in enumerate(LHSOp.dirichletBlocks) if b[0]==1]
 N = M.shape[1]
 chi_interior = np.ones(N)
 chi_interior[dirichlet_zero_dofs] = 0.0
@@ -178,20 +172,18 @@ solutions = [space.function(name = "eigenvalue"+str(i)) for i in range(num_sols)
 # %%
 eigvals.real
 # %%
-import math
 pairs = [ n**2 + m**2 for n in range(1,num_sols+1) for m in range(1,num_sols+1)]
 pairs.sort()
-reference_eigvals = [math.pi**2 * pair for pair in pairs[:num_sols] ]
+reference_eigvals = [np.pi**2 * pair for pair in pairs[:num_sols] ]
 reference_eigvals
 # %% [markdown]
 #
 # We include numpy so that perform the 'renormalisation' required.
 # It is often unnecessary to do so as this will not be the dominating contribution to the error.
 # %%
-import numpy
 for k in range(num_sols):
     solutions[k].as_numpy[:] = eigvecs[:,k].real
-    L2Value = sqrt(numpy.dot(solutions[k].as_numpy, MassMatrix*solutions[k].as_numpy))
+    L2Value = sqrt(np.dot(solutions[k].as_numpy, MassMatrix*solutions[k].as_numpy))
     solutions[k].as_numpy[:]/=L2Value
 # gridView.writeVTK( "Dirichlet_Eigenvalues", pointdata = solutions )
 rows, cols = num_sols//3, 3

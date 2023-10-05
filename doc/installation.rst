@@ -18,7 +18,14 @@ coffee/tea at hand):
 
 .. code-block:: bash
 
-  pip install dune-fem
+  pip install --pre dune-fem
+
+.. note:: this tutorial is based on the upcoming 2.10 version of Dune. A
+   2.9 release version is available in the Python package index and can be
+   obtained by removing the `--pre` from the above install command. Note
+   that a few of the features described in this tutorial will not be
+   available and that the API has changed in some places. See the
+   description in the :doc:`changelog<changelog290>` for details.
 
 To test that everything works you can download all the scripts described
 in this tutorial and try them out
@@ -259,3 +266,15 @@ Troubleshooting
   Check for example that you are not using this flag in your cmake setup for Dune.
   See `here <https://moyix.blogspot.com/2022/09/someones-been-messing-with-my-subnormals.html/>`_
   for a detailed description.
+
+* Newly installed software is not used: after for example adding `petsc` to
+  your system one needs to remove an existing `dune-py` module which
+  contains the jit compiled modules. New software components are not
+  automatically picked up. One can run
+
+  .. code-block:: bash
+
+    python -m dune info
+
+  to find the location of the `dune-py` folder. That folder needs to be
+  removed before the new component can be used.

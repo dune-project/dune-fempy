@@ -1,8 +1,85 @@
 Since 2.9 release
 =================
 
+Deprecation of ``dune.fem.function.integrate``
+----------------------------------------------
+This function is deprecated. Use ``dune.fem.integrate`` instead. The ufl
+expression to integrate is now the first argument. If possible the grid
+view and order will be determined from the ufl expression if possible but
+can be passed in as extra arguments similar to the old function:
+``dune.fem.function.integrate(grid,expression,order=None)``
+with
+``dune.fem.integrate(expression,gridView=None,order=None)``.
+
+Deprecation of ``dune.fem.function.uflFunction`` and ``dune.fem.function.cppFunction``
+--------------------------------------------------------------------------------------
+To construct different versions of grid function use
+``dune.fem.function.gridFunction``. The signature of the new function is
+``def gridFunction(expr=None,gridView=None,*,name=None,order=None, fctName=None, view=None, **kwargs)``.
+
+* If ``expr`` is a ``gridView`` or is ``None`` (and the ``gridView`` is not ``None``)
+  then the function acts like the decorator from 2.9 version. Note that the
+  old ``view`` parameter is also deprecated and replaced by ``gridView``.
+
+  .. note:: ``@gridFunction(gv,"name",5)`` will not work anymore since name and
+     order need to be named arguments. So this will lead to an error instead
+     of a deprecation warning and needs to be replaced by
+     ``@gridFunction(gv,name="name",order=5)``.
+
+* If ``expr`` is a ufl expression then this functions acts like the
+  ``uflFunction`` from 2.9 with the old ``ufl`` argument being replaced by
+  ``expr``. In addition ``gridView`` and ``order`` can be omitted in case where
+  the grid view can be determined from the ufl expression (e.g. the
+  expression contains a grid function). The order will be determined
+  heuristically from the expression if omitted. 
+
+* If ``expr`` is a string then the function acts as like the old ``cppFunction``.
+  If ``fctName`` is not provided the ``name`` argument is assumed to also
+  be the name of the cpp function to export.
+
+Deprecation of ``dune.fem.operator.linear``
+-------------------------------------------
+Use the new method ``linear`` on the schemes or operators. Note that the
+new method has no ``ubar`` argument (use the ``jacobian`` method to
+assemble around a non zero value). The method has a new bool argument ``assemble``
+which is ``True`` by default. Passing in ``assemble=False`` returns an
+empty linear operator which can be passed into ``jacobian`` to be filled.
+
+Extension of the ``jacobian`` method on schemes and operators
+-------------------------------------------------------------
+In addition to the existing ``jacobian`` method taking a linear operator
+object a new overload is available taking a further `rhs` argument which
+returns the functional part of the operator as though it was on the right
+hand side. So if the ufl form is ``a(u,v)=l(v)`` then this method assembles
+both the system matrix ``A`` and the right hand side functional (``rhs``
+needs to be a discrete function over the range space of the operator).
+
 Assembly function
 -----------------
+The function ``dune.fem.assemble`` takes a ufl form and returns their assembled versions.
+
+* If the first argument has arity zero (i.e. has no trial or test function)
+  then the intral will be computed, e.g.,
+  ``dune.fem.assemble(dot.ufl(x,x)*ufl.dx, gridView=gv)`` where ``x`` is a
+  ``ufl.SpatialCoordinate``. Note that the grid view needs to be provided
+  since it can not be determined from the ufl form. It can be omitted if
+  the form contains for example a grid function, e.g.,
+  ``dune.fem.assemble(inner(grad(u_h),grad(u_h))*dx)``. Note that forms are
+  always scalar valued. For vector valued integration use
+  ``dune.fem.integrate``.
+
+* If the first function has arity one (i.e. contains a test function) then
+  the functional we be assembled returning a discrete function:
+  ``dune.fem.assemble(f*v*dx)``. Again if possible the grid view will be
+  extracted from the form.
+
+* If the first argument has arity two (i.e. contains both test and trial
+  function) then the function assembles the system matrix and (if the form
+  contains a arity one part) the right hand side functional:
+  ``dune.fem.assemble(u*v*dx - f*v*dx)`` returns the linear operator for
+  ``u*v*dx`` and the discrete function for ``f*v*dx``. If the form does not
+  contain an arity one part, e.g., ``dune.fem.assemble(u*v*dx)`` returns only
+  the linear operator.
 
 Improved Pickling support
 -------------------------

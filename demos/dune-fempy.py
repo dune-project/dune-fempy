@@ -76,10 +76,7 @@ mat,rhs = assemble(a==l)
 # %% [markdown]
 # We solve the resulting linear system of equations $Ay=b$ using scipy.
 # To this end it is straightforward to expose the underlying data
-# structures in $A,b,u_h$ using the ``as_numpy`` attribute.
-# More details on how to use
-# [Scipy and also PetSC4py](solvers_nb.ipynb) will be discussed later
-# in the tutorial.
+# structures of ``mat,rhs`` and ``u_h`` using the ``as_numpy`` attribute.
 
 # %%
 from scipy.sparse.linalg import spsolve as solver
@@ -93,8 +90,12 @@ y[:] = solver(A,b)
 # Note the ``y[:]`` which guarantees that the result from the solver is
 # stored in the same buffer used for the discrete function. Consequently,
 # no copying is required.
-#
-# So that's it - to see the result we plot it using matplotlib
+# More details on how to use
+# [Scipy and also PetSC4py](solvers_nb.ipynb) will be discussed later
+# in the tutorial.
+
+# %% [markdown]
+# That's it - to see the result we plot it using matplotlib
 
 # %%
 u_h.plot()
@@ -122,7 +123,7 @@ print("L^2 and H^1 errors:",[np.sqrt(e) for e in squaredErrors])
 # .. note::
 #    The ``assemble`` function can be used to assemble bilinear forms as shown
 #    above, linear forms (functionals) as shown further down, and to compute scalar integrals.
-#    So we could compute the error using ``assemble(e_h**2*dx)``. We use the
+#    So we could compute the $L^2$ error using ``assemble(e_h**2*dx)``. We use the
 #    ``integrate`` function above since it allows to integrate vector valued
 #    expressions which is more efficient than calling ``assemble`` multiple times.
 #    Using the assemble function with 'a==l' and 'a-l==0' produces the same result.
@@ -135,13 +136,15 @@ print("L^2 and H^1 errors:",[np.sqrt(e) for e in squaredErrors])
 # .. tip::
 #    Both ``assemble`` and ``integrate`` take extra arguments ``gridView``
 #    and ``order``. The latter allows to fix the order of the quadrature used
-#    to integrate the function - if it is not provided (``None``) a reasonable
-#    order is determined heuristically.  The first argument is required in
+#    to integrate a function - if it is not provided (``None``) a reasonable
+#    order is determined heuristically.  The ``gridView`` argument is required in
 #    cases where the ``gridView`` can not be determined from
 #    the ufl expression.
 #
 # In the above example ``gridView`` can be extracted from
-#    the discrete function ``u_h``, in contrast to the following example:
+# the discrete function ``u_h`` which is part of the expression for
+# ``e_h``. Consider instead the following example where the ``gridView``
+# has to be provided to the integrate method
 #
 
 # %%
@@ -160,7 +163,7 @@ print("average:",assemble(exact*dx,gridView=gridView) )
 # u &= g_D & \text{on}\;\Gamma_D
 # \end{align*}
 # and $f=f(x)$ is some forcing term.
-# For the boundary conditions we set $\Gamma_D={0}\times[0,1]$ and take
+# For the boundary conditions we set $\Gamma_D=\{0\}\times[0,1]$ and take
 # $\Gamma_N$ to be the remaining boundary of $\Omega$.
 #
 # We will solve this problem in variational form
@@ -247,8 +250,7 @@ u_h.plot()
 # \begin{equation}
 # \int_\Omega \nabla u\cdot\nabla v + m(u)v = \int_\Omega fv~.
 # \end{equation}
-# We keep the same forcing $f(x)=|x|^2$ as before and choose
-# $m(u) = (1+u)^2u$.
+# We use $f(x)=|x|^2$ as forcing and choose $m(u) = (1+u)^2u$.
 # Most of the code is identical to the linear case, we can use the same
 # grid, discrete lagrange space, and the discrete function ``u_h``.
 # The model description using ufl is also very similar
@@ -261,10 +263,19 @@ l = dot(x,x)*v * dx
 # To solve the non-linear problem we need to use something like a Newton
 # solver. We could use
 # [the implementation available in Scipy](solvers_nb.ipynb)
-# but ``dune-fem`` provides so called ``schemes`` that have a ``solve`` method
-# which can handle both linear and non-linear models. The default method is
-# a Newton-Krylov solver using a ``gmres`` method to solve the intermediate
-# linear problems. Since the problem here is symmetric we can use a ``cg``
+# but ``dune-fem`` provides so called
+# [schemes](concepts_nb.ipynb#Operators-and-Schemes)
+# that have a ``solve`` method which can handle both linear and non-linear models.
+# The default solver is based on a Newton-Krylov solver using a
+# ``gmres`` method to solve the intermediate linear problems.
+# These ``schemes`` are quite central to solving PDE is different ways,
+# including writing your own linear or non-linear solvers, accessing
+# degrees of freedom on the boundary etc. A detailed description on the
+# API is given [here](scheme_api.rst) and how to use the schemes in
+# different context to solve the problems on the Python side is available
+# [here](solvers_nb.ipynb).
+
+# Since the problem here is symmetric we can use a ``cg``
 # method. A full list of available solvers, preconditioners, and how
 # to customize them is available in the [Alternative Linear Solvers](solvers_nb.ipynb#Available-solvers-and-parameters) section.
 
@@ -277,12 +288,93 @@ info = scheme.solve(target=u_h)
 # %% [markdown]
 # That's it - we can plot the solution again - we don't know the exact
 # solution so we can't compute any errors in this case.
-# In addition the ``info`` structured returned by the ``solve`` method
-# gives some information on the solver step
+# In addition the ``info`` structure returned by the ``solve`` method
+# gives some information on the solver like number of iterations required
 
 # %%
 print(info)
 u_h.plot()
+
+# %% [markdown]
+# .. index::
+#    pair: Models; Constants
+#
+# ## Using `Constant` parameters and grid functions in PDEs
+#
+# Every time we call `assemble` or construct a new `scheme` as show above,
+# some code must be compiled which leads to some extra cost. In time
+# critical points of the simulation, e.g., in loops, this extra cost is not
+# acceptable. To avoid recompilation general
+# [grid functions](concepts_nb.ipynb#Grid-Functions)
+# and placeholders for scalar or vector valued
+# [constants](concepts_nb.ipynb#Operators-and-Schemes)
+# can be used within the ufl forms.
+# In the [next section](concepts_nb.ipynb) we will give a full example for this in the
+# context of a time dependent problems.
+#
+# As a simple introduction we consider a linear version of the elliptic problem
+# considered previously
+# $$ -\varepsilon \triangle u(x) + m(x) u(x) = f(x) $$
+# with Neuman boundary conditions.
+# We also added a real valued constant $\varepsilon$ and we want to able to
+# change $m$ easily. Assuming $\bar{u}$ is the exact solution of the
+# non-linear elliptic problem from above then $\bar{u}$ will also solve the
+# above equation if $\varepsilon=1$ and we chose
+# $m(x) = (1+\bar{u})^2$. We will use the discrete solution $u_h$
+# from above, which is an approximation to $\bar{u}$ and chose
+# $m(x) = (1+u_h)^2$. Later we want to solve
+# the same linear problem but with $\varepsilon=0$ and $m(x)=1$
+# so that we are simply looking at the $L^2$ projection of $f$:
+# $$ \int_\Omega uv = \int_\Omega fv~. $$
+#
+# Although the problem is linear and we could just use
+# ``dune.fem.assemble`` and Scipy to solve it, we will again use a ``scheme`` instead.
+# Details on schemes and operators will be provided in the following
+# section. For this example the important characteristic of a `scheme` is
+# that we can still access some information contained in the underlying UFL
+# form, e.g., the `Constants` used. This allows us to change these
+# efficiently during the simulation as shown below.
+
+# %%
+from dune.ufl import Constant
+
+epsilon = Constant(1,name="eps")   # start with epsilon=1
+x,u,v   = SpatialCoordinate(space), TrialFunction(space), TestFunction(space)
+f       = dot(x,x)
+a       = epsilon*dot(grad(u), grad(v)) * dx + (1+u_h)**2*u*v * dx
+b       = f*v*dx
+
+scheme = solutionScheme(a == b, solver='cg')
+w_h    = space.interpolate(0,name="w_h")
+scheme.solve(target = w_h)
+w_h.plot()
+
+from dune.fem.operator import galerkin
+op = galerkin(a == b)
+
+# %% [markdown]
+#
+# Note that since $\varepsilon=1$ and we use the previously computed approximation $u_h$
+# the new discrete function $w_h$ is close to $u_h$.
+#
+# We can print the value of a `Constant` with name `foo` via
+# `scheme.model.foo` and change it's value using the same attribute:
+
+# %%
+print(scheme.model.eps)
+scheme.model.eps = 0          # change to the problem which matches our exact solution
+print(scheme.model.eps)
+
+# %% [markdown]
+# To switch to a standard $L^2$ projection we will also change
+# $m=(1+u_h)^2$ to $m\equiv 1$. This can be easily done by changing $u_h$
+# to be zero everywhere. This can be either done using `u_h.interpolate(0)` or
+# by using `u_h.clear()`.
+
+# %%
+u_h.interpolate(0)
+scheme.solve(target = w_h)
+w_h.plot()
 
 # %% [markdown]
 # A wide range of problems a covered in the

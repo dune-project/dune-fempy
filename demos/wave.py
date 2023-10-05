@@ -1,7 +1,7 @@
 # %% [markdown]
 # .. index:: Equations; Wave Equation
 #
-# # Wave Equation in a Slit Domain
+# # Wave Equation: double slit domain
 #
 # In the following we will consider the wave equation
 # \begin{align*}
@@ -109,9 +109,11 @@ p_in = Constant(0.0, name="g")
 # bc   = DirichletBC(V, p_in, conditional(x[0]<1e-10,1,0))
 bc   = BoxDirichletBC(V, p_in, [None,None],[0,None], eps=1e-10)
 
-from dune.fem.operator import galerkin,linear
+from dune.fem.operator import galerkin
 op        = galerkin([dot(grad(u),grad(v))*dx,bc])
-S         = linear(op).as_numpy
+S         = op.linear()
+op.jacobian(V.zero, S)
+S         = S.as_numpy
 lapPhi    = V.interpolate(1,name="e")
 lapPhiVec = lapPhi.as_numpy
 

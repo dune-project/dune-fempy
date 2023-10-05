@@ -2,9 +2,9 @@
 # .. index:: Grid construction
 #
 # # Examples of grid construction
-# Besides the already discussed construction of Cartesian grid and using
-# dictionaries [from general concepts](dune-corepy_nb.ipynb) it is also possible
-# to read grid files using either the `DGF` or `gmsh` format (or other
+# In addition to the already discussed construction of Cartesian grid and
+# the usage of dictionaries discussed in the [general concepts section](dune-corepy_nb.ipynb),
+# it is also possible to read grid files using either the `DGF` or `gmsh` format (or other
 # formats available through the `meshio` package).
 #
 # %%
@@ -213,7 +213,7 @@ gridView2d = leafGridView(domain2d, dimgrid=2)
 #
 # ### Visualizing Boundary Ids
 #
-# After construction of a grid we can visualize boundary ids with the
+# After construction of a grid we can visualize boundary ids
 # by assigning a piecewise constant function to hold the value of adjacent
 # boundaries. This is not necessarily unique but works in most cases.
 #
@@ -291,5 +291,9 @@ u = s.interpolate(sin(x[0]), name="u")
 u.plot()
 
 # %% [markdown]
-# pyplot can very easily be used in 1d:
-# pyplot.plot(g.tessellate()[0], u.pointData(), '-p')
+# pyplot can very easily be used in 1d using the ``tessellate`` method on
+# the grid which will be described in more detail in the section about the
+# bindings for the full [dune grid interface](dune-corepy_nb.ipynb).
+
+# %%
+pyplot.plot(g.tessellate()[0], u.pointData(), '-p')

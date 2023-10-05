@@ -1,8 +1,8 @@
 .. sectionauthor:: Andreas Dedner <a.s.dedner@warwick.ac.uk>, Robert Kl\ |oe|\ fkorn <robert.kloefkorn@iris.no>, Martin Nolte <nolte.mrtn@gmail.com>
 
-#########################################
-Grid Views: Adaptivity and Moving Domains
-#########################################
+##################################################
+Adaptivity and Moving Domains: extended grid views
+##################################################
 
 =======================================================
 Overview and some basic grid views (level and filtered)

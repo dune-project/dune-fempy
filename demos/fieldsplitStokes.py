@@ -122,7 +122,7 @@ fig = pyplot.figure()
 solution_vector_cg.plot(vectors=[0,1], gridLines=None, figure=fig)
 solution_vector_cg[2].plot(figure=fig, gridLines=None)
 
-# [markdown]
+# %% [markdown]
 # The same solver using a standard pipe flow problem:
 
 # %%

@@ -26,12 +26,13 @@ from dune.fem.plotting import plotPointData as plot
 import dune.grid as grid
 import dune.fem as fem
 import dune.common as common
-import dune.generator.algorithm as algorithm
 from dune.fem.view import adaptiveLeafGridView as adaptiveGridView
 from dune.fem.space import lagrange as solutionSpace
+from dune.fem.scheme import galerkin as solutionScheme
 from dune.alugrid import aluConformGrid as leafGridView
 from ufl import *
-from dune.ufl import DirichletBC, expression2GF
+from dune.ufl import DirichletBC
+from dune.fem.function import gridFunction
 
 
 # set the angle for the corner (0<angle<=360)
@@ -66,7 +67,6 @@ def setup():
     gridView.hierarchicalGrid.globalRefine(2)
     space = solutionSpace(gridView, order=order)
 
-    from dune.fem.scheme import galerkin as solutionScheme
     u = TrialFunction(space)
     v = TestFunction(space)
     x = SpatialCoordinate(space.cell())
@@ -91,13 +91,12 @@ uh, exact, laplace = setup()
 # to minimize the error. To compute the dwr estimator we need the solution
 # to the dual problem with right hand side $J(\varphi_i)$ for all basis
 # functions $\varphi_i$. This is not directly expressible in UFL and we
-# therefore implement this using a small C++ function which we then export
-# to Python:
-#
-# .. literalinclude:: laplace-dwr.hh
+# therefore need to implement this either using some lower level functions
+# on the space or using a small C++ function which we then export
+# to Python.
 
 # %%
-from dune.fem.scheme import galerkin as solutionScheme
+
 spaceZ = solutionSpace(uh.space.gridView, order=order+1)
 u = TrialFunction(spaceZ)
 v = TestFunction(spaceZ)
@@ -108,11 +107,24 @@ z = spaceZ.interpolate(0, name="dual")
 zh = uh.copy(name="dual_h")
 point = common.FieldVector([0.4,0.4])
 pointFunctional = z.copy("dual_rhs")
-eh = expression2GF( uh.space.gridView, abs(exact-uh), order=order+1 )
-computeFunctional = algorithm.load("pointFunctional", "laplace-dwr.hh",
-            point, pointFunctional, eh)
+eh = gridFunction(abs(exact-uh),name="error", order=order+1)
+
+from dune.fem.utility import pointSample
+def computeFunctional(point, pointFunctional, eh):
+    space = pointFunctional.space
+    en, xLoc = pointSample(space.gridView, point)
+    phiVal = numpy.array( space.evaluateBasis(en, xLoc) )[:,0] # issue here with scalar function spaces
+    idx = space.mapper(en)
+    lf = eh.localFunction()
+    lf.bind(en)
+    pointFunctional.as_numpy[ idx ] += phiVal
+    return lf(xLoc)
 
 # %% [markdown]
+#
+# %% [markdown]
+# Next we define the actual estimator
+
 # %%
 from dune.fem.space import finiteVolume as estimatorSpace
 from dune.fem.operator import galerkin as estimatorOp
@@ -126,44 +138,52 @@ n = FacetNormal(fvspace.cell())
 estimator_ufl = abs(div(grad(u)))*abs(z-zh) * v * dx +\
                 abs(inner(jump(grad(u)), n('+')))*abs(avg(z-zh)) * avg(v) * dS
 estimator = estimatorOp(estimator_ufl)
-tolerance = 1e-6
 
 # %% [markdown]
 # Let us solve over a loop (solve,estimate,mark) and plot the solutions side by side.
+
 # %%
 h1error = dot(grad(uh - exact), grad(uh - exact))
-fig = pyplot.figure(figsize=(30,30))
-count = 0
-errorVector    = []
-estimateVector = []
-dofs           = []
-while True:
-    laplace.solve(target=uh)
-    if count%9 == 8:
-        plot(uh, figure=(fig, 131+count//9), colorbar=False, linewidth=1)
-    pointFunctional.clear()
-    error = computeFunctional(point, pointFunctional,eh)
-    dual.solve(target=z, rhs=pointFunctional)
-    zh.interpolate(z)
-    estimator(uh, estimate)
-    eta = sum(estimate.dofVector)
-    dofs           += [uh.space.size]
-    errorVector    += [error]
-    estimateVector += [eta]
-    if count%3 == 2:
-        print(count, ": size=", uh.space.gridView.size(0), "estimate=", eta, "error=", error)
-    if eta < tolerance:
-        break
-    marked = fem.mark(estimate,eta/uh.space.gridView.size(0))
-    fem.adapt(uh) # can also be a list or tuple of function to prolong/restrict
-    fem.loadBalance(uh)
-    count += 1
-plot(uh, figure=(fig, 131+2), colorbar=False, linewidth=1)
 
+def compute(tolerance):
+    fig = pyplot.figure(figsize=(60,30))
+    count = 0
+    errorVector    = []
+    estimateVector = []
+    dofs           = []
+    while True:
+        laplace.solve(target=uh)
+        if count%9 == 6:
+            plot(uh, figure=(fig, 121), colorbar=False, linewidth=1)
+        pointFunctional.clear()
+        error = computeFunctional(point, pointFunctional,eh)
+        dual.solve(target=z, rhs=pointFunctional)
+        zh.interpolate(z)
+        estimator(uh, estimate)
+        eta = sum(estimate.dofVector)
+        dofs           += [uh.space.size]
+        errorVector    += [error]
+        estimateVector += [eta]
+        if count%3 == 2:
+            print(count, ": size=", uh.space.gridView.size(0), "estimate=", eta, "error=", error)
+        if eta < tolerance:
+            break
+        marked = fem.mark(estimate,eta/uh.space.gridView.size(0))
+        fem.adapt(uh) # can also be a list or tuple of function to prolong/restrict
+        fem.loadBalance(uh)
+        count += 1
+    plot(uh, figure=(fig, 122), colorbar=False, linewidth=1)
+
+# %% [markdown]
+# We first use a version based entirely on the available binding:
+
+# %%
+compute( tolerance=1e-6 )
 
 # %% [markdown]
 # Let's take a close up look of the refined region around the point of
 # interest and the origin:
+
 # %%
 pyplot.close('all')
 fig = pyplot.figure(figsize=(45,15))

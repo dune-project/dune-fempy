@@ -55,26 +55,3 @@ Slit domain mesh                                  :download:`slit domain mesh <w
 Quadrilateral mesh                                :download:`quadrilateral mesh <quads.msh>`
 Converter Gmsh-to-DGF                             :download:`convert gmsh file to dgf format <gmsh2dgf.py>`.
 ================================================= =====================================================
-
-###################
-Citing this project
-###################
-
-If you found this tutorial helpful for getting your own projects up and
-running please cite this project:
-
-Title: Python Bindings for the DUNE-FEM module
-*Authors: Andreas Dedner, Martin Nolte, and Robert Klöfkorn*
-Publisher: Zenodoo, 2020
-DOI 10.5281/zenodo.3706994
-
-.. image:: https://zenodo.org/badge/DOI/10.5281/zenodo.3706994.svg
-   :target: https://doi.org/10.5281/zenodo.3706994
-
-#################################
-List of things that need doing...
-#################################
-
-.. todolist::
-
-

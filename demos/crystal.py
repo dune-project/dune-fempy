@@ -3,7 +3,7 @@
 #
 # .. index:: Adaptation; Phase Field
 #
-# # Crystal Growth (Phase Field model)
+# # Adaptive phase field: crystal growth model
 # Here we demonstrate crystallisation on the surface of a liquid due to cooling from [@Guyer].
 # This example uses
 # [dynamic grid refinement](gridviews.rst#Dynamic-Local-Grid-Refinement-and-Coarsening).

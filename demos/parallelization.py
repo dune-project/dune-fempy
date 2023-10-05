@@ -72,9 +72,14 @@ print("Using",threading.use,"threads")
 # When running distributed memory jobs load balancing is an issue. The specific
 # load balancing method used, depends on the grid implementation.
 # There are two ways to ensure a balanced work load. For computations without
-# dynamic adaptation this only has to be done once in the beginning of the run. In
-# fact, most grids do this automatically. For adaptation and load balancing with
-# data see the [crystal growth](crystal_nb.ipynb) or [Re-entrant Corner Problem](laplace-adaptive_nb.ipynb) examples.
+# dynamic adaptation this only has to be done once in the beginning of the run.
+#
+# .. tip:: Most grid managers will read the grid onto rank zero on
+#    construction. While many grid will then perform a load balance step,
+#    it is good practice to add a call to ``loadbalance`` right after the grid
+#    construction to guarantee the grid is distributed between the
+#    available processes.
+#
 
 # %%
 from dune.alugrid import aluCubeGrid
@@ -102,5 +107,7 @@ vtk()
 # %% [markdown]
 
 # For load balancing with re-distribution of user data the function
-# `dune.fem.loadBalance` should be used. See
-# the [crystal growth](crystal_nb.ipynb) or [Re-entrant Corner Problem](laplace-adaptive_nb.ipynb) examples.
+# `dune.fem.loadBalance` should be used. This method is similar to the
+# ``dune.fem.adapt`` method discussed in the
+# [section on adaptivity](gridviews.rst#Dynamic-Local-Grid-Refinement-and-Coarsening).
+# See also the [crystal growth](crystal_nb.ipynb) or [Re-entrant Corner Problem](laplace-adaptive_nb.ipynb) examples.

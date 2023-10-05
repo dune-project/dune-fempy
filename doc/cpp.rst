@@ -27,6 +27,6 @@ section for some :ref:`hints for developers</developers.rst>`
    :maxdepth: 2
 
    cppfunctions_nb
-   mcf-algorithm_nb
-   laplace-dwr_nb
    lineplot_nb
+   mcf-algorithm_nb
+   laplace-dwr-algorithm_nb

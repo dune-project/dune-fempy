@@ -5,7 +5,7 @@
 #
 # .. index:: Methods; Moving domains
 #
-# # Mean Curvature Flow
+# # Moving surface grid: flow under mean curvature
 #
 # This example uses a
 # [moving grid](gridviews.rst#Evolving-Domains).
