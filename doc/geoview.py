@@ -33,4 +33,4 @@ spiral = geometryGridView(diamond)
 
 # %%
 from dune.fem.plotting import plotPointData as plot
-plot(theta, grid=spiral)
+plot(theta, gridView=spiral)

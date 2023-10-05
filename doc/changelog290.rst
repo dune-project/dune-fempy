@@ -1,6 +1,10 @@
 Since 2.9 release
 =================
 
+Deprecation of ``dune.ufl.expression2GF``
+-----------------------------------------
+Use ``dune.fem.function.gridFunction`` instead
+
 Deprecation of ``dune.fem.function.integrate``
 ----------------------------------------------
 This function is deprecated. Use ``dune.fem.integrate`` instead. The ufl
