@@ -148,7 +148,6 @@ M = M - assemble([Constant(0)*inner(u,v)*dx, dbc]).as_numpy
 
 # %%
 import scipy.sparse as sps
-import scipy.linalg as linalg
 M = assemble([inner(u,v)*dx, dbc]).as_numpy
 dirichlet_zero_dofs = [i for i,b in enumerate(LHSOp.dirichletBlocks) if b[0]==1]
 N = M.shape[1]
