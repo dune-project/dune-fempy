@@ -585,7 +585,21 @@ initial = 1/2*(x[0]**2+x[1]**2) - 1/3*(x[0]**3 - x[1]**3) + 1
 # chosen time step $\Delta t$. Since we want to be able to change these
 # during the simulation (we need to do this for $t$ and might want to do
 # this for $\Delta t$ we use the ``dune.ufl.Constant`` which stores a
-# mutable scalar and can be used within a ufl expression:
+# mutable scalar and can be used within a ufl expression.
+#
+# .. index::
+#    pair: Quadratures ; mass lumping
+#
+# .. index:: Quadratures ; default order
+#
+# .. note:: we want to use a lumped mass matrix for the time derivatives.
+#    This is done by setting the ``quadrature_rule`` in the ``metadata`` of
+#    ``ufl.dx``. Currently, this is the only non default quadrature rule
+#    available. The default quadrature order is of order `2 * space.order`
+#    for element and `2 * space.order + 1` for surface integrals.
+#    This default order can be changed by calling the method
+#    ``setQuadratureOrders(interiorOrder, surfaceOrder)`` on the
+#    operator/scheme instance.
 
 # %%
 from dune.fem.scheme import galerkin as solutionScheme
@@ -598,9 +612,11 @@ v = TestFunction(space)
 
 abs_du = lambda u: sqrt(inner(grad(u), grad(u)))
 K = lambda u: 2/(1 + sqrt(1 + 4*abs_du(u)))
-a = ( dot((u - u_h_n)/dt, v) \
-    + 0.5*dot(K(u)*grad(u), grad(v)) \
-    + 0.5*dot(K(u_h_n)*grad(u_h_n), grad(v)) ) * dx
+# mass lumped time derivative terms
+a = dot((u - u_h_n)/dt, v) * dx(metadata={"quadrature_rule":"lumped"})
+# diffusion terms
+a += ( 0.5*dot(K(u)*grad(u), grad(v)) \
+     + 0.5*dot(K(u_h_n)*grad(u_h_n), grad(v)) ) * dx
 
 # %% [markdown]
 # To define the right hand side we use the given function $u$ to define
@@ -617,21 +633,12 @@ b = 0.5*(f(t)+f(t+dt))*v*dx + 0.5*dot(g(t)+g(t+dt),n)*v*ds
 # With the model described as a ufl form, we can again construct a scheme class
 # that provides the solve method which we can use to evolve the solution from
 # one time step to the next. As already mentioned the solve methods always assumes
-# that the problem is non-linear and use a Newton method to solve the problem:
+# that the problem is non-linear and use a Newton method to solve the
+# problem. We also change the default quadrature rules:
 
 # %%
 scheme = solutionScheme(a == b, solver='cg')
-
-# %% [markdown]
-#
-# Optionally, we may want to increase the default quadrature orders which are
-# `2 * space.order` for element integrals and `2 * space.order + 1` for surface
-# integrals. Depending on the data this might not be enough. Then we simply
-# set the integration orders by hand like in the following example, by calling
-# the method setQuadratureOrders(interiorOrder, surfaceOrder).
-
-# %%
-#scheme.setQuadratureOrders( 2*space.order, 2*space.order+1 )
+scheme.setQuadratureOrders( 2*space.order+1, 2*space.order+2 )
 
 # %% [markdown]
 #
