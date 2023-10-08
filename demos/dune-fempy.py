@@ -357,13 +357,16 @@ op = galerkin(a == b)
 # Note that since $\varepsilon=1$ and we use the previously computed approximation $u_h$
 # the new discrete function $w_h$ is close to $u_h$.
 #
-# We can print the value of a `Constant` with name `foo` via
-# `scheme.model.foo` and change it's value using the same attribute:
+# We can print the value of a `Constant` with name `foo` either via
+# `scheme.model.foo` or using the `value` on the `Constant` itself.
+# We can change the value using the same attribute. See the discussion at
+# the end of section on operators and schemes in the [concepts chapter](concepts_nb.ipynb#Operators-and-Schemes) for
+# more detail on these two approaches.
 
 # %%
-print(scheme.model.eps)
-scheme.model.eps = 0          # change to the problem which matches our exact solution
-print(scheme.model.eps)
+print(scheme.model.eps, epsilon.value)
+epsilon.value = 0                          # change to the problem which matches our exact solution
+print(scheme.model.eps, epsilon.value)
 
 # %% [markdown]
 # To switch to a standard $L^2$ projection we will also change

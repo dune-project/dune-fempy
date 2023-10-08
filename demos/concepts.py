@@ -507,27 +507,59 @@ print("Number of elements:",gridView.size(0),
 # .. index:: Constant; Constant Definition
 #
 # .. note:: The **dune.ufl.Constant** class implements a scalar or vector
-# valued constant with a name. This constant can be used within a ufl form
-# and after the ufl form was converted into a `scheme` or `operator` the
-# given name can be used to change the constant within the form
-# efficiently, e.g., we can adapt the point in time or time step during the
-# simulation without requiring any additional just in time compilation.
+#    valued constant with a name. This constant can be used within a ufl form
+#    and after the ufl form was converted into a `scheme` or `operator` the
+#    given name can be used to change the constant within the form
+#    efficiently, e.g., we can adapt the point in time or time step during the
+#    simulation without requiring any additional just in time compilation.
 #
-# Note that $\alpha=1$ so we do not have the correct exact solution.
-# We can print the value of a `Constant` with name `foo` via
-# `scheme.model.foo` and change it's value using the same attribute:
+# Instances of ``dune.ufl.Constant`` have an attribute
+# ``value`` to read and change the constant. Setting the value,
+# will change it everywhere it is used.
+# In addition a ``scheme``/``operator`` provides the attribute ``model``
+# which has an attribute ``name`` for each constant
+# with name `name` contained in the ufl form used to construct the
+# ``scheme``/``operator``.  Cchanging the value of the constants through
+# the ``model`` attribute only changes it within that model and not globally.
+#
 
 # %%
-print(scheme.model.mass)
-scheme.model.mass = 0      # change to the problem which matches our exact solution
-print(scheme.model.mass)
+print(scheme.model.mass, alpha.value)
+scheme.model.mass = 2
+print(scheme.model.mass, alpha.value)
+alpha.value = 0
+print(scheme.model.mass, alpha.value)
 
+# %% [markdown]
+# Note that now $\alpha=0$ so we have the correct exact solution and can
+# compute the errors:
+
+# %%
 scheme.solve(target = u_h)
 
 h1error = dot(grad(u_h - exact), grad(u_h - exact))
 error = np.sqrt(integrate(h1error))
 print("Number of elements:",gridView.size(0),
       "number of dofs:",space.size,"H^1 error:", error)
+u_h.plot()
+
+# %% [markdown]
+# Or switch to $\alpha=1$ to directly solve a different PDE without needing
+# to recompile anything:
+
+# %%
+alpha.value = 1
+scheme.solve(target = u_h)
+u_h.plot()
+
+# %% [markdown]
+# .. tip:: Changing the values of constants using the ``value`` attribute
+#    on ``dune.ufl.Constant`` is generally the option with the least chance
+#    for surprise.
+#    The ``scheme.model.name`` approach is useful if the instance of
+#    ``dune.ufl.Constant`` is not available anymore, e.g., a ``scheme`` was
+#    returned by some function which constructed the constants as local
+#    variables.
 
 # %% [markdown]
 # .. index:: Equations; Non-linear parabolic
@@ -663,14 +695,14 @@ h1error = gridFunction(dot(grad(u_h - exact_end), grad(u_h - exact_end)), name="
 # of the simulation. This value could be changed in each time step:
 
 # %%
-scheme.model.dt = 0.01
+dt.value = 0.01
 time = 0
 u_h.interpolate(initial)
 while time < (endTime - 1e-6):
-    scheme.model.t = time
+    t.value = time
     u_h_n.assign(u_h)
     scheme.solve(target=u_h)
-    time += scheme.model.dt
+    time += dt.value
 
 errors = [np.sqrt(e) for e in integrate([l2error,h1error])]
 print('grid size:', gridView.size(0))
@@ -684,14 +716,14 @@ gridView.writeVTK('forchheimer', pointdata={'u': u_h, 'l2error': l2error, 'h1err
 
 # %%
 globalRefine(1, gridView.hierarchicalGrid)
-scheme.model.dt /= 2
+dt.value /= 2
 u_h.interpolate(initial)
 time = 0
 while time < (endTime - 1e-6):
-    scheme.model.t = time
+    t.value = time
     u_h_n.assign(u_h)
     scheme.solve(target=u_h)
-    time += scheme.model.dt
+    time += dt.value
 
 errorsFine = [np.sqrt(e) for e in integrate([l2error,h1error])]
 print('grid size:', gridView.size(0))
