@@ -104,7 +104,7 @@ scheme = solutionScheme(a == 0, space, solver="cg")
 count = 0
 t = 0.
 end_time = 0.05
-scheme.model.dt = 0.005
+dt.value = 0.005
 
 fig = pyplot.figure(figsize=(10, 10))
 plot(solution, figure=(fig, 131+count%3), colorbar=False,

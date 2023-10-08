@@ -65,7 +65,7 @@ massOp.jacobian(spcP.zero,M)
 M = M.as_numpy
 def Minv(rhs,target): target[:] = linalg.spsolve(M,rhs)
 
-if mainOp.model.nu > 0:
+if mainOp.model.nu > 0: # same as nu.value>0
     preconOp    = galerkinOperator( (preconModel, DirichletBC(spcP,0)), spcP)
     P = linearOperator(preconOp).as_numpy
     def Pinv(rhs,target): target[:] = linalg.spsolve(P,rhs)

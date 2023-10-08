@@ -149,7 +149,7 @@ def calculate(use_cpp, gridView):
     Rexact = lambda t: numpy.sqrt(R0*R0 - 4.*t)
     radius = switchCalcRadius(use_cpp,surface)
 
-    scheme.model.dt = 0.02
+    dt.value = 0.02
 
     numberOfLoops = 3
     times = numpy.zeros(numberOfLoops)
@@ -178,7 +178,7 @@ def calculate(use_cpp, gridView):
         gridSizes[i] = gridView.size(2)
         if i < numberOfLoops - 1:
             gridView.hierarchicalGrid.globalRefine(1)
-            scheme.model.dt /= 2
+            dt.value /= 2
     eocs = numpy.log(errors[0:][:numberOfLoops-1] / errors[1:]) / numpy.log(numpy.sqrt(2))
     try:
         import pandas as pd

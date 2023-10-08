@@ -100,7 +100,7 @@ h1error = gridFunction(name="h1error", expr=dot(grad(u_h - exact_end), grad(u_h 
 def evolve(scheme, u_h, u_h_n, endTime):
     time = 0
     while time < (endTime - 1e-6):
-        scheme.model.t = time
+        t.value = time
         u_h_n.assign(u_h)
         scheme.solve(target=u_h)
         time += scheme.model.dt
@@ -111,7 +111,7 @@ def evolve(scheme, u_h, u_h_n, endTime):
 # two grids and estimate the convergence rate:
 
 # %%
-scheme.model.dt = 0.005
+dt.value = 0.005
 
 errors = 0,0
 loops = 2
@@ -131,7 +131,7 @@ for eocLoop in range(loops):
     u_h.plot()
     if eocLoop < loops-1:
         gridView.hierarchicalGrid.globalRefine(1)
-        scheme.model.dt /= 2
+        dt.value /= 2
 
 # %% [markdown]
 # .. index::
@@ -383,7 +383,7 @@ if petsc:
     # (using the sor preconditioner)
     schemePetsc = solutionScheme(a == b, space=spacePetsc,
                     parameters={"linear.preconditioning.method":"sor"})
-    schemePetsc.model.dt = scheme.model.dt
+    dt.value = scheme.model.dt
     u_h = spacePetsc.interpolate(initial, name='u_h')
     u_h_n = u_h.copy(name="previous")
     evolve(schemePetsc, u_h, u_h_n, endTime)

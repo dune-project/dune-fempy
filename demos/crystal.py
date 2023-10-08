@@ -224,7 +224,7 @@ vtk()
 
 
 # %%
-scheme.model.dt = 0.0005
+dt.value = 0.0005
 t = 0.0
 
 # %% [markdown]
@@ -241,7 +241,7 @@ while t < endTime:
     u_h_n.assign(u_h)
     scheme.solve(target=u_h)
     print(t, gridView.size(0), end="\r")
-    t += scheme.model.dt
+    t += dt.value
     fem.mark(indicator,1.4,1.2,0,maxLevel)
     fem.adapt(u_h) # can also be a list or tuple of function to prolong/restrict
     fem.loadBalance(u_h) # can also be a list or tuple of function
