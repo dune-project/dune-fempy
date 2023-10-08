@@ -52,6 +52,7 @@
 # https://firedrakeproject.org/demos/linear_wave_equation.py.html
 
 # %%
+from matplotlib import pyplot as plt
 import numpy
 import dune.fem as fem
 from dune.grid import reader
@@ -111,19 +112,28 @@ bc   = BoxDirichletBC(V, p_in, [None,None],[0,None], eps=1e-10)
 
 from dune.fem.operator import galerkin
 op        = galerkin([dot(grad(u),grad(v))*dx,bc])
-S         = op.linear()
-op.jacobian(V.zero, S)
-S         = S.as_numpy
+S         = op.linear().as_numpy
 lapPhi    = V.interpolate(1,name="e")
 lapPhiVec = lapPhi.as_numpy
 
+# %% [markdown]
+# .. index::
+#    pair: Quadratures; Mass lumping
+#
+# Next we construct a lumped (diagonal) approximation $M$ to the mass matrix.
+# We then use this to form the matrix $\Delta t M^{-1}S$ where $M^{-1}$ is
+# easy to compute since $M$ is diagonal.
+# To compute $M$ we can either use the *row sum* approach
+# which is a diagonal matrix with entries $m_{ii} = \sum_j\int_\Omega\varphi_i\varphi_j$.
+# We could either setup a mass matrix using
+
+# %%
+M = galerkin(u*v*dx).linear().as_numpy
+diag = M.sum(axis=1)
 
 # %% [markdown]
-# Next we multiply the inverse lumped mass matrix to $S$, i.e., we form the
-# matrix $\Delta t M^{-1}S$ where $M$ is a diagonal matrix with entries
-# $m_{ii} = \int_\Omega\varphi_i$. To compute these values we construct the
-# mass operator $<L[u],\varphi_i> = \int_\Omega u\varphi_i$ and apply it to
-# $u\equiv 1$
+# Another approach is to construct a mass operator $<L[u],\varphi_i> = \int_\Omega u\varphi_i$
+# and applying that to $u\equiv 1$:
 
 # %%
 from scipy.sparse import dia_matrix
@@ -132,8 +142,24 @@ lumped = lapPhi.copy()
 lumping(lapPhi,lumped)       # note that lapPhi=1
 N = len(lumped.as_numpy)
 M = dia_matrix(([dt/lumped.as_numpy],[0]),shape=(N,N) )
-S = M*S
+S1 = M*S
 
+# %% [markdown]
+# An alternative approach is to use an interpolation quadrature, where the
+# integral for the mass matrix \int_\Omega \varphi_i\varphi_j$ is
+# approximated by a quadrature based on the Lagrange points.
+# We can change the quadrature by using the metadata argument when defining
+# the ufl measure:
+#
+# .. todo:: currently mass lumping only for schemes
+#
+
+# %%
+from dune.fem.scheme import galerkin
+lumping = galerkin(u*v*dx(metadata={"quadrature_rule":"lumped"})==0)
+lumped = lumping.linear().as_numpy.diagonal()
+M = dia_matrix(([dt/lumped],[0]),shape=(N,N) )
+S2 = M*S
 
 # %% [markdown]
 # We can now set up the time loop and perform our explicit time stepping
@@ -149,10 +175,10 @@ step = 0
 while t <= T:
     step += 1
     phiVec[:] -= pVec[:]*dt/2
-    pVec[:]   += S*phiVec[:]
+    pVec[:]   += S2*phiVec[:]
     t += dt
     # set the values on the Dirichlet boundary
     p_in.value = numpy.sin(2*numpy.pi*5*t)
     op.setConstraints(p)
     phiVec[:] -= pVec[:]*dt/2
-phi.plot(gridLines=None, clim=[-0.02,0.02])
+phi.plot(gridLines=None, clim=[-0.02,0.02], figure=plt.figure(figsize=(10,10)))
