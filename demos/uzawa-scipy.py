@@ -19,7 +19,7 @@ from dune.ufl import Constant, DirichletBC
 import dune.fem
 
 muValue = 1
-nuValue = 0
+nuValue = 0.1
 order = 2
 
 grid = aluCubeGrid(constructor=cartesianDomain([0,0],[3,1],[30,10]))
@@ -51,23 +51,19 @@ divOp       = galerkinOperator( divModel, spcU,spcP)
 massOp      = galerkinOperator( massModel, spcP)
 
 A = mainOp.linear()
-mainOp.jacobian(spcU.zero, A)
 A = A.as_numpy
 def Ainv(rhs,target): target[:] = linalg.spsolve(A,rhs)
 G = gradOp.linear()
-gradOp.jacobian(spcP.zero,G)
 G = G.as_numpy
 D = divOp.linear()
-divOp.jacobian(spcU.zero,D)
 D = D.as_numpy
 M = massOp.linear()
-massOp.jacobian(spcP.zero,M)
 M = M.as_numpy
 def Minv(rhs,target): target[:] = linalg.spsolve(M,rhs)
 
 if mainOp.model.nu > 0: # same as nu.value>0
     preconOp    = galerkinOperator( (preconModel, DirichletBC(spcP,0)), spcP)
-    P = linearOperator(preconOp).as_numpy
+    P = preconOp.linear().as_numpy
     def Pinv(rhs,target): target[:] = linalg.spsolve(P,rhs)
 
 # discrete functions

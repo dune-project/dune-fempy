@@ -117,9 +117,7 @@ from dune.fem.operator import galerkin
 from dune.ufl import DirichletBC
 dbc = DirichletBC(space,0)
 LHSOp = galerkin([inner(grad(u),grad(v))*dx, dbc])
-A = LHSOp.linear()
-LHSOp.jacobian(space.zero,A)
-A = A.as_numpy
+A = LHSOp.linear().as_numpy
 M = assemble([inner(u,v)*dx, dbc]).as_numpy
 
 # %% [markdown]

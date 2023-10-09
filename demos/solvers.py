@@ -163,14 +163,18 @@ vecu_h = u_h.as_numpy
 #
 # A `scheme` describing an operator `L`
 # provides a method `linear` which returns an object that
-# stores a sparse matrix structure. The matrix is empty at this point. To
-# fill it one can use the `jacobian` method on the `scheme` that linearized
-# the the operator `L` around a given grid function `ubar` and fills the matrix
-# structure in the given linear operator:
+# stores a sparse matrix structure. The object describes the operator
+# linearized around zero.
+# To linearize around a different value use the `jacobian` method on the `scheme` that linearized
+# the the operator `L` around a given grid function `ubar` and fills the
+# linear operator structure passed in as second argument. It is also
+# possible to pass ``assemble=False`` to the ``linear`` method to avoid an
+# the linearization around zero to reduce computational cost:
 
 # %%
-linOp = scheme.linear()
-scheme.jacobian(space.zero, linOp)
+linOp = scheme.linear()                  # linearized around 0
+linOp = scheme.linear(assemble=False)    # empty (non valid) linear operator
+scheme.jacobian(u_h, linOp)              # linearized around ubar=u_h)
 
 # %% [markdown]
 # Here we linearize around zero. But that argument could be any grid
@@ -312,15 +316,13 @@ print("Forchheimer(scipy) size: ", gridView.size(0), "L^2, H^1 error:",'{:0.5e},
 from dune.ufl import DirichletBC
 from dune.fem.operator import galerkin
 from scipy.sparse.linalg import cg as solver
-model  = ( inner(grad(u), grad(v)) -
-           conditional(dot(x,x)<0.6,10.,0.) * v ) * dx
-dbcs   = [ DirichletBC(space,-1,1),
-           DirichletBC(space, 1,2) ]
-op     = galerkin([model, *dbcs], space)
-lin    = op.linear()
+model = ( inner(grad(u), grad(v)) -
+          conditional(dot(x,x)<0.6,10.,0.) * v ) * dx
+dbcs  = [ DirichletBC(space,-1,1), DirichletBC(space, 1,2) ]
+op  = galerkin([model, *dbcs], space)
 sol = space.interpolate(0, name="u_h")
 rhs = sol.copy()
-op.jacobian(space.zero,lin,rhs)
+lin = op.linear()
 
 # %% [markdown]
 # So far everything is as before. Dirichlet boundary conditions
@@ -399,7 +401,6 @@ if petsc4py is not None and petsc:
       def __init__(self, scheme):
           self.model = scheme.model
           self.jacobian = scheme.linear()
-          scheme.jacobian(scheme.rangeSpace.zero,self.jacobian)
           self.ksp = PETSc.KSP()
           self.ksp.create(PETSc.COMM_WORLD)
           # use conjugate gradients method
@@ -440,7 +441,6 @@ if petsc4py is not None and petsc is not None:
             self.res = scheme.space.interpolate([0],name="residual")
             self.scheme = scheme
             self.jacobian = scheme.linear()
-            scheme.jacobian(scheme.rangeSpace.zero,self.jacobian)
             self.snes = PETSc.SNES().create()
             self.snes.setFunction(self.f, self.res.as_petsc.duplicate())
             self.snes.setUseMF(False)

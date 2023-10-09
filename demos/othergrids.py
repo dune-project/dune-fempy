@@ -2,7 +2,8 @@
 # .. index:: Grid construction
 #
 # # Examples of grid construction
-# In addition to the already discussed construction of Cartesian grid and
+# In addition to the already discussed construction of Cartesian grid using
+# `dune.grid.structuredGrid` and `dune.grid.cartesianDomain` and
 # the usage of dictionaries discussed in the [general concepts section](dune-corepy_nb.ipynb),
 # it is also possible to read grid files using either the `DGF` or `gmsh` format (or other
 # formats available through the `meshio` package).

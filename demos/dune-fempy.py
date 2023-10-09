@@ -41,6 +41,9 @@ gridView = structuredGrid([0, 0], [1, 1], [20, 20])
 # The details of what a ``gridView`` is together with some other central
 # concepts is provided in the [next section](concepts_nb.ipynb).
 #
+# .. tip:: an overview of available approaches to construct a grid can be
+#    found [here](othergrids_nb.ipynb).
+#
 
 # %% [markdown]
 # Next we define a linear Lagrange Finite-Element space over that grid
@@ -90,9 +93,10 @@ y[:] = solver(A,b)
 # Note the ``y[:]`` which guarantees that the result from the solver is
 # stored in the same buffer used for the discrete function. Consequently,
 # no copying is required.
-# More details on how to use
-# [Scipy and also PetSC4py](solvers_nb.ipynb) will be discussed later
-# in the tutorial.
+#
+# .. tip:: More details on how to use [Scipy](solvers_nb.ipynb#Using-Scipy) will be given later
+#    in the tutorial. Other linear solver backends are also available,
+#    e.g., [PETSc and petsc4py](solvers_nb.ipynb#Using-PETSc-and-Petsc4Py).
 
 # %% [markdown]
 # That's it - to see the result we plot it using matplotlib
@@ -179,7 +183,7 @@ print("average:",assemble(exact*dx,gridView=gridView) )
 # u(x) = \left(\frac{1}{2}(x_1^2 + x_2^2) - \frac{1}{3}(x_1^3 - x_2^3)\right) + 1~.
 # \end{align*}
 #
-# More [general boundary conditions](boundary_nb.ipynb) are discussed in a later section.
+# .. tip:: More [general boundary conditions](boundary_nb.ipynb) are discussed in a later section.
 #
 # The setup of the model using ufl is very similar to the previous example
 # but we need to include the non trivial Neumann boundary conditions:
@@ -380,9 +384,9 @@ scheme.solve(target = w_h)
 w_h.plot()
 
 # %% [markdown]
-# A wide range of problems a covered in the
-# [further examples](furtherexamples.rst) section.
-# In the [next section](concepts_nb.ipynb) we explain the main concepts
-# we use to solve PDE using finite-element approximations which we end with
-# a solution to a non-linear time-dependent problem using the
-# Crank-Nicolson method in time.
+# .. tip:: A wide range of problems a covered in the
+#    [further examples](furtherexamples.rst) section.
+#    In the [next section](concepts_nb.ipynb) we explain the main concepts
+#    we use to solve PDE using finite-element approximations which we end with
+#    a solution to a non-linear time-dependent problem using the
+#    Crank-Nicolson method in time.
