@@ -348,6 +348,7 @@ sol.as_numpy[:], _ = solver(lin.as_numpy, rhs.as_numpy, x0=sol.as_numpy,
                             callback=cb, tol=1e-10, atol=1e-10)
 sol.plot()
 
+"""
 # %% [markdown]
 # .. index::
 #    pair: Solvers; Petsc
@@ -470,6 +471,7 @@ if petsc4py is not None and petsc is not None:
     error = u_h - exact_end
     print("Forchheimer(petsc4py) size: ", gridView.size(0), "L^2, H^1 error:",'{:0.5e}, {:0.5e}'.format(
       *[ sqrt(e) for e in integrate([error**2,inner(grad(error),grad(error))]) ]))
+"""
 
 # %% [markdown]
 # .. index::
