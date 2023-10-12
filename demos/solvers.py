@@ -174,13 +174,13 @@ vecu_h = u_h.as_numpy
 # %%
 linOp = scheme.linear()                  # linearized around 0
 linOp = scheme.linear(assemble=False)    # empty (non valid) linear operator
-scheme.jacobian(u_h, linOp)              # linearized around ubar=u_h)
+scheme.jacobian(space.zero, linOp)       # linearized around zero
 
 # %% [markdown]
 # Here we linearize around zero. But that argument could be any grid
 # function. A second version of this method will return an addition
-# discrete function `rhs` such that `DL[ubar](u-ubar) - rhs` are the first terms in
-# the Taylor expansion of the operator `L`:
+# discrete function `rhs` which equals `-L[ubar]` such that `DL[ubar](u-ubar) - rhs` are the first
+# terms in the Taylor expansion of the operator `L`:
 
 # %%
 rhs = u_h.copy()
@@ -188,13 +188,12 @@ scheme.jacobian(u_h, linOp, rhs)
 
 # %% [markdown]
 # One can now easily access the underlying sparse matrix by again using
-# `as_numpy` (again the underlying data buffers are not copied):
+# `as_numpy` (and again the underlying data buffers are not copied):
 
 # %%
 A = linOp.as_numpy
 print(type(A))
-plt.spy(A, precision=1e-8, markersize=1)
-plt.show()
+# plt.spy(A, precision=1e-8, markersize=1)
 
 # %% [markdown]
 # Now we have all the ingredients to write a simple Newton solver to solve
