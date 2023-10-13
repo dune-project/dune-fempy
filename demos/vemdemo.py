@@ -27,6 +27,7 @@ except:
     print("This example needs 'dune.vem'")
     import sys
     sys.exit(0)
+
 from matplotlib import pyplot
 import numpy
 from dune.grid import cartesianDomain, gridFunction
@@ -94,9 +95,8 @@ polygons.plot(colorbar="horizontal")
 
 # %%
 order = 3
-space = dune.vem.vemSpace( polyGrid, order=order, dimRange=1, storage="numpy",
+space = dune.vem.vemSpace( polyGrid, order=order, storage="numpy",
                            testSpaces=[-1,order-1,order-2])
-# space = dune.vem.vemSpace( polyGrid, order=order, dimRange=1)
 
 # %% [markdown]
 # Now we define the model starting with the exact solution:
@@ -106,7 +106,7 @@ x = SpatialCoordinate(space)
 u = TrialFunction(space)
 v = TestFunction(space)
 
-exact = as_vector( [x[0]*x[1] * cos(pi*x[0]*x[1])] )
+exact = x[0]*x[1] * cos(pi*x[0]*x[1])
 
 massCoeff = 1+sin(dot(x,x))       # factor for mass term
 diffCoeff = 1-0.9*cos(dot(x,x))   # factor for diffusion term
@@ -114,7 +114,7 @@ diffCoeff = 1-0.9*cos(dot(x,x))   # factor for diffusion term
 a = (diffCoeff*inner(grad(u),grad(v)) + massCoeff*dot(u,v) ) * dx
 
 # finally the right hand side and the boundary conditions
-b = (-div(diffCoeff*grad(exact[0])) + massCoeff*exact[0] ) * v[0] * dx
+b = (-div(diffCoeff*grad(exact)) + massCoeff*exact ) * v * dx
 dbc = [dune.ufl.DirichletBC(space, exact, i+1) for i in range(4)]
 
 # %% [markdown]
@@ -128,7 +128,7 @@ parameters = {"newton.linear.tolerance": 1e-12,
               "newton.linear.verbose": False,
               "newton.verbose": False
               }
-df = space.interpolate([0],name="solution")
+df = space.interpolate(0,name="solution")
 scheme = dune.vem.vemScheme( [a==b, *dbc], space, solver="cg",
                              gradStabilization=diffCoeff,
                              massStabilization=massCoeff,
@@ -141,9 +141,9 @@ df.plot()
 # Repeating the same test with a H^1-conforming space
 
 # %%
-space = dune.vem.vemSpace( polyGrid, order=order, dimRange=1, storage="istl",
+space = dune.vem.vemSpace( polyGrid, order=order, storage="numpy",
                            testSpaces=[0,order-2,order-2])
-df = space.interpolate([0],name="solution")
+df = space.interpolate(0,name="solution")
 scheme = dune.vem.vemScheme( [a==b, *dbc], space, solver="cg",
                              gradStabilization=diffCoeff,
                              massStabilization=massCoeff,
@@ -190,8 +190,8 @@ methods = [ ### "[legend,space,scheme,spaceKwargs,schemeKwargs]"
 
 # %%
 def compute(grid, space,spaceArgs, schemeName,schemeArgs):
-    space = space( grid, order=order, dimRange=1, storage="istl", **spaceArgs )
-    df = space.interpolate([0],name="solution")
+    space = space( grid, order=order, **spaceArgs )
+    df = space.interpolate(0,name="solution")
     scheme = schemeName( [a==b, *dbc], space, solver="cg", **schemeArgs,
                          parameters=parameters )
     info = scheme.solve(target=df)
@@ -223,18 +223,18 @@ for i,m in enumerate(methods):
 # We can easily set up a non linear problem
 
 # %%
-space = dune.vem.vemSpace( polyGrid, order=1, dimRange=1, storage="istl", conforming=True )
+space = dune.vem.vemSpace( polyGrid, order=1, conforming=True )
 u = TrialFunction(space)
 v = TestFunction(space)
 x = SpatialCoordinate(space)
-exact = as_vector ( [  (x[0] - x[0]*x[0] ) * (x[1] - x[1]*x[1] ) ] )
-Dcoeff = lambda u: 1.0 + u[0]**2
+exact = (x[0] - x[0]*x[0] ) * (x[1] - x[1]*x[1] )
+Dcoeff = lambda u: 1.0 + u**2
 a = (Dcoeff(u) * inner(grad(u), grad(v)) ) * dx
-b = -div( Dcoeff(exact) * grad(exact[0]) ) * v[0] * dx
+b = -div( Dcoeff(exact) * grad(exact) ) * v * dx
 dbcs = [dune.ufl.DirichletBC(space, exact, i+1) for i in range(4)]
 scheme = dune.vem.vemScheme( [a==b, *dbcs], space, gradStabilization=Dcoeff(u),
                              solver="cg", parameters=parameters)
-solution = space.interpolate([0], name="solution")
+solution = space.interpolate(0, name="solution")
 info = scheme.solve(target=solution)
 edf = exact-solution
 errors = [ numpy.sqrt(e) for e in
@@ -258,7 +258,7 @@ def polygons(en,x):
 polygons.plot(colorbar="horizontal")
 
 # instead of providing the moments we can simply add a parameter 'conforming' to construct the H^1-conforming space
-space = dune.vem.vemSpace( beamGrid, order=2, dimRange=2, storage="istl", conforming=True)
+space = dune.vem.vemSpace( beamGrid, order=2, dimRange=2, conforming=True)
 
 # %% [markdown]
 
@@ -346,26 +346,25 @@ ncC1testSpaces = [ [0], [order-3,order-2], [order-4] ]
 
 # %%
 polyGrid = dune.vem.polyGrid( dune.vem.voronoiCells([[0,0],[1,1]], 50, lloyd=100) )
-space = dune.vem.vemSpace( polyGrid, order=order, dimRange=1, storage="istl",
-                           testSpaces=ncC1testSpaces)
+space = dune.vem.vemSpace( polyGrid, order=order, testSpaces=ncC1testSpaces)
 
 x = SpatialCoordinate(space)
-exact = as_vector( [sin(2*pi*x[0])**2*sin(2*pi*x[1])**2] )
+exact = sin(2*pi*x[0])**2*sin(2*pi*x[1])**2
 
 laplace = lambda w: div(grad(w))
 H = lambda w: grad(grad(w))
 u = TrialFunction(space)
 v = TestFunction(space)
-a = ( inner(H(u[0]),H(v[0])) ) * dx
+a = ( inner(H(u),H(v)) ) * dx
 
 # finally the right hand side and the boundary conditions
-b = laplace(laplace(exact[0])) * v[0] * dx
+b = laplace(laplace(exact)) * v * dx
 dbcs = [dune.ufl.DirichletBC(space, [0], i+1) for i in range(4)]
 
 scheme = dune.vem.vemScheme( [a==b, *dbcs], space, hessStabilization=1,
                              solver="cg", parameters=parameters )
 
-# solution = space.interpolate([0], name="solution") # issue here for C^1 spaces
+# solution = space.interpolate(0, name="solution") # issue here for C^1 spaces
 solution = discreteFunction(space, name="solution")
 info = scheme.solve(target=solution)
 edf = exact-solution
