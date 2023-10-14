@@ -206,7 +206,8 @@ get a colored figure and are hopefully ready to go...
 Troubleshooting
 ###############
 
-* If you are using ``Python 3.11`` or above the version of ``Pybind11``
+* **Compiling issue with ``Pyhon 3.11`` or above:**
+  If you are using ``Python 3.11`` or above the version of ``Pybind11``
   shipped with the release version of ``Dune`` is not recent enough.
   Please try the prerelease version by using
 
@@ -214,7 +215,8 @@ Troubleshooting
 
     $ pip install --pre dune-fem
 
-* The compiler version needs to be 7 or later. This can be checked in terminal with
+* **Issue with C++ compiler:**
+  If the gnu compiler is used, version needs to be 7 or later. This can be checked in terminal with
 
   .. code-block:: bash
 
@@ -222,7 +224,8 @@ Troubleshooting
 
   If your version is out of date, you will need to upgrade your system to use Dune
 
-* It is possible that the python version may be an issue. The scripts
+* **Python version:**
+  It is possible that the python version may be an issue. The scripts
   require `python3` including the development package being installed.
   If during the Dune installation you get the error
 
@@ -230,11 +233,15 @@ Troubleshooting
 
     fatal error: pyconfig.h: No such file or directory
 
-  This can probably be fixed by installing additional python3.5 libraries with e.g. ::
+  This can probably be fixed by installing additional python3 libraries with e.g. ::
 
   $ sudo apt-get install libpython3-dev
 
-* One other problem is that a default version of Open MPI may already be installed. This will lead to errors where Dune appears to be looking in the wrong directory for Open MPI (e.g. usr/lib/openmpi instead of the home directory where the script installs it). This can be solved by running
+* **MPI not found:**
+  One other problem is that a default version of Open MPI may already be installed.
+  This will lead to errors where Dune appears to be looking in the wrong directory for Open MPI
+  (e.g. `usr/lib/openmpi` instead of the home directory where the script installs it).
+  This can be solved by running
 
   .. code-block:: bash
 
@@ -255,7 +262,7 @@ Troubleshooting
     $ python setup.py build --mpicc=/path/to/openmpi/bin/mpicc
     $ python setup.py install --user
 
-* User warning from numpy
+* **User warning from numpy:**
 
   .. code-block:: none
 
@@ -267,7 +274,8 @@ Troubleshooting
   See `here <https://moyix.blogspot.com/2022/09/someones-been-messing-with-my-subnormals.html/>`_
   for a detailed description.
 
-* Newly installed software is not used: after for example adding `petsc` to
+* **Newly installed software is not used:**
+  after for example adding `petsc` to
   your system one needs to remove an existing `dune-py` module which
   contains the jit compiled modules. New software components are not
   automatically picked up. One can run
@@ -278,3 +286,11 @@ Troubleshooting
 
   to find the location of the `dune-py` folder. That folder needs to be
   removed before the new component can be used.
+
+* **Output to terminal seems a bit random:**
+  the issue is (probably) that
+  Python buffers its `print` output and C++ does not. So if in a mixed
+  program both are writing to the terminal (or piped into a file) the C++
+  output often appears before the Python output. This can be fixed by (i)
+  adding `flush=True` to the Python print statements or setting the
+  environment variable `PYTHONUNBUFFERED` to some non zero value.
