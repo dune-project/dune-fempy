@@ -120,12 +120,13 @@ assert sum([ abs(td-vd) for td,vd in zip(test.dofVector, vec.dofVector)] ) /\
 # [solving Dirichlet Eigenvalue problems](evalues_laplace_nb.ipynb#Dirichlet-Eigenvalue-problem).
 
 # %%
-dc = vecScheme.dirichletBlocks
-for i,block in enumerate(dc):         # a block is of size `dimRange`
-    for j,b in enumerate(block):      # iterate over the block
-        # 'b' is the `id` of the boundary as described below
-        if b > 0:                     # if b>0 it's a boundary
-            vec.dofVector[i*len(block)+j] = 0 # set all Dirichlet dofs to 0
+for i in vecScheme.dirichletIndices():
+    vec.dofVector[i] = 0
+
+# %% [markdown]
+# .. tip:: the `dirichletIndices` method takes as optional argument an `id`
+#    which then returns the list of indices of degrees of freedom on the
+#    boundary with that id. See further down for a discussion on boundary ids.
 
 # %% [markdown]
 # We have set all degrees of freedom on the boundary to zero. In this
@@ -223,7 +224,6 @@ plotComponents(vec, gridLines=None, level=2,
 # the Dune Grid Format (dgf) reader. Please consult the [documentation of the
 # DGF file format](https://dune-project.org/doxygen/master/group__DuneGridFormatParser.html#details) for details
 # and [other examples given for grid construction](othergrids_nb.ipynb).
-#
 
 # %% [markdown]
 # .. index::
