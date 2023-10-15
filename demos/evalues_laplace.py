@@ -147,7 +147,7 @@ M = M - assemble([Constant(0)*inner(u,v)*dx, dbc]).as_numpy
 # %%
 import scipy.sparse as sps
 M = assemble([inner(u,v)*dx, dbc]).as_numpy
-dirichlet_zero_dofs = [i for i,b in enumerate(LHSOp.dirichletBlocks) if b[0]==1]
+dirichlet_zero_dofs = LHSOp.dirichletIndices()
 N = M.shape[1]
 chi_interior = np.ones(N)
 chi_interior[dirichlet_zero_dofs] = 0.0

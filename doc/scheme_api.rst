@@ -139,17 +139,14 @@ additional methods:
   :math:`w_i=0`.
 - ``subConstraints``: there is only one version of this method
   ``op.subConstrains(v,w_h)`` leading to :math:`w_i = w_i+v_i`.
+- ``dirichletIndices``: This method returns the indices of dofs on the Dirichlet boundary. By
+  default all indices are returned but a boundary id can be provided to only
+  return a subset of indices.
 - ``dirichletBlocks``: this method provides indices of the degrees of
   freedom on the Dirichlet boundary defined by the ``DirichletBC`` instances.
-  ``dblocks = op.dirichletBlocks``. The value ``dblock`` returned is a list
-  of lists....
-
-  .. todo::
-
-    dirichletBlocks method needs changing or some explanation here.
-    I don't want to explain blocked dofs here. And one actually needs a flat
-    list of boundary dof indices + dirichlet id. Currently one needs to write
-    something like
+  ``dblocks = op.dirichletBlocks`` in blocked form.
+  The indices as returned by the ``dirichletIndices`` can be obtained
+  using:
 
     .. code:: python
 

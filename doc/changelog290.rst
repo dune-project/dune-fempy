@@ -49,6 +49,12 @@ assemble around a non zero value). The method has a new bool argument ``assemble
 which is ``True`` by default. Passing in ``assemble=False`` returns an
 empty linear operator which can be passed into ``jacobian`` to be filled.
 
+Add ``DirichletIndices`` method to operators and schemes
+--------------------------------------------------------
+This method returns the indices of dofs on the Dirichlet boundary. By
+default all indices are returned but a boundary id can be provided to only
+return a subset of indices.
+
 Extension of the ``jacobian`` method on schemes and operators
 -------------------------------------------------------------
 In addition to the existing ``jacobian`` method taking a linear operator
