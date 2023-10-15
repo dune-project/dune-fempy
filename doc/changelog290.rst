@@ -25,7 +25,7 @@ To construct different versions of grid function use
   then the function acts like the decorator from 2.9 version. Note that the
   old ``view`` parameter is also deprecated and replaced by ``gridView``.
 
-  .. note:: ``@gridFunction(gv,"name",5)`` will not work anymore since name and
+  .. warning:: ``@gridFunction(gv,"name",5)`` will not work anymore since name and
      order need to be named arguments. So this will lead to an error instead
      of a deprecation warning and needs to be replaced by
      ``@gridFunction(gv,name="name",order=5)``.
