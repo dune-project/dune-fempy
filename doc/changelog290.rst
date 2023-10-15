@@ -41,6 +41,10 @@ To construct different versions of grid function use
   If ``fctName`` is not provided the ``name`` argument is assumed to also
   be the name of the cpp function to export.
 
+Deprecation of ``dune.ufl.expression2GF``
+-----------------------------------------
+Use the extended version of ``dune.fem.function.gridFunction`` instead.
+
 Deprecation of ``dune.fem.operator.linear``
 -------------------------------------------
 Use the new method ``linear`` on the schemes or operators. Note that the
