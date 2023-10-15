@@ -53,6 +53,11 @@ assemble around a non zero value). The method has a new bool argument ``assemble
 which is ``True`` by default. Passing in ``assemble=False`` returns an
 empty linear operator which can be passed into ``jacobian`` to be filled.
 
+Deprecation of ``dune.fem.space.combinedSpace``
+-----------------------------------------------
+This has been renamed to ``dune.fem.space.compositeSpace`` and will be
+deprecated soon.
+
 Add ``DirichletIndices`` method to operators and schemes
 --------------------------------------------------------
 This method returns the indices of dofs on the Dirichlet boundary. By
@@ -67,6 +72,13 @@ returns the functional part of the operator as though it was on the right
 hand side. So if the ufl form is ``a(u,v)=l(v)`` then this method assembles
 both the system matrix ``A`` and the right hand side functional (``rhs``
 needs to be a discrete function over the range space of the operator).
+
+Set non default quadratures in quadrature rules
+-----------------------------------------------
+At the moment only ``dx(metadata={"quadrature_rule":"lumped"})`` is
+available that sets a quadrature that can be used for lower order Lagrange
+elements to use lumped mass matrices. More general cases will be added
+soon.
 
 Assembly function
 -----------------
@@ -157,6 +169,9 @@ Storage setup in scheme
 
 Methods on space to return local mapper and for evaluating basis functions
 --------------------------------------------------------------------------
+New methods have been added to the space to return the basis functions
+evaluated at some given point. Also a new method has been added to return
+the global indices of the dofs attached to a given element.
 
 Logging of parameter values
 ---------------------------
