@@ -13,7 +13,9 @@ The sources for
 the methods is available in the `dune-vem git repository <https://gitlab.dune-project.org/dune-fem/dune-vem>`_.
 See our `publication`_ for details on our approach to add virtual element
 spaces to existing finite element software frameworks.
-For a focus on forth order spaces have a look `here`_.
+The examples from the paper can be reproduced using the scripts collected in
+https://gitlab.dune-project.org/dune-fem/dune-vem-paper.
+For a focus on the analysis and testing of spaces for forth order problems have a look `here`_.
 
 .. _here: https://academic.oup.com/imajna/advance-article-abstract/doi/10.1093/imanum/drab003/6174313?redirectedFrom=fulltext
 

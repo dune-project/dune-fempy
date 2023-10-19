@@ -72,7 +72,6 @@ N            = 6.
 # We use this value to set up our solution.
 
 # %%
-from dune.fem.function import globalFunction
 from ufl import dot,sqrt,conditional,as_vector, SpatialCoordinate
 x = SpatialCoordinate(space)
 r = sqrt( dot( x-as_vector([6,6]), x-as_vector([6,6])) )

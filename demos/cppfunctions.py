@@ -1,7 +1,7 @@
 # %% [markdown]
 # ## C++ Based Grid Functions
 # .. index::
-#    triple: Functions; Grid Functions; C++
+#    triple: Functions; dune.fem.function; C++ grid function
 #
 # We discussed the [construction of grid functions](concepts_nb.ipynb)
 # based on ``gridFunction``.

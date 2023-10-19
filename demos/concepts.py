@@ -134,14 +134,14 @@ gridView.writeVTK('exact', pointdata={'exact': exact})
 # we provide more detail on how to access the grid interface).
 
 # .. index::
-#    pair: Functions; dune.fem.function.gridFunction
+#    pari: dune.fem.function; gridFunction
 #
 # .. note:: ``dune.fem.function.gridFunction`` provides different options for
 # constructing grid functions: it can be used as decorator of Python
 # function, provided with a C++ code snippet, or an ufl expression.
 #
 # .. index::
-#    triple: Functions; Grid Functions; ufl grid function
+#    triple: Functions; dune.fem.function; ufl grid function
 #
 # We will discuss the second usages later and have some example for using
 # C++ code snippets [in a later section](cppfunctions_nb.ipynb).
@@ -171,7 +171,7 @@ print(mass)
 
 # %% [markdown]
 # .. index::
-#    triple: Functions; Grid Functions; Decorator
+#    triple: Functions; dune.fem.function; grid function decorator
 #
 # Another way to obtain a grid function is to use the `gridFunction` as
 # decorator. This can be obtained from `dune.grid` but then without UFL
@@ -767,7 +767,7 @@ components("space")
 # %% [markdown]
 # .. index:: Functions; Available Functions
 #
-# Available discrete functions are:
+# Available grid functions are:
 
 # %%
 components("function")
