@@ -371,7 +371,7 @@ print(mass)
 # (using binary data format to reduce size)
 
 # %%
-u_h.plot(gridLines="white")
+u_h.plot(gridLines="white", linewidth=2)
 from dune.grid import OutputType
 gridView.writeVTK('uh', pointdata=[u_h])
 
