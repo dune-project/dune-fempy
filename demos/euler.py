@@ -6,7 +6,7 @@
 try:
     import dune.femdg
 except ImportError:
-    print("This example needs 'dune.femdg'")
+    print("This example needs 'dune.femdg' - skipping")
     import sys
     sys.exit(0)
 

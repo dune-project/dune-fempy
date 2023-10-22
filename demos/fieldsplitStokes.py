@@ -19,15 +19,13 @@
 # %%
 from matplotlib import pyplot
 import numpy as np
+import sys
 try:
-    import sys, petsc4py
+    import petsc4py
     petsc4py.init(sys.argv)
     from petsc4py import PETSc
-except:
-    print("""
-Example requires `petsc4py` - not running.
-          """)
-    import sys
+except ImportError:
+    print("Example requires `petsc4py` - skipping")
     sys.exit(0)
 
 from dune.grid import structuredGrid

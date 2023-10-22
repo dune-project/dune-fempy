@@ -10,7 +10,7 @@
 try:
     import dune.vem
 except:
-    print("This example needs 'dune.vem'")
+    print("This example needs 'dune.vem' - skipping")
     import sys
     sys.exit(0)
 from matplotlib import pyplot
