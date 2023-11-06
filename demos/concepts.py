@@ -65,18 +65,42 @@ gridView.plot()
 # of a subset of the `hierarchical grid`.
 # In the following this is called `gridView` and sometimes simply `grid`.
 # See <cite data-cite="DuneReview"></cite>, Section 3.1.1, for more details.
+#
+# .. tip:: The functions constructing a grid generally return a **leaf grid view**,
+# i.e., only contains of a view of the finest grid elements.
+# We also provide some special grid views to for example simulate on
+# [evolving domains](gridviews.rst#Evolving-Domains) or
+# to simplify efficient [local grid adaptivity](gridviews.rst#Dynamic-Local-Grid-Refinement-and-Coarsening).
+#
 # Since a `gridView` can not be changed
 # directly we need to access the underlying `hierarchicalGrid` to perform
-# e.g. grid refinement.
+# e.g. grid refinement. So to globally refine the grid call
+
+# %%
+gridView.hierarchicalGrid.globalRefine(1)
+gridView.plot()
+
+# %% [markdown]
+# If `level>0` then the
+# grid is refined down by the given level and `level<0` leads to global
+# coarsening of the grid by the given number of levels (if possible).
 #
-# .. note:: The functions constructing a grid generally return a **leaf grid view**.
-# We also provide some special grid views to for example simulate on
-# evolving domains gridviews rst Evolving-Domains or
-# to simplify efficient [local grid adaptivity](gridviews.rst#Dynamic-Local-Grid-Refinement-and-Coarsening).
+# .. tip:: the effect of this refinement will depend on the underlying
+# grid manager. For Cartesian grid for example refining by one level leads
+# a reduction of the grid spacing by 2 while for a bisection grid in $d$
+# space dimensions one needs to refine by $2^{d-1}$ levels to achieve the same effect.
+#
+# In addition to the `globalRefine` method on the `hierarchicalGrid`
+# `dune-fem` also provides a `globalRefine` function, which takes the
+# `level` as the first argument and a hierarchical grid as second argument.
+# This method can also be used to prolong and restrict discrete functions
+# as will be discussed in [a later section](gridviews.rst#Dynamic-Local-Grid-Refinement-and-Coarsening).
 
 # %%
 from dune.fem import globalRefine
-globalRefine(1,gridView.hierarchicalGrid) # the first argument is the number of refinements to perform
+globalRefine(1,gridView.hierarchicalGrid)  # the first argument is the number of refinements to perform
+gridView.plot()
+globalRefine(-1,gridView.hierarchicalGrid) # coarsen again by one level
 gridView.plot()
 
 # %% [markdown]
@@ -410,6 +434,7 @@ u_h.axpy(2,u_h_n)
 # %% [markdown]
 # We started with `u_h_n=u_h` so after these changes each dof in
 # `u_h` should be seven times its original value
+
 # %%
 for d in u_h.dofVector:
     print(d,end=", ")
