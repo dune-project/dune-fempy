@@ -150,7 +150,7 @@ Point sampler returning (entity,local coordinate) for given global coordinate
 Improved Dirichlet Boundary Indexing in UFL Forms
 -------------------------------------------------
 To restrict a domain integral to a part of the boundary given by a boundary id 
-one can now use ``ufl.ds(id)`` or multiply the integral with ``dune.ufl.BoundaryId(id)``
+one can now use ``ufl.ds(id)`` or multiply the integral with ``dune.ufl.BoundaryId(space)``
 (see the section on
 :ref:`Mixing different types of boundary conditions</boundary_nb.ipynb#Mixing-different-types-of-boundary-conditions>`.
 
