@@ -152,7 +152,7 @@ def weak_form_stationary_stokes(u,v,p,q, f,mu, dirichlet_velocity=None):
 #
 
 # %%
-from dune.ufl import DirichletBC, BoundaryId
+from dune.ufl import DirichletBC
 from ufl import as_vector
 from dune.fem.function import gridFunction
 

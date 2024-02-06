@@ -4,8 +4,13 @@
 #
 # # Backup and restore (pickling)
 # We show here how the state of a simulation can be stored and restored
-# using pickle. This is still work in progress.
-#
+# using pickle. This is still work in progress and based on an extension
+# of the standard `pickle` module available in `dune.common`:
+
+# %%
+import dune.common.pickle
+
+# %% [markdown]
 # Let's first construct a grid and some discrete function:
 
 # %%
@@ -58,7 +63,6 @@ def setup():
 
 # Let's first write a function that dumps some discrete functions:
 # %%
-import dune.common.pickle
 def dump():
     df1, df2, gf = setup()
 
@@ -122,7 +126,7 @@ class CheckPointer:
             pickle.dump(self.gridView,self.file)
         self.items = []
 
-    # add an item to picke when backup is called (or restore)
+    # add an item to pickle when backup is called (or restore)
     def add(self,item):
         assert hasattr(item,"write") and hasattr(item,"read")
         self.items += [item]
