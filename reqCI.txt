@@ -1,6 +1,5 @@
 numpy>=1.20
 scipy
-scikit-umfpack
 nbconvert
 nbsphinx
 ipython
@@ -21,3 +20,4 @@ pygmsh
 # petsc4py
 # gmsh # - fails in CI for some reason
 # mayavi
+# scikit-umfpack
