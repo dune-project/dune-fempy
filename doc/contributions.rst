@@ -1,15 +1,42 @@
 .. _contributing:
 
+############################
+Contributing to this project
+############################
+
+
+Contributions are very welcomed - these can include but are not restricted to
+
+* pointing out typos or suggesting places were the description should be improved
+  (open an MR in https://gitlab.dune-project.org/dune-fem/dune-fempy
+  or send us an email)
+
+* providing an improvement:
+
+  To make changes or add something to one of the existing scripts, please
+  note that the notebooks are generated from the Python scripts using the
+  package `jupytext`. So any changes should be done in the scripts. To check
+  the effect of any change in the notebook simply install the Python packages
+  `jupytext` (and `jupyter`) and after the change run
+
+  .. code-block:: rst
+
+    jupytext script.py --execute --set-kernel python3 --output script_nb.ipynb
+
+  Then you can have a look at the notebook in the usual way.
+  Once you are finished open a MR or send us the modified script - any help
+  will certainly be appreciated!
+
+* showcasing what you are doing with this project:
+  we would like to showcase what user have used this package for,
+  by adding sections to the :ref:`userprojects` chapter:
+
 #################################
 How to showcase your own project
 #################################
 
-Contributions are very welcomed - this can include pointing out typos,
-suggestion places were the description should be improved, providing this
-improvement, and so on. In addition we would like to showcase what user
-have used this package for, by adding sections to the :ref:`userprojects` chapter:
-
-To do this provide us with a file *projectname_descr.rst* with a short
+To provide an example of what you have been doing with this package,
+send us a file *projectname_descr.rst* with a short
 description of your project with the authors and links to the project web
 page, journal article and so on.
 The following is an example taken from the description file of the
@@ -29,7 +56,12 @@ The following is an example taken from the description file of the
    The code is available in the module
    https://gitlab.dune-project.org/dune-fem/dune-vem.
 
-Your python script *myproject.py* showcasing your project can contain both *markdown* parts for
+A python script *myproject.py* showcasing your project can be provided as
+well. But it should run with a standard set of Python packages and Dune
+modules - and not take ages to run. For longer running example simply link
+to results on your project webpage.
+
+The script can contain both *markdown* parts for
 additional descriptions between python code blocks similar to
 a jupyter notebook
 (see e.g. the :download:`script<vemdemo.py>` for the virtual element project).
