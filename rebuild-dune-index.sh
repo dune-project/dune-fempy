@@ -52,6 +52,7 @@ pip-download -d $(pwd)/downloads \
    pandoc\
    pygmsh\
    pyqt5\
+   scikit-umfpack\
    sparkmonitor\
    sphinx-autobuild\
    sphinx_rtd_theme\

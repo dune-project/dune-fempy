@@ -8,7 +8,7 @@
 # This example uses
 # [dynamic grid refinement](gridviews.rst#Dynamic-Local-Grid-Refinement-and-Coarsening).
 #
-# Let us first set up the grid and the function space. We use the default DoF storage available in ```dune-fem``` - this can be changed for example to ```istl``` or ```petsc```.
+# Let us first set up the grid and the function space. We use the default DoF storage available in ``dune-fem`` - this can be changed for example to ``istl`` or ``petsc``.
 
 
 # %%
@@ -219,7 +219,7 @@ vtk()
 
 
 # %% [markdown]
-# We set ```dt``` and the initial time t=0.
+# We set ``dt`` and the initial time t=0.
 
 
 # %%
@@ -229,8 +229,8 @@ t = 0.0
 # %% [markdown]
 # Finally, we set up the time loop and solve the problem -
 # each time this cell is run the simulation will progress to
-# the given ```endTime``` and then the result is shown.
-# The simulation can be progressed further by rerunning the cell while increasing the ```endTime```.
+# the given ``endTime`` and then the result is shown.
+# The simulation can be progressed further by rerunning the cell while increasing the ``endTime``.
 
 # %%
 from dune.fem.plotting import plotPointData
@@ -239,7 +239,7 @@ endTime = 0.1
 while t < endTime:
     u_h_n.assign(u_h)
     scheme.solve(target=u_h)
-    print(t, gridView.size(0), end="\r")
+    # print(t, gridView.size(0), end="\r")
     t += dt.value
     fem.mark(indicator,1.4,1.2,0,maxLevel)
     fem.adapt(u_h) # can also be a list or tuple of function to prolong/restrict
