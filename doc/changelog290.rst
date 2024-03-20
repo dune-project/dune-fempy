@@ -1,6 +1,10 @@
 Since 2.9 release
 =================
 
+Add operator ``__len__`` to spaces.
+-----------------------------------
+This allows to use the typical Python build-in function `len(space)`.
+
 Deprecation of ``dune.ufl.expression2GF``
 -----------------------------------------
 Use ``dune.fem.function.gridFunction`` instead
