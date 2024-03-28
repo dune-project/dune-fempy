@@ -73,7 +73,7 @@
 #
 # From the *strong* form of the Quasi-Stokes equations it is possible
 # to derive a precoditioner for Schur's complement, with a lot of
-# "handwaving" the operator $A$ aplied to a velocity $u$ is
+# "handwaving" the operator $A$ applied to a velocity $u$ is
 # "something" like $\rho\,u - \mu\,\nabla\cdot\nabla u$, while $B$
 # corresponds to the gradient $\nabla$ of a pressure function and
 # $B^\ast$ corresponds to the divergence of a velocity function. In
