@@ -13,7 +13,7 @@ crystal.py            lineplot.py           svg2pdf.py            cppfunctions.p
 dune-corepy.py        mcf-algorithm.py      twophaseflow.py       chemical.py
 concepts.py           dune-fempy.py         mcf_cmp_plot.py       euler.py
 elasticity.py         mcf.py
-uzawa-scipy.py        monolithicStokes.py   fieldsplitStokes.py
+uzawa-scipy.py        monolithicStokes.py   fieldsplitStokes.py quasi-stokes-schur-complement.py
 othergrids.py         gitlab-formatting.py  gmsh2dgf.py pandoc-formatting.py  vemdemo.py            chimpl.py
 discontinuousgalerkin.py
 interpolation.py      wave.py               laplace-adaptive.py   laplace-dwr.py laplace-dwr-algorithm.py
@@ -26,6 +26,7 @@ elasticity_nb.ipynb        uzawa-scipy_nb.ipynb       othergrids_nb.ipynb
 laplace-adaptive_nb.ipynb  vemdemo_nb.ipynb           chimpl_nb.ipynb
 discontinuousgalerkin_nb.ipynb gmsh2dgf_nb.ipynb
 monolithicStokes_nb.ipynb  fieldsplitStokes_nb.ipynb
+quasi-stokes-schur-complement_nb.ipynb
 laplace-dwr_nb.ipynb       laplace-dwr-algorithm_nb.ipynb
 lineplot_nb.ipynb          wave_nb.ipynb
 mcf-algorithm_nb.ipynb     parallelization_nb.ipynb   backuprestore_nb.ipynb

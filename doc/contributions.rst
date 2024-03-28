@@ -1,8 +1,8 @@
 .. _contributing:
 
-############################
-Contributing to this project
-############################
+#############################
+Contributing to this tutorial
+#############################
 
 
 Contributions are very welcomed - these can include but are not restricted to

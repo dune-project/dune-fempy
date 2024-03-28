@@ -7,4 +7,4 @@ Saddle point solver for the stationary Stokes problem
 
    monolithicStokes_nb
    fieldsplitStokes_nb
-   uzawa-scipy_nb
+   quasi-stokes-schur-complement_nb
