@@ -50,7 +50,7 @@ from ufl import TestFunction, TrialFunction, SpatialCoordinate, FacetNormal, \
                 dx, ds, div, grad, dot, inner, sqrt, exp, sin,\
                 conditional
 
-gridView = leafGridView([0, 0], [1, 1], [4, 4])
+gridView = leafGridView([0, 0], [1, 1], [12, 12])
 space = solutionSpace(gridView, order=2)
 
 x = SpatialCoordinate(space)
@@ -62,8 +62,8 @@ u_h_n = u_h.copy(name="previous")
 
 u = TrialFunction(space)
 v = TestFunction(space)
-dt = Constant(0, name="dt")    # time step
-t  = Constant(0, name="t")     # current time
+dt = Constant(0, name="dt")       # time step
+t  = Constant(0, name="time")     # current time
 
 abs_du = lambda u: sqrt(inner(grad(u), grad(u)))
 K = lambda u: 2/(1 + sqrt(1 + 4*abs_du(u)))
@@ -97,21 +97,30 @@ h1error = gridFunction(name="h1error", expr=dot(grad(u_h - exact_end), grad(u_h 
 # problem for $u^{n+1}$ given $u^n$:
 
 # %%
+import time as timer
 def evolve(scheme, u_h, u_h_n, endTime):
+    start = timer.time()
     time = 0
+    nIter,linIter = 0,0
+    steps = 0
     while time < (endTime - 1e-6):
-        t.value = time
+        scheme.model.time = time
+        # t.value = time
+        # assert t.value == time
         u_h_n.assign(u_h)
-        scheme.solve(target=u_h)
+        info = scheme.solve(target=u_h)
+        nIter += info["iterations"]
+        linIter += info["linear_iterations"]
         time += scheme.model.dt
-
+        steps += 1
+    print(f"steps={[steps,scheme.model.dt]}, runtime={timer.time()- start}, iterations={[nIter,linIter]}",flush=True)
 # %% [markdown]
 # We can simply use the `galerkinScheme` instance `scheme` in this function to produce the solution
 # at the final time. We combine this with a loop to compute the error over
 # two grids and estimate the convergence rate:
 
 # %%
-dt.value = 0.005
+dt.value = 0.05
 
 errors = 0,0
 loops = 2
@@ -132,6 +141,49 @@ for eocLoop in range(loops):
     if eocLoop < loops-1:
         gridView.hierarchicalGrid.globalRefine(1)
         dt.value /= 2
+
+# %% [markdown]
+#
+# We can also only use the internal linear solvers and write the Newton
+# method in Python - here is a very simple version of that.
+# The central new method is `linear` available on the scheme that returns a
+# linearized version of the model around a given grid function ubar.
+# Much more # details on the methods used are given in the next section.
+
+# %%
+class Scheme:
+    def __init__(self, scheme):
+        self.scheme = scheme
+        self.model = scheme.model
+        self.jacobian = scheme.linear()  # optain a linear operator for the Newton method
+
+    def solve(self, target):
+        # create a copy of target for the residual
+        res = target.copy(name="residual")
+        dh  = target.copy(name="direction")
+
+        n = 0
+        linIter = 0
+        while True:
+            self.scheme(target, res)
+            absF = res.scalarProductDofs(res)
+            if absF < 1e-6**2: # this is the default for the build-in Newton solver
+                break
+            self.scheme.jacobian(target,self.jacobian)  # assemble the linearization
+            dh.clear()                                  # zero is good initial guess for iterator solver
+            info = self.jacobian.solve(target=dh,rhs=res)
+            linIter += info["linear_iterations"]
+            target -= dh
+            n += 1
+        return {"iterations":n, "linear_iterations":linIter}
+
+scheme_cls = Scheme(scheme)
+
+u_h.interpolate(initial)                # reset u_h to initial
+evolve(scheme_cls, u_h, u_h_n, endTime)
+error = u_h - exact_end
+print("Forchheimer(Newton) size: ", gridView.size(0), "L^2, H^1 error:",'{:0.5e}, {:0.5e}'.format(
+  *[ sqrt(e) for e in integrate([error**2,inner(grad(error),grad(error))]) ]))
 
 # %% [markdown]
 # .. index::
@@ -203,27 +255,29 @@ print(type(A))
 import numpy as np
 from scipy.sparse.linalg import spsolve as solver
 class Scheme:
-  def __init__(self, scheme):
-      self.model = scheme.model
-      self.jacobian = scheme.linear()
+    def __init__(self, scheme):
+        self.model = scheme.model
+        self.jacobian = scheme.linear()
 
-  def solve(self, target):
-      # create a copy of target for the residual
-      res = target.copy(name="residual")
+    def solve(self, target):
+        # create a copy of target for the residual
+        res = target.copy(name="residual")
 
-      # extract numpy vectors from target and res
-      sol_coeff = target.as_numpy
-      res_coeff = res.as_numpy
+        # extract numpy vectors from target and res
+        sol_coeff = target.as_numpy
+        res_coeff = res.as_numpy
 
-      n = 0
-      while True:
-          scheme(target, res)
-          absF = numpy.sqrt( np.dot(res_coeff,res_coeff) )
-          if absF < 1e-10:
-              break
-          scheme.jacobian(target,self.jacobian)
-          sol_coeff -= solver(self.jacobian.as_numpy, res_coeff)
-          n += 1
+        n = 0
+        while True:
+            scheme(target, res)
+            absF = numpy.sqrt( np.dot(res_coeff,res_coeff) )
+            if absF < 1e-6:
+                break
+            scheme.jacobian(target,self.jacobian)
+            sol_coeff -= solver(self.jacobian.as_numpy, res_coeff)
+            n += 1
+        return {"iterations":n, "linear_iterations":n} # direct linear solver requires no additional iterations
+
 
 scheme_cls = Scheme(scheme)
 
@@ -246,6 +300,7 @@ class Scheme2:
         self.scheme = scheme
         self.model = scheme.model
         self.res = u_h.copy(name="residual")
+        self.n = 0
 
     # non linear function
     def f(self, x_coeff):
@@ -253,6 +308,7 @@ class Scheme2:
         # into a discrete function over the given space
         x = space.function("tmp", dofVector=x_coeff)
         scheme(x, self.res)
+        self.n += 1
         return self.res.as_numpy
 
     # class for the derivative DS of S
@@ -269,14 +325,15 @@ class Scheme2:
             scheme.jacobian(x, self.jacobian)
         # compute DS(u)^{-1}x for a given DoF vector x
         def _matvec(self, x_coeff):
-            return solver(self.jacobian.as_numpy, x_coeff, tol=1e-10, atol=1e-10)[0]
+            return solver(self.jacobian.as_numpy, x_coeff, rtol=1e-10, atol=1e-10)[0]
 
     def solve(self, target):
         sol_coeff = target.as_numpy
         # call the newton krylov solver from scipy
         sol_coeff[:] = newton_krylov(self.f, sol_coeff,
-                    verbose=0, f_tol=1e-8,
+                    f_tol=1e-6,
                     inner_M=self.Df(sol_coeff))
+        return {"iterations":self.n, "linear_iterations":-1} # not keeping track of linear iterations
 
 scheme2_cls = Scheme2(scheme)
 u_h.interpolate(initial)
@@ -320,7 +377,6 @@ model = ( inner(grad(u), grad(v)) -
 dbcs  = [ DirichletBC(space,-1,1), DirichletBC(space, 1,2) ]
 op  = galerkin([model, *dbcs], space)
 sol = space.interpolate(0, name="u_h")
-rhs = sol.copy()
 lin = op.linear()
 
 # %% [markdown]
@@ -336,15 +392,24 @@ lin = op.linear()
 # [more general boundary conditions](boundary_nb.ipynb#Accessing-the-Dirichlet-degrees-of-freedom).
 
 # %%
-op.setConstraints(rhs)
 op.setConstraints(sol)
+
+# setup the right hand side
+rhs = sol.copy()
+op(sol,rhs)
+rhs *= -1
+op.setConstraints(rhs)
+
+# a callback to show the residual reduction during the linear solver iteration
 rk = sol.copy("residual")
 def cb(xk): # a callback to print the residual norm in each step
     x_h = space.function("iterate", dofVector=xk)
     op(x_h,rk)
-    print(rk.as_numpy[:].dot(rk.as_numpy[:]), flush=True, end='\t')
+    print(rk.as_numpy[:].dot(rk.as_numpy[:]), end='\t')
+
+
 sol.as_numpy[:], _ = solver(lin.as_numpy, rhs.as_numpy, x0=sol.as_numpy,
-                            callback=cb, tol=1e-10, atol=1e-10)
+                            callback=cb, rtol=1e-10, atol=1e-10)
 sol.plot()
 
 # %% [markdown]
@@ -397,37 +462,38 @@ if petsc:
 # %%
 if petsc4py is not None and petsc:
     class Scheme3:
-      def __init__(self, scheme):
-          self.model = scheme.model
-          self.jacobian = scheme.linear()
-          self.ksp = PETSc.KSP()
-          self.ksp.create(PETSc.COMM_WORLD)
-          # use conjugate gradients method
-          self.ksp.setType("cg")
-          # and incomplete Cholesky
-          self.ksp.getPC().setType("icc")
-          self.ksp.setOperators(self.jacobian.as_petsc)
-          self.ksp.setFromOptions()
-      def solve(self, target):
-          res = target.copy(name="residual")
-          sol_coeff = target.as_petsc
-          res_coeff = res.as_petsc
-          n = 0
-          while True:
-              schemePetsc(target, res)
-              absF = numpy.sqrt( res_coeff.dot(res_coeff) )
-              if absF < 1e-10:
-                  break
-              schemePetsc.jacobian(target, self.jacobian)
-              self.ksp.solve(res_coeff, res_coeff)
-              sol_coeff -= res_coeff
-              n += 1
+        def __init__(self, scheme):
+            self.model = scheme.model
+            self.jacobian = scheme.linear()
+            self.ksp = PETSc.KSP()
+            self.ksp.create(PETSc.COMM_WORLD)
+            # use conjugate gradients method
+            self.ksp.setType("cg")
+            # and incomplete Cholesky
+            self.ksp.getPC().setType("icc")
+            self.ksp.setOperators(self.jacobian.as_petsc)
+            self.ksp.setFromOptions()
+        def solve(self, target):
+            res = target.copy(name="residual")
+            sol_coeff = target.as_petsc
+            res_coeff = res.as_petsc
+            n = 0
+            while True:
+                schemePetsc(target, res)
+                absF = numpy.sqrt( res_coeff.dot(res_coeff) )
+                if absF < 1e-6:
+                    break
+                schemePetsc.jacobian(target, self.jacobian)
+                self.ksp.solve(res_coeff, res_coeff)
+                sol_coeff -= res_coeff
+                n += 1
+            return {"iterations":n, "linear_iterations":-1} # not keeping track of linear iterations
 
     u_h.interpolate(initial)
     scheme3_cls = Scheme3(schemePetsc)
     evolve(scheme3_cls, u_h, u_h_n, endTime)
     error = u_h - exact_end
-    print("Forchheimer(petsc) size: ", gridView.size(0), "L^2, H^1 error:",'{:0.5e}, {:0.5e}'.format(
+    print("Forchheimer(petsc4py 1) size: ", gridView.size(0), "L^2, H^1 error:",'{:0.5e}, {:0.5e}'.format(
       *[ sqrt(e) for e in integrate([error**2,inner(grad(error),grad(error))]) ]))
 
 # %% [markdown]
@@ -445,6 +511,7 @@ if petsc4py is not None and petsc is not None:
             self.snes.setUseMF(False)
             self.snes.setJacobian(self.Df, self.jacobian.as_petsc, self.jacobian.as_petsc)
             self.snes.getKSP().setType("cg")
+            self.snes.setTolerances(atol=1e-6)
             self.snes.setFromOptions()
 
         def f(self, snes, x, f):
@@ -462,13 +529,17 @@ if petsc4py is not None and petsc is not None:
             sol_coeff = target.as_petsc
             self.res.clear()
             self.snes.solve(self.res.as_petsc, sol_coeff)
+            return {"iterations":self.snes.getIterationNumber(),
+                    "linear_iterations":self.snes.getLinearSolveIterations()}
 
     u_h.interpolate(initial)
     scheme4_cls = Scheme4(schemePetsc)
     evolve(scheme4_cls, u_h, u_h_n, endTime)
     error = u_h - exact_end
-    print("Forchheimer(petsc4py) size: ", gridView.size(0), "L^2, H^1 error:",'{:0.5e}, {:0.5e}'.format(
+    print("Forchheimer(petsc4py 2) size: ", gridView.size(0), "L^2, H^1 error:",'{:0.5e}, {:0.5e}'.format(
       *[ sqrt(e) for e in integrate([error**2,inner(grad(error),grad(error))]) ]))
+
+print(flush=True)
 
 # %% [markdown]
 # .. index::
