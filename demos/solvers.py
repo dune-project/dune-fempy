@@ -190,7 +190,7 @@ print("Forchheimer(Newton 1) size: ", gridView.size(0), "L^2, H^1 error:",'{:0.5
 # A second version using a linearization of the non-linear problem
 # including an affine shift, i.e., the first two terms in the Taylor
 # expansion around a given $\bar{u}$:
-# $$ L[u] = DS[\bar{u}]u + S[\bar{u}] $$
+# $$ L[u] = DS[\bar{u}](u-\bar{u}) + S[\bar{u}] $$
 
 # %%
 from dune.fem.scheme import linearized
@@ -198,7 +198,10 @@ class Scheme:
     def __init__(self, scheme):
         self.scheme = scheme
         self.model = scheme.model
-        self.linear = linearized(scheme)
+        self.linear = linearized(scheme, parameters={
+                      "fem.solver.verbose":True,
+                      "fem.solver.method":"cg",
+                      })
 
     def solve(self, target):
         n = 0
@@ -212,8 +215,8 @@ class Scheme:
             #   = u^n - DS[u^n])^{-1}S[u^n]
             #   = u^{n+1}
             self.linear.setup(target)
-            info = self.linear.solve(target=target)
-            linIter += info["linear_iterations"]
+            # Does not converge: info = self.linear.solve(target=target)
+            # linIter += info["linear_iterations"]
         return {"iterations":n, "linear_iterations":linIter}
 
 scheme_cls = Scheme(scheme)
