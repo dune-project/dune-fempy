@@ -155,7 +155,7 @@ class Scheme:
     def __init__(self, scheme):
         self.scheme = scheme
         self.model = scheme.model
-        self.jacobian = scheme.linear()  # optain a linear operator for the Newton method
+        self.jacobian = scheme.linear()  # obtain a linear operator for the Newton method
 
     def solve(self, target):
         # create a copy of target for the residual
@@ -167,7 +167,7 @@ class Scheme:
         while True:
             self.scheme(target, res)
             absF = res.scalarProductDofs(res)
-            if absF < 1e-6**2: # this is the default for the build-in Newton solver
+            if absF < 1e-6**2: # this is the default for the built-in Newton solver
                 break
             self.scheme.jacobian(target,self.jacobian)  # assemble the linearization
             dh.clear()                                  # zero is good initial guess for iterator solver
@@ -182,8 +182,52 @@ scheme_cls = Scheme(scheme)
 u_h.interpolate(initial)                # reset u_h to initial
 evolve(scheme_cls, u_h, u_h_n, endTime)
 error = u_h - exact_end
-print("Forchheimer(Newton) size: ", gridView.size(0), "L^2, H^1 error:",'{:0.5e}, {:0.5e}'.format(
+print("Forchheimer(Newton 1) size: ", gridView.size(0), "L^2, H^1 error:",'{:0.5e}, {:0.5e}'.format(
   *[ sqrt(e) for e in integrate([error**2,inner(grad(error),grad(error))]) ]))
+
+# %% [markdown]
+# A second version using a linearization of the non-linear problem
+# including an affine shift, i.e., the first two terms in the Taylor
+# expansion around a given $\bar{u}$:
+# $$ L[u] = DS[\bar{u}]u + S[\bar{u}] $$
+
+# %%
+from dune.fem.scheme import linearized
+class Scheme:
+    def __init__(self, scheme):
+        self.scheme = scheme
+        self.model = scheme.model
+        self.linear = linearized(scheme)
+
+    def solve(self, target):
+        dh  = target.copy(name="direction")
+
+        n = 0
+        linIter = 0
+        # we are not computing the residual directly so need a different
+        # stopping criteria, i.e., size of the step dh
+        for n in range(4):
+            # setup L[d] = DS[u^n]d + S[u^n]
+            # Then L[d] = 0 leads to
+            # d = -(DS[u^n])^{-1}S[u^n]
+            self.linear.setup(target)
+            dh.clear()
+            info = self.linear.solve(target=dh)
+            linIter += info["linear_iterations"]
+            target += dh
+            absD = dh.scalarProductDofs(dh)
+            print(n,absD)
+        return {"iterations":n, "linear_iterations":linIter}
+
+scheme_cls = Scheme(scheme)
+
+u_h.interpolate(initial)                # reset u_h to initial
+evolve(scheme_cls, u_h, u_h_n, endTime)
+error = u_h - exact_end
+print("Forchheimer(Newton 2) size: ", gridView.size(0), "L^2, H^1 error:",'{:0.5e}, {:0.5e}'.format(
+  *[ sqrt(e) for e in integrate([error**2,inner(grad(error),grad(error))]) ]))
+
+assert False
 
 # %% [markdown]
 # .. index::
