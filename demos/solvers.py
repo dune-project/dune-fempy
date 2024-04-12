@@ -144,6 +144,7 @@ for eocLoop in range(loops):
 
 # %% [markdown]
 #
+# ## Python sided Newton solver
 # We can also only use the internal linear solvers and write the Newton
 # method in Python - here is a very simple version of that.
 # The central new method is `linear` available on the scheme that returns a
@@ -200,23 +201,19 @@ class Scheme:
         self.linear = linearized(scheme)
 
     def solve(self, target):
-        dh  = target.copy(name="direction")
-
         n = 0
         linIter = 0
         # we are not computing the residual directly so need a different
         # stopping criteria, i.e., size of the step dh
         for n in range(4):
-            # setup L[d] = DS[u^n]d + S[u^n]
-            # Then L[d] = 0 leads to
-            # d = -(DS[u^n])^{-1}S[u^n]
+            # setup L[u] = DS[u^n](u-u^n) + S[u^n]
+            # Then L[u] = 0 leads to
+            # u = (DS[u^n])^{-1} (DS[u^n]u^n-S[u^n])
+            #   = u^n - DS[u^n])^{-1}S[u^n]
+            #   = u^{n+1}
             self.linear.setup(target)
-            dh.clear()
-            info = self.linear.solve(target=dh)
+            info = self.linear.solve(target=target)
             linIter += info["linear_iterations"]
-            target += dh
-            absD = dh.scalarProductDofs(dh)
-            print(n,absD)
         return {"iterations":n, "linear_iterations":linIter}
 
 scheme_cls = Scheme(scheme)
@@ -226,8 +223,6 @@ evolve(scheme_cls, u_h, u_h_n, endTime)
 error = u_h - exact_end
 print("Forchheimer(Newton 2) size: ", gridView.size(0), "L^2, H^1 error:",'{:0.5e}, {:0.5e}'.format(
   *[ sqrt(e) for e in integrate([error**2,inner(grad(error),grad(error))]) ]))
-
-assert False
 
 # %% [markdown]
 # .. index::
@@ -589,7 +584,7 @@ print(flush=True)
 # .. index::
 #    triple: I/O; Logging; Parameters
 
-# ## Accessing and reusing values of parameters
+# ## Parameters for fine-tuning the internal solvers
 # Sometimes it is necessary to extract which parameters were read and which
 # values were used, e.g., for debugging purposes like finding spelling
 # in the parameters provided to a scheme.
@@ -672,8 +667,6 @@ info = scheme2.solve(target=u_h)
 pprint(scheme2.parameterLog())
 
 # %% [markdown]
-# ### Parameter hints
-#
 # .. tip:: To get information about available values for some parameters
 # (those with string arguments) a possible approach is to provide a non valid
 # string, e.g., `"help"`.
