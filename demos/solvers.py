@@ -74,7 +74,8 @@ a = ( dot((u - u_h_n)/dt, v) \
 f = lambda s: -2*exp(-2*s)*(initial - 1) - div( K(exact(s))*grad(exact(s)) )
 g = lambda s: K(exact(s))*grad(exact(s))
 n = FacetNormal(space)
-b = 0.5*(f(t)+f(t+dt))*v*dx + 0.5*dot(g(t)+g(t+dt),n)*v*ds
+b = 0.5*(f(t)+f(t+dt))*v*dx
+b += 0.5*dot(g(t)+g(t+dt),n)*v*ds
 
 # %% [markdown]
 # When creating a scheme, it is possible to set the linear solver as well as
@@ -83,8 +84,10 @@ b = 0.5*(f(t)+f(t+dt))*v*dx + 0.5*dot(g(t)+g(t+dt),n)*v*ds
 # methods at the end of this section.
 
 # %%
-scheme = solutionScheme(a == b, solver='cg')
+# scheme = solutionScheme(a == b, solver='cg')
 # scheme = solutionScheme(a == b, solver=("suitesparse","umfpack"))
+from dune.ufl import DirichletBC
+scheme = solutionScheme([a == b, DirichletBC(space,exact(t+0.5*dt))], solver='cg')
 
 endTime    = 0.25
 exact_end  = exact(endTime)
@@ -168,6 +171,10 @@ class Scheme:
         n = 0
         linIter = 0
         while True:
+            try:
+                self.scheme.setConstraints(target)
+            except:
+                pass
             self.scheme(target, res)
             absF = res.scalarProductDofs(res)
             if absF < 1e-6**2: # this is the default for the built-in Newton solver
