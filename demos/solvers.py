@@ -522,23 +522,16 @@ if petsc:
 if petsc4py is not None and petsc:
     class Scheme3:
         def __init__(self, scheme):
-            print("A",flush=True)
             self.model = scheme.model
             self.jacobian = scheme.linear()
             self.ksp = PETSc.KSP()
             self.ksp.create(PETSc.COMM_WORLD)
             # use conjugate gradients method
             self.ksp.setType("cg")
-            print("M",flush=True)
             # and incomplete Cholesky
             self.ksp.getPC().setType("icc")
-            print("N")
-            print(self.jacobian.as_petsc,flush=True)
-            print("O")
             self.ksp.setOperators(self.jacobian.as_petsc)
-            print("S")
             self.ksp.setFromOptions()
-            print("Z",flush=True)
         def solve(self, target):
             res = target.copy(name="residual")
             sol_coeff = target.as_petsc
@@ -555,12 +548,9 @@ if petsc4py is not None and petsc:
                 n += 1
             return {"iterations":n, "linear_iterations":-1} # not keeping track of linear iterations
 
-    from dune.fem.operator import galerkin as solutionOp
-    schemePetsc = solutionOp(a-b, domainSpace=spacePetsc,rangeSpace=spacePetsc)
+    schemePetsc = solutionScheme(a-b==0, domainSpace=spacePetsc,rangeSpace=spacePetsc)
     u_h.interpolate(initial)
-    print("setup scheme",flush=True)
     scheme3_cls = Scheme3(schemePetsc)
-    print("evolve petsc",flush=True)
     evolve(scheme3_cls, u_h, u_h_n, endTime)
     error = u_h - exact_end
     print("Forchheimer(petsc4py 1) size: ", gridView.size(0), "L^2, H^1 error:",'{:0.5e}, {:0.5e}'.format(
@@ -572,9 +562,9 @@ if petsc4py is not None and petsc:
 if petsc4py is not None and petsc is not None:
     class Scheme4:
         def __init__(self, scheme):
+            self.scheme = scheme
             self.model = scheme.model
             self.res = scheme.rangeSpace.interpolate([0],name="residual")
-            self.scheme = scheme
             self.jacobian = scheme.linear()
             self.snes = PETSc.SNES().create()
             self.snes.setFunction(self.f, self.res.as_petsc.duplicate())
@@ -586,7 +576,7 @@ if petsc4py is not None and petsc is not None:
 
         def f(self, snes, x, f):
             # setup discrete function using the provide petsc vectors
-            inDF = self.scheme.domainSace.function("tmp",dofVector=x)
+            inDF = self.scheme.domainSpace.function("tmp",dofVector=x)
             outDF = self.scheme.rangeSpace.function("tmp",dofVector=f)
             self.scheme(inDF,outDF)
 
