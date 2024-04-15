@@ -62,7 +62,7 @@ u_h_n = u_h.copy(name="previous")
 
 u = TrialFunction(space)
 v = TestFunction(space)
-dt = Constant(0, name="dt")       # time step
+dt = Constant(1, name="dt")       # time step
 t  = Constant(0, name="time")     # current time
 
 abs_du = lambda u: sqrt(inner(grad(u), grad(u)))
@@ -84,6 +84,7 @@ b = 0.5*(f(t)+f(t+dt))*v*dx + 0.5*dot(g(t)+g(t+dt),n)*v*ds
 
 # %%
 scheme = solutionScheme(a == b, solver='cg')
+# scheme = solutionScheme(a == b, solver=("suitesparse","umfpack"))
 
 endTime    = 0.25
 exact_end  = exact(endTime)
@@ -105,7 +106,7 @@ def evolve(scheme, u_h, u_h_n, endTime):
     steps = 0
     while time < (endTime - 1e-6):
         scheme.model.time = time
-        # t.value = time
+        t.value = time
         # assert t.value == time
         u_h_n.assign(u_h)
         info = scheme.solve(target=u_h)
@@ -125,6 +126,7 @@ dt.value = 0.05
 errors = 0,0
 loops = 2
 for eocLoop in range(loops):
+    t.value = 0
     u_h.interpolate(initial)
     evolve(scheme, u_h, u_h_n, endTime)
     errors_old = errors
@@ -134,8 +136,8 @@ for eocLoop in range(loops):
     else:
         eocs = [ round(numpy.log(e/e_old)/numpy.log(0.5),2) \
                  for e,e_old in zip(errors,errors_old) ]
-    print('Forchheimer: step:', eocLoop, ', size:', gridView.size(0))
-    print('\t | u_h - u | =', '{:0.5e}'.format(errors[0]), ', eoc =', eocs[0])
+    print('Forchheimer: step:', eocLoop, ', size:', gridView.size(0),flush=True)
+    print('\t | u_h - u | =', '{:0.5e}'.format(errors[0]), ', eoc =', eocs[0], flush=True)
     print('\t | grad(uh - u) | =', '{:0.5e}'.format(errors[1]), ', eoc =', eocs[1])
     u_h.plot()
     if eocLoop < loops-1:
@@ -153,10 +155,10 @@ for eocLoop in range(loops):
 
 # %%
 class Scheme:
-    def __init__(self, scheme):
+    def __init__(self, scheme, u0):
         self.scheme = scheme
         self.model = scheme.model
-        self.jacobian = scheme.linear()  # obtain a linear operator for the Newton method
+        self.jacobian = scheme.linear(ubar=u0)  # obtain a linear operator for the Newton method
 
     def solve(self, target):
         # create a copy of target for the residual
@@ -178,13 +180,14 @@ class Scheme:
             n += 1
         return {"iterations":n, "linear_iterations":linIter}
 
-scheme_cls = Scheme(scheme)
-
+t.value = 0
 u_h.interpolate(initial)                # reset u_h to initial
+scheme_cls = Scheme(scheme,u0=u_h)
+
 evolve(scheme_cls, u_h, u_h_n, endTime)
 error = u_h - exact_end
 print("Forchheimer(Newton 1) size: ", gridView.size(0), "L^2, H^1 error:",'{:0.5e}, {:0.5e}'.format(
-  *[ sqrt(e) for e in integrate([error**2,inner(grad(error),grad(error))]) ]))
+  *[ sqrt(e) for e in integrate([error**2,inner(grad(error),grad(error))]) ]),flush=True)
 
 # %% [markdown]
 # A second version using a linearization of the non-linear problem
@@ -195,37 +198,51 @@ print("Forchheimer(Newton 1) size: ", gridView.size(0), "L^2, H^1 error:",'{:0.5
 # %%
 from dune.fem.scheme import linearized
 class Scheme:
-    def __init__(self, scheme):
+    def __init__(self, scheme, u0):
         self.scheme = scheme
         self.model = scheme.model
-        self.linear = linearized(scheme, parameters={
-                      "fem.solver.verbose":True,
-                      "fem.solver.method":"cg",
+        self.linear = linearized(scheme, ubar=u0,
+                      parameters={
+                        "verbose":False,
+                        "method":"gmres",
+                        "gmres.restart":100,
                       })
+        self.linear.setup(u0)
 
     def solve(self, target):
+        prev = target.copy()
         n = 0
         linIter = 0
         # we are not computing the residual directly so need a different
         # stopping criteria, i.e., size of the step dh
-        for n in range(4):
+        while True:
             # setup L[u] = DS[u^n](u-u^n) + S[u^n]
             # Then L[u] = 0 leads to
             # u = (DS[u^n])^{-1} (DS[u^n]u^n-S[u^n])
             #   = u^n - DS[u^n])^{-1}S[u^n]
             #   = u^{n+1}
             self.linear.setup(target)
-            # Does not converge: info = self.linear.solve(target=target)
-            # linIter += info["linear_iterations"]
+            info = self.linear.solve(target=target)
+            linIter += info["linear_iterations"]
+            n += 1
+
+            # subtract the new iterate from the previous one
+            prev.sub( target )
+            absDiff = prev.scalarProductDofs(prev)
+            if absDiff < 1e-6**2: # this is the default for the built-in Newton solver
+                break
+            prev.assign(target)
         return {"iterations":n, "linear_iterations":linIter}
 
-scheme_cls = Scheme(scheme)
-
+t.value = 0
 u_h.interpolate(initial)                # reset u_h to initial
+u_h_n.assign(u_h)
+scheme_cls = Scheme(scheme,u_h)
+
 evolve(scheme_cls, u_h, u_h_n, endTime)
 error = u_h - exact_end
 print("Forchheimer(Newton 2) size: ", gridView.size(0), "L^2, H^1 error:",'{:0.5e}, {:0.5e}'.format(
-  *[ sqrt(e) for e in integrate([error**2,inner(grad(error),grad(error))]) ]))
+  *[ sqrt(e) for e in integrate([error**2,inner(grad(error),grad(error))]) ]),flush=True)
 
 # %% [markdown]
 # .. index::
@@ -505,16 +522,23 @@ if petsc:
 if petsc4py is not None and petsc:
     class Scheme3:
         def __init__(self, scheme):
+            print("A",flush=True)
             self.model = scheme.model
             self.jacobian = scheme.linear()
             self.ksp = PETSc.KSP()
             self.ksp.create(PETSc.COMM_WORLD)
             # use conjugate gradients method
             self.ksp.setType("cg")
+            print("M",flush=True)
             # and incomplete Cholesky
             self.ksp.getPC().setType("icc")
+            print("N")
+            print(self.jacobian.as_petsc,flush=True)
+            print("O")
             self.ksp.setOperators(self.jacobian.as_petsc)
+            print("S")
             self.ksp.setFromOptions()
+            print("Z",flush=True)
         def solve(self, target):
             res = target.copy(name="residual")
             sol_coeff = target.as_petsc
@@ -531,8 +555,12 @@ if petsc4py is not None and petsc:
                 n += 1
             return {"iterations":n, "linear_iterations":-1} # not keeping track of linear iterations
 
+    from dune.fem.operator import galerkin as solutionOp
+    schemePetsc = solutionOp(a-b, domainSpace=spacePetsc,rangeSpace=spacePetsc)
     u_h.interpolate(initial)
+    print("setup scheme",flush=True)
     scheme3_cls = Scheme3(schemePetsc)
+    print("evolve petsc",flush=True)
     evolve(scheme3_cls, u_h, u_h_n, endTime)
     error = u_h - exact_end
     print("Forchheimer(petsc4py 1) size: ", gridView.size(0), "L^2, H^1 error:",'{:0.5e}, {:0.5e}'.format(
@@ -545,7 +573,7 @@ if petsc4py is not None and petsc is not None:
     class Scheme4:
         def __init__(self, scheme):
             self.model = scheme.model
-            self.res = scheme.space.interpolate([0],name="residual")
+            self.res = scheme.rangeSpace.interpolate([0],name="residual")
             self.scheme = scheme
             self.jacobian = scheme.linear()
             self.snes = PETSc.SNES().create()
@@ -558,12 +586,12 @@ if petsc4py is not None and petsc is not None:
 
         def f(self, snes, x, f):
             # setup discrete function using the provide petsc vectors
-            inDF = self.scheme.space.function("tmp",dofVector=x)
-            outDF = self.scheme.space.function("tmp",dofVector=f)
+            inDF = self.scheme.domainSace.function("tmp",dofVector=x)
+            outDF = self.scheme.rangeSpace.function("tmp",dofVector=f)
             self.scheme(inDF,outDF)
 
         def Df(self, snes, x, m, b):
-            inDF = self.scheme.space.function("tmp",dofVector=x)
+            inDF = self.scheme.domainSpace.function("tmp",dofVector=x)
             self.scheme.jacobian(inDF, self.jacobian)
             return PETSc.Mat.Structure.SAME_NONZERO_PATTERN
 
@@ -621,7 +649,7 @@ scheme = galerkin( a==l, solver="cg", parameters=
                    {"newton.linear.tolerance": 1e-12,
                     "newton.linear.verbose": True,
                     "newton.linear.preconditioning.method": "amg-ilu",
-                    "fem.solver.newton.linear.errormeasure": "relative",
+                    "newton.linear.errormeasure": "relative",
                     "logging": "precon-amg"
                    } )
 info = scheme.solve(target=u_h)
@@ -679,7 +707,7 @@ scheme = galerkin( a==l, solver="cg", parameters=
                    {"newton.linear.tolerance": 1e-12,
                     "newton.linear.verbose": True,
                     "newton.linear.preconditioning.method": "help",
-                    "fem.solver.newton.linear.errormeasure": "relative",
+                    "newton.linear.errormeasure": "relative",
                     "logging": "precon-amg"
                    } )
 try:
