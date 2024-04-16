@@ -1,9 +1,8 @@
 .. _contributing:
 
-############################
-Contributing to this project
-############################
-
+#############################
+Contributing to this tutorial
+#############################
 
 Contributions are very welcomed - these can include but are not restricted to
 
@@ -11,7 +10,12 @@ Contributions are very welcomed - these can include but are not restricted to
   (open an MR in https://gitlab.dune-project.org/dune-fem/dune-fempy
   or send us an email)
 
-* providing an improvement:
+* showcasing what you are doing with the Python bindings for `dune`:
+  we would like to showcase what user have used this package for,
+  by adding sections to the :ref:`userprojects` chapter as described in the
+  next section.
+
+* providing an improvement or a small example:
 
   To make changes or add something to one of the existing scripts, please
   note that the notebooks are generated from the Python scripts using the
@@ -27,13 +31,47 @@ Contributions are very welcomed - these can include but are not restricted to
   Once you are finished open a MR or send us the modified script - any help
   will certainly be appreciated!
 
-* showcasing what you are doing with this project:
-  we would like to showcase what user have used this package for,
-  by adding sections to the :ref:`userprojects` chapter:
+  If you want to build the full tutorial yourself then you need to build
+  this dune module using `dunecontrol` and then run `make doc` in the cmake
+  build directory. The tutorial can then be viewed by loading
+  `doc/html/index.html` into a web browser.
+  Note that the notebooks used for the html tutorial are part of the
+  repository so that the Python bindings are not needed to run `make doc`.
+  Some Python packages are needed in addition to `sphinx`:
+  `nbsphinx, nbconvert, ipython, jupytext,  sphinx_rtd_theme`.
 
-#################################
-How to showcase your own project
-#################################
+  Rebuilding the notebook is done in the `doc` subfolder using standard
+  `make`, e.g., after a change to `concepts.py` run
+  ```
+  cd doc
+  touch concepts.py
+  make concepts_nb.ipynb
+  cd ../build-cmake
+  make doc
+  ```
+  All packages needed to rebuild the full tutorial (which takes quite some
+  time) are listed in the file `reqCI.txt` in the main folder and can be
+  installed using
+  ```
+  pip install -r reqCI.txt
+  ```
+
+  Adding a new notebook involves the following steps
+
+  * adding the script with the markdown/python code into the `demos` folder
+  * adding a link to the script in the `doc` folder
+  * adding the `script_nb.ipynb` file to `doc/Makefile` and both the script
+    and the notebook to `CMakeLists.txt`.
+  * adding the notebook to one of the `rst` files, e.g., `doc/furtherexamples.rst`
+  * running `make script_nb.ipynb` in the `doc` folder (not in the build directory).
+  * running `make doc` in the cmake build directory
+
+The script in `demos`, the link to that in `doc` and the notebook
+generated in `doc` by running `make script_nb.ipynb` should be added to the repository. 
+
+#############################
+How to showcase your own work
+#############################
 
 To provide an example of what you have been doing with this package,
 send us a file *projectname_descr.rst* with a short
