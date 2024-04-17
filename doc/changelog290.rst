@@ -197,4 +197,4 @@ the global indices of the dofs attached to a given element.
 
 Logging of parameter values
 ---------------------------
-:ref:`See section</solvers_nb.ipynb#Available-solvers-and-parameters>`.
+:ref:`See section</solvers-internal_nb.ipynb#Available-solvers-and-parameters>`.

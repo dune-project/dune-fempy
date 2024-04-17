@@ -326,7 +326,7 @@ print("convert to a numpy array:", np.array( space.jacobianBasis(element, localP
 # .. note:: A special type of grid function is a **discrete function** living in a
 # discrete (finite dimensional) space. The main property of a discrete
 # function is that it contains a **dof vector**.
-# [In a later section](solvers_nb.ipynb)
+# [In a later section](solvers-external_nb.ipynb)
 # we will see how to extract the underlying dof vector in the form of a `numpy` or a `petsc` vector.
 
 #

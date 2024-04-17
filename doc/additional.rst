@@ -15,7 +15,8 @@ Example                                           Notebooks                     
 Introduction                                      :download:`notebook <concepts_nb.ipynb>`              :download:`script <concepts.py>`
 Time Dependent Problem                            :download:`notebook <dune-fempy_nb.ipynb>`            :download:`script <dune-fempy.py>`
 Adding boundary data                              :download:`notebook <boundary_nb.ipynb>`              :download:`script <boundary.py>`
-Using different linear solver packages            :download:`notebook <solvers_nb.ipynb>`               :download:`script <solvers.py>`
+Tweaking solvers                                  :download:`notebook <solvers-internal_nb.ipynb>`      :download:`script <solvers-internal.py>`
+Using different linear solver packages            :download:`notebook <solvers-external_nb.ipynb>`      :download:`script <solvers-external.py>`
 One and three dimensional grids                   :download:`notebook <othergrids_nb.ipynb>`            :download:`script <othergrids.py>`
 Parallelization                                   :download:`notebook <parallelization_nb.ipynb>`       :download:`script <parallelization.py>`
 Checkpointing                                     :download:`notebook <backuprestore_nb.ipynb>`         :download:`script <backuprestore.py>`

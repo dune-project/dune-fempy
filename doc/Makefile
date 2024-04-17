@@ -5,7 +5,8 @@ FIGURES = figures/3dexample.png figures/interpolation_discrete.png figures/inter
 NBS = spiral_nb.ipynb elasticity_nb.ipynb wave_nb.ipynb \
       uzawa-scipy_nb.ipynb monolithicStokes_nb.ipynb fieldsplitStokes_nb.ipynb\
       laplace-adaptive_nb.ipynb crystal_nb.ipynb mmesh_nb.ipynb cppfunctions_nb.ipynb evalues_laplace_nb.ipynb \
-			mcf_nb.ipynb boundary_nb.ipynb solvers_nb.ipynb \
+			mcf_nb.ipynb boundary_nb.ipynb \
+      solvers-internal_nb.ipynb solvers-external_nb.ipynb \
 			mcf-algorithm_nb.ipynb lineplot_nb.ipynb laplace-dwr_nb.ipynb \
       laplace-dwr-algorithm_nb.ipynb othergrids_nb.ipynb \
 			concepts_nb.ipynb dune-fempy_nb.ipynb backuprestore_nb.ipynb parallelization_nb.ipynb \

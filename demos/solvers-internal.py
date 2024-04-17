@@ -1,21 +1,18 @@
 # %% [markdown]
 #
-# # Alternative Linear Solvers (Scipy and Petsc)
-# Here we look at different ways of solving PDEs using external
-# packages and python functionality.
-# Different linear algebra backends can be accessed by changing setting the
-# `storage` parameter during construction of the discrete space. All
-# discrete functions and operators/schemes based on this space will then
-# use this backend. Available backends are `numpy,istl,petsc`. The default is
-# `numpy` which uses simple data structures and linear solvers implemented in
-# the `dune-fem` package. The simplicity of the data structure makes it
-# possible to use the buffer protocol to seamlessly move between C++ and
+# # Tweaking the (non-) linear solvers
+# Here we look at how to tweak the internal linear and nonlinear solvers.
+# Other linear algebra backends (e.g. `petsc`) can be accessed by changing setting the
+# `storage` parameter during construction of the discrete space and this
+# will be discussed in the next section [cite]. The simplicity of the default backend (`numpy`)
 # Numpy/Scipy data structures on the python side. A degrees of freedom
 # vector (dof vector) can be retrieved from a discrete function over the
 # `numpy` space by using the `as_numpy` method. Similar methods are available
 # for the other storages, i.e., `as_istl,as_petsc`. The same methods are
 # also available to retrieve the underlying matrix structures of linear
-# operators.
+# operators. Here we will discuss the `as_numpy` attribute and how to use
+# this to implement part of the algorithm for solving PDEs on the Python
+# side.
 #
 # We will mostly revisit the nonlinear time dependent problem studied at the end of the
 # [concepts section](concepts_nb.ipynb) which after discretizing in time had the variational formulation
@@ -41,8 +38,8 @@ import numpy, sys, io
 import matplotlib.pyplot as plt
 
 from dune.grid import structuredGrid as leafGridView
-from dune.fem.space import lagrange as solutionSpace
-from dune.fem.scheme import galerkin as solutionScheme
+from dune.fem.space import lagrange
+from dune.fem.scheme import galerkin
 from dune.fem.function import gridFunction
 from dune.fem import integrate
 from dune.ufl import Constant
@@ -51,7 +48,7 @@ from ufl import TestFunction, TrialFunction, SpatialCoordinate, FacetNormal, \
                 conditional
 
 gridView = leafGridView([0, 0], [1, 1], [12, 12])
-space = solutionSpace(gridView, order=2)
+space = lagrange(gridView, order=2)
 
 x = SpatialCoordinate(space)
 initial = 1/2*(x[0]**2+x[1]**2) - 1/3*(x[0]**3 - x[1]**3) + 1
@@ -73,9 +70,10 @@ a = ( dot((u - u_h_n)/dt, v) \
 
 f = lambda s: -2*exp(-2*s)*(initial - 1) - div( K(exact(s))*grad(exact(s)) )
 g = lambda s: K(exact(s))*grad(exact(s))
+bf = 0.5*(f(t)+f(t+dt))*v*dx
+
 n = FacetNormal(space)
-b = 0.5*(f(t)+f(t+dt))*v*dx
-b += 0.5*dot(g(t)+g(t+dt),n)*v*ds
+bg = 0.5*dot(g(t)+g(t+dt),n)*v*ds
 
 # %% [markdown]
 # When creating a scheme, it is possible to set the linear solver as well as
@@ -84,10 +82,7 @@ b += 0.5*dot(g(t)+g(t+dt),n)*v*ds
 # methods at the end of this section.
 
 # %%
-# scheme = solutionScheme(a == b, solver='cg')
-# scheme = solutionScheme(a == b, solver=("suitesparse","umfpack"))
-from dune.ufl import DirichletBC
-scheme = solutionScheme([a == b, DirichletBC(space,exact(t+0.5*dt))], solver='cg')
+scheme = galerkin(a == bf+bg, solver='cg')
 
 endTime    = 0.25
 exact_end  = exact(endTime)
@@ -118,9 +113,12 @@ def evolve(scheme, u_h, u_h_n, endTime):
         time += scheme.model.dt
         steps += 1
     print(f"steps={[steps,scheme.model.dt]}, runtime={timer.time()- start}, iterations={[nIter,linIter]}",flush=True)
+
 # %% [markdown]
-# We can simply use the `galerkinScheme` instance `scheme` in this function to produce the solution
-# at the final time. We combine this with a loop to compute the error over
+# We can simply use the `galerkin' scheme instance in this function to produce the solution
+# at the final time this is comparable to the code shown previously in
+# [concepts section](concepts_nb.ipynb).
+# We combine this with a loop to compute the error over
 # two grids and estimate the convergence rate:
 
 # %%
@@ -153,8 +151,8 @@ for eocLoop in range(loops):
 # We can also only use the internal linear solvers and write the Newton
 # method in Python - here is a very simple version of that.
 # The central new method is `linear` available on the scheme that returns a
-# linearized version of the model around a given grid function ubar.
-# Much more # details on the methods used are given in the next section.
+# linearized version of the model around a given grid function `ubar`.
+# Much more details on the methods used are given in the next section.
 
 # %%
 class Scheme:
@@ -171,10 +169,6 @@ class Scheme:
         n = 0
         linIter = 0
         while True:
-            try:
-                self.scheme.setConstraints(target)
-            except:
-                pass
             self.scheme(target, res)
             absF = res.scalarProductDofs(res)
             if absF < 1e-6**2: # this is the default for the built-in Newton solver
@@ -208,11 +202,12 @@ class Scheme:
     def __init__(self, scheme, u0):
         self.scheme = scheme
         self.model = scheme.model
+        # let's use a `gmres` solver for demonstration purposes
         self.linear = linearized(scheme, ubar=u0,
                       parameters={
                         "verbose":False,
                         "method":"gmres",
-                        "gmres.restart":100,
+                        "gmres.restart":50,
                       })
         self.linear.setup(u0)
 
@@ -253,195 +248,27 @@ print("Forchheimer(Newton 2) size: ", gridView.size(0), "L^2, H^1 error:",'{:0.5
 
 # %% [markdown]
 # .. index::
-#    pair: Solvers; Scipy
-#
-# ## Using Scipy
-# We implement a simple Newton Krylov solver using a linear solver from
-# Scipy. We can use the `as_numpy` method to access the degrees of freedom as
-# Numpy vector based on the `python buffer protocol`. So no data is copied
-# and changes to the dofs made on the Python side are automatically carried
-# over to the C++ side.
-
-# %% [markdown]
-# The most important step is accessing the data structures setup on the C++
-# side in Python. In this case we would like to use the underlying dof vector from
-# a discrete function as numpy arrays and system matrices assembled by the
-# schemes and operators as scipy sparse matrices.
-# In the [introduction](dune-fempy_nb.ipynb) we already discussed the `as_numpy` method.
-# So
-
-# %%
-vecu_h = u_h.as_numpy
-
-# %% [markdown]
-# provides access to the underlying dof vector without copying. So changes
-# to the numpy array `vecu_h` carries over to the discrete function `u_h`.
-# Just remember to make changes using `vecu_h[:]` to change the actual
-# memory buffer.
-#
-# A `scheme` describing an operator `L`
-# provides a method `linear` which returns an object that
-# stores a sparse matrix structure. The object describes the operator
-# linearized around zero.
-# To linearize around a different value use the `jacobian` method on the `scheme` that linearized
-# the the operator `L` around a given grid function `ubar` and fills the
-# linear operator structure passed in as second argument. It is also
-# possible to pass ``assemble=False`` to the ``linear`` method to avoid an
-# the linearization around zero to reduce computational cost:
-
-# %%
-linOp = scheme.linear()                  # linearized around 0
-linOp = scheme.linear(assemble=False)    # empty (non valid) linear operator
-scheme.jacobian(space.zero, linOp)       # linearized around zero
-
-# %% [markdown]
-# Here we linearize around zero. But that argument could be any grid
-# function. A second version of this method will return an addition
-# discrete function `rhs` which equals `-L[ubar]` such that `DL[ubar](u-ubar) - rhs` are the first
-# terms in the Taylor expansion of the operator `L`:
-
-# %%
-rhs = u_h.copy()
-scheme.jacobian(u_h, linOp, rhs)
-
-# %% [markdown]
-# One can now easily access the underlying sparse matrix by again using
-# `as_numpy` (and again the underlying data buffers are not copied):
-
-# %%
-A = linOp.as_numpy
-print(type(A))
-# plt.spy(A, precision=1e-8, markersize=1)
-
-# %% [markdown]
-# Now we have all the ingredients to write a simple Newton solver to solve
-# our non-linear time dependent PDE.
-
-# %%
-import numpy as np
-from scipy.sparse.linalg import spsolve as solver
-class Scheme:
-    def __init__(self, scheme):
-        self.model = scheme.model
-        self.jacobian = scheme.linear()
-
-    def solve(self, target):
-        # create a copy of target for the residual
-        res = target.copy(name="residual")
-
-        # extract numpy vectors from target and res
-        sol_coeff = target.as_numpy
-        res_coeff = res.as_numpy
-
-        n = 0
-        while True:
-            scheme(target, res)
-            absF = numpy.sqrt( np.dot(res_coeff,res_coeff) )
-            if absF < 1e-6:
-                break
-            scheme.jacobian(target,self.jacobian)
-            sol_coeff -= solver(self.jacobian.as_numpy, res_coeff)
-            n += 1
-        return {"iterations":n, "linear_iterations":n} # direct linear solver requires no additional iterations
-
-
-scheme_cls = Scheme(scheme)
-
-u_h.interpolate(initial)                # reset u_h to initial
-evolve(scheme_cls, u_h, u_h_n, endTime)
-error = u_h - exact_end
-print("Forchheimer(numpy) size: ", gridView.size(0), "L^2, H^1 error:",'{:0.5e}, {:0.5e}'.format(
-  *[ sqrt(e) for e in integrate([error**2,inner(grad(error),grad(error))]) ]))
-
-# %% [markdown]
-# We can also use a non linear solver from the Scipy package
-
-# %%
-from scipy.optimize import newton_krylov
-from scipy.sparse.linalg import LinearOperator
-from scipy.sparse.linalg import cg as solver
-
-class Scheme2:
-    def __init__(self, scheme):
-        self.scheme = scheme
-        self.model = scheme.model
-        self.res = u_h.copy(name="residual")
-        self.n = 0
-
-    # non linear function
-    def f(self, x_coeff):
-        # the following converts a given numpy array
-        # into a discrete function over the given space
-        x = space.function("tmp", dofVector=x_coeff)
-        scheme(x, self.res)
-        self.n += 1
-        return self.res.as_numpy
-
-    # class for the derivative DS of S
-    class Df(LinearOperator):
-        def __init__(self, x_coeff):
-            self.shape = (x_coeff.shape[0], x_coeff.shape[0])
-            self.dtype = x_coeff.dtype
-            x = space.function("tmp", dofVector=x_coeff)
-            self.jacobian = scheme.linear()
-            self.update(x_coeff,None)
-        # reassemble the matrix DF(u) given a DoF vector for u
-        def update(self, x_coeff, f):
-            x = space.function("tmp", dofVector=x_coeff)
-            scheme.jacobian(x, self.jacobian)
-        # compute DS(u)^{-1}x for a given DoF vector x
-        def _matvec(self, x_coeff):
-            return solver(self.jacobian.as_numpy, x_coeff, rtol=1e-10, atol=1e-10)[0]
-
-    def solve(self, target):
-        sol_coeff = target.as_numpy
-        # call the newton krylov solver from scipy
-        sol_coeff[:] = newton_krylov(self.f, sol_coeff,
-                    f_tol=1e-6,
-                    inner_M=self.Df(sol_coeff))
-        return {"iterations":self.n, "linear_iterations":-1} # not keeping track of linear iterations
-
-scheme2_cls = Scheme2(scheme)
-u_h.interpolate(initial)
-evolve(scheme2_cls, u_h, u_h_n, endTime)
-error = u_h - exact_end
-print("Forchheimer(scipy) size: ", gridView.size(0), "L^2, H^1 error:",'{:0.5e}, {:0.5e}'.format(
-  *[ sqrt(e) for e in integrate([error**2,inner(grad(error),grad(error))]) ]))
-
-# %% [markdown]
-# .. index::
 #    triple: Solvers; Dirichlet; Conditions
 #
 # .. index::
 #    pair: Boundary; Linear Solvers
 #
 # ## Handling Dirichlet boundary conditions
-# We look at a simple Poisson problem with Dirichlet BCs
-# to show how to use external solvers like the cg method
-# from Scipy in this case.
+# We first look at a simple Poisson problem with Dirichlet BCs
+# to show how to use the internal solvers in this setting.
 # We solve $-\triangle u=10\chi_\omega$ where $\chi_\omega$ is a characteristic
 # function with $\omega=\{x\colon |x|^2<0.6\}$. For the boundary
-# we prescribe trivial Neuman at the top and bottom boundaries
+# we prescribe trivial Neumann at the top and bottom boundaries
 # and Dirichlet values $u=-1$ and $u=1$ at the left and right
 # boundaries, respectively.
-# We will use the CG solver from `scipy.sparse.linalg`.
-#
-# .. tip:: Since we are not needing to invert the operator
-# we will use the `dune.fem.operator.galerkin` class
-# to setup the problem. This is similar to `dune.fem.scheme.galerkin`
-# we have been using so far but can be used to model
-# operators between different spaces.
-# See [here](scheme_api.rst) for a summary of the concepts and API for
-# operators and schemes.
 
 # %%
 from dune.ufl import DirichletBC
-from dune.fem.operator import galerkin
 from scipy.sparse.linalg import cg as solver
 model = ( inner(grad(u), grad(v)) -
           conditional(dot(x,x)<0.6,10.,0.) * v ) * dx
 dbcs  = [ DirichletBC(space,-1,1), DirichletBC(space, 1,2) ]
-op  = galerkin([model, *dbcs], space)
+op  = galerkin([model==0, *dbcs], space)
 sol = space.interpolate(0, name="u_h")
 lin = op.linear()
 
@@ -465,27 +292,58 @@ rhs = sol.copy()
 op(sol,rhs)
 rhs *= -1
 op.setConstraints(rhs)
-
-# a callback to show the residual reduction during the linear solver iteration
-rk = sol.copy("residual")
-def cb(xk): # a callback to print the residual norm in each step
-    x_h = space.function("iterate", dofVector=xk)
-    op(x_h,rk)
-    print(rk.as_numpy[:].dot(rk.as_numpy[:]), end='\t')
-
-
-sol.as_numpy[:], _ = solver(lin.as_numpy, rhs.as_numpy, x0=sol.as_numpy,
-                            callback=cb, rtol=1e-10, atol=1e-10)
+lin.solve(rhs=rhs,target=sol)
 sol.plot()
 
 # %% [markdown]
+# Let's revisit the first implementation of the Newton method discussed
+# above but change the time dependent problem to require Dirichlet
+# conditions on the whole boundary:
+
+# %%
+scheme = galerkin([a == bf, DirichletBC(space,exact(t+0.5*dt))], solver='cg')
+
+class Scheme:
+    def __init__(self, scheme, u0):
+        self.scheme = scheme
+        self.model = scheme.model
+        self.jacobian = scheme.linear(ubar=u0)  # obtain a linear operator for the Newton method
+
+    def solve(self, target):
+        # create a copy of target for the residual
+        res = target.copy(name="residual")
+        dh  = target.copy(name="direction")
+
+        n = 0
+        linIter = 0
+        while True:
+            self.scheme.setConstraints(target)
+            self.scheme(target, res)
+            absF = res.scalarProductDofs(res)
+            if absF < 1e-6**2: # this is the default for the built-in Newton solver
+                break
+            self.scheme.jacobian(target,self.jacobian)  # assemble the linearization
+            dh.clear()                                  # zero is good initial guess for iterator solver
+            info = self.jacobian.solve(target=dh,rhs=res)
+            linIter += info["linear_iterations"]
+            target -= dh
+            n += 1
+        return {"iterations":n, "linear_iterations":linIter}
+t.value = 0
+u_h.interpolate(initial)                # reset u_h to initial
+scheme_cls = Scheme(scheme,u0=u_h)
+evolve(scheme_cls, u_h, u_h_n, endTime)
+error = u_h - exact_end
+print("Forchheimer(Dirichlet, Newton 1) size: ", gridView.size(0), "L^2, H^1 error:",'{:0.5e}, {:0.5e}'.format(
+  *[ sqrt(e) for e in integrate([error**2,inner(grad(error),grad(error))]) ]),flush=True)
+
+# %% [markdown]
+# ## Other internal solvers (petsc)
 # .. index::
 #    pair: Solvers; Petsc
 #
-# ## Using PETSc and Petsc4Py
 # The following requires that a PETSc installation was found during the
-# configuration of ``dune``. Furthermore some examples make use of the
-# Python package ``petsc4py`.
+# configuration of ``dune``.
 
 # %%
 from dune.common.checkconfiguration import assertCMakeHave, ConfigurationError
@@ -495,27 +353,22 @@ try:
 except ConfigurationError:
     print("Dune not configured with petsc - skipping example")
     petsc = False
-try:
-    import petsc4py
-    petsc4py.init(sys.argv)
-    from petsc4py import PETSc
-except ModuleNotFoundError:
-    print("petsc4py module not found -- skipping example")
-    petsc4py = None
 
 # %% [markdown]
+# We provide internal bindings to parts of the PETSc package and show this
+# first. How to make use of `petsc4py` is shown
+# [in a later section](solvers-external_nb.ipynb).
+#
 # Switching to a storage based on the PETSc solver package and solving the
 # system using the dune-fem bindings can be achieved by using the
-# ``storage`` argument to the space constructor
+# ``storage`` argument to the space constructor.
 
 # %%
 if petsc:
-    spacePetsc = solutionSpace(gridView, order=2, storage='petsc')
-    # first we will use the petsc solver available in the `dune-fem` package
-    # (using the sor preconditioner)
-    schemePetsc = solutionScheme(a == b, space=spacePetsc,
-                    parameters={"linear.preconditioning.method":"sor"})
-    dt.value = scheme.model.dt
+    spacePetsc = lagrange(gridView, order=2, storage='petsc')
+    # We use an sor preconditioner:
+    schemePetsc = galerkin(a == bf+bg, space=spacePetsc,
+                           parameters={"linear.preconditioning.method":"sor"})
     u_h = spacePetsc.interpolate(initial, name='u_h')
     u_h_n = u_h.copy(name="previous")
     evolve(schemePetsc, u_h, u_h_n, endTime)
@@ -524,89 +377,27 @@ if petsc:
       *[ sqrt(e) for e in integrate([error**2,inner(grad(error),grad(error))]) ]))
 
 # %% [markdown]
-# Implementing a Newton Krylov solver using the binding provided by petsc4py
-# %%
-if petsc4py is not None and petsc:
-    class Scheme3:
-        def __init__(self, scheme):
-            self.model = scheme.model
-            self.jacobian = scheme.linear()
-            self.ksp = PETSc.KSP()
-            self.ksp.create(PETSc.COMM_WORLD)
-            # use conjugate gradients method
-            self.ksp.setType("cg")
-            # and incomplete Cholesky
-            self.ksp.getPC().setType("icc")
-            self.ksp.setOperators(self.jacobian.as_petsc)
-            self.ksp.setFromOptions()
-        def solve(self, target):
-            res = target.copy(name="residual")
-            sol_coeff = target.as_petsc
-            res_coeff = res.as_petsc
-            n = 0
-            while True:
-                schemePetsc(target, res)
-                absF = numpy.sqrt( res_coeff.dot(res_coeff) )
-                if absF < 1e-6:
-                    break
-                schemePetsc.jacobian(target, self.jacobian)
-                self.ksp.solve(res_coeff, res_coeff)
-                sol_coeff -= res_coeff
-                n += 1
-            return {"iterations":n, "linear_iterations":-1} # not keeping track of linear iterations
+# ## Other internal solvers (istl)
+# .. index::
+#    pair: Solvers; dune-istl
+#
+# We can just as easily use the `dune-istl` package to solve the system
+# (`dune-istl` should be available when installing `dune-fem`):
 
-    schemePetsc = solutionScheme(a-b==0, domainSpace=spacePetsc,rangeSpace=spacePetsc)
-    u_h.interpolate(initial)
-    scheme3_cls = Scheme3(schemePetsc)
-    evolve(scheme3_cls, u_h, u_h_n, endTime)
-    error = u_h - exact_end
-    print("Forchheimer(petsc4py 1) size: ", gridView.size(0), "L^2, H^1 error:",'{:0.5e}, {:0.5e}'.format(
+# %%
+spaceIstl = lagrange(gridView, order=2, storage='istl')
+# We use an amg preconditioner:
+schemeIstl = galerkin(a == bf+bg, space=spaceIstl,
+                      parameters={"linear.preconditioning.method":"amg-jacobi"})
+u_h = spaceIstl.interpolate(initial, name='u_h')
+u_h_n = u_h.copy(name="previous")
+evolve(schemeIstl, u_h, u_h_n, endTime)
+error = u_h - exact_end
+print("Forchheimer(istl) size: ", gridView.size(0), "L^2, H^1 error:",'{:0.5e}, {:0.5e}'.format(
       *[ sqrt(e) for e in integrate([error**2,inner(grad(error),grad(error))]) ]))
 
-# %% [markdown]
-# Using the petsc4py bindings for the non linear KSP solvers from PETSc
-# %%
-if petsc4py is not None and petsc is not None:
-    class Scheme4:
-        def __init__(self, scheme):
-            self.scheme = scheme
-            self.model = scheme.model
-            self.res = scheme.rangeSpace.interpolate([0],name="residual")
-            self.jacobian = scheme.linear()
-            self.snes = PETSc.SNES().create()
-            self.snes.setFunction(self.f, self.res.as_petsc.duplicate())
-            self.snes.setUseMF(False)
-            self.snes.setJacobian(self.Df, self.jacobian.as_petsc, self.jacobian.as_petsc)
-            self.snes.getKSP().setType("cg")
-            self.snes.setTolerances(atol=1e-6)
-            self.snes.setFromOptions()
 
-        def f(self, snes, x, f):
-            # setup discrete function using the provide petsc vectors
-            inDF = self.scheme.domainSpace.function("tmp",dofVector=x)
-            outDF = self.scheme.rangeSpace.function("tmp",dofVector=f)
-            self.scheme(inDF,outDF)
 
-        def Df(self, snes, x, m, b):
-            inDF = self.scheme.domainSpace.function("tmp",dofVector=x)
-            self.scheme.jacobian(inDF, self.jacobian)
-            return PETSc.Mat.Structure.SAME_NONZERO_PATTERN
-
-        def solve(self, target):
-            sol_coeff = target.as_petsc
-            self.res.clear()
-            self.snes.solve(self.res.as_petsc, sol_coeff)
-            return {"iterations":self.snes.getIterationNumber(),
-                    "linear_iterations":self.snes.getLinearSolveIterations()}
-
-    u_h.interpolate(initial)
-    scheme4_cls = Scheme4(schemePetsc)
-    evolve(scheme4_cls, u_h, u_h_n, endTime)
-    error = u_h - exact_end
-    print("Forchheimer(petsc4py 2) size: ", gridView.size(0), "L^2, H^1 error:",'{:0.5e}, {:0.5e}'.format(
-      *[ sqrt(e) for e in integrate([error**2,inner(grad(error),grad(error))]) ]))
-
-print(flush=True)
 
 # %% [markdown]
 # .. index::
@@ -629,11 +420,10 @@ print(flush=True)
 import dune.fem
 from dune.grid import structuredGrid
 from dune.fem.space import lagrange
-from dune.fem.scheme import galerkin
 from ufl import (TestFunction, TrialFunction, SpatialCoordinate,
                  dx, grad, inner, dot, sin, cos, pi )
 gridView = structuredGrid([0, 0], [1, 1], [200, 200])
-space = lagrange(gridView, order=1, storage="istl")
+space = lagrange(gridView, order=1)
 u_h   = space.interpolate(0, name='u_h')
 x = SpatialCoordinate(space)
 u = TrialFunction(space)
@@ -645,9 +435,9 @@ l = f*v * dx
 scheme = galerkin( a==l, solver="cg", parameters=
                    {"newton.linear.tolerance": 1e-12,
                     "newton.linear.verbose": True,
-                    "newton.linear.preconditioning.method": "amg-ilu",
+                    "newton.linear.preconditioning.method": "jacobi",
                     "newton.linear.errormeasure": "relative",
-                    "logging": "precon-amg"
+                    "logging": "log-jacobi"
                    } )
 info = scheme.solve(target=u_h)
 
@@ -700,14 +490,14 @@ pprint(scheme2.parameterLog())
 # string, e.g., `"help"`.
 
 # %%
-scheme = galerkin( a==l, solver="cg", parameters=
-                   {"newton.linear.tolerance": 1e-12,
-                    "newton.linear.verbose": True,
-                    "newton.linear.preconditioning.method": "help",
-                    "newton.linear.errormeasure": "relative",
-                    "logging": "precon-amg"
-                   } )
 try:
+    scheme = galerkin( a==l, solver="cg", parameters=
+                       {"newton.linear.tolerance": 1e-12,
+                        "newton.linear.verbose": True,
+                        "newton.linear.preconditioning.method": "help",
+                        "newton.linear.errormeasure": "relative",
+                        "logging": "precon"
+                       } )
     scheme.solve(target=u_h)
 except RuntimeError as rte:
     print(rte)
@@ -727,7 +517,7 @@ except RuntimeError as rte:
 # to be used with `dune-fem`.
 
 # %%
-space = solutionSpace(gridView, order=2, storage='numpy')
+space = lagrange(gridView, order=2)
 
 # %% [markdown]
 # Switching is as simple as passing `storage='istl'` or  `storage='petsc'`.
