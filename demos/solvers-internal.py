@@ -2,17 +2,26 @@
 #
 # # Tweaking the (non-) linear solvers
 # Here we look at how to tweak the internal linear and nonlinear solvers.
-# Other linear algebra backends (e.g. `petsc`) can be accessed by changing setting the
-# `storage` parameter during construction of the discrete space and this
-# will be discussed in the next section [cite]. The simplicity of the default backend (`numpy`)
+# The `solve` method on the `schemes` uses a Newton method to solve
+# the (non)linear PDE model. Parameters set during the construction of a `scheme`
+# can be used to customize the Newton solver and the underlying solver for
+# the linear problem in each step, i.e., setting line-search parameters or
+# preconditioners. A number of linear solvers and some simple
+# preconditioners are directly available and others can be used through
+# additional software packages. This is done by changing the
+# linear algebra backend (e.g. using `petsc`) by changing using the
+# `storage` parameter during construction of the discrete space.
+# The simplicity of the default backend (`numpy`) allows the usage
 # Numpy/Scipy data structures on the python side. A degrees of freedom
-# vector (dof vector) can be retrieved from a discrete function over the
-# `numpy` space by using the `as_numpy` method. Similar methods are available
+# vector (dof vector) can be retrieved from a discrete function with the
+# default storage by using the `as_numpy` method. Similar methods are available
 # for the other storages, i.e., `as_istl,as_petsc`. The same methods are
 # also available to retrieve the underlying matrix structures of linear
 # operators. Here we will discuss the `as_numpy` attribute and how to use
-# this to implement part of the algorithm for solving PDEs on the Python
-# side.
+# this to implement part of the algorithm for solving PDEs on the Python side.
+# A short description on the other storages follows at the end of this
+# section, with more detail [to follow](solvers-external_nb.ipynb).
+#
 #
 # We will mostly revisit the nonlinear time dependent problem studied at the end of the
 # [concepts section](concepts_nb.ipynb) which after discretizing in time had the variational formulation
@@ -79,10 +88,16 @@ bg = 0.5*dot(g(t)+g(t+dt),n)*v*ds
 # When creating a scheme, it is possible to set the linear solver as well as
 # parameters for the internal Newton solver and the linear solver
 # and preconditioning. See a list of available solvers and preconditioning
-# methods at the end of this section.
+# methods at the end of this section. The default solver is a `gmres`
+# method but since this problem is symmetric a `cg` solver is more
+# efficient. In addition we will use a Jacobi preconditioner. We also set
+# the tolerance for the Newton method to $10^{-9}$:
 
 # %%
-scheme = galerkin(a == bf+bg, solver='cg')
+scheme = galerkin(a == bf+bg, solver='cg',
+                  parameters={"newton.linear.preconditioner":"jacobi",
+                              "newton.tolerance":1e-8},
+                 )
 
 endTime    = 0.25
 exact_end  = exact(endTime)
@@ -159,7 +174,7 @@ class Scheme:
     def __init__(self, scheme, u0):
         self.scheme = scheme
         self.model = scheme.model
-        self.jacobian = scheme.linear(ubar=u0)  # obtain a linear operator for the Newton method
+        self.jacobian = scheme.linear(ubar=u0) # obtain a linear operator for the Newton method
 
     def solve(self, target):
         # create a copy of target for the residual
@@ -171,7 +186,7 @@ class Scheme:
         while True:
             self.scheme(target, res)
             absF = res.scalarProductDofs(res)
-            if absF < 1e-6**2: # this is the default for the built-in Newton solver
+            if absF < 1e-8**2: # this is the same tolerance we set above for the built-in Newton solver
                 break
             self.scheme.jacobian(target,self.jacobian)  # assemble the linearization
             dh.clear()                                  # zero is good initial guess for iterator solver
@@ -188,7 +203,7 @@ scheme_cls = Scheme(scheme,u0=u_h)
 evolve(scheme_cls, u_h, u_h_n, endTime)
 error = u_h - exact_end
 print("Forchheimer(Newton 1) size: ", gridView.size(0), "L^2, H^1 error:",'{:0.5e}, {:0.5e}'.format(
-  *[ sqrt(e) for e in integrate([error**2,inner(grad(error),grad(error))]) ]),flush=True)
+  *[ sqrt(e) for e in integrate([error**2,inner(grad(error),grad(error))]) ]), flush=True)
 
 # %% [markdown]
 # A second version using a linearization of the non-linear problem
@@ -204,11 +219,7 @@ class Scheme:
         self.model = scheme.model
         # let's use a `gmres` solver for demonstration purposes
         self.linear = linearized(scheme, ubar=u0,
-                      parameters={
-                        "verbose":False,
-                        "method":"gmres",
-                        "gmres.restart":50,
-                      })
+                      parameters={ "method":"gmres", "gmres.restart":50 })
         self.linear.setup(u0)
 
     def solve(self, target):
@@ -231,7 +242,7 @@ class Scheme:
             # subtract the new iterate from the previous one
             prev.sub( target )
             absDiff = prev.scalarProductDofs(prev)
-            if absDiff < 1e-6**2: # this is the default for the built-in Newton solver
+            if absDiff < 1e-8**2: # this is the default for the built-in Newton solver
                 break
             prev.assign(target)
         return {"iterations":n, "linear_iterations":linIter}
@@ -245,6 +256,36 @@ evolve(scheme_cls, u_h, u_h_n, endTime)
 error = u_h - exact_end
 print("Forchheimer(Newton 2) size: ", gridView.size(0), "L^2, H^1 error:",'{:0.5e}, {:0.5e}'.format(
   *[ sqrt(e) for e in integrate([error**2,inner(grad(error),grad(error))]) ]),flush=True)
+
+# %% [markdown]
+# __Note__: the parameters used to tweak the linear solver set when constructing
+# the `scheme` are passed on to the linear solver when calling
+# `scheme.linear` but can be overwritten in the call of `scheme.linear`.
+# So to obtain a linearization (around zero by default) using a `gmres`
+# method when calling `jac.solve` we could call
+
+# %%
+model = ( inner(grad(u), grad(v)) + (u - conditional(dot(x,x)<0.6,10.,0.))*v ) * dx
+# verbose output for the linear solver is too long so use default `False` setting
+sc  = galerkin(model==0, solver="cg",
+               parameters={"newton.linear.verbose":False,"newton.verbose":True}
+              )
+sol = space.interpolate(0, name="u_h")
+jac = linearized(sc, parameters={ "method":"gmres", "gmres.restart":100, })
+info = jac.solve(target=sol)
+print(info,flush=True)
+
+# %% [markdown]
+# Since we setup the `scheme` using `solver="cg"` calling the `solve`
+# method will use the Newton method + a `cg` solver.
+#
+# __Note__: since the problem is linear the Newton method produces no real
+# overhead.
+
+# %%
+sol.clear()
+info = sc.solve(target=sol)
+print(info,flush=True)
 
 # %% [markdown]
 # .. index::
@@ -320,7 +361,7 @@ class Scheme:
             self.scheme.setConstraints(target)
             self.scheme(target, res)
             absF = res.scalarProductDofs(res)
-            if absF < 1e-6**2: # this is the default for the built-in Newton solver
+            if absF < 1e-8**2: # this is the default for the built-in Newton solver
                 break
             self.scheme.jacobian(target,self.jacobian)  # assemble the linearization
             dh.clear()                                  # zero is good initial guess for iterator solver
@@ -470,7 +511,7 @@ pprint(scheme.parameterLog())
 # One can easily reuse these parameters to construct another scheme by
 # converting the result of the above call to a dictionary.
 # As an example change the above problem to a PDE with Dirichlet conditions
-# but turn of verbose output of the solver.
+# but turn off verbose output of the solver.
 #
 # .. note:: the `logging` parameter has to be set if we want to use the
 # `parameterLog` method on the scheme.
