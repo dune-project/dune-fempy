@@ -299,6 +299,7 @@ except ModuleNotFoundError:
 # %% [markdown]
 # To use `petsc4py` we need to which to a storage based on the PETSc package
 # using the ``storage`` argument to the space constructor.
+<<<<<<< HEAD
 #
 # Implementing a Newton Krylov solver using the binding provided by
 # `petsc4py` is now straightforward - we again use incomplete LU as

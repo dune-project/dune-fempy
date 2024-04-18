@@ -223,6 +223,35 @@ print(info,flush=True)
 # .. note:: Since the problem is linear the Newton method produces no real overhead.
 
 # %% [markdown]
+# .. tip:: the parameters used to tweak the linear solver set when constructing
+#    the `scheme` are passed on to the linear solver when calling
+#    `scheme.linear` but can be overwritten.
+#    Below we construct a linearization (by default around zero) which uses a `gmres`
+#    method when calling `jac.solve`:
+
+# %%
+model = ( inner(grad(u), grad(v)) + (u - conditional(dot(x,x)<0.6,10.,0.))*v ) * dx
+# verbose output for the linear solver is too long so use default `False` setting
+sc  = galerkin(model==0, solver="cg",
+               parameters={"newton.linear.verbose":False,"newton.verbose":True}
+              )
+sol = space.interpolate(0, name="u_h")
+jac = linearized(sc, parameters={ "method":"gmres", "gmres.restart":100, })
+info = jac.solve(target=sol)
+print(info,flush=True)
+
+# %% [markdown]
+# Since we setup the `scheme` using `solver="cg"` calling the `solve`
+# method will use the Newton method + a `cg` solver.
+#
+# .. tip:: since the problem is linear the Newton method produces no real overhead.
+
+# %%
+sol.clear()
+info = sc.solve(target=sol)
+print(info,flush=True)
+
+# %% [markdown]
 # .. index::
 #    triple: Solvers; Dirichlet; Conditions
 #
