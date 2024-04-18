@@ -18,6 +18,15 @@ and has to be provided as a named argument.
    `scheme.solve(target=target,rightHandSide=rhs)`.
    No changes are needed for schemes without Dirichlet boundary constraints.
 
+Added a ``solve`` method to the linearization of `schemes`
+----------------------------------------------------------
+The object returned by the `linear` method on a `scheme` now has a `solve` method.
+
+Updated ``dune.fem.scheme.linearized``
+--------------------------------------
+This function takes a `scheme` and returns a scheme implementing the first
+two terms of its Taylor expansion. Like the object returned by
+`scheme.linear` this has a `solve` method.
 
 Add operator ``__len__`` to spaces.
 -----------------------------------
@@ -197,4 +206,4 @@ the global indices of the dofs attached to a given element.
 
 Logging of parameter values
 ---------------------------
-:ref:`See section</solvers-internal_nb.ipynb#Available-solvers-and-parameters>`.
+:ref:`See section</solversInternal_nb.ipynb#Available-solvers-and-parameters>`.

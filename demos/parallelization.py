@@ -17,7 +17,7 @@
 # external packages for the linear algebra, speedup in this step will
 # depend on the multithreading support available in the chosen linear
 # algebra backend - see the discussion on how to
-# [switch between linear solver backends](solvers-external_nb.ipynb)
+# [switch between linear solver backends](solversExternal_nb.ipynb)
 # to, for example, use the thread parallel solvers from scipy.
 #
 # By default only a single thread is used. To enable multithreading simply add
@@ -50,7 +50,7 @@ print("Using",threading.use,"threads")
 # parallel grid, in fact most of the DUNE grids work in parallel except `albertaGrid` or `polyGrid`.
 # Most iterative solvers in DUNE work for parallel runs. Some of the
 # preconditioning methods also work in parallel, a complete list is found at the
-# [bottom of the solver discussion](solvers-internal_nb.ipynb).
+# [bottom of the solver discussion](solversInternal_nb.ipynb).
 #
 # Running a parallel job can be
 # done by using `mpirun`

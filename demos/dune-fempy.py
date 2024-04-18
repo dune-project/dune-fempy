@@ -94,9 +94,9 @@ y[:] = solver(A,b)
 # stored in the same buffer used for the discrete function. Consequently,
 # no copying is required.
 #
-# .. tip:: More details on how to use [Scipy](solvers-external_nb.ipynb#Using-Scipy) will be given later
+# .. tip:: More details on how to use [Scipy](solversExternal_nb.ipynb#Using-Scipy) will be given later
 #    in the tutorial. Other linear solver backends are also available,
-#    e.g., [PETSc](solvers-internal_nb.ipynb#Other-internal-solvers-(petsc)).
+#    e.g., [PETSc](solversInternal_nb.ipynb#Other-internal-solvers-(petsc)).
 
 # %% [markdown]
 # That's it - to see the result we plot it using matplotlib
@@ -266,7 +266,7 @@ l = dot(x,x)*v * dx
 # %% [markdown]
 # To solve the non-linear problem we need to use something like a Newton
 # solver. We could use
-# [the implementation available in Scipy](solvers-external_nb.ipynb)
+# [the implementation available in Scipy](solversExternal_nb.ipynb)
 # but ``dune-fem`` provides so called
 # [schemes](concepts_nb.ipynb#Operators-and-Schemes)
 # that have a ``solve`` method which can handle both linear and non-linear models.
@@ -277,13 +277,13 @@ l = dot(x,x)*v * dx
 # degrees of freedom on the boundary etc. A detailed description on the
 # API is given [here](scheme_api.rst) and how to use the schemes in
 # different context to solve the problems on the Python side is available
-# [here](solvers-internal_nb.ipynb) and [here](solvers-external_nb.ipynb).
+# [here](solversInternal_nb.ipynb) and [here](solversExternal_nb.ipynb).
 
 # Since the problem here is symmetric we can use a ``cg``
 # method. A full list of available solvers, preconditioners, and how
 # to customize them is available in the
-# [Tweaking Linear Solvers](solvers-internal_nb.ipynb) and
-# [Alternative Linear Solvers](solvers-internal_nb.ipynb#Available-solvers-and-parameters) sections.
+# [Tweaking Linear Solvers](solversInternal_nb.ipynb) and
+# [Alternative Linear Solvers](solversInternal_nb.ipynb#Available-solvers-and-parameters) sections.
 
 # %%
 from dune.fem.scheme import galerkin as solutionScheme

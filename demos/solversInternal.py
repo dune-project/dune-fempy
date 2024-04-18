@@ -20,8 +20,7 @@
 # operators. Here we will discuss the `as_numpy` attribute and how to use
 # this to implement part of the algorithm for solving PDEs on the Python side.
 # A short description on the other storages follows at the end of this
-# section, with more detail [to follow](solvers-external_nb.ipynb).
-#
+# section, with more detail [to follow](solversExternal_nb.ipynb).
 #
 # We will mostly revisit the nonlinear time dependent problem studied at the end of the
 # [concepts section](concepts_nb.ipynb) which after discretizing in time had the variational formulation
@@ -86,12 +85,17 @@ bg = 0.5*dot(g(t)+g(t+dt),n)*v*ds
 
 # %% [markdown]
 # When creating a scheme, it is possible to set the linear solver as well as
-# parameters for the internal Newton solver and the linear solver
-# and preconditioning. See a list of available solvers and preconditioning
+# parameters for the internal Newton solver and the linear solver (e.g. for
+# preconditioning). See a list of available solvers and preconditioning
 # methods at the end of this section. The default solver is a `gmres`
 # method but since this problem is symmetric a `cg` solver is more
 # efficient. In addition we will use a Jacobi preconditioner. We also set
 # the tolerance for the Newton method to $10^{-9}$:
+#
+# .. tip:: we use Krylov methods like `cg` and `gmres` in this section to
+#    solve the linear problems. We also provide bindings for direct solvers
+#    from the `suitesparse` package, e.g., `umfpack` if installed. For this use
+#    `solver=["suitesparse","umfpack"]` when constructing the scheme.
 
 # %%
 scheme = galerkin(a == bf+bg, solver='cg',
@@ -258,11 +262,11 @@ print("Forchheimer(Newton 2) size: ", gridView.size(0), "L^2, H^1 error:",'{:0.5
   *[ sqrt(e) for e in integrate([error**2,inner(grad(error),grad(error))]) ]),flush=True)
 
 # %% [markdown]
-# __Note__: the parameters used to tweak the linear solver set when constructing
-# the `scheme` are passed on to the linear solver when calling
-# `scheme.linear` but can be overwritten in the call of `scheme.linear`.
-# So to obtain a linearization (around zero by default) using a `gmres`
-# method when calling `jac.solve` we could call
+# .. tip:: the parameters used to tweak the linear solver set when constructing
+#    the `scheme` are passed on to the linear solver when calling
+#    `scheme.linear` but can be overwritten.
+#    Below we construct a linearization (by default around zero) which uses a `gmres`
+#    method when calling `jac.solve`:
 
 # %%
 model = ( inner(grad(u), grad(v)) + (u - conditional(dot(x,x)<0.6,10.,0.))*v ) * dx
@@ -279,8 +283,7 @@ print(info,flush=True)
 # Since we setup the `scheme` using `solver="cg"` calling the `solve`
 # method will use the Newton method + a `cg` solver.
 #
-# __Note__: since the problem is linear the Newton method produces no real
-# overhead.
+# .. tip:: since the problem is linear the Newton method produces no real overhead.
 
 # %%
 sol.clear()
@@ -398,7 +401,7 @@ except ConfigurationError:
 # %% [markdown]
 # We provide internal bindings to parts of the PETSc package and show this
 # first. How to make use of `petsc4py` is shown
-# [in a later section](solvers-external_nb.ipynb).
+# [in a later section](solversExternal_nb.ipynb).
 #
 # Switching to a storage based on the PETSc solver package and solving the
 # system using the dune-fem bindings can be achieved by using the
