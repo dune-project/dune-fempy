@@ -14,7 +14,7 @@
 # As discussed there, a degrees of freedom
 # vector (dof vector) can be retrieved from a discrete function over the
 # `numpy` space by using the `as_numpy` method. Similar attributes are available
-# for the other storages, i.e., `as_istl,as_petsc`. These attribtes are
+# for the other storages, i.e., `as_istl,as_petsc`. These attributes are
 # also available to retrieve the underlying matrix structures of linear
 # operators. We will show now how to use this to use `scipy` or `petsc4py`
 # to solve the (non) linear systems.
