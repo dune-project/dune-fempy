@@ -13,22 +13,21 @@
 #
 # As discussed there, a degrees of freedom
 # vector (dof vector) can be retrieved from a discrete function over the
-# `numpy` space by using the `as_numpy` method. Similar methods are available
-# for the other storages, i.e., `as_istl,as_petsc`. The same methods are
+# `numpy` space by using the `as_numpy` method. Similar attributes are available
+# for the other storages, i.e., `as_istl,as_petsc`. These attribtes are
 # also available to retrieve the underlying matrix structures of linear
-# operators.
+# operators. We will show now how to use this to use `scipy` or `petsc4py`
+# to solve the (non) linear systems.
 #
 # We start with the same setup as used [in the previously section](solversInternal_nb.ipynb):
 
 # %%
+import matplotlib.pyplot as plt
 import numpy
 
 from dune.grid import structuredGrid as leafGridView
 from dune.fem.space import lagrange
-from dune.fem.scheme import galerkin
-from dune.fem.function import gridFunction
 from dune.fem import integrate
-from dune.ufl import Constant
 from ufl import TestFunction, TrialFunction, SpatialCoordinate, FacetNormal, \
                 dx, ds, div, grad, dot, inner, exp, sin, conditional
 
@@ -50,14 +49,14 @@ def printResult(method,error,info):
           "\n\t","solver info=",info,flush=True)
 
 # %% [markdown]
-# Having defined the model, we can now construct an `operator`. We will
-# use the `galerkin` operator from `dune.fem.operator` instead of the
+# We will use the `galerkin` operator from `dune.fem.operator` instead of the
 # `scheme` used so far, since we do not need the `solve` method since we
 # want to use external solvers in this section:
 
 # %%
 from dune.fem.operator import galerkin
-operator = galerkin(a - (bf+bg))
+from dune.ufl import DirichletBC
+operator = galerkin([a - (bf+bg), DirichletBC(space,exact,1)])
 
 # %% [markdown]
 # ## Accessing underlying data structures
@@ -66,17 +65,24 @@ operator = galerkin(a - (bf+bg))
 # side in Python. In this case we would like to use the underlying dof vector from
 # a discrete function as numpy arrays and system matrices assembled by the
 # schemes and operators as scipy sparse matrices.
-# In the [introduction](dune-fempy_nb.ipynb) we already discussed the `as_numpy` method.
-# So
+#
+# In the [introduction](dune-fempy_nb.ipynb) we already discussed the
+# `as_numpy` attribute which allows access to the degrees of freedom as
+# numpy array based on the `python buffer protocol`.
+# So no data is copied and changes to the dofs made on the Python side are
+# automatically carried over to the C++ side.
+#
+# We setup `u_h` to be zero but can initialize the dof vector with a random
+# values directly changing `u_h` itself:
 
 # %%
-vecu_h = u_h.as_numpy
+u_h.as_numpy[:] = numpy.random.rand(space.size)
+u_h.plot()
 
 # %% [markdown]
-# provides access to the underlying dof vector without copying. So changes
-# to the numpy array `vecu_h` carries over to the discrete function `u_h`.
-# Just remember to make changes using `vecu_h[:]` to change the actual
-# memory buffer.
+# .. tip:: changes to the numpy array `u_h.as_numpy` carries over to the discrete
+#    function `u_h`, just remember to make changes using `vecu_h[:]` to change the actual
+#    memory buffer.
 #
 # An instance of `dune.fem.operator` describing an operator `L`
 # provides a method `linear` which returns an object that
@@ -111,7 +117,7 @@ operator.jacobian(u_h, linOp, rhs)
 # %%
 A = linOp.as_numpy
 print(type(A))
-# plt.spy(A, precision=1e-8, markersize=1)
+plt.spy(A, precision=1e-8, markersize=1)
 
 # %% [markdown]
 # ## Defining discrete function with given external dof vector
@@ -130,7 +136,7 @@ vh.plot()
 # directly change the discrete function
 
 # %%
-v_coeff[range(space.size)] = range(space.size)
+v_coeff[:] = range(space.size)
 vh.plot()
 
 # %% [markdown]
@@ -143,10 +149,7 @@ vh.plot()
 #
 # ## Using Scipy
 # In our first example, we implement a simple Newton Krylov solver using a linear solver from
-# Scipy. We can use the `as_numpy` method to access the degrees of freedom as
-# Numpy vector based on the `python buffer protocol`. So no data is copied
-# and changes to the dofs made on the Python side are automatically carried
-# over to the C++ side.
+# Scipy.
 
 # %%
 import numpy as np
@@ -172,7 +175,8 @@ class Scheme1:
             if absF < 1e-6:
                 break
             self.op.jacobian(target,self.jacobian)
-            sol_coeff -= solver(self.jacobian.as_numpy, res_coeff)
+            dh_coeff = solver(self.jacobian.as_numpy, res_coeff)
+            sol_coeff -= dh_coeff
             n += 1
         return {"iterations":n, "linear_iterations":n} # direct linear solver requires no additional iterations
 
@@ -182,19 +186,18 @@ info = scheme1_cls.solve(target=u_h)
 printResult("Scipy-1",u_h-exact,info)
 
 # %% [markdown]
-# We can also use a non linear solver from the Scipy package
+# We can also use a non linear solver from the Scipy package - together
+# for example with an incomplete LU factorization for the Jacobian:
 
 # %%
-from scipy.optimize import newton_krylov
-from scipy.sparse.linalg import LinearOperator
-from scipy.sparse.linalg import cg as solver
+from scipy.optimize import newton_krylov, root
+from scipy.sparse.linalg import LinearOperator,cg,spilu
 
 class Scheme2:
     def __init__(self, op):
         self.op = operator
         self.model = op.model
         self.res = u_h.copy(name="residual")
-        self.n = 0
 
     # non linear function
     def f(self, x_coeff):
@@ -202,7 +205,6 @@ class Scheme2:
         # into a discrete function over the given space
         x = space.function("tmp", dofVector=x_coeff)
         self.op(x, self.res)
-        self.n += 1
         return self.res.as_numpy
 
     # class for the derivative DS of S
@@ -213,27 +215,32 @@ class Scheme2:
             self.dtype = x_coeff.dtype
             x = space.function("tmp", dofVector=x_coeff)
             self.jacobian = self.op.linear()
+            self.n = -1
             self.update(x_coeff,None)
         # reassemble the matrix DF(u) given a DoF vector for u
         def update(self, x_coeff, f):
             x = space.function("tmp", dofVector=x_coeff)
             self.op.jacobian(x, self.jacobian)
+            self.invJac = spilu(self.jacobian.as_numpy.tocsc())
+            self.n += 1
         # compute DS(u)^{-1}x for a given DoF vector x
         def _matvec(self, x_coeff):
-            return solver(self.jacobian.as_numpy, x_coeff, rtol=1e-10, atol=1e-10)[0]
+            return self.invJac.solve(x_coeff)
+
 
     def solve(self, target):
         sol_coeff = target.as_numpy
+        M = self.Df(self.op,sol_coeff)
         # call the newton krylov solver from scipy
         sol_coeff[:] = newton_krylov(self.f, sol_coeff,
-                    f_tol=1e-6,
-                    inner_M=self.Df(self.op,sol_coeff))
-        return {"iterations":self.n, "linear_iterations":-1} # not keeping track of linear iterations
+                    f_tol=1e-6, method=cg, inner_M=M)
+        return {"iterations":(M.n), "linear_iterations":M.n}
 
 scheme2_cls = Scheme2(operator)
 u_h.clear()
 info = scheme2_cls.solve(target=u_h)
 printResult("Scipy-2",u_h-exact,info)
+u_h.plot()
 
 # %% [markdown]
 # .. index::
@@ -266,49 +273,62 @@ except ModuleNotFoundError:
 # using the ``storage`` argument to the space constructor.
 #
 # Implementing a Newton Krylov solver using the binding provided by
-# `petsc4py` is now straightforward:
+# `petsc4py` is now straightforward - we again use incomplete LU as
+# preconditioner:
 
 # %%
 if petsc4py is not None and petsc:
+    petsc_options = PETSc.Options()
     spacePetsc = lagrange(gridView, order=2, storage='petsc')
     u_h = spacePetsc.interpolate(0, name='u_h')
-    schemePetsc = galerkin(a==bf+bg, domainSpace=spacePetsc,rangeSpace=spacePetsc)
+    schemePetsc = galerkin([a==bf+bg,DirichletBC(spacePetsc,exact,1)],
+                           domainSpace=spacePetsc,rangeSpace=spacePetsc)
 
     class Scheme3:
-        def __init__(self, scheme):
-            self.model = scheme.model
-            self.jacobian = scheme.linear()
+        def __init__(self, op):
+            self.model = op.model
+            self.op = op
+            self.jacobian = op.linear()
             self.ksp = PETSc.KSP()
             self.ksp.create(PETSc.COMM_WORLD)
             # use conjugate gradients method
             self.ksp.setType("cg")
-            # and incomplete Cholesky
-            self.ksp.getPC().setType("icc")
+            # use an incomplete lu preconditioner
+            self.ksp.getPC().setType("ilu")
             self.ksp.setOperators(self.jacobian.as_petsc)
+            petsc_options['pc_factor_levels'] = 1
             self.ksp.setFromOptions()
         def solve(self, target):
             res = target.copy(name="residual")
+            dh = target.copy(name="direction")
             sol_coeff = target.as_petsc
+            dh_coeff = dh.as_petsc
             res_coeff = res.as_petsc
             n = 0
+            numIter = 0
             while True:
-                schemePetsc(target, res)
-                absF = numpy.sqrt( res_coeff.dot(res_coeff) )
+                self.op(target, res)
+                absF = numpy.sqrt( np.dot(res_coeff,res_coeff) )
                 if absF < 1e-6:
                     break
-                schemePetsc.jacobian(target, self.jacobian)
-                self.ksp.solve(res_coeff, res_coeff)
-                sol_coeff -= res_coeff
+                dh.clear()
+                self.op.jacobian(target,self.jacobian)
+                self.ksp.setUp()
+                self.ksp.solve(res_coeff, dh_coeff)
+                numIter += self.ksp.getIterationNumber()
+                sol_coeff -= dh_coeff
                 n += 1
-            return {"iterations":n, "linear_iterations":-1} # not keeping track of linear iterations
+            return {"iterations":n, "linear_iterations":numIter}
 
     u_h.interpolate(0)
     scheme3_cls = Scheme3(schemePetsc)
     info = scheme3_cls.solve(target=u_h)
-    printResult("PETSc4py",u_h-exact,info)
+    printResult("PETSc4py 1",u_h-exact,info)
 
 # %% [markdown]
-# Here is another example now using the petsc4py bindings for the non linear KSP solvers from PETSc
+# Here is another example now using the petsc4py bindings for the non
+# linear KSP solvers from PETSc. This time we use a algebraic multigrid
+# preconditioner:
 
 # %%
 if petsc4py is not None and petsc is not None:
@@ -322,8 +342,10 @@ if petsc4py is not None and petsc is not None:
             self.snes.setFunction(self.f, self.res.as_petsc.duplicate())
             self.snes.setUseMF(False)
             self.snes.setJacobian(self.Df, self.jacobian.as_petsc, self.jacobian.as_petsc)
-            self.snes.getKSP().setType("cg")
             self.snes.setTolerances(atol=1e-6)
+            self.snes.getKSP().setType("cg")
+            self.snes.getKSP().getPC().setType("hypre")
+            petsc_options['pc_hypre_type'] = 'boomeramg'
             self.snes.setFromOptions()
 
         def f(self, snes, x, f):

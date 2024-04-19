@@ -9,35 +9,36 @@
 # preconditioners. A number of linear solvers and some simple
 # preconditioners are directly available and others can be used through
 # additional software packages. This is done by changing the
-# linear algebra backend (e.g. using `petsc`) by changing using the
+# linear algebra backend (e.g. using `petsc`) by using the
 # `storage` parameter during construction of the discrete space.
-# The simplicity of the default backend (`numpy`) allows the usage
-# Numpy/Scipy data structures on the python side. A degrees of freedom
-# vector (dof vector) can be retrieved from a discrete function with the
-# default storage by using the `as_numpy` method. Similar methods are available
-# for the other storages, i.e., `as_istl,as_petsc`. The same methods are
-# also available to retrieve the underlying matrix structures of linear
-# operators. Here we will discuss the `as_numpy` attribute and how to use
-# this to implement part of the algorithm for solving PDEs on the Python side.
-# A short description on the other storages follows at the end of this
-# section, with more detail [to follow](solversExternal_nb.ipynb).
+# The simplicity of the default backend (`numpy`) allows to extract the
+# underlying data structures to use with Numpy/Scipy on the python side.
+# A degrees of freedom vector (dof vector) can be retrieved as `numpy.array`
+# from a discrete function with this default storage by using the `as_numpy`
+# attribute on an instance of a discrete function. Similar attributes are available
+# for the other storages, i.e., `as_istl,as_petsc`. The same attributes are
+# also available to retrieve the underlying matrix structures on
+# operators/schemes on linear operators/schemes.
+# A short description on the other storages with examples using the internal
+# bindings for these packages follows at the end of this section.
+# We will discuss how to use these attributes to implement part of the
+# solution algorithm on the Python side using `Scipy` or `PETSc4py`
+# [will follow](solversExternal_nb.ipynb).
 #
 # We will mostly revisit the nonlinear problem studied at the end of the
 # [introduction](dune-fempy_nb.ipynb) - but we will prescribe a forcing
 # which we compute to obtain the exact solution
-# $ ... $.
+# \begin{align*}
+# u(x,y) = \left(\frac{1}{2}(x^2 + y^2) - \frac{1}{3}(x^3 - y^3)\right) + 1
+# \end{align*}
 # The following code was described in the [concepts section](concepts_nb.ipynb)
-#
 
 # %%
 import numpy
 
 from dune.grid import structuredGrid as leafGridView
 from dune.fem.space import lagrange
-from dune.fem.scheme import galerkin
-from dune.fem.function import gridFunction
 from dune.fem import integrate
-from dune.ufl import Constant
 from ufl import TestFunction, TrialFunction, SpatialCoordinate, FacetNormal, \
                 dx, ds, div, grad, dot, inner, exp, sin, conditional
 
@@ -62,10 +63,12 @@ def printResult(method,error,info):
 # When creating a scheme, it is possible to set the linear solver as well as
 # parameters for the internal Newton solver and the linear solver (e.g. for
 # preconditioning). See a list of available solvers and preconditioning
-# methods at the end of this section. The default solver is a `gmres`
+# methods at [the end of this section](#Available-solvers-and-parameters).
+#
+# The default solver is a `gmres`
 # method but since this problem is symmetric a `cg` solver is more
-# efficient. In addition we will use a Jacobi preconditioner. We also set
-# the tolerance for the Newton method to $10^{-9}$:
+# efficient. In addition we will use a Jacobi preconditioner and set
+# the tolerance for the Newton method to $10^{-8}$:
 #
 # .. tip:: we use Krylov methods like `cg` and `gmres` in this section to
 #    solve the linear problems. We also provide bindings for direct solvers
@@ -73,15 +76,15 @@ def printResult(method,error,info):
 #    `solver=["suitesparse","umfpack"]` when constructing the scheme.
 
 # %%
+from dune.fem.scheme import galerkin
 scheme = galerkin(a == bf+bg, solver='cg',
                   parameters={"newton.linear.preconditioning.method":"jacobi",
                               "newton.tolerance":1e-7},
                  )
 
 # %% [markdown]
-# We can simply use the `galerkin' scheme instance to compute the solution
-# as shown previously in
-# [concepts section](concepts_nb.ipynb).
+# We can simply use the `galerkin` scheme instance to compute the solution
+# as shown previously in [the introduction section](dune-fempy_nb.ipynb).
 # We combine this with a loop to compute the error over
 # two grids to observe the expected convergence rate:
 
@@ -104,7 +107,8 @@ for eocLoop in range(loops):
 # method in Python - here is a very simple version of that.
 # The central new method is `linear` available on the scheme that returns a
 # linearized version of the model around a given grid function `ubar`.
-# Much more details on the methods used are given in the next section.
+# Much more details on the methods used are given
+# [in the next section](solversExternal_nb.ipynb).
 
 # %%
 class Scheme:
@@ -139,6 +143,11 @@ info = scheme_cls.solve(target=u_h)
 printResult("Newton 1",u_h-exact,info)
 
 # %% [markdown]
+# .. tip:: The iterative linear solvers use the provided target discrete
+#    function as initial guess for the iteration - so here we are starting
+#    with `0` in each step of the Newton method.
+
+# %% [markdown]
 # A second version using a linearization of the non-linear problem
 # including an affine shift, i.e., the first two terms in the Taylor
 # expansion around a given $\bar{u}$:
@@ -153,7 +162,6 @@ class Scheme:
         # let's use a `gmres` solver for demonstration purposes
         self.linear = linearized(scheme, ubar=u0,
                       parameters={ "method":"gmres", "gmres.restart":50 })
-        self.linear.setup(u0)
 
     def solve(self, target):
         prev = target.copy()
@@ -170,7 +178,6 @@ class Scheme:
             self.linear.setup(target)
             info = self.linear.solve(target=target)
             linIter += info["linear_iterations"]
-            n += 1
 
             # subtract the new iterate from the previous one
             prev.sub( target )
@@ -178,6 +185,7 @@ class Scheme:
             if absDiff < 1e-7**2: # this is the default for the built-in Newton solver
                 break
             prev.assign(target)
+            n += 1
         return {"iterations":n, "linear_iterations":linIter}
 
 u_h.clear()                         # reset u_h
@@ -190,7 +198,8 @@ printResult("Newton 2 (gmres)",u_h-exact,info)
 #    the `scheme` are passed on to the linear solver when calling
 #    `scheme.linear` but can be overwritten.
 #    Below we construct a linearization (by default around zero) which uses a `gmres`
-#    method when calling `jac.solve`:
+#    method when calling `jac.solve` - the same would work with
+#    `sc.linear(parameter={..})`.
 
 # %%
 model = ( inner(grad(u), grad(v)) + (u - conditional(dot(x,x)<0.6,10.,0.))*v ) * dx
@@ -205,7 +214,9 @@ print(info,flush=True)
 
 # %% [markdown]
 # Since we setup the `scheme` using `solver="cg"` calling the `solve`
-# method will use the Newton method + a `cg` solver.
+# method will use the Newton method with a `cg` solver - some verbose
+# output is provided in each step of the Newton method due to
+# `"newton.verbose":True`:
 #
 # .. tip:: since the problem is linear the Newton method produces no real overhead.
 
@@ -284,14 +295,15 @@ class Scheme:
 
         n = 0
         linIter = 0
+        self.scheme.setConstraints(target)
         while True:
-            self.scheme.setConstraints(target)
             self.scheme(target, res)
             absF = res.scalarProductDofs(res)
             if absF < 1e-7**2: # this is the default for the built-in Newton solver
                 break
             self.scheme.jacobian(target,self.jacobian)  # assemble the linearization
             dh.clear()                                  # zero is good initial guess for iterator solver
+            self.scheme.setConstraints(0,res)
             info = self.jacobian.solve(target=dh,rhs=res)
             linIter += info["linear_iterations"]
             target -= dh
@@ -302,6 +314,40 @@ u_h.clear()
 scheme_cls = Scheme(scheme,u0=u_h)
 info = scheme_cls.solve(target=u_h)
 printResult("Dirichlet, Newton 1",u_h-exact,info)
+
+# %% [markdown]
+# and using the `linearized` operator:
+
+# %%
+class Scheme:
+    def __init__(self, scheme, u0):
+        self.scheme = scheme
+        self.model = scheme.model
+        self.linear = linearized(scheme, ubar=u0)
+
+    def solve(self, target):
+        # create a copy of target for the residual
+        prev = target.copy(name="residual")
+
+        n = 0
+        linIter = 0
+        self.scheme.setConstraints(target)
+        while True:
+            self.linear.setup(target)
+            info = self.linear.solve(target=target)
+            linIter += info["linear_iterations"]
+            prev.sub( target )
+            absDiff = prev.scalarProductDofs(prev)
+            if absDiff < 1e-7**2: # this is the default for the built-in Newton solver
+                break
+            prev.assign(target)
+            n += 1
+        return {"iterations":n, "linear_iterations":linIter}
+
+u_h.clear()
+scheme_cls = Scheme(scheme,u0=u_h)
+info = scheme_cls.solve(target=u_h)
+printResult("Dirichlet, Newton 2",u_h-exact,info)
 
 # %% [markdown]
 # ## Other internal solvers (petsc)
