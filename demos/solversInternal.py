@@ -22,28 +22,15 @@
 # A short description on the other storages follows at the end of this
 # section, with more detail [to follow](solversExternal_nb.ipynb).
 #
-# We will mostly revisit the nonlinear time dependent problem studied at the end of the
-# [concepts section](concepts_nb.ipynb) which after discretizing in time had the variational formulation
-# \begin{equation}
-# \begin{split}
-# \int_{\Omega} \frac{u^{n+1}-u^n}{\Delta t} \varphi
-# + \frac{1}{2}K(\nabla u^{n+1}) \nabla u^{n+1} \cdot \nabla \varphi \
-# + \frac{1}{2}K(\nabla u^n) \nabla u^n \cdot \nabla \varphi v\ dx \\
-# - \int_{\Omega} \frac{1}{2}(f(x,t^n)+f(x,t^n+\Delta t) \varphi\ dx
-# - \int_{\partial \Omega} \frac{1}{2}(g(x,t^n)+g(x,t^n+\Delta t)) v\ ds
-# = 0.
-# \end{split}
-# \end{equation}
-# on a domain $\Omega=[0,1]^2$. We choose $f,g$ so that the exact solution
-# is given by
-# \begin{align*}
-# u(x,t) = e^{-2t}\left(\frac{1}{2}(x^2 + y^2) - \frac{1}{3}(x^3 - y^3)\right) + 1
-# \end{align*}
+# We will mostly revisit the nonlinear problem studied at the end of the
+# [introduction](dune-fempy_nb.ipynb) - but we will prescribe a forcing
+# which we compute to obtain the exact solution
+# $ ... $.
 # The following code was described in the [concepts section](concepts_nb.ipynb)
+#
 
 # %%
-import numpy, sys, io
-import matplotlib.pyplot as plt
+import numpy
 
 from dune.grid import structuredGrid as leafGridView
 from dune.fem.space import lagrange
@@ -52,36 +39,24 @@ from dune.fem.function import gridFunction
 from dune.fem import integrate
 from dune.ufl import Constant
 from ufl import TestFunction, TrialFunction, SpatialCoordinate, FacetNormal, \
-                dx, ds, div, grad, dot, inner, sqrt, exp, sin,\
-                conditional
+                dx, ds, div, grad, dot, inner, exp, sin, conditional
 
 gridView = leafGridView([0, 0], [1, 1], [12, 12])
 space = lagrange(gridView, order=2)
+u_h = space.interpolate(0, name='u_h')
 
-x = SpatialCoordinate(space)
-initial = 1/2*(x[0]**2+x[1]**2) - 1/3*(x[0]**3 - x[1]**3) + 1
-exact   = lambda t: exp(-2*t)*(initial - 1) + 1
+x,u,v,n = ( SpatialCoordinate(space), TrialFunction(space), TestFunction(space), FacetNormal(space) )
+exact = 1/2*(x[0]**2+x[1]**2) - 1/3*(x[0]**3 - x[1]**3) + 1
 
-u_h   = space.interpolate(initial, name='u_h')
-u_h_n = u_h.copy(name="previous")
+a  = ( inner(grad(u),grad(v)) + (1+u)**2*u*v ) * dx
+bf = (-div(grad(exact)) + (1+exact)**2*exact) * v * dx
+bg = dot(grad(exact),n)*v*ds
 
-u = TrialFunction(space)
-v = TestFunction(space)
-dt = Constant(1, name="dt")       # time step
-t  = Constant(0, name="time")     # current time
-
-abs_du = lambda u: sqrt(inner(grad(u), grad(u)))
-K = lambda u: 2/(1 + sqrt(1 + 4*abs_du(u)))
-a = ( dot((u - u_h_n)/dt, v) \
-    + 0.5*dot(K(u)*grad(u), grad(v)) \
-    + 0.5*dot(K(u_h_n)*grad(u_h_n), grad(v)) ) * dx
-
-f = lambda s: -2*exp(-2*s)*(initial - 1) - div( K(exact(s))*grad(exact(s)) )
-g = lambda s: K(exact(s))*grad(exact(s))
-bf = 0.5*(f(t)+f(t+dt))*v*dx
-
-n = FacetNormal(space)
-bg = 0.5*dot(g(t)+g(t+dt),n)*v*ds
+# simple function to show the result of a simulation
+def printResult(method,error,info):
+    print(method,"L^2, H^1 error:",'{:0.5e}, {:0.5e}'.format(
+                 *[ numpy.sqrt(e) for e in integrate([error**2,inner(grad(error),grad(error))]) ]),
+          "\n\t","solver info=",info,flush=True)
 
 # %% [markdown]
 # When creating a scheme, it is possible to set the linear solver as well as
@@ -99,70 +74,28 @@ bg = 0.5*dot(g(t)+g(t+dt),n)*v*ds
 
 # %%
 scheme = galerkin(a == bf+bg, solver='cg',
-                  parameters={"newton.linear.preconditioner":"jacobi",
-                              "newton.tolerance":1e-8},
+                  parameters={"newton.linear.preconditioning.method":"jacobi",
+                              "newton.tolerance":1e-7},
                  )
 
-endTime    = 0.25
-exact_end  = exact(endTime)
-l2error = gridFunction(name="l2error", expr=dot(u_h - exact_end, u_h - exact_end))
-h1error = gridFunction(name="h1error", expr=dot(grad(u_h - exact_end), grad(u_h - exact_end)))
-
 # %% [markdown]
-# We define a function to evolve the solution from time 0 to the end time.
-# The first argument is a class with a `solve` method that moves the
-# solution from one time level to the next - i.e., solves the non-linear
-# problem for $u^{n+1}$ given $u^n$:
-
-# %%
-import time as timer
-def evolve(scheme, u_h, u_h_n, endTime):
-    start = timer.time()
-    time = 0
-    nIter,linIter = 0,0
-    steps = 0
-    while time < (endTime - 1e-6):
-        scheme.model.time = time
-        t.value = time
-        # assert t.value == time
-        u_h_n.assign(u_h)
-        info = scheme.solve(target=u_h)
-        nIter += info["iterations"]
-        linIter += info["linear_iterations"]
-        time += scheme.model.dt
-        steps += 1
-    print(f"steps={[steps,scheme.model.dt]}, runtime={timer.time()- start}, iterations={[nIter,linIter]}",flush=True)
-
-# %% [markdown]
-# We can simply use the `galerkin' scheme instance in this function to produce the solution
-# at the final time this is comparable to the code shown previously in
+# We can simply use the `galerkin' scheme instance to compute the solution
+# as shown previously in
 # [concepts section](concepts_nb.ipynb).
 # We combine this with a loop to compute the error over
-# two grids and estimate the convergence rate:
+# two grids to observe the expected convergence rate:
 
 # %%
-dt.value = 0.05
-
 errors = 0,0
 loops = 2
 for eocLoop in range(loops):
-    t.value = 0
-    u_h.interpolate(initial)
-    evolve(scheme, u_h, u_h_n, endTime)
-    errors_old = errors
-    errors = [sqrt(e) for e in integrate([l2error,h1error])]
-    if eocLoop == 0:
-        eocs = ['-','-']
-    else:
-        eocs = [ round(numpy.log(e/e_old)/numpy.log(0.5),2) \
-                 for e,e_old in zip(errors,errors_old) ]
-    print('Forchheimer: step:', eocLoop, ', size:', gridView.size(0),flush=True)
-    print('\t | u_h - u | =', '{:0.5e}'.format(errors[0]), ', eoc =', eocs[0], flush=True)
-    print('\t | grad(uh - u) | =', '{:0.5e}'.format(errors[1]), ', eoc =', eocs[1])
+    u_h.interpolate(0)
+    info = scheme.solve(target=u_h)
+    print('step:', eocLoop, ', size:', gridView.size(0),flush=True)
+    printResult("Default",u_h-exact,info)
     u_h.plot()
     if eocLoop < loops-1:
         gridView.hierarchicalGrid.globalRefine(1)
-        dt.value /= 2
 
 # %% [markdown]
 #
@@ -190,7 +123,7 @@ class Scheme:
         while True:
             self.scheme(target, res)
             absF = res.scalarProductDofs(res)
-            if absF < 1e-8**2: # this is the same tolerance we set above for the built-in Newton solver
+            if absF < 1e-7**2: # this is the same tolerance we set above for the built-in Newton solver
                 break
             self.scheme.jacobian(target,self.jacobian)  # assemble the linearization
             dh.clear()                                  # zero is good initial guess for iterator solver
@@ -200,14 +133,10 @@ class Scheme:
             n += 1
         return {"iterations":n, "linear_iterations":linIter}
 
-t.value = 0
-u_h.interpolate(initial)                # reset u_h to initial
+u_h.interpolate(0)                     # reset u_h to zero (could also use `u_h.clear()`
 scheme_cls = Scheme(scheme,u0=u_h)
-
-evolve(scheme_cls, u_h, u_h_n, endTime)
-error = u_h - exact_end
-print("Forchheimer(Newton 1) size: ", gridView.size(0), "L^2, H^1 error:",'{:0.5e}, {:0.5e}'.format(
-  *[ sqrt(e) for e in integrate([error**2,inner(grad(error),grad(error))]) ]), flush=True)
+info = scheme_cls.solve(target=u_h)
+printResult("Newton 1",u_h-exact,info)
 
 # %% [markdown]
 # A second version using a linearization of the non-linear problem
@@ -246,20 +175,15 @@ class Scheme:
             # subtract the new iterate from the previous one
             prev.sub( target )
             absDiff = prev.scalarProductDofs(prev)
-            if absDiff < 1e-8**2: # this is the default for the built-in Newton solver
+            if absDiff < 1e-7**2: # this is the default for the built-in Newton solver
                 break
             prev.assign(target)
         return {"iterations":n, "linear_iterations":linIter}
 
-t.value = 0
-u_h.interpolate(initial)                # reset u_h to initial
-u_h_n.assign(u_h)
+u_h.clear()                         # reset u_h
 scheme_cls = Scheme(scheme,u_h)
-
-evolve(scheme_cls, u_h, u_h_n, endTime)
-error = u_h - exact_end
-print("Forchheimer(Newton 2) size: ", gridView.size(0), "L^2, H^1 error:",'{:0.5e}, {:0.5e}'.format(
-  *[ sqrt(e) for e in integrate([error**2,inner(grad(error),grad(error))]) ]),flush=True)
+info = scheme_cls.solve(target=u_h)
+printResult("Newton 2 (gmres)",u_h-exact,info)
 
 # %% [markdown]
 # .. tip:: the parameters used to tweak the linear solver set when constructing
@@ -345,7 +269,7 @@ sol.plot()
 # conditions on the whole boundary:
 
 # %%
-scheme = galerkin([a == bf, DirichletBC(space,exact(t+0.5*dt))], solver='cg')
+scheme = galerkin([a == bf, DirichletBC(space,exact)], solver='cg')
 
 class Scheme:
     def __init__(self, scheme, u0):
@@ -364,7 +288,7 @@ class Scheme:
             self.scheme.setConstraints(target)
             self.scheme(target, res)
             absF = res.scalarProductDofs(res)
-            if absF < 1e-8**2: # this is the default for the built-in Newton solver
+            if absF < 1e-7**2: # this is the default for the built-in Newton solver
                 break
             self.scheme.jacobian(target,self.jacobian)  # assemble the linearization
             dh.clear()                                  # zero is good initial guess for iterator solver
@@ -373,13 +297,11 @@ class Scheme:
             target -= dh
             n += 1
         return {"iterations":n, "linear_iterations":linIter}
-t.value = 0
-u_h.interpolate(initial)                # reset u_h to initial
+
+u_h.clear()
 scheme_cls = Scheme(scheme,u0=u_h)
-evolve(scheme_cls, u_h, u_h_n, endTime)
-error = u_h - exact_end
-print("Forchheimer(Dirichlet, Newton 1) size: ", gridView.size(0), "L^2, H^1 error:",'{:0.5e}, {:0.5e}'.format(
-  *[ sqrt(e) for e in integrate([error**2,inner(grad(error),grad(error))]) ]),flush=True)
+info = scheme_cls.solve(target=u_h)
+printResult("Dirichlet, Newton 1",u_h-exact,info)
 
 # %% [markdown]
 # ## Other internal solvers (petsc)
@@ -411,14 +333,11 @@ except ConfigurationError:
 if petsc:
     spacePetsc = lagrange(gridView, order=2, storage='petsc')
     # We use an sor preconditioner:
-    schemePetsc = galerkin(a == bf+bg, space=spacePetsc,
-                           parameters={"linear.preconditioning.method":"sor"})
-    u_h = spacePetsc.interpolate(initial, name='u_h')
-    u_h_n = u_h.copy(name="previous")
-    evolve(schemePetsc, u_h, u_h_n, endTime)
-    error = u_h - exact_end
-    print("Forchheimer(petsc) size: ", gridView.size(0), "L^2, H^1 error:",'{:0.5e}, {:0.5e}'.format(
-      *[ sqrt(e) for e in integrate([error**2,inner(grad(error),grad(error))]) ]))
+    schemePetsc = galerkin(a == bf+bg, space=spacePetsc, solver="cg",
+                           parameters={"newton.linear.preconditioning.method":"hypre"})
+    u_h = spacePetsc.interpolate(0, name='u_h')
+    info = schemePetsc.solve(target=u_h)
+    printResult("PETSc",u_h-exact,info)
 
 # %% [markdown]
 # ## Other internal solvers (istl)
@@ -431,17 +350,11 @@ if petsc:
 # %%
 spaceIstl = lagrange(gridView, order=2, storage='istl')
 # We use an amg preconditioner:
-schemeIstl = galerkin(a == bf+bg, space=spaceIstl,
-                      parameters={"linear.preconditioning.method":"amg-jacobi"})
-u_h = spaceIstl.interpolate(initial, name='u_h')
-u_h_n = u_h.copy(name="previous")
-evolve(schemeIstl, u_h, u_h_n, endTime)
-error = u_h - exact_end
-print("Forchheimer(istl) size: ", gridView.size(0), "L^2, H^1 error:",'{:0.5e}, {:0.5e}'.format(
-      *[ sqrt(e) for e in integrate([error**2,inner(grad(error),grad(error))]) ]))
-
-
-
+schemeIstl = galerkin(a == bf+bg, space=spaceIstl, solver="cg",
+                      parameters={"newton.linear.preconditioning.method":"amg-jacobi"})
+u_h = spaceIstl.interpolate(0, name='u_h')
+info = schemeIstl.solve(target=u_h)
+printResult("Dune-Istl",u_h-exact,info)
 
 # %% [markdown]
 # .. index::

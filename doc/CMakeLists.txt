@@ -14,7 +14,7 @@ dune-corepy.py        mcf-algorithm.py      twophaseflow.py       chemical.py
 concepts.py           dune-fempy.py         mcf_cmp_plot.py       euler.py
 elasticity.py         mcf.py
 uzawa-scipy.py        monolithicStokes.py   fieldsplitStokes.py
-othergrids.py         gitlab-formatting.py  gmsh2dgf.py           solversIntro.py pandoc-formatting.py
+othergrids.py         gitlab-formatting.py  gmsh2dgf.py          pandoc-formatting.py
 vemdemo.py            chimpl.py             discontinuousgalerkin.py
 interpolation.py      wave.py               laplace-adaptive.py   laplace-dwr.py laplace-dwr-algorithm.py
 backuprestore.py      parallelization.py    boundary.py

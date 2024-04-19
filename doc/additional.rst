@@ -48,7 +48,6 @@ Additional Scripts
 Description                                       Script file
 ================================================= =====================================================
 Converter Gmsh-to-DGF                             :download:`convert gmsh file to dgf format <gmsh2dgf.py>`.
-Setup for the solvers notebook                    :download:`intro to solvers discussion <solversIntro.py>`.
 ================================================= =====================================================
 
 

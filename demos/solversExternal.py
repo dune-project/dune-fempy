@@ -18,11 +18,36 @@
 # also available to retrieve the underlying matrix structures of linear
 # operators.
 #
-# We start with the same setup as used [in the previously section](solversInternal_nb.ipynb)
-# (provided in script [solversIntro.py](solversIntro.py)):
+# We start with the same setup as used [in the previously section](solversInternal_nb.ipynb):
 
 # %%
-from solversIntro import *
+import numpy
+
+from dune.grid import structuredGrid as leafGridView
+from dune.fem.space import lagrange
+from dune.fem.scheme import galerkin
+from dune.fem.function import gridFunction
+from dune.fem import integrate
+from dune.ufl import Constant
+from ufl import TestFunction, TrialFunction, SpatialCoordinate, FacetNormal, \
+                dx, ds, div, grad, dot, inner, exp, sin, conditional
+
+gridView = leafGridView([0, 0], [1, 1], [12, 12])
+space = lagrange(gridView, order=2)
+u_h = space.interpolate(0, name='u_h')
+
+x,u,v,n = ( SpatialCoordinate(space), TrialFunction(space), TestFunction(space), FacetNormal(space) )
+exact = 1/2*(x[0]**2+x[1]**2) - 1/3*(x[0]**3 - x[1]**3) + 1
+
+a  = ( inner(grad(u),grad(v)) + (1+u)**2*u*v ) * dx
+bf = (-div(grad(exact)) + (1+exact)**2*exact) * v * dx
+bg = dot(grad(exact),n)*v*ds
+
+# simple function to show the result of a simulation
+def printResult(method,error,info):
+    print(method,"L^2, H^1 error:",'{:0.5e}, {:0.5e}'.format(
+                 *[ numpy.sqrt(e) for e in integrate([error**2,inner(grad(error),grad(error))]) ]),
+          "\n\t","solver info=",info,flush=True)
 
 # %% [markdown]
 # Having defined the model, we can now construct an `operator`. We will
@@ -126,7 +151,7 @@ vh.plot()
 # %%
 import numpy as np
 from scipy.sparse.linalg import spsolve as solver
-class Scheme:
+class Scheme1:
     def __init__(self, op):
         self.model = op.model
         self.jacobian = op.linear()
@@ -151,13 +176,10 @@ class Scheme:
             n += 1
         return {"iterations":n, "linear_iterations":n} # direct linear solver requires no additional iterations
 
-scheme_cls = Scheme(operator)
-
-u_h.interpolate(initial)                # reset u_h to initial
-evolve(scheme_cls, u_h, u_h_n, endTime)
-error = u_h - exact_end
-print("Forchheimer(numpy) size: ", gridView.size(0), "L^2, H^1 error:",'{:0.5e}, {:0.5e}'.format(
-  *[ sqrt(e) for e in integrate([error**2,inner(grad(error),grad(error))]) ]))
+scheme1_cls = Scheme1(operator)
+u_h.clear()
+info = scheme1_cls.solve(target=u_h)
+printResult("Scipy-1",u_h-exact,info)
 
 # %% [markdown]
 # We can also use a non linear solver from the Scipy package
@@ -209,11 +231,9 @@ class Scheme2:
         return {"iterations":self.n, "linear_iterations":-1} # not keeping track of linear iterations
 
 scheme2_cls = Scheme2(operator)
-u_h.interpolate(initial)
-evolve(scheme2_cls, u_h, u_h_n, endTime)
-error = u_h - exact_end
-print("Forchheimer(scipy) size: ", gridView.size(0), "L^2, H^1 error:",'{:0.5e}, {:0.5e}'.format(
-  *[ sqrt(e) for e in integrate([error**2,inner(grad(error),grad(error))]) ]))
+u_h.clear()
+info = scheme2_cls.solve(target=u_h)
+printResult("Scipy-2",u_h-exact,info)
 
 # %% [markdown]
 # .. index::
@@ -233,6 +253,7 @@ except ConfigurationError:
     print("Dune not configured with petsc - skipping example")
     petsc = False
 try:
+    import sys
     import petsc4py
     petsc4py.init(sys.argv)
     from petsc4py import PETSc
@@ -243,19 +264,16 @@ except ModuleNotFoundError:
 # %% [markdown]
 # To use `petsc4py` we need to which to a storage based on the PETSc package
 # using the ``storage`` argument to the space constructor.
-
-# %%
-if petsc:
-    spacePetsc = lagrange(gridView, order=2, storage='petsc')
-    u_h = spacePetsc.interpolate(initial, name='u_h')
-    u_h_n = u_h.copy(name="previous")
-
-# %% [markdown]
+#
 # Implementing a Newton Krylov solver using the binding provided by
 # `petsc4py` is now straightforward:
 
 # %%
 if petsc4py is not None and petsc:
+    spacePetsc = lagrange(gridView, order=2, storage='petsc')
+    u_h = spacePetsc.interpolate(0, name='u_h')
+    schemePetsc = galerkin(a==bf+bg, domainSpace=spacePetsc,rangeSpace=spacePetsc)
+
     class Scheme3:
         def __init__(self, scheme):
             self.model = scheme.model
@@ -284,16 +302,14 @@ if petsc4py is not None and petsc:
                 n += 1
             return {"iterations":n, "linear_iterations":-1} # not keeping track of linear iterations
 
-    schemePetsc = galerkin(a==bf+bg, domainSpace=spacePetsc,rangeSpace=spacePetsc)
-    u_h.interpolate(initial)
+    u_h.interpolate(0)
     scheme3_cls = Scheme3(schemePetsc)
-    evolve(scheme3_cls, u_h, u_h_n, endTime)
-    error = u_h - exact_end
-    print("Forchheimer(petsc4py 1) size: ", gridView.size(0), "L^2, H^1 error:",'{:0.5e}, {:0.5e}'.format(
-      *[ sqrt(e) for e in integrate([error**2,inner(grad(error),grad(error))]) ]))
+    info = scheme3_cls.solve(target=u_h)
+    printResult("PETSc4py",u_h-exact,info)
 
 # %% [markdown]
-# Using the petsc4py bindings for the non linear KSP solvers from PETSc
+# Here is another example now using the petsc4py bindings for the non linear KSP solvers from PETSc
+
 # %%
 if petsc4py is not None and petsc is not None:
     class Scheme4:
@@ -328,9 +344,7 @@ if petsc4py is not None and petsc is not None:
             return {"iterations":self.snes.getIterationNumber(),
                     "linear_iterations":self.snes.getLinearSolveIterations()}
 
-    u_h.interpolate(initial)
     scheme4_cls = Scheme4(schemePetsc)
-    evolve(scheme4_cls, u_h, u_h_n, endTime)
-    error = u_h - exact_end
-    print("Forchheimer(petsc4py 2) size: ", gridView.size(0), "L^2, H^1 error:",'{:0.5e}, {:0.5e}'.format(
-      *[ sqrt(e) for e in integrate([error**2,inner(grad(error),grad(error))]) ]))
+    u_h.clear()
+    info = scheme4_cls.solve(target=u_h)
+    printResult("PETSc4py 2",u_h-exact,info)
