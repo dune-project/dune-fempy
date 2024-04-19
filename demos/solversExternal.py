@@ -56,7 +56,7 @@ def printResult(method,error,info):
 # %%
 from dune.fem.operator import galerkin
 from dune.ufl import DirichletBC
-operator = galerkin([a - (bf+bg), DirichletBC(space,exact,1)])
+operator = galerkin([a - (bf+bg), DirichletBC(space,exact,2)])
 
 # %% [markdown]
 # ## Accessing underlying data structures
@@ -181,9 +181,10 @@ class Scheme1:
         return {"iterations":n, "linear_iterations":n} # direct linear solver requires no additional iterations
 
 scheme1_cls = Scheme1(operator)
-u_h.clear()
+u_h.interpolate(2)
 info = scheme1_cls.solve(target=u_h)
 printResult("Scipy-1",u_h-exact,info)
+u_h.plot()
 
 # %% [markdown]
 # We can also use a non linear solver from the Scipy package - together
@@ -237,7 +238,7 @@ class Scheme2:
         return {"iterations":(M.n), "linear_iterations":M.n}
 
 scheme2_cls = Scheme2(operator)
-u_h.clear()
+u_h.interpolate(2)
 info = scheme2_cls.solve(target=u_h)
 printResult("Scipy-2",u_h-exact,info)
 u_h.plot()
@@ -280,7 +281,7 @@ except ModuleNotFoundError:
 if petsc4py is not None and petsc:
     petsc_options = PETSc.Options()
     spacePetsc = lagrange(gridView, order=2, storage='petsc')
-    u_h = spacePetsc.interpolate(0, name='u_h')
+    u_h = spacePetsc.interpolate(2, name='u_h')  # start with solution at top boundary
     schemePetsc = galerkin([a==bf+bg,DirichletBC(spacePetsc,exact,1)],
                            domainSpace=spacePetsc,rangeSpace=spacePetsc)
 
@@ -320,10 +321,11 @@ if petsc4py is not None and petsc:
                 n += 1
             return {"iterations":n, "linear_iterations":numIter}
 
-    u_h.interpolate(0)
+    u_h.interpolate(2)
     scheme3_cls = Scheme3(schemePetsc)
     info = scheme3_cls.solve(target=u_h)
     printResult("PETSc4py 1",u_h-exact,info)
+    u_h.plot()
 
 # %% [markdown]
 # Here is another example now using the petsc4py bindings for the non
@@ -336,7 +338,7 @@ if petsc4py is not None and petsc is not None:
         def __init__(self, scheme):
             self.scheme = scheme
             self.model = scheme.model
-            self.res = scheme.rangeSpace.interpolate([0],name="residual")
+            self.res = scheme.rangeSpace.interpolate(0,name="residual")
             self.jacobian = scheme.linear()
             self.snes = PETSc.SNES().create()
             self.snes.setFunction(self.f, self.res.as_petsc.duplicate())
@@ -367,6 +369,7 @@ if petsc4py is not None and petsc is not None:
                     "linear_iterations":self.snes.getLinearSolveIterations()}
 
     scheme4_cls = Scheme4(schemePetsc)
-    u_h.clear()
+    u_h.interpolate(2)
     info = scheme4_cls.solve(target=u_h)
     printResult("PETSc4py 2",u_h-exact,info)
+    u_h.plot()

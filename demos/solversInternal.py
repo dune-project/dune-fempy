@@ -92,7 +92,7 @@ scheme = galerkin(a == bf+bg, solver='cg',
 errors = 0,0
 loops = 2
 for eocLoop in range(loops):
-    u_h.interpolate(0)
+    u_h.interpolate(2)               # start with the boundary conditions at the top
     info = scheme.solve(target=u_h)
     print('step:', eocLoop, ', size:', gridView.size(0),flush=True)
     printResult("Default",u_h-exact,info)
@@ -137,7 +137,7 @@ class Scheme:
             n += 1
         return {"iterations":n, "linear_iterations":linIter}
 
-u_h.interpolate(0)                     # reset u_h to zero (could also use `u_h.clear()`
+u_h.interpolate(2)                        # start with the boundary conditions at the top
 scheme_cls = Scheme(scheme,u0=u_h)
 info = scheme_cls.solve(target=u_h)
 printResult("Newton 1",u_h-exact,info)
@@ -295,7 +295,6 @@ class Scheme:
 
         n = 0
         linIter = 0
-        self.scheme.setConstraints(target)
         while True:
             self.scheme(target, res)
             absF = res.scalarProductDofs(res)
@@ -303,14 +302,13 @@ class Scheme:
                 break
             self.scheme.jacobian(target,self.jacobian)  # assemble the linearization
             dh.clear()                                  # zero is good initial guess for iterator solver
-            self.scheme.setConstraints(0,res)
             info = self.jacobian.solve(target=dh,rhs=res)
             linIter += info["linear_iterations"]
             target -= dh
             n += 1
         return {"iterations":n, "linear_iterations":linIter}
 
-u_h.clear()
+u_h.interpolate(2)                        # start with the boundary conditions at the top
 scheme_cls = Scheme(scheme,u0=u_h)
 info = scheme_cls.solve(target=u_h)
 printResult("Dirichlet, Newton 1",u_h-exact,info)
@@ -331,7 +329,6 @@ class Scheme:
 
         n = 0
         linIter = 0
-        self.scheme.setConstraints(target)
         while True:
             self.linear.setup(target)
             info = self.linear.solve(target=target)
@@ -344,7 +341,7 @@ class Scheme:
             n += 1
         return {"iterations":n, "linear_iterations":linIter}
 
-u_h.clear()
+u_h.interpolate(2)
 scheme_cls = Scheme(scheme,u0=u_h)
 info = scheme_cls.solve(target=u_h)
 printResult("Dirichlet, Newton 2",u_h-exact,info)
@@ -381,7 +378,7 @@ if petsc:
     # We use an sor preconditioner:
     schemePetsc = galerkin(a == bf+bg, space=spacePetsc, solver="cg",
                            parameters={"newton.linear.preconditioning.method":"hypre"})
-    u_h = spacePetsc.interpolate(0, name='u_h')
+    u_h = spacePetsc.interpolate(2, name='u_h')
     info = schemePetsc.solve(target=u_h)
     printResult("PETSc",u_h-exact,info)
 
@@ -398,7 +395,7 @@ spaceIstl = lagrange(gridView, order=2, storage='istl')
 # We use an amg preconditioner:
 schemeIstl = galerkin(a == bf+bg, space=spaceIstl, solver="cg",
                       parameters={"newton.linear.preconditioning.method":"amg-jacobi"})
-u_h = spaceIstl.interpolate(0, name='u_h')
+u_h = spaceIstl.interpolate(2, name='u_h')
 info = schemeIstl.solve(target=u_h)
 printResult("Dune-Istl",u_h-exact,info)
 
@@ -483,7 +480,7 @@ param = dict(scheme.parameterLog()) # this method returns a set of pairs which w
 param["logging"] = "Dirichlet" # only needed to use the `parameterLog` method
 param["newton.linear.verbose"] = False
 scheme2 = galerkin( [a==l,DirichletBC(space,0)], parameters=param )
-u_h.clear()
+u_h.interpolate(2)
 info = scheme2.solve(target=u_h)
 pprint(scheme2.parameterLog())
 
