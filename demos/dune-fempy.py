@@ -37,9 +37,9 @@ gridView = structuredGrid([0, 0], [1, 1], [20, 20])
 # %% [markdown]
 #
 # .. note::
-# In the following we will often use the term ``gridView`` instead of grid.
-# The details of what a ``gridView`` is together with some other central
-# concepts is provided in the [next section](concepts_nb.ipynb).
+#    In the following we will often use the term ``gridView`` instead of grid.
+#    The details of what a ``gridView`` is together with some other central
+#    concepts is provided in the [next section](concepts_nb.ipynb).
 #
 # .. tip:: an overview of available approaches to construct a grid can be
 #    found [here](othergrids_nb.ipynb).
@@ -96,7 +96,8 @@ y[:] = solver(A,b)
 #
 # .. tip:: More details on how to use [Scipy](solversExternal_nb.ipynb#Using-Scipy) will be given later
 #    in the tutorial. Other linear solver backends are also available,
-#    e.g., [PETSc](solversInternal_nb.ipynb#Other-internal-solvers-(petsc)).
+#    e.g., [PETSc](solversInternal_nb.ipynb#Other-internal-solvers-(petsc))
+#    and [PETSc4py can also be used](solversExternal_nb.ipynb#Using-PETSc4Py).
 
 # %% [markdown]
 # That's it - to see the result we plot it using matplotlib
@@ -300,6 +301,48 @@ info = scheme.solve(target=u_h)
 # %%
 print(info)
 u_h.plot()
+
+# %% [markdown]
+# Let's complete this discussion by looking at the experimental order of
+# convergence (EOC) of our approximation. For this we add a forcing that
+# leads to the problem having the prescribed solution
+# \begin{align*}
+# u(x,y) = \left(\frac{1}{2}(x^2 + y^2) - \frac{1}{3}(x^3 - y^3)\right) + 1
+# \end{align*}
+
+# %%
+exact = 1/2*(x[0]**2+x[1]**2) - 1/3*(x[0]**3 - x[1]**3) + 1
+a  = ( inner(grad(u),grad(v)) + (1+u)**2*u*v ) * dx
+bf = (-div(grad(exact)) + (1+exact)**2*exact) * v * dx
+bg = dot(grad(exact),n)*v*ds
+scheme = solutionScheme(a == bf+bg, solver="cg")
+
+# %% [markdown]
+# .. note::
+#    we use a Newton method to solve the non-linear problem and by default
+#    a gmres method to solve linear system in each Newton step. We show
+#    here how to switch to a `cg` method since the
+#    problem considered here. [More details are provided later](solversInternal_nb.ipynb).
+
+# %%
+errors = 0,0
+loops = 2
+for eocLoop in range(loops):
+    u_h.interpolate(0)
+    info = scheme.solve(target=u_h)
+    errors_old = errors
+    l2error, h1error = dot(u_h-exact, u_h-exact), dot(grad(u_h-exact), grad(u_h-exact))
+    errors = [np.sqrt(e) for e in integrate([l2error,h1error])]
+    if eocLoop == 0:
+        eocs = ['-','-']
+    else:
+        eocs = [ round(np.log(e/e_old)/np.log(0.5),2) for e,e_old in zip(errors,errors_old) ]
+    print("step:", eocLoop, ", size:", gridView.size(0))
+    print("\t\t L^2, H^1 error:",'{:0.5e}, {:0.5e}'.format(*errors),", eocs =", eocs)
+    print("\t\t solver info=",info)
+    u_h.plot()
+    if eocLoop < loops-1:
+        gridView.hierarchicalGrid.globalRefine(1)
 
 # %% [markdown]
 # .. index::

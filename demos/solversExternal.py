@@ -31,7 +31,7 @@ from dune.fem import integrate
 from ufl import TestFunction, TrialFunction, SpatialCoordinate, FacetNormal, \
                 dx, ds, div, grad, dot, inner, exp, sin, conditional
 
-gridView = leafGridView([0, 0], [1, 1], [12, 12])
+gridView = leafGridView([0, 0], [1, 1], [24, 24])
 space = lagrange(gridView, order=2)
 u_h = space.interpolate(0, name='u_h')
 
@@ -47,8 +47,6 @@ def printResult(method,error,info):
     print(method,"L^2, H^1 error:",'{:0.5e}, {:0.5e}'.format(
                  *[ numpy.sqrt(e) for e in integrate([error**2,inner(grad(error),grad(error))]) ]),
           "\n\t","solver info=",info,flush=True)
-
-gridView.hierarchicalGrid.globalRefine(1)
 
 # %% [markdown]
 # We will use the `galerkin` operator from `dune.fem.operator` instead of the
@@ -150,25 +148,39 @@ vh.plot()
 #    pair: Solvers; Scipy
 #
 # ## Using Scipy
-# In our first example, we implement a simple Newton Krylov solver using a linear solver from
-# Scipy.
+# In our first example, we implement a simple Newton Krylov solver using a
+# `cg` solver from Scipy.
+#
+# .. note::
+#    As pointed out the system matrix is no longer
+#    symmetric due to the handling of the Dirichlet constraints. For this
+#    reason we need to provide an initial guess to the `cg` solver with the
+#    degrees of freedom on the boundary set to be equal to the corresponding
+#    degrees of freedom in the right hand side vector. For this we use the
+#    `setConstraints` method on the solver.
 
 # %%
 import numpy as np
-from scipy.sparse.linalg import spsolve as solver
+from scipy.sparse.linalg import cg
 class Scheme1:
     def __init__(self, op):
         self.model = op.model
         self.jacobian = op.linear()
         self.op = op
+        self.linIter = 0
+
+    def callback(self,x):
+        self.linIter += 1
 
     def solve(self, target):
         # create a copy of target for the residual
         res = target.copy(name="residual")
+        initialGuess = target.copy(name="initial-guess")
 
         # extract numpy vectors from target and res
         sol_coeff = target.as_numpy
         res_coeff = res.as_numpy
+        x0 = initialGuess.as_numpy
 
         n = 0
         while True:
@@ -177,10 +189,12 @@ class Scheme1:
             if absF < 1e-6:
                 break
             self.op.jacobian(target,self.jacobian)
-            dh_coeff = solver(self.jacobian.as_numpy, res_coeff)
-            sol_coeff -= dh_coeff
+            self.op.setConstraints(res,initialGuess)
+            dh_coeff = cg(self.jacobian.as_numpy, res_coeff, x0,
+                          callback=lambda x: self.callback(x) )
+            sol_coeff -= dh_coeff[0]
             n += 1
-        return {"iterations":n, "linear_iterations":n} # direct linear solver requires no additional iterations
+        return {"iterations":n, "linear_iterations":self.linIter}
 
 scheme1_cls = Scheme1(operator)
 u_h.interpolate(2)
@@ -190,17 +204,28 @@ u_h.plot()
 
 # %% [markdown]
 # We can also use a non linear solver from the Scipy package - together
-# for example with an incomplete LU factorization for the Jacobian:
+# for example with an incomplete LU factorization for the Jacobian.
+#
+# .. note::
+#    since we are using a LU type method here (i.e. a direct solver) we do
+#    not need to worry about the constraints as with the `cg` method
+#    previously.
 
 # %%
 from scipy.optimize import newton_krylov, root
-from scipy.sparse.linalg import LinearOperator,cg,spilu
+from scipy.sparse.linalg import LinearOperator,spilu
 
 class Scheme2:
     def __init__(self, op):
         self.op = operator
         self.model = op.model
         self.res = u_h.copy(name="residual")
+        self.linIter = 0
+
+    def callback(self,x):
+        self.linIter += 1
+    def cgCallback(self,*args,**kwargs):
+        return cg(*args,**kwargs,callback=lambda x:self.callback(x))
 
     # non linear function
     def f(self, x_coeff):
@@ -236,8 +261,8 @@ class Scheme2:
         M = self.Df(self.op,sol_coeff)
         # call the newton krylov solver from scipy
         sol_coeff[:] = newton_krylov(self.f, sol_coeff,
-                    f_tol=1e-6, method=cg, inner_M=M)
-        return {"iterations":(M.n), "linear_iterations":M.n}
+                    f_tol=1e-6, method=self.cgCallback, inner_M=M)
+        return {"iterations":M.n, "linear_iterations":self.linIter}
 
 scheme2_cls = Scheme2(operator)
 u_h.interpolate(2)
@@ -249,7 +274,7 @@ u_h.plot()
 # .. index::
 #    pair: Solvers; Petsc4Py
 #
-# ## Using Petsc4Py
+# ## Using PETSc4Py
 # The following requires that a PETSc installation was found during the
 # configuration of ``dune``. Furthermore the Python package ``petsc4py`
 # is required:
@@ -284,22 +309,24 @@ if petsc4py is not None and petsc:
     petsc_options = PETSc.Options()
     spacePetsc = lagrange(gridView, order=2, storage='petsc')
     u_h = spacePetsc.interpolate(2, name='u_h')  # start with solution at top boundary
-    schemePetsc = galerkin([a==bf+bg,DirichletBC(spacePetsc,exact,1)],
-                           domainSpace=spacePetsc,rangeSpace=spacePetsc)
+    opPetsc = galerkin([a==bf+bg,DirichletBC(spacePetsc,exact,2)],
+                       domainSpace=spacePetsc,rangeSpace=spacePetsc)
 
     class Scheme3:
         def __init__(self, op):
-            self.model = op.model
             self.op = op
             self.jacobian = op.linear()
             self.ksp = PETSc.KSP()
             self.ksp.create(PETSc.COMM_WORLD)
             # use conjugate gradients method
             self.ksp.setType("cg")
-            # use an incomplete lu preconditioner
+            # use sor preconditioner
+            # self.ksp.getPC().setType("sor")
+            # or ILU(1)
             self.ksp.getPC().setType("ilu")
-            self.ksp.setOperators(self.jacobian.as_petsc)
             petsc_options['pc_factor_levels'] = 1
+            self.ksp.setOperators(self.jacobian.as_petsc)
+            self.ksp.setInitialGuessNonzero(True)
             self.ksp.setFromOptions()
         def solve(self, target):
             res = target.copy(name="residual")
@@ -316,6 +343,7 @@ if petsc4py is not None and petsc:
                     break
                 dh.clear()
                 self.op.jacobian(target,self.jacobian)
+                self.op.setConstraints(res,dh) # petsc does not seem to need this...
                 self.ksp.setUp()
                 self.ksp.solve(res_coeff, dh_coeff)
                 numIter += self.ksp.getIterationNumber()
@@ -324,7 +352,7 @@ if petsc4py is not None and petsc:
             return {"iterations":n, "linear_iterations":numIter}
 
     u_h.interpolate(2)
-    scheme3_cls = Scheme3(schemePetsc)
+    scheme3_cls = Scheme3(opPetsc)
     info = scheme3_cls.solve(target=u_h)
     printResult("PETSc4py 1",u_h-exact,info)
     u_h.plot()
@@ -337,11 +365,10 @@ if petsc4py is not None and petsc:
 # %%
 if petsc4py is not None and petsc is not None:
     class Scheme4:
-        def __init__(self, scheme):
-            self.scheme = scheme
-            self.model = scheme.model
-            self.res = scheme.rangeSpace.interpolate(0,name="residual")
-            self.jacobian = scheme.linear()
+        def __init__(self, op):
+            self.op = op
+            self.res = op.rangeSpace.interpolate(0,name="residual")
+            self.jacobian = op.linear()
             self.snes = PETSc.SNES().create()
             self.snes.setFunction(self.f, self.res.as_petsc.duplicate())
             self.snes.setUseMF(False)
@@ -354,13 +381,13 @@ if petsc4py is not None and petsc is not None:
 
         def f(self, snes, x, f):
             # setup discrete function using the provide petsc vectors
-            inDF = self.scheme.domainSpace.function("tmp",dofVector=x)
-            outDF = self.scheme.rangeSpace.function("tmp",dofVector=f)
-            self.scheme(inDF,outDF)
+            inDF = self.op.domainSpace.function("tmp",dofVector=x)
+            outDF = self.op.rangeSpace.function("tmp",dofVector=f)
+            self.op(inDF,outDF)
 
         def Df(self, snes, x, m, b):
-            inDF = self.scheme.domainSpace.function("tmp",dofVector=x)
-            self.scheme.jacobian(inDF, self.jacobian)
+            inDF = self.op.domainSpace.function("tmp",dofVector=x)
+            self.op.jacobian(inDF, self.jacobian)
             return PETSc.Mat.Structure.SAME_NONZERO_PATTERN
 
         def solve(self, target):
@@ -370,7 +397,7 @@ if petsc4py is not None and petsc is not None:
             return {"iterations":self.snes.getIterationNumber(),
                     "linear_iterations":self.snes.getLinearSolveIterations()}
 
-    scheme4_cls = Scheme4(schemePetsc)
+    scheme4_cls = Scheme4(opPetsc)
     u_h.interpolate(2)
     info = scheme4_cls.solve(target=u_h)
     printResult("PETSc4py 2",u_h-exact,info)

@@ -17,21 +17,21 @@
 # from a discrete function with this default storage by using the `as_numpy`
 # attribute on an instance of a discrete function. Similar attributes are available
 # for the other storages, i.e., `as_istl,as_petsc`. The same attributes are
-# also available to retrieve the underlying matrix structures on
-# operators/schemes on linear operators/schemes.
+# also available to retrieve the underlying matrix structures on linear
+# operators/schemes.
 # A short description on the other storages with examples using the internal
 # bindings for these packages follows at the end of this section.
-# We will discuss how to use these attributes to implement part of the
-# solution algorithm on the Python side using `Scipy` or `PETSc4py`
+# We will discuss how to use these attributes to implement (parts of)
+# the solution algorithm on the Python side using `Scipy` or `PETSc4py`
 # [will follow](solversExternal_nb.ipynb).
 #
 # We will mostly revisit the nonlinear problem studied at the end of the
-# [introduction](dune-fempy_nb.ipynb) - but we will prescribe a forcing
-# which we compute to obtain the exact solution
+# [introduction](dune-fempy_nb.ipynb) - using the prescribed forcing
+# to obtain the exact solution
 # \begin{align*}
 # u(x,y) = \left(\frac{1}{2}(x^2 + y^2) - \frac{1}{3}(x^3 - y^3)\right) + 1
 # \end{align*}
-# The following code was described in the [concepts section](concepts_nb.ipynb)
+# The following code was described in the [introduction](dune-fempy_nb.ipynb)
 
 # %%
 import numpy
@@ -42,7 +42,7 @@ from dune.fem import integrate
 from ufl import TestFunction, TrialFunction, SpatialCoordinate, FacetNormal, \
                 dx, ds, div, grad, dot, inner, exp, sin, conditional
 
-gridView = leafGridView([0, 0], [1, 1], [12, 12])
+gridView = leafGridView([0, 0], [1, 1], [24, 24])
 space = lagrange(gridView, order=2)
 u_h = space.interpolate(0, name='u_h')
 
@@ -64,16 +64,10 @@ def printResult(method,error,info):
 # parameters for the internal Newton solver and the linear solver (e.g. for
 # preconditioning). See a list of available solvers and preconditioning
 # methods at [the end of this section](#Available-solvers-and-parameters).
-#
 # The default solver is a `gmres`
 # method but since this problem is symmetric a `cg` solver is more
 # efficient. In addition we will use a Jacobi preconditioner and set
 # the tolerance for the Newton method to $10^{-8}$:
-#
-# .. tip:: we use Krylov methods like `cg` and `gmres` in this section to
-#    solve the linear problems. We also provide bindings for direct solvers
-#    from the `suitesparse` package, e.g., `umfpack` if installed. For this use
-#    `solver=["suitesparse","umfpack"]` when constructing the scheme.
 
 # %%
 from dune.fem.scheme import galerkin
@@ -83,22 +77,19 @@ scheme = galerkin(a == bf+bg, solver='cg',
                  )
 
 # %% [markdown]
+# .. tip:: we use Krylov methods like `cg` and `gmres` in this section to
+#    solve the linear problems. We also provide bindings for direct solvers
+#    from the `suitesparse` package, e.g., `umfpack` if installed. For this use
+#    `solver=["suitesparse","umfpack"]` when constructing the scheme.
+#
 # We can simply use the `galerkin` scheme instance to compute the solution
 # as shown previously in [the introduction section](dune-fempy_nb.ipynb).
-# We combine this with a loop to compute the error over
-# two grids to observe the expected convergence rate:
 
 # %%
-errors = 0,0
-loops = 2
-for eocLoop in range(loops):
-    u_h.interpolate(2)               # start with the boundary conditions at the top
-    info = scheme.solve(target=u_h)
-    print('step:', eocLoop, ', size:', gridView.size(0),flush=True)
-    printResult("Default",u_h-exact,info)
-    u_h.plot()
-    if eocLoop < loops-1:
-        gridView.hierarchicalGrid.globalRefine(1)
+u_h.interpolate(2)               # start with the boundary conditions at the top
+info = scheme.solve(target=u_h)
+printResult("Default",u_h-exact,info)
+u_h.plot()
 
 # %% [markdown]
 #
@@ -106,24 +97,21 @@ for eocLoop in range(loops):
 # We can also only use the internal linear solvers and write the Newton
 # method in Python - here is a very simple version of that.
 # The central new method is `linear` available on the scheme that returns a
-# linearized version of the model around a given grid function `ubar`.
+# linear `scheme` which represents the Jacobian of the model around a given grid function `ubar`.
 # Much more details on the methods used are given
 # [in the next section](solversExternal_nb.ipynb).
 
 # %%
-class Scheme:
+class Scheme1:
     def __init__(self, scheme, u0):
         self.scheme = scheme
-        self.model = scheme.model
         self.jacobian = scheme.linear(ubar=u0) # obtain a linear operator for the Newton method
 
     def solve(self, target):
         # create a copy of target for the residual
         res = target.copy(name="residual")
         dh  = target.copy(name="direction")
-
-        n = 0
-        linIter = 0
+        n, linIter = 0,0
         while True:
             self.scheme(target, res)
             absF = res.scalarProductDofs(res)
@@ -138,7 +126,7 @@ class Scheme:
         return {"iterations":n, "linear_iterations":linIter}
 
 u_h.interpolate(2)                        # start with the boundary conditions at the top
-scheme_cls = Scheme(scheme,u0=u_h)
+scheme_cls = Scheme1(scheme,u0=u_h)
 info = scheme_cls.solve(target=u_h)
 printResult("Newton 1",u_h-exact,info)
 
@@ -155,18 +143,16 @@ printResult("Newton 1",u_h-exact,info)
 
 # %%
 from dune.fem.scheme import linearized
-class Scheme:
+class Scheme2:
     def __init__(self, scheme, u0):
         self.scheme = scheme
-        self.model = scheme.model
         # let's use a `gmres` solver for demonstration purposes
         self.linear = linearized(scheme, ubar=u0,
                       parameters={ "method":"gmres", "gmres.restart":50 })
 
     def solve(self, target):
         prev = target.copy()
-        n = 0
-        linIter = 0
+        n, linIter = 0,0
         # we are not computing the residual directly so need a different
         # stopping criteria, i.e., size of the step dh
         while True:
@@ -179,17 +165,19 @@ class Scheme:
             info = self.linear.solve(target=target)
             linIter += info["linear_iterations"]
 
-            # subtract the new iterate from the previous one
+            # We don't have access to the residual so we use |u^{n+1}-u^n|
+            # as stopping criteria.
+            # Subtract the new iterate from the previous one
             prev.sub( target )
             absDiff = prev.scalarProductDofs(prev)
-            if absDiff < 1e-7**2: # this is the default for the built-in Newton solver
+            if absDiff < 1e-7**2:
                 break
             prev.assign(target)
             n += 1
         return {"iterations":n, "linear_iterations":linIter}
 
-u_h.clear()                         # reset u_h
-scheme_cls = Scheme(scheme,u_h)
+u_h.clear()                         # reset u_h - so we start the Newton method with u_h=0
+scheme_cls = Scheme2(scheme,u_h)
 info = scheme_cls.solve(target=u_h)
 printResult("Newton 2 (gmres)",u_h-exact,info)
 
@@ -200,6 +188,8 @@ printResult("Newton 2 (gmres)",u_h-exact,info)
 #    Below we construct a linearization (by default around zero) which uses a `gmres`
 #    method when calling `jac.solve` - the same would work with
 #    `sc.linear(parameter={..})`.
+#
+# Here is another example of this:
 
 # %%
 model = ( inner(grad(u), grad(v)) + (u - conditional(dot(x,x)<0.6,10.,0.))*v ) * dx
@@ -217,13 +207,14 @@ print(info,flush=True)
 # method will use the Newton method with a `cg` solver - some verbose
 # output is provided in each step of the Newton method due to
 # `"newton.verbose":True`:
-#
-# .. tip:: since the problem is linear the Newton method produces no real overhead.
 
 # %%
 sol.clear()
 info = sc.solve(target=sol)
 print(info,flush=True)
+
+# %% [markdown]
+# .. tip:: since the problem is linear the Newton method produces no real overhead.
 
 # %% [markdown]
 # .. index::
@@ -235,7 +226,7 @@ print(info,flush=True)
 # ## Handling Dirichlet boundary conditions
 # We first look at a simple Poisson problem with Dirichlet BCs
 # to show how to use the internal solvers in this setting.
-# We solve $-\triangle u=10\chi_\omega$ where $\chi_\omega$ is a characteristic
+# We solve $-\triangle u=15\chi_\omega$ where $\chi_\omega$ is a characteristic
 # function with $\omega=\{x\colon |x|^2<0.6\}$. For the boundary
 # we prescribe trivial Neumann at the top and bottom boundaries
 # and Dirichlet values $u=-1$ and $u=1$ at the left and right
@@ -244,8 +235,7 @@ print(info,flush=True)
 # %%
 from dune.ufl import DirichletBC
 from scipy.sparse.linalg import cg as solver
-model = ( inner(grad(u), grad(v)) -
-          conditional(dot(x,x)<0.6,10.,0.) * v ) * dx
+model = ( inner(grad(u), grad(v)) - 15*conditional(dot(x,x)<0.6,1.,0.) * v ) * dx
 dbcs  = [ DirichletBC(space,-1,1), DirichletBC(space, 1,2) ]
 op  = galerkin([model==0, *dbcs], space)
 sol = space.interpolate(0, name="u_h")
@@ -275,44 +265,18 @@ lin.solve(rhs=rhs,target=sol)
 sol.plot()
 
 # %% [markdown]
-# Let's revisit the first implementation of the Newton method discussed
-# above but change the time dependent problem to require Dirichlet
-# conditions on the whole boundary:
+# Let's revisit our two implementations of the Newton method discussed
+# above but with Dirichlet conditions on the whole boundary:
 
 # %%
 scheme = galerkin([a == bf, DirichletBC(space,exact)], solver='cg')
 
-class Scheme:
-    def __init__(self, scheme, u0):
-        self.scheme = scheme
-        self.model = scheme.model
-        self.jacobian = scheme.linear(ubar=u0)  # obtain a linear operator for the Newton method
+# %% [markdown]
+# First version with `scheme.linear`:
 
-    def solve(self, target):
-        # create a copy of target for the residual
-        res = target.copy(name="residual")
-        dh  = target.copy(name="direction")
-
-        n = 0
-        linIter = 0
-        while True:
-            self.scheme(target, res)
-            # res^n = u^n - g on bnd
-            absF = res.scalarProductDofs(res)
-            if absF < 1e-7**2: # this is the default for the built-in Newton solver
-                break
-            self.scheme.jacobian(target,self.jacobian)  # assemble the linearization
-            dh.clear()                                  # zero is good initial guess for iterator solver
-            info = self.jacobian.solve(target=dh,rhs=res)
-            # dh^n = res^n = u^n - g on bnd
-            linIter += info["linear_iterations"]
-            target -= dh
-            # u^{n+1} = u^n - dh^n = u^n - u^n + g on bnd
-            n += 1
-        return {"iterations":n, "linear_iterations":linIter}
-
+# %%
 u_h.interpolate(2)                        # start with the boundary conditions at the top
-scheme_cls = Scheme(scheme,u0=u_h)
+scheme_cls = Scheme1(scheme,u0=u_h)
 info = scheme_cls.solve(target=u_h)
 printResult("Dirichlet, Newton 1",u_h-exact,info)
 
@@ -320,37 +284,8 @@ printResult("Dirichlet, Newton 1",u_h-exact,info)
 # and using the `linearized` operator:
 
 # %%
-class Scheme:
-    def __init__(self, scheme, u0):
-        self.scheme = scheme
-        self.model = scheme.model
-        self.linear = linearized(scheme, ubar=u0)
-
-    def solve(self, target):
-        # create a copy of target for the residual
-        prev = target.copy(name="residual")
-
-        n = 0
-        linIter = 0
-        while True:
-            # setup operator L[w] = DS[u]w + S[u] - DS[u]u with and w-g on boundary
-            self.linear.setup(target)
-            # solve L[u_new] = 0 so
-            #       u_new = -DS[u]^{-1}(S[u]-DS[u]u) = u - DS[u]^{-1}S[u]
-            #       and   = g on boundary
-            info = self.linear.solve(target=target)
-            linIter += info["linear_iterations"]
-            # we have not computed the residual directly so we use # |u-u_new|<tol as stopping criteria
-            prev.sub( target )
-            absDiff = prev.scalarProductDofs(prev)
-            if absDiff < 1e-7**2: # this is the default for the built-in Newton solver
-                break
-            prev.assign(target)
-            n += 1
-        return {"iterations":n, "linear_iterations":linIter}
-
 u_h.interpolate(2)
-scheme_cls = Scheme(scheme,u0=u_h)
+scheme_cls = Scheme2(scheme,u0=u_h)
 info = scheme_cls.solve(target=u_h)
 printResult("Dirichlet, Newton 2",u_h-exact,info)
 
@@ -379,16 +314,24 @@ except ConfigurationError:
 # Switching to a storage based on the PETSc solver package and solving the
 # system using the dune-fem bindings can be achieved by using the
 # ``storage`` argument to the space constructor.
+#
+# .. Note:: that we can use the
+#    ufl forms we already defined. Normally we space to use is extracted from
+#    the form but this can be overwritten by providing a `space` argument
+#    during scheme construction:
+#
+# We'll use Dirichlet BCs at the left boundary only:
 
 # %%
 if petsc:
     spacePetsc = lagrange(gridView, order=2, storage='petsc')
     # We use an sor preconditioner:
-    schemePetsc = galerkin(a == bf+bg, space=spacePetsc, solver="cg",
+    schemePetsc = galerkin([a == bf+bg, DirichletBC(space,exact,2)],
+                           space=spacePetsc, solver="cg",
                            parameters={"newton.linear.preconditioning.method":"hypre"})
-    u_h = spacePetsc.interpolate(2, name='u_h')
-    info = schemePetsc.solve(target=u_h)
-    printResult("PETSc",u_h-exact,info)
+    uPetsc_h = spacePetsc.interpolate(2, name='u_h')
+    info = schemePetsc.solve(target=uPetsc_h)
+    printResult("PETSc",uPetsc_h-exact,info)
 
 # %% [markdown]
 # ## Other internal solvers (istl)
@@ -396,14 +339,18 @@ if petsc:
 #    pair: Solvers; dune-istl
 #
 # We can just as easily use the `dune-istl` package to solve the system
-# (`dune-istl` should be available when installing `dune-fem`):
+# (`dune-istl` should be available when installing `dune-fem`).
+#
+# .. tip:: instead of changing the storage in the space requiring some
+#    extra compilation it is also possible to provide the solver
+#    information directly to the scheme as shown here.
 
 # %%
 spaceIstl = lagrange(gridView, order=2, storage='istl')
 # We use an amg preconditioner:
-schemeIstl = galerkin(a == bf+bg, space=spaceIstl, solver="cg",
+schemeIstl = galerkin(a == bf+bg, solver=("istl","cg"),
                       parameters={"newton.linear.preconditioning.method":"amg-jacobi"})
-u_h = spaceIstl.interpolate(2, name='u_h')
+u_h.interpolate(2)
 info = schemeIstl.solve(target=u_h)
 printResult("Dune-Istl",u_h-exact,info)
 
