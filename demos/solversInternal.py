@@ -297,14 +297,17 @@ class Scheme:
         linIter = 0
         while True:
             self.scheme(target, res)
+            # res^n = u^n - g on bnd
             absF = res.scalarProductDofs(res)
             if absF < 1e-7**2: # this is the default for the built-in Newton solver
                 break
             self.scheme.jacobian(target,self.jacobian)  # assemble the linearization
             dh.clear()                                  # zero is good initial guess for iterator solver
             info = self.jacobian.solve(target=dh,rhs=res)
+            # dh^n = res^n = u^n - g on bnd
             linIter += info["linear_iterations"]
             target -= dh
+            # u^{n+1} = u^n - dh^n = u^n - u^n + g on bnd
             n += 1
         return {"iterations":n, "linear_iterations":linIter}
 
@@ -330,9 +333,14 @@ class Scheme:
         n = 0
         linIter = 0
         while True:
+            # setup operator L[w] = DS[u]w + S[u] - DS[u]u with and w-g on boundary
             self.linear.setup(target)
+            # solve L[u_new] = 0 so
+            #       u_new = -DS[u]^{-1}(S[u]-DS[u]u) = u - DS[u]^{-1}S[u]
+            #       and   = g on boundary
             info = self.linear.solve(target=target)
             linIter += info["linear_iterations"]
+            # we have not computed the residual directly so we use # |u-u_new|<tol as stopping criteria
             prev.sub( target )
             absDiff = prev.scalarProductDofs(prev)
             if absDiff < 1e-7**2: # this is the default for the built-in Newton solver

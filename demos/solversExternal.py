@@ -48,6 +48,8 @@ def printResult(method,error,info):
                  *[ numpy.sqrt(e) for e in integrate([error**2,inner(grad(error),grad(error))]) ]),
           "\n\t","solver info=",info,flush=True)
 
+gridView.hierarchicalGrid.globalRefine(1)
+
 # %% [markdown]
 # We will use the `galerkin` operator from `dune.fem.operator` instead of the
 # `scheme` used so far, since we do not need the `solve` method since we
