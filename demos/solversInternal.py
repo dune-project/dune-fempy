@@ -26,8 +26,8 @@
 # [will follow](solversExternal_nb.ipynb).
 #
 # We will mostly revisit the nonlinear problem studied at the end of the
-# [introduction](dune-fempy_nb.ipynb) - using the prescribed forcing
-# to obtain the exact solution
+# section on [non-linear elliptic problems](dune-fempy_nb.ipynb#A-non-linear-elliptic-problem)
+# in the introduction - using a prescribed forcing to obtain the exact solution
 # \begin{align*}
 # u(x,y) = \left(\frac{1}{2}(x^2 + y^2) - \frac{1}{3}(x^3 - y^3)\right) + 1
 # \end{align*}
@@ -113,14 +113,20 @@ class Scheme1:
         dh  = target.copy(name="direction")
         n, linIter = 0,0
         while True:
+            # res = S[u]
+            #     = u - g on boundary
             self.scheme(target, res)
             absF = res.scalarProductDofs(res)
             if absF < 1e-7**2: # this is the same tolerance we set above for the built-in Newton solver
                 break
             self.scheme.jacobian(target,self.jacobian)  # assemble the linearization
-            dh.clear()                                  # zero is good initial guess for iterator solver
-            info = self.jacobian.solve(target=dh,rhs=res)
+            # dh = DS[u]^{-1}S[u]
+            #    = u - g on boundary
+            dh.clear()
+            info = self.jacobian.solve(target=dh,rightHandSide=res)
             linIter += info["linear_iterations"]
+            # unew = u - DS[u]^{-1}S[u]
+            #      = u - (u-g) = g on boundary
             target -= dh
             n += 1
         return {"iterations":n, "linear_iterations":linIter}
@@ -234,7 +240,6 @@ print(info,flush=True)
 
 # %%
 from dune.ufl import DirichletBC
-from scipy.sparse.linalg import cg as solver
 model = ( inner(grad(u), grad(v)) - 15*conditional(dot(x,x)<0.6,1.,0.) * v ) * dx
 dbcs  = [ DirichletBC(space,-1,1), DirichletBC(space, 1,2) ]
 op  = galerkin([model==0, *dbcs], space)
@@ -261,7 +266,7 @@ rhs = sol.copy()
 op(sol,rhs)
 rhs *= -1
 op.setConstraints(rhs)
-lin.solve(rhs=rhs,target=sol)
+lin.solve(rightHandSide=rhs,target=sol)
 sol.plot()
 
 # %% [markdown]
