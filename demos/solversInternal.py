@@ -77,7 +77,7 @@ scheme = galerkin(a == bf+bg, solver='cg',
                  )
 
 # %% [markdown]
-# .. tip:: we use Krylov methods like `cg` and `gmres` in this section to
+# .. tip:: We use Krylov methods like `cg` and `gmres` in this section to
 #    solve the linear problems. We also provide bindings for direct solvers
 #    from the `suitesparse` package, e.g., `umfpack` if installed. For this use
 #    `solver=["suitesparse","umfpack"]` when constructing the scheme.
@@ -188,7 +188,7 @@ info = scheme_cls.solve(target=u_h)
 printResult("Newton 2 (gmres)",u_h-exact,info)
 
 # %% [markdown]
-# .. tip:: the parameters used to tweak the linear solver set when constructing
+# .. tip:: The parameters used to tweak the linear solver set when constructing
 #    the `scheme` are passed on to the linear solver when calling
 #    `scheme.linear` but can be overwritten.
 #    Below we construct a linearization (by default around zero) which uses a `gmres`
@@ -220,7 +220,7 @@ info = sc.solve(target=sol)
 print(info,flush=True)
 
 # %% [markdown]
-# .. tip:: since the problem is linear the Newton method produces no real overhead.
+# .. note:: Since the problem is linear the Newton method produces no real overhead.
 
 # %% [markdown]
 # .. index::
@@ -346,7 +346,7 @@ if petsc:
 # We can just as easily use the `dune-istl` package to solve the system
 # (`dune-istl` should be available when installing `dune-fem`).
 #
-# .. tip:: instead of changing the storage in the space requiring some
+# .. tip:: Instead of changing the storage in the space requiring some
 #    extra compilation it is also possible to provide the solver
 #    information directly to the scheme as shown here.
 
