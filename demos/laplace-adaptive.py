@@ -33,6 +33,10 @@ from dune.fem import integrate
 from ufl import *
 from dune.ufl import DirichletBC
 
+from functools import partial
+from dune.common import comm
+# print can be used in parallel runs as before but will only produce output on rank 0
+print = partial(print, flush=True) if comm.rank == 0 else lambda *args, **kwargs: None
 
 # set the angle for the corner (0<angle<=360)
 cornerAngle = 320.
