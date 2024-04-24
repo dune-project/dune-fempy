@@ -1,25 +1,24 @@
 Since 2.9 release
 =================
 
-Deprecation of the rhs argument for ``scheme.solve``
-----------------------------------------------------
+Deprecation of the ``rhs`` argument for ``scheme.solve``
+--------------------------------------------------------
+The ``rhs`` argument has been replaced with ``rightHandSide`` and has to be provided
+as a named argument.
 
-The `rhs` argument has been replaced with `rightHandSide`
-and has to be provided as a named argument.
+.. warning:: ``schemes`` with Dirichlet constraints did not handle a given
+   ``rhs`` argument correctly. The returned ``target`` was always equal to
+   the Dirichlet conditions on the boundary independent of the values in
+   the provided ``rhs``. This has now been corrected so that
+   ``target=rhs+dirichlet`` at the boundary which is consistent with the
+   evaluation of the operator
+   (``operator(u,w)`` results in ``w=u-dirichlet`` on the boundary).
+   To obtain the old behavior add ``scheme.setConstraints(0,rhs)`` before
+   calling ``scheme.solve(target=target,rightHandSide=rhs)``. No changes
+   are needed for ``schemes`` without Dirichlet boundary constraints.
 
-.. warning::
-   `schemes` with Dirichlet constraints did not handle a given `rhs` argument correctly.
-   The returned `target` was always equal to the Dirichlet conditions on the boundary
-   independent of the values in the provided `rhs`.
-   This has now been corrected so that `target=rhs+dirichlet` at the boundary
-   which is consistent with the evaluation of the operator
-   (`operator(u,w)` results in `w=u-dirichlet` on the boundary).
-   To obtain the old behavior add `scheme.setConstraints(0,rhs)` before calling
-   `scheme.solve(target=target,rightHandSide=rhs)`.
-   No changes are needed for schemes without Dirichlet boundary constraints.
-
-Added a ``solve`` method to the linearization of `schemes`
-----------------------------------------------------------
+Added a ``solve`` method to the linearization of ``schemes``
+------------------------------------------------------------
 The object returned by the `linear` method on a `scheme` now has a `solve` method.
 
 Updated ``dune.fem.scheme.linearized``
