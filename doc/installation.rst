@@ -47,7 +47,7 @@ the later `jupyter` is needed
 This has been tested with different Linux distributions, MacOS, and using
 the *Windows Subsystem for Linux*.
 
-.. note::
+.. important::
 
    The current installation requires MPI to be available.
 

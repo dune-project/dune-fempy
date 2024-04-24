@@ -320,7 +320,7 @@ except ConfigurationError:
 # system using the dune-fem bindings can be achieved by using the
 # ``storage`` argument to the space constructor.
 #
-# .. note:: That we can use the
+# .. note:: We can use the
 #    ufl forms we already have defined. Normally the space
 #    to use is extracted from the form but this can
 #    be overwritten by providing a `space` argument
