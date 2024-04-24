@@ -146,7 +146,7 @@ estimator = estimatorOp(estimator_ufl)
 h1error = dot(grad(uh - exact), grad(uh - exact))
 
 def compute(tolerance):
-    fig = pyplot.figure(figsize=(60,30))
+    fig = pyplot.figure(figsize=(20,10))
     count = 0
     errorVector    = []
     estimateVector = []
@@ -186,7 +186,7 @@ compute( tolerance=1e-6 )
 
 # %%
 pyplot.close('all')
-fig = pyplot.figure(figsize=(45,15))
+fig = pyplot.figure(figsize=(30,10))
 plot(uh, figure=(fig, 131), xlim=(-0.5, 0.5), ylim=(-0.5, 0.5),
         gridLines="white", colorbar={"shrink": 0.75}, linewidth=2)
 plot(uh, figure=(fig, 132), xlim=(-0.1, 0.5), ylim=(-0.1, 0.5),
@@ -194,7 +194,7 @@ plot(uh, figure=(fig, 132), xlim=(-0.1, 0.5), ylim=(-0.1, 0.5),
 plot(uh, figure=(fig, 133), xlim=(-0.02, 0.5), ylim=(-0.02, 0.5),
         gridLines="white", colorbar={"shrink": 0.75}, linewidth=2)
 
-fig = pyplot.figure(figsize=(45,15))
+fig = pyplot.figure(figsize=(30,10))
 from dune.fem.function import levelFunction
 levels = levelFunction(uh.space.gridView)
 plot(levels, figure=(fig, 131), xlim=(-0.5, 0.5), ylim=(-0.5, 0.5),
