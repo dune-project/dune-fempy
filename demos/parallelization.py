@@ -58,7 +58,21 @@ print("Using",threading.use,"threads")
 # in order to use `4` MPI processes. Example scripts that run in parallel are,
 # for example, the [Re-entrant Corner Problem](laplace-adaptive_nb.ipynb).
 #
+# .. index:  Parallelization; print
+#
+# .. tip:: When running a parallel program output to the console should only be
+# received on dedicated processors, e.g. process 0. This can be achieved by
+# simply overloading the print function as shown below.
+#
+# %%
+from functools import partial
+from dune.common import comm
+# print can be used as before but will only produce output on rank 0
+print = partial(print, flush=True) if comm.rank == 0 else lambda *args, **kwargs: None
+# %% [markdown]
+#
 # .. index:  Parallelization; SLURM Batch Script
+#
 #
 # .. tip:: On a cluster where multiple parallel jobs are run simultaneously, it's
 # advisable to use one separate cache per job. This can be easily
