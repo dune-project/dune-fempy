@@ -41,7 +41,7 @@ gridView = structuredGrid([0, 0], [1, 1], [20, 20])
 #    The details of what a ``gridView`` is together with some other central
 #    concepts is provided in the [next section](concepts_nb.ipynb).
 #
-# .. tip:: an overview of available approaches to construct a grid can be
+# .. tip:: An overview of available approaches to construct a grid can be
 #    found [here](othergrids_nb.ipynb).
 #
 
@@ -319,8 +319,8 @@ scheme = solutionScheme(a == bf+bg, solver="cg")
 
 # %% [markdown]
 # .. note::
-#    we use a Newton method to solve the non-linear problem and by default
-#    a gmres method to solve linear system in each Newton step. We show
+#    We use a Newton method to solve the non-linear problem and by default
+#    a gmres method to solve the linear system in each Newton step. We show
 #    here how to switch to a `cg` method since the
 #    problem considered here. [More details are provided later](solversInternal_nb.ipynb).
 

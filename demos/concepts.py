@@ -85,7 +85,7 @@ gridView.plot()
 # grid is refined down by the given level and `level<0` leads to global
 # coarsening of the grid by the given number of levels (if possible).
 #
-# .. tip:: the effect of this refinement will depend on the underlying
+# .. tip:: The effect of this refinement will depend on the underlying
 # grid manager. For Cartesian grid for example refining by one level leads
 # a reduction of the grid spacing by 2 while for a bisection grid in $d$
 # space dimensions one needs to refine by $2^{d-1}$ levels to achieve the same effect.

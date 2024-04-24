@@ -320,10 +320,11 @@ except ConfigurationError:
 # system using the dune-fem bindings can be achieved by using the
 # ``storage`` argument to the space constructor.
 #
-# .. Note:: that we can use the
-#    ufl forms we already defined. Normally we space to use is extracted from
-#    the form but this can be overwritten by providing a `space` argument
-#    during scheme construction:
+# .. note:: That we can use the
+#    ufl forms we already have defined. Normally the space
+#    to use is extracted from the form but this can
+#    be overwritten by providing a `space` argument
+#    during scheme construction.
 #
 # We'll use Dirichlet BCs at the left boundary only:
 
@@ -432,7 +433,7 @@ pprint(scheme.parameterLog())
 # As an example change the above problem to a PDE with Dirichlet conditions
 # but turn off verbose output of the solver.
 #
-# .. note:: the `logging` parameter has to be set if we want to use the
+# .. note:: The `logging` parameter has to be set if we want to use the
 # `parameterLog` method on the scheme.
 
 # %%

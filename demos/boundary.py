@@ -124,7 +124,7 @@ for i in vecScheme.dirichletIndices():
     vec.dofVector[i] = 0
 
 # %% [markdown]
-# .. tip:: the `dirichletIndices` method takes as optional argument an `id`
+# .. tip:: The `dirichletIndices` method takes as optional argument an `id`
 #    which then returns the list of indices of degrees of freedom on the
 #    boundary with that id. See further down for a discussion on boundary ids.
 
@@ -239,7 +239,7 @@ plotComponents(vec, gridLines=None, level=2,
 # For grids implementing a true
 # Cartesian grids, like YaspGrid, this is fixed. Altering this numbering
 # can only be done by using an unstructured grid, e.g. ALUGrid.
-# See the [grid construction section](othergrids_nb.ipynb#Attaching-boundary-ids-to-a-grid-constructed-with-gmsh-using-DGF) to see how this is done.
+# See the [grid construction section](othergrids_nb.ipynb#Attaching-boundary-ids-to-a-grid-constructed-with-gmsh-using-DGF) to get an idea how this is done.
 #
 # .. note:: **Boundary ids and refinement**: Boundary ids only allow to tell apart intersections with the domain boundary
 # on the macro level of a grid. Descendants of macro intersections on the domain
