@@ -16,6 +16,7 @@ as a named argument.
    To obtain the old behavior add ``scheme.setConstraints(0,rhs)`` before
    calling ``scheme.solve(target=target,rightHandSide=rhs)``. No changes
    are needed for ``schemes`` without Dirichlet boundary constraints.
+   See `merge request 661`_.
 
 Added a ``solve`` method to the linearization of ``schemes``
 ------------------------------------------------------------
@@ -160,7 +161,7 @@ the correct env variable can be set by running
 
   export PV_PLUGIN_PATH=`python -m dune.fem readerpath`
 
-See https://gitlab.dune-project.org/dune-fem/dune-fem/-/merge_requests/581.
+See `merge request 581`_.
 
 
 Sampler along Boundary
@@ -205,4 +206,7 @@ the global indices of the dofs attached to a given element.
 
 Logging of parameter values
 ---------------------------
-:ref:`See section</solversInternal_nb.ipynb#Available-solvers-and-parameters>`.
+:ref:`See section on internal solvers</solversInternal_nb.ipynb#Available-solvers-and-parameters>`.
+
+.. _merge request 581: https://gitlab.dune-project.org/dune-fem/dune-fem/-/merge_requests/581
+.. _merge request 661: https://gitlab.dune-project.org/dune-fem/dune-fem/-/merge_requests/661

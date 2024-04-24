@@ -271,20 +271,12 @@ l = dot(x,x)*v * dx
 # but ``dune-fem`` provides so called
 # [schemes](concepts_nb.ipynb#Operators-and-Schemes)
 # that have a ``solve`` method which can handle both linear and non-linear models.
-# The default solver is based on a Newton-Krylov solver using a
-# ``gmres`` method to solve the intermediate linear problems.
-# These ``schemes`` are quite central to solving PDE is different ways,
-# including writing your own linear or non-linear solvers, accessing
-# degrees of freedom on the boundary etc. A detailed description on the
-# API is given [here](scheme_api.rst) and how to use the schemes in
-# different context to solve the problems on the Python side is available
-# [here](solversInternal_nb.ipynb) and [here](solversExternal_nb.ipynb).
-
-# Since the problem here is symmetric we can use a ``cg``
-# method. A full list of available solvers, preconditioners, and how
-# to customize them is available in the
-# [Tweaking Linear Solvers](solversInternal_nb.ipynb) and
-# [Alternative Linear Solvers](solversInternal_nb.ipynb#Available-solvers-and-parameters) sections.
+#
+# .. note:: The default solver is based on a Newton-Krylov solver using a
+#    ``gmres`` method to solve the intermediate linear problems.
+#
+# Since the problem we are considering is symmetric we can use a ``cg`` method which we
+# do during construction of the scheme:
 
 # %%
 from dune.fem.scheme import galerkin as solutionScheme
@@ -293,6 +285,16 @@ u_h.clear() # set u_h to zero as initial guess for the Newton solver
 info = scheme.solve(target=u_h)
 
 # %% [markdown]
+# .. tip:: These ``schemes`` provide options for solving PDEs
+#    for writing your own solvers, accessing
+#    degrees of freedom on the boundary etc. A description of the
+#    API is given [here](scheme_api.rst) and example usage is
+#    available in the sections on the use of
+#    [internal solvers](solversInternal_nb.ipynb) and
+#    [external solvers](solversExternal_nb.ipynb).
+#    A list of solvers, preconditioners, and parameters is available
+#    [here](solversInternal_nb.ipynb#Available-solvers-and-parameters).
+#
 # That's it - we can plot the solution again - we don't know the exact
 # solution so we can't compute any errors in this case.
 # In addition the ``info`` structure returned by the ``solve`` method
@@ -317,14 +319,6 @@ bf = (-div(grad(exact)) + (1+exact)**2*exact) * v * dx
 bg = dot(grad(exact),n)*v*ds
 scheme = solutionScheme(a == bf+bg, solver="cg")
 
-# %% [markdown]
-# .. note::
-#    We use a Newton method to solve the non-linear problem and by default
-#    a gmres method to solve the linear system in each Newton step. We show
-#    here how to switch to a `cg` method since the
-#    problem considered here. [More details are provided later](solversInternal_nb.ipynb).
-
-# %%
 errors = 0,0
 loops = 2
 for eocLoop in range(loops):
