@@ -17,12 +17,14 @@
 #
 # ## Setting up the Grid
 #
-# .. note:: The goal of a Dune **grid** or **hierarchical grid** is to provide an
+# .. attention::
+#    The goal of a Dune **grid** or **hierarchical grid** is to provide an
 #    interface to describe subdivisions (entities or elements for codim 0) of the computational domain $\Omega$
 #    in a generic way. In the following this is referred to as `hierarchicalGrid`.
 #    See <cite data-cite="DuneReview"></cite>, Section 3.1, for more details.
 #
-# .. note:: Grids can be refined in a hierarchic manner, meaning that elements are subdivided into several smaller elements. The
+# .. note::
+#    Grids can be refined in a hierarchic manner, meaning that elements are subdivided into several smaller elements. The
 #    element to be refined is kept in the grid and remains accessible. One
 #    can either refine all elements (global refinement) as described below.
 #    We will discuss [local refinement](gridviews.rst#Dynamic-Local-Grid-Refinement-and-Coarsening)
@@ -61,7 +63,7 @@ gridView.plot()
 # .. index::
 #    pair: Grid view; Grid view Definition
 #
-# .. note:: A **grid view** object provides read-only access to the entities of all codimensions
+# .. attention:: A **grid view** object provides read-only access to the entities of all codimensions
 # of a subset of the `hierarchical grid`.
 # In the following this is called `gridView` and sometimes simply `grid`.
 # See <cite data-cite="DuneReview"></cite>, Section 3.1.1, for more details.
@@ -85,7 +87,7 @@ gridView.plot()
 # grid is refined down by the given level and `level<0` leads to global
 # coarsening of the grid by the given number of levels (if possible).
 #
-# .. tip:: the effect of this refinement will depend on the underlying
+# .. tip:: The effect of this refinement will depend on the underlying
 # grid manager. For Cartesian grid for example refining by one level leads
 # a reduction of the grid spacing by 2 while for a bisection grid in $d$
 # space dimensions one needs to refine by $2^{d-1}$ levels to achieve the same effect.
@@ -109,7 +111,8 @@ gridView.plot()
 #
 # ## Grid Functions
 #
-# .. note:: A **grid function** is a function that is defined
+# .. attention::
+# A **grid function** is a function that is defined
 # over a given grid view and is evaluated by using an element
 # of this view and local coordinate within that element, e.g., a quadrature point.
 #
@@ -263,7 +266,8 @@ exactGlobal.plot(figure=(fig,122))
 # discretization, they are exactly evaluated at the given point. We next
 # discuss functions over finite dimensional (discrete) spaces.
 #
-# .. note:: A **discrete (function) space** is a finite dimensional function space
+# .. attention::
+# A **discrete (function) space** is a finite dimensional function space
 # defined over a given grid view. Typically these are Finite Element
 # spaces.
 #
@@ -323,10 +327,11 @@ print("convert to a numpy array:", np.array( space.jacobianBasis(element, localP
 #
 # ## Discrete Functions
 #
-# .. note:: A special type of grid function is a **discrete function** living in a
+# .. attention::
+# A special type of grid function is a **discrete function** living in a
 # discrete (finite dimensional) space. The main property of a discrete
 # function is that it contains a **dof vector**.
-# [In a later section](solvers_nb.ipynb)
+# [In a later section](solversExternal_nb.ipynb)
 # we will see how to extract the underlying dof vector in the form of a `numpy` or a `petsc` vector.
 
 #
@@ -486,7 +491,8 @@ print()
 #
 # .. index:: Scheme; Scheme Definition
 #
-# .. note:: A **scheme** implements a Galerkin scheme for a given
+# .. attention::
+#    A **scheme** implements a Galerkin scheme for a given
 #    weak form for a wide range of PDEs, where the model (integrands) is provided as ufl form.
 #    Mathematically a `scheme` implements an operator $L\colon V_h\to V_h$
 #    with equal (discrete) domain and range space. The `scheme`

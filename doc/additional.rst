@@ -15,7 +15,8 @@ Example                                           Notebooks                     
 Introduction                                      :download:`notebook <concepts_nb.ipynb>`              :download:`script <concepts.py>`
 Time Dependent Problem                            :download:`notebook <dune-fempy_nb.ipynb>`            :download:`script <dune-fempy.py>`
 Adding boundary data                              :download:`notebook <boundary_nb.ipynb>`              :download:`script <boundary.py>`
-Using different linear solver packages            :download:`notebook <solvers_nb.ipynb>`               :download:`script <solvers.py>`
+Tweaking solvers                                  :download:`notebook <solversInternal_nb.ipynb>`       :download:`script <solversInternal.py>`
+Using different linear solver packages            :download:`notebook <solversExternal_nb.ipynb>`       :download:`script <solversExternal.py>`
 One and three dimensional grids                   :download:`notebook <othergrids_nb.ipynb>`            :download:`script <othergrids.py>`
 Parallelization                                   :download:`notebook <parallelization_nb.ipynb>`       :download:`script <parallelization.py>`
 Checkpointing                                     :download:`notebook <backuprestore_nb.ipynb>`         :download:`script <backuprestore.py>`
@@ -39,6 +40,15 @@ Virtual element method                            :download:`notebook <vemdemo_n
 VEM method for Cahn-Hilliard                      :download:`notebook <chimpl_nb.ipynb>`                :download:`script <chimpl.py>`
 ================================================= ===================================================== =================================================
 
+##################
+Additional Scripts
+##################
+
+================================================= =====================================================
+Description                                       Script file
+================================================= =====================================================
+Converter Gmsh-to-DGF                             :download:`convert gmsh file to dgf format <gmsh2dgf.py>`.
+================================================= =====================================================
 
 
 ###############################
@@ -53,5 +63,4 @@ Sphere grid file                                  :download:`sphere grid file <s
 Three quarters sphere grid with boundary          :download:`three quarters sphere grid with boundary <soap.dgf>`
 Slit domain mesh                                  :download:`slit domain mesh <wave_tank.msh>`
 Quadrilateral mesh                                :download:`quadrilateral mesh <quads.msh>`
-Converter Gmsh-to-DGF                             :download:`convert gmsh file to dgf format <gmsh2dgf.py>`.
 ================================================= =====================================================

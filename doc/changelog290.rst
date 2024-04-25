@@ -1,23 +1,32 @@
 Since 2.9 release
 =================
 
-Deprecation of the rhs argument for ``scheme.solve``
-----------------------------------------------------
+Deprecation of the ``rhs`` argument for ``scheme.solve``
+--------------------------------------------------------
+The ``rhs`` argument has been replaced with ``rightHandSide`` and has to be provided
+as a named argument.
 
-The `rhs` argument has been replaced with `rightHandSide`
-and has to be provided as a named argument.
+.. warning:: ``schemes`` with Dirichlet constraints did not handle a given
+   ``rhs`` argument correctly. The returned ``target`` was always equal to
+   the Dirichlet conditions on the boundary independent of the values in
+   the provided ``rhs``. This has now been corrected so that
+   ``target=rhs+dirichlet`` at the boundary which is consistent with the
+   evaluation of the operator
+   (``operator(u,w)`` results in ``w=u-dirichlet`` on the boundary).
+   To obtain the old behavior add ``scheme.setConstraints(0,rhs)`` before
+   calling ``scheme.solve(target=target,rightHandSide=rhs)``. No changes
+   are needed for ``schemes`` without Dirichlet boundary constraints.
+   See `merge request 661`_.
 
-.. warning::
-   `schemes` with Dirichlet constraints did not handle a given `rhs` argument correctly.
-   The returned `target` was always equal to the Dirichlet conditions on the boundary
-   independent of the values in the provided `rhs`.
-   This has now been corrected so that `target=rhs+dirichlet` at the boundary
-   which is consistent with the evaluation of the operator
-   (`operator(u,w)` results in `w=u-dirichlet` on the boundary).
-   To obtain the old behavior add `scheme.setConstraints(0,rhs)` before calling
-   `scheme.solve(target=target,rightHandSide=rhs)`.
-   No changes are needed for schemes without Dirichlet boundary constraints.
+Added a ``solve`` method to the linearization of ``schemes``
+------------------------------------------------------------
+The object returned by the `linear` method on a `scheme` now has a `solve` method.
 
+Updated ``dune.fem.scheme.linearized``
+--------------------------------------
+This function takes a `scheme` and returns a scheme implementing the first
+two terms of its Taylor expansion. Like the object returned by
+`scheme.linear` this has a `solve` method.
 
 Add operator ``__len__`` to spaces.
 -----------------------------------
@@ -152,7 +161,7 @@ the correct env variable can be set by running
 
   export PV_PLUGIN_PATH=`python -m dune.fem readerpath`
 
-See https://gitlab.dune-project.org/dune-fem/dune-fem/-/merge_requests/581.
+See `merge request 581`_.
 
 
 Sampler along Boundary
@@ -197,4 +206,7 @@ the global indices of the dofs attached to a given element.
 
 Logging of parameter values
 ---------------------------
-:ref:`See section</solvers_nb.ipynb#Available-solvers-and-parameters>`.
+:ref:`See section on internal solvers</solversInternal_nb.ipynb#Available-solvers-and-parameters>`.
+
+.. _merge request 581: https://gitlab.dune-project.org/dune-fem/dune-fem/-/merge_requests/581
+.. _merge request 661: https://gitlab.dune-project.org/dune-fem/dune-fem/-/merge_requests/661

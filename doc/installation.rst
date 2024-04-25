@@ -20,7 +20,7 @@ coffee/tea at hand):
 
   pip install --pre dune-fem
 
-.. note:: this tutorial is based on the upcoming 2.10 version of Dune. A
+.. note:: This tutorial is based on the upcoming 2.10 version of Dune. A
    2.9 release version is available in the Python package index and can be
    obtained by removing the `--pre` from the above install command. Note
    that a few of the features described in this tutorial will not be
@@ -47,9 +47,9 @@ the later `jupyter` is needed
 This has been tested with different Linux distributions, MacOS, and using
 the *Windows Subsystem for Linux*.
 
-.. note::
+.. important::
 
-   the current installation requires MPI to be available.
+   The current installation requires MPI to be available.
 
 .. note::
 

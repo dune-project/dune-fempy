@@ -28,7 +28,7 @@ gridView = leafGridView([0, 0], [1, 1], [4, 4])
 # template being ``class GridView``
 # The return value of this ``lambda`` is either a ``double`` or
 # a ``Dune::FieldVector<double,R>``. The generating function can
-# have parameters of own which can be set when constructing the grid
+# have parameters of their own which can be set when constructing the grid
 # function. The first example takes a double parameter `a` which we set
 # to `2`:
 
