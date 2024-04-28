@@ -36,7 +36,7 @@ duneci-standard-test
 export DUNE_LOG_LEVEL=DEBUG
 echo "CXXFLAGS=$DUNE_CMAKE_FLAGS"
 ret=0
-cd demo
+cd demos
 python laplace-adaptive.py
 if [ ! $? -eq 0 ] ; then ret=1 ; fi
 python solversInternal.py
