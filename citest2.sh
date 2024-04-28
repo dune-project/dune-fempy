@@ -4,8 +4,6 @@ set -u
 set -- --opts="/duneci/dune.opts" "${@}"
 DUNECONTROL=dunecontrol
 
-# export PETSC_DIR=/usr/lib/petsc # petsc4py doesn't build with version available in docker container
-
 pip install -i https://gitlab.dune-project.org/api/v4/projects/541/packages/pypi/simple --no-build-isolation wheel
 pip install -i https://gitlab.dune-project.org/api/v4/projects/541/packages/pypi/simple --no-build-isolation --upgrade Pygments
 pip install -i https://gitlab.dune-project.org/api/v4/projects/541/packages/pypi/simple --no-build-isolation --upgrade -r reqCI.txt
@@ -34,7 +32,9 @@ set -x
 duneci-standard-test
 
 export DUNE_LOG_LEVEL=DEBUG
+set +u
 echo "CXXFLAGS=$DUNE_CMAKE_FLAGS"
+set -u
 ret=0
 cd demos
 python laplace-adaptive.py
