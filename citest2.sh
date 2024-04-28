@@ -1,5 +1,5 @@
 #! /bin/bash
-set -e
+# set -e
 set -u
 set -- --opts="/duneci/dune.opts" "${@}"
 DUNECONTROL=dunecontrol
@@ -16,7 +16,6 @@ DUNECONTROL=dunecontrol
 
 echo "*******************************"
 pip list
-which pandoc
 echo "*******************************"
 
 parallel_opts=
@@ -29,7 +28,7 @@ export OMPI_MCA_mpi_yield_when_idle=1
 export OMPI_MCA_btl_base_warn_component_unused=0
 set -x
 
-# duneci-standard-test
+duneci-standard-test
 
 export DUNE_LOG_LEVEL=DEBUG
 export DUNEPY_DISABLE_PLOTTING=1
