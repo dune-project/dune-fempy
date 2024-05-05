@@ -128,7 +128,7 @@ parameters = {"newton.linear.tolerance": 1e-12,
               "newton.linear.verbose": False,
               "newton.verbose": False
               }
-df = space.interpolate(0,name="solution")
+df = space.function(name="solution")
 scheme = dune.vem.vemScheme( [a==b, *dbc], space, solver="cg",
                              gradStabilization=diffCoeff,
                              massStabilization=massCoeff,
@@ -143,7 +143,7 @@ df.plot()
 # %%
 space = dune.vem.vemSpace( polyGrid, order=order, storage="numpy",
                            testSpaces=[0,order-2,order-2])
-df = space.interpolate(0,name="solution")
+df = space.function(name="solution")
 scheme = dune.vem.vemScheme( [a==b, *dbc], space, solver="cg",
                              gradStabilization=diffCoeff,
                              massStabilization=massCoeff,
@@ -191,7 +191,7 @@ methods = [ ### "[legend,space,scheme,spaceKwargs,schemeKwargs]"
 # %%
 def compute(grid, space,spaceArgs, schemeName,schemeArgs):
     space = space( grid, order=order, **spaceArgs )
-    df = space.interpolate(0,name="solution")
+    df = space.function(name="solution")
     scheme = schemeName( [a==b, *dbc], space, solver="cg", **schemeArgs,
                          parameters=parameters )
     info = scheme.solve(target=df)
@@ -234,7 +234,7 @@ b = -div( Dcoeff(exact) * grad(exact) ) * v * dx
 dbcs = [dune.ufl.DirichletBC(space, exact, i+1) for i in range(4)]
 scheme = dune.vem.vemScheme( [a==b, *dbcs], space, gradStabilization=Dcoeff(u),
                              solver="cg", parameters=parameters)
-solution = space.interpolate(0, name="solution")
+solution = space.function(name="solution")
 info = scheme.solve(target=solution)
 edf = exact-solution
 errors = [ numpy.sqrt(e) for e in
@@ -290,7 +290,7 @@ a = inner(sigma(u), epsilon(v))*dx
 b = dot(as_vector([0,-rho*g]),v)*dx
 
 # Compute solution
-displacement = space.interpolate([0,0], name="displacement")
+displacement = space.function(name="displacement")
 scheme = dune.vem.vemScheme( [a==b, dbc], space,
         gradStabilization = as_vector([lambda_+2*mu, lambda_+2*mu]),
         solver="cg", parameters=parameters )
