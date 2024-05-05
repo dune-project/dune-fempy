@@ -157,7 +157,7 @@ def compute(tolerance):
             plot(uh, figure=(fig, 121), colorbar=False, linewidth=1)
         pointFunctional.clear()
         error = computeFunctional(point, pointFunctional,eh)
-        dual.solve(target=z, rhs=pointFunctional)
+        dual.solve(target=z, rightHandSide=pointFunctional)
         zh.interpolate(z)
         estimator(uh, estimate)
         eta = sum(estimate.dofVector)

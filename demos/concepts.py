@@ -317,7 +317,9 @@ localPoint = [0.1,0.1] # this is in the reference element
 for i,element in enumerate(gridView.elements):
     print( space.evaluateBasis(element, localPoint) )
     if i == 4: break
-print("convert to a numpy array:", np.array( space.jacobianBasis(element, localPoint) ) )
+# The next line fails on MacOS (with a Bus Error 10)
+# (tested 28/04/2024). Removed for now
+# print("convert to a numpy array:", np.array( space.jacobianBasis(element, localPoint) ) )
 
 
 # %% [markdown]
