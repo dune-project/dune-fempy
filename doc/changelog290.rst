@@ -1,6 +1,36 @@
 Since 2.9 release
 =================
 
+Changes to solver parameter keys
+--------------------------------
+The parameter keys used to customize the (non)-linear solvers during the
+construction of a `scheme` have been changed. Keys with prefix
+`newton.linear` have been replaced with `linear` while parameters with only
+a `newton` prefix are now prefixed with `nonlinear`. So
+
+.. code:: python
+
+  {"newton.tolerance":1e-8,
+   "newton.verbose":True,
+   "newton.linear.preconditioning.method":"jacobi",
+   "newton.linear.tolerance":1e-10}
+
+should be replace with
+
+.. code:: python
+
+  {"nonlinear.tolerance":1e-8,
+   "nonlinear.verbose":True,
+   "linear.preconditioning.method": "jacobi",
+   "linear.tolerance":1e-10}
+
+In addition the parameter ``newton.linear.tolerance.strategy`` has been
+replaced with ``nonlinear.forcing``.
+
+.. warning:: while all the changes are indendet to be backwards compatible
+   with suitable deprecation warnings printed if old keys are still used,
+   it is possible that some corner cases were missed.
+
 Deprecation of the ``rhs`` argument for ``scheme.solve``
 --------------------------------------------------------
 The ``rhs`` argument has been replaced with ``rightHandSide`` and has to be provided

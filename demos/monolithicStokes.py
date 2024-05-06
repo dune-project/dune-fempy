@@ -230,12 +230,12 @@ solution_vector_cg = taylor_hood_space.interpolate([0]*(dim_space+1), name="solu
 
 print("solution_vector.order = " + str(solution_vector_cg.order))
 
-solver_parameters ={"newton.tolerance": 1e-10,
-                    "newton.verbose": False,
-                    "newton.linear.tolerance": 1e-14,
-                    "newton.linear.preconditioning.method": "ilu",
-                    "newton.linear.verbose": False,
-                    "newton.linear.maxiterations": 1000}
+solver_parameters ={"nonlinear.tolerance": 1e-10,
+                    "nonlinear.verbose": False,
+                    "linear.tolerance": 1e-14,
+                    "linear.preconditioning.method": "ilu",
+                    "linear.verbose": False,
+                    "linear.maxiterations": 1000}
 
 # Alternative (commented) version uses weakly imposed boundary conditions:
 # eqns = weak_form_stationary_stokes(u_h, v_h, p_h, q_h, f_exact, mu, as_vector([u_exact, v_exact]))
@@ -479,12 +479,12 @@ dirichlet_velocity = as_vector([u_exact, v_exact])
 weak_form_stokes_dg = weak_form_stationary_stokes_dg(u_h, v_h, p_h, q_h, f_exact, mu, is_dirichlet_velocity, dirichlet_velocity)
 solution_vector_dg = taylor_hood_space_dg.interpolate([0, 0, 0], name="solution_vector_dg")
 
-solver_parameters ={"newton.tolerance": 1e-10,
-                    "newton.verbose": False,
-                    "newton.linear.tolerance": 1e-14,
-                    "newton.linear.preconditioning.method": "ilu",
-                    "newton.linear.verbose": False,
-                    "newton.linear.maxiterations": 1000}
+solver_parameters ={"nonlinear.tolerance": 1e-10,
+                    "nonlinear.verbose": False,
+                    "linear.tolerance": 1e-14,
+                    "linear.preconditioning.method": "ilu",
+                    "linear.verbose": False,
+                    "linear.maxiterations": 1000}
 
 scheme_taylor_hood_dg = solutionScheme(weak_form_stokes_dg,
                                     space=taylor_hood_space_dg,

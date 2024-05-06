@@ -141,7 +141,7 @@ bndCpp = gridFunction(code, gridView=gridView, name="bnd", order=2, args=[coeffV
 bcBottom = DirichletBC(vecSpace,[sin(2*pi*(x[0]+x[1])),1],x[1]<1e-10)
 bc = DirichletBC(vecSpace,[bndCpp,None])
 vecScheme = solutionScheme( [a == 0, bc, bcBottom],
-                            parameters={"newton.linear.tolerance": 1e-9} )
+                            parameters={"linear.tolerance": 1e-9} )
 vecScheme.solve(target=vec)
 plotComponents(vec, gridLines=None, level=2,
                colorbar={"orientation":"horizontal", "ticks":ticker.MaxNLocator(nbins=4)})

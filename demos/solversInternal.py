@@ -72,8 +72,8 @@ def printResult(method,error,info):
 # %%
 from dune.fem.scheme import galerkin
 scheme = galerkin(a == bf+bg, solver='cg',
-                  parameters={"newton.linear.preconditioning.method":"jacobi",
-                              "newton.tolerance":1e-7},
+                  parameters={"linear.preconditioning.method":"jacobi",
+                              "nonlinear.tolerance":1e-7},
                  )
 
 # %% [markdown]
@@ -201,7 +201,7 @@ printResult("Newton 2 (gmres)",u_h-exact,info)
 model = ( inner(grad(u), grad(v)) + (u - conditional(dot(x,x)<0.6,10.,0.))*v ) * dx
 # verbose output for the linear solver is too long so use default `False` setting
 sc  = galerkin(model==0, solver="cg",
-               parameters={"newton.linear.verbose":False,"newton.verbose":True}
+               parameters={"linear.verbose":False,"nonlinear.verbose":True}
               )
 sol = space.interpolate(0, name="u_h")
 jac = linearized(sc, parameters={ "method":"gmres", "gmres.restart":100, })
@@ -212,7 +212,7 @@ print(info,flush=True)
 # Since we setup the `scheme` using `solver="cg"` calling the `solve`
 # method will use the Newton method with a `cg` solver - some verbose
 # output is provided in each step of the Newton method due to
-# `"newton.verbose":True`:
+# `"nonlinear.verbose":True`:
 
 # %%
 sol.clear()
@@ -334,7 +334,7 @@ if petsc:
     # We use an sor preconditioner:
     schemePetsc = galerkin([a == bf+bg, DirichletBC(space,exact,2)],
                            space=spacePetsc, solver="cg",
-                           parameters={"newton.linear.preconditioning.method":"hypre"})
+                           parameters={"linear.preconditioning.method":"hypre"})
     uPetsc_h = spacePetsc.interpolate(2, name='u_h')
     info = schemePetsc.solve(target=uPetsc_h)
     printResult("PETSc",uPetsc_h-exact,info)
@@ -355,7 +355,7 @@ if petsc:
 spaceIstl = lagrange(gridView, order=2, storage='istl')
 # We use an amg preconditioner:
 schemeIstl = galerkin(a == bf+bg, solver=("istl","cg"),
-                      parameters={"newton.linear.preconditioning.method":"amg-jacobi"})
+                      parameters={"linear.preconditioning.method":"amg-jacobi"})
 u_h.interpolate(2)
 info = schemeIstl.solve(target=u_h)
 printResult("Dune-Istl",u_h-exact,info)
@@ -394,10 +394,10 @@ f = (8*pi**2+1) * cos(2*pi*x[0])*cos(2*pi*x[1])
 a = ( inner(grad(u),grad(v)) + u*v ) * dx
 l = f*v * dx
 scheme = galerkin( a==l, solver="cg", parameters=
-                   {"newton.linear.tolerance": 1e-12,
-                    "newton.linear.verbose": True,
-                    "newton.linear.preconditioning.method": "jacobi",
-                    "newton.linear.errormeasure": "relative",
+                   {"linear.tolerance": 1e-12,
+                    "linear.verbose": True,
+                    "linear.preconditioning.method": "jacobi",
+                    "linear.errormeasure": "relative",
                     "logging": "log-jacobi"
                    } )
 info = scheme.solve(target=u_h)
@@ -439,7 +439,7 @@ pprint(scheme.parameterLog())
 # %%
 param = dict(scheme.parameterLog()) # this method returns a set of pairs which we can convert to a dictionary
 param["logging"] = "Dirichlet" # only needed to use the `parameterLog` method
-param["newton.linear.verbose"] = False
+param["linear.verbose"] = False
 scheme2 = galerkin( [a==l,DirichletBC(space,0)], parameters=param )
 u_h.interpolate(2)
 info = scheme2.solve(target=u_h)
@@ -453,10 +453,10 @@ pprint(scheme2.parameterLog())
 # %%
 try:
     scheme = galerkin( a==l, solver="cg", parameters=
-                       {"newton.linear.tolerance": 1e-12,
-                        "newton.linear.verbose": True,
-                        "newton.linear.preconditioning.method": "help",
-                        "newton.linear.errormeasure": "relative",
+                       {"linear.tolerance": 1e-12,
+                        "linear.verbose": True,
+                        "linear.preconditioning.method": "help",
+                        "linear.errormeasure": "relative",
                         "logging": "precon"
                        } )
     scheme.solve(target=u_h)

@@ -80,7 +80,7 @@ def setup():
 
     # set up the scheme
     laplace = solutionScheme([a==0, DirichletBC(space, exact, 1)], solver="cg",
-            parameters={"newton.linear.preconditioning.method":"jacobi"})
+            parameters={"linear.preconditioning.method":"jacobi"})
     uh = space.interpolate(0, name="solution")
     return uh, exact, laplace
 

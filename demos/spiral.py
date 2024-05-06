@@ -126,11 +126,11 @@ ode_update = ufl.as_vector([ vh_n[0] + dt*spiral_h(uh_n[0], vh_n[0]) ])
 # The model is now completely implemented and can be created, together with the corresponding scheme:
 # %%
 solverParameters =\
-       {"newton.tolerance": 1e-3,
-        "newton.verbose": False,
-        "newton.linear.tolerance": 1e-5,
-        "newton.linear.preconditioning.method": "jacobi",
-        "newton.linear.verbose": False}
+       {"nonlinear.tolerance": 1e-3,
+        "nonlinear.verbose": False,
+        "linear.tolerance": 1e-5,
+        "linear.preconditioning.method": "jacobi",
+        "linear.verbose": False}
 scheme = dune.fem.scheme.galerkin( equation, space, solver="cg", parameters=solverParameters)
 
 # %% [markdown]

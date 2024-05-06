@@ -165,11 +165,11 @@ bc = DirichletBC(space,x)
 
 # %%
 solverParameters =\
-       {"newton.tolerance": 1e-9,
-        "newton.linear.tolerance": 1e-11,
-        "newton.linear.preconditioning.method": "jacobi",
-        "newton.verbose": False,
-        "newton.linear.preconditioning.iteration": 3}
+       {"nonlinear.tolerance": 1e-9,
+        "linear.tolerance": 1e-11,
+        "linear.preconditioning.method": "jacobi",
+        "nonlinear.verbose": False,
+        "linear.preconditioning.iteration": 3}
 # setup scheme
 scheme = solutionScheme([form == 0, bc], space, solver="cg",
                         parameters=solverParameters)
