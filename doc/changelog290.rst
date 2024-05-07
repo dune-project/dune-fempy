@@ -62,10 +62,6 @@ Add operator ``__len__`` to spaces.
 -----------------------------------
 This allows to use the typical Python built-in function `len(space)`.
 
-Deprecation of ``dune.ufl.expression2GF``
------------------------------------------
-Use ``dune.fem.function.gridFunction`` instead
-
 Deprecation of ``dune.fem.function.integrate``
 ----------------------------------------------
 This function is deprecated. Use ``dune.fem.integrate`` instead. The ufl
@@ -224,9 +220,12 @@ This was not the case with some grid implementations.
 
 Eisenstatwalker in Newton method
 --------------------------------
+Set parameter ``nonlinear.forcing`` to ``eisenstatwalker`` during scheme
+construction.
 
 Storage setup in scheme
 -----------------------
+TODO
 
 Methods on space to return local mapper and for evaluating basis functions
 --------------------------------------------------------------------------
