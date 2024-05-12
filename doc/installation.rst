@@ -6,8 +6,8 @@ From PyPi
 
 .. warning::
 
-   Make sure that the installation folder name and any parent folder names do not
-   contain white spaces since this will break the installation at various
+   Make sure that the installation folder name and any parent folder names **do not
+   contain white spaces** since this will break the installation at various
    points. In general white spaces in filenames and folder names should be
    avoided.
 
