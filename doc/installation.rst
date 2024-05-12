@@ -4,6 +4,13 @@ From PyPi
 
 .. _installation:
 
+.. warning::
+
+   Make sure that the installation folder name and any parent folder names do not
+   contain white spaces since this will break the installation at various
+   points. In general white spaces in filenames and folder names should be
+   avoided.
+
 By far the easiest way to get access to `Dune` is by installing into a
 virtual environment using `pip`. In some folder e.g. `Dune` setup a virtual
 environment and activate it
