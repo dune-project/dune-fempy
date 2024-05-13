@@ -8,7 +8,8 @@
    spiral_nb
    wave_nb
    stokes
-   evalues_laplace_nb
+   evalues_laplace_np
+   biharmonic_IPC0_nb
    crystal_nb
    mcf_nb
    laplace-dwr_nb
