@@ -32,7 +32,7 @@ mcf-algorithm_nb.ipynb     parallelization_nb.ipynb   backuprestore_nb.ipynb
 boundary_nb.ipynb          mmesh_nb.ipynb
 solversInternal_nb.ipynb  solversExternal_nb.ipynb
 cppfunctions_nb.ipynb      laplace-dwr.hh             utility.hh
-uzawa.hh                   evalues_laplace_nb.ipynb   biharmonic_IPC0_np.ipynb
+uzawa.hh                   evalues_laplace_nb.ipynb   biharmonic_IPC0_nb.ipynb
 figures _static dune-fempy.bib .special.rst
 soap.dgf sphere.dgf unitcube-2d.dgf wave_tank.msh quads.msh
 config.opts
