@@ -26,8 +26,7 @@
 # The appraoch we consider here is to use a non-conforming method, a $C^0$ conforming method nevertheless.
 # Since it is a non-conforming method, it has many similarities to a standard discontinuous Galerkin discretisation of a second order problem.
 #
-#
-## Implementation
+# ## Implementation
 # As standard, we begin by importing ufl.
 # In addition, we import alugrid and consider the domain $(0,1)^2$ and refine:
 # %%
