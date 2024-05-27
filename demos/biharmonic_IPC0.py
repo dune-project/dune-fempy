@@ -126,8 +126,8 @@ plt.plot( dofs, errorH1, label = "H1", marker = 'x' )
 plt.plot( dofs, errorH2, label = "H2", marker = 'x' )
 plt.plot( dofs, [(d/dofs[0])**(-1) for d in dofs], label = r"dofs$^{-1}$")
 plt.plot( dofs, [(d/dofs[0])**(-1/2) for d in dofs], label = r"dofs$^{-1/2}$")
-plt.loglog()
 plt.legend()
+plt.loglog();
 
 # %% [markdown]
 # ## Simply supported boundary conditions
@@ -185,5 +185,5 @@ plt.plot( dofs, errorH1, label = "H1", marker = 'x' )
 plt.plot( dofs, errorH2, label = "H2", marker = 'x' )
 plt.plot( dofs, [(d/dofs[0])**(-1) for d in dofs], label = r"dofs$^{-1}$")
 plt.plot( dofs, [(d/dofs[0])**(-1/2) for d in dofs], label = r"dofs$^{-1/2}$")
-plt.loglog()
 plt.legend()
+plt.loglog();
