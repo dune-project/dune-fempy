@@ -9,6 +9,7 @@
    wave_nb
    stokes
    evalues_laplace_nb
+   biharmonic_IPC0_nb
    crystal_nb
    mcf_nb
    laplace-dwr_nb
