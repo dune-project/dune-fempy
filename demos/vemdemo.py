@@ -122,11 +122,11 @@ dbc = [dune.ufl.DirichletBC(space, exact, i+1) for i in range(4)]
 # description and arguments for stabilization:
 
 # %%
-parameters = {"newton.linear.tolerance": 1e-12,
-              "newton.linear.preconditioning.method": "jacobi",
+parameters = {"nonlinear.verbose": False,
+              "linear.tolerance": 1e-12,
+              "linear.preconditioning.method": "jacobi",
+              "linear.verbose": False,
               "penalty": 10*order*order,  # for the dg schemes
-              "newton.linear.verbose": False,
-              "newton.verbose": False
               }
 df = space.function(name="solution")
 scheme = dune.vem.vemScheme( [a==b, *dbc], space, solver="cg",

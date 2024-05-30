@@ -149,10 +149,10 @@ a_im = (alpha*alpha*dt / tau * (inner(dot(d0, grad(u[0])),
 # %%
 from dune.fem.scheme import galerkin as solutionScheme
 solverParameters = {
-        "newton.tolerance": 1e-8,
-        "newton.linear.tolerance": 1e-10,
-        "newton.verbose": False,
-        "newton.linear.verbose": False
+        "nonlinear.tolerance": 1e-8,
+        "linear.tolerance": 1e-10,
+        "nonlinear.verbose": False,
+        "nonlinear.linear.verbose": False
     }
 scheme = solutionScheme(a_im == a_ex, space, solver="gmres", parameters=solverParameters)
 

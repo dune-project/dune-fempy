@@ -77,8 +77,8 @@ form          = aInternal + diffSkeleton + advSkeleton
 
 # %%
 scheme = solutionScheme(form==0, solver="gmres",
-            parameters={"newton.linear.preconditioning.method":"jacobi",
-                       # "newton.verbose": True,
+            parameters={"linear.preconditioning.method":"jacobi",
+                       # "nonlinear.verbose": True,
                        }
                         )
 uh = space.interpolate(0, name="solution")
