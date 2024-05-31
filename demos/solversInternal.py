@@ -488,14 +488,14 @@ space = lagrange(gridView, order=2)
 # | --------- | ------------------------------------------------------------------- |
 # | numpy     | the storage is based on a raw C pointer which can be                |
 # |           | directly accessed as a numpy.array using the Python buffer protocol |
-# |           | To change the underlying vector of a discrete function 'u_h' use    |
-# |           | 'uh.as_numpy[:]'.                                                   |
+# |           | To change the underlying vector of a discrete function `u_h` use    |
+# |           | `uh.as_numpy[:]`.                                                   |
 # |           | As shown in the examples, linear operators return a                 |
-# |           | `scipy.sparse.csr_matrix` through the 'as_numpy' property.          |
+# |           | `scipy.sparse.csr_matrix` through the `as_numpy` property.          |
 # | istl      | data is stored in a block vector/matrix from the dune.istl package  |
-# |           | Access through 'as_istl'                                            |
+# |           | Access through `as_istl`                                            |
 # | petsc     | data is stored in a petsc vector/matrix which can also be used with |
-# |           | petsc4py on the python side using 'as_petsc'                        |
+# |           | petsc4py on the python side using `as_petsc`.                        |
 
 # %% [markdown]
 # .. index:: Solvers; Parameters
