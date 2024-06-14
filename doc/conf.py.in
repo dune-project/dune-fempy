@@ -40,11 +40,13 @@ extensions = [
     'sphinx.ext.mathjax',
     'sphinx.ext.ifconfig',
     'sphinx.ext.viewcode',
-#    'sphinx_multitoc_numbering',
-    'nbsphinx',
-#    'sphinxcontrib.apidoc',
+    'sphinx_tabs.tabs',
     'sphinxcontrib.bibtex',
+    'myst_nb',
 #    'sphinx.ext.autosectionlabel',
+#    'sphinx_multitoc_numbering',
+#    'sphinxcontrib.apidoc',
+#    'nbsphinx',
 ]
 bibtex_bibfiles = ['dune-fempy.bib']
 
@@ -67,7 +69,7 @@ html_theme_options = {
 templates_path = ['_templates']
 
 # The suffix of source filenames.
-source_suffix = '.rst'
+source_suffix = '.md'
 
 # The encoding of source files.
 #source_encoding = 'utf-8-sig'
@@ -110,7 +112,7 @@ today = ''
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
 # This patterns also effect to html_static_path and html_extra_path
-exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store', 'html', 'src_dir']
+exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store', 'html', 'src_dir', 'jupyter_execute']
 
 # The reST default role (used for this markup: `text`) to use for all
 # documents.
@@ -311,26 +313,52 @@ apidoc_separate_modules = True
 
 
 rst_epilog = """
-.. include:: .special.rst
+.. include:: .special.md
 
 .. image:: https://zenodo.org/badge/DOI/10.5281/zenodo.3706994.svg
    :target: https://doi.org/10.5281/zenodo.3706994
 """
 
-[extensions]
-todo_include_todos=True
-nbsphinx_timeout = -1
-nbsphinx_execute = 'never'
-nbsphinx_epilog = r"""
+#[extensions]
+jupyter_execute = "off"
+nb_execution_timeout = -1
+nb_execution_mode = 'off'
+myst_enable_extensions = [
+    "amsmath",
+    "attrs_inline",
+    "colon_fence",
+    "deflist",
+    "dollarmath",
+    "fieldlist",
+    "html_admonition",
+    "html_image",
+    "linkify",
+    "replacements",
+    "smartquotes",
+    "strikethrough",
+    "substitution",
+    "tasklist",
+]
+myst_heading_anchors = 6
+myst_dmath_double_inline = True
 
-.. raw:: html
+myst_heading_slug_func = "dune.fem.utility.myslug.heading_slug_func"
 
-    <div class="admonition note">
-      <p>
-            This page was generated from
-            the notebook {{ env.doc2path(env.docname, base=None) }}
-            and is part of the tutorial for the dune-fem python bindings
-            <a href="https://doi.org/10.5281/zenodo.3706994"><img src="https://zenodo.org/badge/DOI/10.5281/zenodo.3706994.svg" alt="DOI"></a>
-      </p>
-    </div>
-"""
+
+#[extensions]
+#todo_include_todos=True
+#nbsphinx_timeout = -1
+#nbsphinx_execute = 'never'
+#nbsphinx_epilog = r"""
+
+#.. raw:: html
+#
+#    <div class="admonition note">
+#      <p>
+#            This page was generated from
+#            the notebook {{ env.doc2path(env.docname, base=None) }}
+#            and is part of the tutorial for the dune-fem python bindings
+#            <a href="https://doi.org/10.5281/zenodo.3706994"><img src="https://zenodo.org/badge/DOI/10.5281/zenodo.3706994.svg" alt="DOI"></a>
+#      </p>
+#    </div>
+#"""

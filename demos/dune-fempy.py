@@ -7,6 +7,7 @@
 #
 # As an introduction we will solve
 # \begin{equation}
+# \label{eq:laplace}
 # -\triangle u + u = f
 # \end{equation}
 # in $\Omega=[0,1]^2$, where $f=f(x)$ is a given forcing term.
@@ -94,10 +95,10 @@ y[:] = solver(A,b)
 # stored in the same buffer used for the discrete function. Consequently,
 # no copying is required.
 #
-# .. tip:: More details on how to use [Scipy](solversExternal_nb.ipynb#Using-Scipy) will be given later
+# .. tip:: More details on how to use # [Scipy](solversExternal_nb.ipynb#Using-Scipy) will be given later
 #    in the tutorial. Other linear solver backends are also available,
 #    e.g., [PETSc](solversInternal_nb.ipynb#Other-internal-solvers-(petsc))
-#    and [PETSc4py can also be used](solversExternal_nb.ipynb#Using-PETSc4Py).
+#    and [PETSc4py can also be used](solversExternal_nb.ipynb#Using-PETSc4y).
 
 # %% [markdown]
 # That's it - to see the result we plot it using matplotlib
@@ -269,7 +270,7 @@ l = dot(x,x)*v * dx
 # solver. We could use
 # [the implementation available in Scipy](solversExternal_nb.ipynb)
 # but ``dune-fem`` provides so called
-# [schemes](concepts_nb.ipynb#Operators-and-Schemes)
+# [schemes](concepts_nb.ipynb#operators-and-schemes)
 # that have a ``solve`` method which can handle both linear and non-linear models.
 #
 # .. note:: The default solver is based on a Newton-Krylov solver using a
@@ -288,12 +289,12 @@ info = scheme.solve(target=u_h)
 # .. tip:: These ``schemes`` provide options for solving PDEs
 #    for writing your own solvers, accessing
 #    degrees of freedom on the boundary etc. A description of the
-#    API is given [here](scheme_api.rst) and example usage is
+#    API is given [here](scheme_api.md) and example usage is
 #    available in the sections on the use of
 #    [internal solvers](solversInternal_nb.ipynb) and
 #    [external solvers](solversExternal_nb.ipynb).
 #    A list of solvers, preconditioners, and parameters is available
-#    [here](solversInternal_nb.ipynb#Available-solvers-and-parameters).
+#    [here](solversInternal_nb.ipynb#available-solvers-and-parameters).
 #
 # That's it - we can plot the solution again - we don't know the exact
 # solution so we can't compute any errors in this case.
@@ -348,9 +349,9 @@ for eocLoop in range(loops):
 # some code must be compiled which leads to some extra cost. In time
 # critical points of the simulation, e.g., in loops, this extra cost is not
 # acceptable. To avoid recompilation general
-# [grid functions](concepts_nb.ipynb#Grid-Functions)
+# [grid functions](concepts_nb.ipynb#grid-functions)
 # and placeholders for scalar or vector valued
-# [constants](concepts_nb.ipynb#Operators-and-Schemes)
+# [constants](concepts_nb.ipynb#operators-and-schemes)
 # can be used within the ufl forms.
 # In the [next section](concepts_nb.ipynb) we will give a full example for this in the
 # context of a time dependent problems.
@@ -403,7 +404,7 @@ op = galerkin(a == b)
 # We can print the value of a `Constant` with name `foo` either via
 # `scheme.model.foo` or using the `value` on the `Constant` itself.
 # We can change the value using the same attribute. See the discussion at
-# the end of section on operators and schemes in the [concepts chapter](concepts_nb.ipynb#Operators-and-Schemes) for
+# the end of section on operators and schemes in the [concepts chapter](concepts_nb.ipynb#operators-and-schemes) for
 # more detail on these two approaches.
 
 # %%
@@ -424,7 +425,7 @@ w_h.plot()
 
 # %% [markdown]
 # .. tip:: A wide range of problems a covered in the
-#    [further examples](furtherexamples.rst) section.
+#    [further examples](furtherexamples.md) section.
 #    In the [next section](concepts_nb.ipynb) we explain the main concepts
 #    we use to solve PDE using finite-element approximations which we end with
 #    a solution to a non-linear time-dependent problem using the

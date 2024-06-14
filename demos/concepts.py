@@ -12,23 +12,34 @@
 #    model by the Galerkin method (**scheme**)
 
 # %% [markdown]
+# ```{eval-rst}
 # .. index::
 #    triple: Grids; Hierarchical Grids; Grid Definition
+# ```
 #
 # ## Setting up the Grid
 #
+# ```{eval-rst}
 # .. attention::
 #    The goal of a Dune **grid** or **hierarchical grid** is to provide an
 #    interface to describe subdivisions (entities or elements for codim 0) of the computational domain $\Omega$
 #    in a generic way. In the following this is referred to as `hierarchicalGrid`.
 #    See <cite data-cite="DuneReview"></cite>, Section 3.1, for more details.
+# ```
 #
-# .. note::
+# :::{note}
 #    Grids can be refined in a hierarchic manner, meaning that elements are subdivided into several smaller elements. The
 #    element to be refined is kept in the grid and remains accessible. One
 #    can either refine all elements (global refinement) as described below.
-#    We will discuss [local refinement](gridviews.rst#Dynamic-Local-Grid-Refinement-and-Coarsening)
+#    We will discuss [local refinement](gridviews.md#Dynamic-Local-Grid-Refinement-and-Coarsening)
 #    in a later section.
+# :::
+#
+# :::{admonition} My Title
+# :class: tip
+#
+# Here's my admonition content.{sup}`1`
+# :::
 #
 # After some general import statements we start our tutorial by setting up
 # a simple Cartesian grid over the domain $\Omega = [0,1]^2$ subdivided into four
@@ -71,8 +82,8 @@ gridView.plot()
 # .. tip:: The functions constructing a grid generally return a **leaf grid view**,
 # i.e., only contains of a view of the finest grid elements.
 # We also provide some special grid views to for example simulate on
-# [evolving domains](gridviews.rst#Evolving-Domains) or
-# to simplify efficient [local grid adaptivity](gridviews.rst#Dynamic-Local-Grid-Refinement-and-Coarsening).
+# [evolving domains](gridviews.md#Evolving-Domains) or
+# to simplify efficient [local grid adaptivity](gridviews.md#Dynamic-Local-Grid-Refinement-and-Coarsening).
 #
 # Since a `gridView` can not be changed
 # directly we need to access the underlying `hierarchicalGrid` to perform
@@ -96,7 +107,7 @@ gridView.plot()
 # `dune-fem` also provides a `globalRefine` function, which takes the
 # `level` as the first argument and a hierarchical grid as second argument.
 # This method can also be used to prolong and restrict discrete functions
-# as will be discussed in [a later section](gridviews.rst#Dynamic-Local-Grid-Refinement-and-Coarsening).
+# as will be discussed in [a later section](gridviews.md#Dynamic-Local-Grid-Refinement-and-Coarsening).
 
 # %%
 from dune.fem import globalRefine
@@ -507,7 +518,7 @@ print()
 # .. note:: The more general case is
 #    covered by classes in `dune.fem.operator` for **operators** $L\colon V_h\to W_h$
 #   with different domain and range spaces. See
-#   [here](scheme_api.rst) for more details on the concepts and a summary of the API for operators and
+#   [here](scheme_api.md) for more details on the concepts and a summary of the API for operators and
 #   schemes.
 
 # %%

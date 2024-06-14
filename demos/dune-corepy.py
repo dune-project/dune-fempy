@@ -16,7 +16,7 @@
 # are very close to the original Dune C++ interfaces, transferring a Python
 # prototype of the algorithm to C++ is mostly straightforward. A just in
 # time compilation utility available in Dune-Python makes it then very easy
-# to use these [C++ algorithms](cpp.rst) from within Python.
+# to use these [C++ algorithms](cpp.md) from within Python.
 #
 # In the following we briefly introduce the most important parts of the
 # Dune core interface
@@ -184,7 +184,7 @@ aluView = aluSimplexGrid({"vertices": vertices, "simplices": triangles})
 #    lost. Use `dune.fem.adapt` and `dune.fem.globalRefine` if data is
 #    supposed to be retained during grid modification. This is described in
 #    detail in the section on
-#    [dynamic grid modification](gridviews.rst#Dynamic-Local-Grid-Refinement-and-Coarsening).
+#    [dynamic grid modification](gridviews.md#Dynamic-Local-Grid-Refinement-and-Coarsening).
 
 # %% [markdown]
 # .. index::
@@ -315,7 +315,7 @@ print("integral of function 'g':",integral)
 # To achieve close to native efficiency the Python prototype
 # can be easily reimplemented as a C++ function and the `algorithm` module
 # used for just in time compilation. This is discussed in a later section
-# based on [some examples](cpp.rst).
+# based on [some examples](cpp.md).
 
 # %% [markdown]
 # .. index:: Grids; Attaching data

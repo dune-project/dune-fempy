@@ -12,8 +12,8 @@ NBS = spiral_nb.ipynb elasticity_nb.ipynb wave_nb.ipynb \
 			concepts_nb.ipynb dune-fempy_nb.ipynb backuprestore_nb.ipynb parallelization_nb.ipynb \
       dune-corepy_nb.ipynb discontinuousgalerkin_nb.ipynb \
       twophaseflow_nb.ipynb euler_nb.ipynb chemical_nb.ipynb \
-			geoview_nb.ipynb geoview_nb.rst \
-			levelgridview_nb.ipynb levelgridview_nb.rst \
+			geoview_nb.ipynb geoview_nb.md \
+			levelgridview_nb.ipynb \
       filteredgridview_nb.ipynb \
       vemdemo_nb.ipynb chimpl_nb.ipynb gmsh2dgf_nb.ipynb
 			# spiral_adapt_nb.ipynb
@@ -47,8 +47,8 @@ distclean: clean
 %_nb.ipynb: %.py
 	@jupytext $< --execute --set-kernel python3 --output $*_nb.ipynb
 
-%_nb.rst: %_nb.ipynb
-	@jupyter-nbconvert $< --to rst
+%_nb.md: %_nb.ipynb
+	@jupyter-nbconvert $< --to markdown
 
 figures/3dexample.png: 3dexample.py dune-fempy_nb.ipynb
 	@pvpython 3dexample.py

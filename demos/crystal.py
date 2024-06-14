@@ -6,7 +6,7 @@
 # # Adaptive phase field: crystal growth model
 # Here we demonstrate crystallisation on the surface of a liquid due to cooling from [@Guyer].
 # This example uses
-# [dynamic grid refinement](gridviews.rst#Dynamic-Local-Grid-Refinement-and-Coarsening).
+# [dynamic grid refinement](gridviews.md#Dynamic-Local-Grid-Refinement-and-Coarsening).
 #
 # Let us first set up the grid and the function space. We use the default DoF storage available in ``dune-fem`` - this can be changed for example to ``istl`` or ``petsc``.
 
