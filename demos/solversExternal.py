@@ -116,7 +116,7 @@ operator.jacobian(u_h, linOp, rhs)
 
 # %%
 A = linOp.as_numpy
-print(type(A))
+print(type(A),flush=True)
 plt.spy(A, precision=1e-8, markersize=1)
 
 # %% [markdown]
@@ -164,6 +164,9 @@ import numpy as np
 from scipy.sparse.linalg import cg
 class Scheme1:
     def __init__(self, op):
+        print("========================")
+        print("Scheme1")
+        print("========================",flush=True)
         self.model = op.model
         self.jacobian = op.linear()
         self.op = op
