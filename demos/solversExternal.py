@@ -176,6 +176,7 @@ class Scheme1:
         self.linIter += 1
 
     def solve(self, target):
+        print("Start solving",flush=True)
         # create a copy of target for the residual
         res = target.copy(name="residual")
         initialGuess = target.copy(name="initial-guess")
@@ -189,7 +190,7 @@ class Scheme1:
         while True:
             self.op(target, res)
             absF = numpy.sqrt( np.dot(res_coeff,res_coeff) )
-            print(f"iter {n} : {absF}")
+            print(f"iter {n} : {absF}",flush=True)
             if absF < 1e-6:
                 break
             self.op.jacobian(target,self.jacobian)
