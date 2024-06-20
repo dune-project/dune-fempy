@@ -38,8 +38,8 @@ u_h = space.interpolate(0, name='u_h')
 x,u,v,n = ( SpatialCoordinate(space), TrialFunction(space), TestFunction(space), FacetNormal(space) )
 exact = 1/2*(x[0]**2+x[1]**2) - 1/3*(x[0]**3 - x[1]**3) + 1
 
-a  = ( inner(grad(u),grad(v)) + (1+u)**2*u*v ) * dx
-bf = (-div(grad(exact)) + (1+exact)**2*exact) * v * dx
+a  = ( inner(grad(u),grad(v)) + (1+u**2)*u*v ) * dx
+bf = (-div(grad(exact)) + (1+exact**2)*exact) * v * dx
 bg = dot(grad(exact),n)*v*ds
 
 # simple function to show the result of a simulation
@@ -189,6 +189,7 @@ class Scheme1:
         while True:
             self.op(target, res)
             absF = numpy.sqrt( np.dot(res_coeff,res_coeff) )
+            print(f"iter {n} : {absF}")
             if absF < 1e-6:
                 break
             self.op.jacobian(target,self.jacobian)
