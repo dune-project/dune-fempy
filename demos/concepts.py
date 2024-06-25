@@ -339,13 +339,13 @@ for i,element in enumerate(gridView.elements):
 #
 # The easiest way to construct a discrete function is to use the `interpolate`
 # method on the discrete function space to create an initialized discrete
-# function or `function` to create an uninitialized discrete function.
+# function or `function` to create a discrete function initialized with $\mathbf{0}$.
 
 # %%
-# initialized
+# initialized with an analytical expression
 u_h = space.interpolate(exact, name='u_h')
 
-# uninitialized
+# initialized with zeros
 u_h = space.function(name='u_h')
 
 # %% [markdown]
