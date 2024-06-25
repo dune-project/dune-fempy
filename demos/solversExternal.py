@@ -38,8 +38,8 @@ u_h = space.interpolate(0, name='u_h')
 x,u,v,n = ( SpatialCoordinate(space), TrialFunction(space), TestFunction(space), FacetNormal(space) )
 exact = 1/2*(x[0]**2+x[1]**2) - 1/3*(x[0]**3 - x[1]**3) + 1
 
-a  = ( inner(grad(u),grad(v)) + (1+u)**2*u*v ) * dx
-bf = (-div(grad(exact)) + (1+exact)**2*exact) * v * dx
+a  = ( inner(grad(u),grad(v)) + (1+u**2)*u*v ) * dx
+bf = (-div(grad(exact)) + (1+exact**2)*exact) * v * dx
 bg = dot(grad(exact),n)*v*ds
 
 # simple function to show the result of a simulation
@@ -116,7 +116,7 @@ operator.jacobian(u_h, linOp, rhs)
 
 # %%
 A = linOp.as_numpy
-print(type(A))
+print(type(A),flush=True)
 plt.spy(A, precision=1e-8, markersize=1)
 
 # %% [markdown]
@@ -164,6 +164,9 @@ import numpy as np
 from scipy.sparse.linalg import cg
 class Scheme1:
     def __init__(self, op):
+        print("========================")
+        print("Scheme1")
+        print("========================",flush=True)
         self.model = op.model
         self.jacobian = op.linear()
         self.op = op
@@ -173,6 +176,7 @@ class Scheme1:
         self.linIter += 1
 
     def solve(self, target):
+        print("Start solving",flush=True)
         # create a copy of target for the residual
         res = target.copy(name="residual")
         initialGuess = target.copy(name="initial-guess")
@@ -186,6 +190,7 @@ class Scheme1:
         while True:
             self.op(target, res)
             absF = numpy.sqrt( np.dot(res_coeff,res_coeff) )
+            print(f"iter {n} : {absF}",flush=True)
             if absF < 1e-6:
                 break
             self.op.jacobian(target,self.jacobian)
