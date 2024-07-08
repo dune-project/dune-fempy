@@ -114,7 +114,7 @@ def computeFunctional(point, pointFunctional, eh):
     space = pointFunctional.space
     en, xLoc = pointSample(space.gridView, point)
     phiVal = numpy.array( space.evaluateBasis(en, xLoc) )[:,0] # issue here with scalar function spaces
-    idx = space.mapper(en)
+    idx = space.mapper()(en)
     lf = eh.localFunction()
     lf.bind(en)
     pointFunctional.as_numpy[ idx ] += phiVal

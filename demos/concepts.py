@@ -302,7 +302,7 @@ space = solutionSpace(gridView, order=2)
 # the basis functions with support on the element:
 
 # %%
-mapper = space.mapper
+mapper = space.mapper()
 for i,element in enumerate(gridView.elements):
     print( mapper(element) )
     if i == 4: break # only show indices for first few elements
