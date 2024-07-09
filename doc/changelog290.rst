@@ -232,6 +232,7 @@ Methods on space to return local mapper and for evaluating basis functions
 New methods have been added to the space to return the basis functions
 evaluated at some given point. Also a new method has been added to return
 the global indices of the dofs attached to a given element.
+:ref:`See section on discrete spaces </concepts_nb.ipynb#Discrete-Spaces>`.
 
 Logging of parameter values
 ---------------------------
