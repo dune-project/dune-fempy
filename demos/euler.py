@@ -15,6 +15,7 @@ from matplotlib import pyplot
 from ufl import *
 from dune.grid import structuredGrid, reader
 import dune.fem
+import dune.ufl
 from dune.fem.space import dgonb, finiteVolume
 from dune.fem.function import gridFunction
 from dune.femdg import femDGOperator
@@ -122,7 +123,7 @@ def evolve(space, u_h, limiter="MinMod"):
 # %% [markdown]
 # A radial Riemann problem
 # %%
-x = SpatialCoordinate(triangle)
+x = SpatialCoordinate(dune.ufl.domain(2))
 initial = conditional(dot(x,x)<0.1,as_vector([1,0,0,2.5]),
                                    as_vector([0.125,0,0,0.25]))
 

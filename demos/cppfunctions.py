@@ -53,9 +53,10 @@ exactCpp.plot()
 # expression and compare the two.
 
 # %%
-from ufl import SpatialCoordinate, triangle
+from ufl import SpatialCoordinate
+import dune.ufl
 from dune.fem import integrate
-x = SpatialCoordinate(triangle)
+x = SpatialCoordinate(dune.ufl.domain(2))
 exact = (x[0]**2+x[1]**2) - 1/3*(x[0]**3 - x[1]**3) + 1
 exact_gf = gridFunction(exact, gridView, name="ufl", order=1)
 print( integrate(abs(exact-exactCpp)) )
@@ -114,7 +115,7 @@ print( integrate(abs(exactCpp-exactCpp2)) )
 # %%
 from dune.fem.space import lagrange as solutionSpace
 from ufl import TestFunction, TrialFunction, SpatialCoordinate,\
-                dx, ds, grad, inner, sin, pi, triangle
+                dx, ds, grad, inner, sin, pi
 from dune.fem.scheme import galerkin as solutionScheme
 from dune.ufl import DirichletBC, Constant
 

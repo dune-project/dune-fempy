@@ -152,7 +152,7 @@ from dune.fem.operator import galerkin as estimatorOp
 fvspace = estimatorSpace(uh.space.gridView)
 estimate = fvspace.interpolate([0], name="estimate")
 
-u = TrialFunction(uh.space.as_ufl())
+u = TrialFunction(uh.space)
 v = TestFunction(fvspace)
 hT = MaxCellEdgeLength(fvspace)
 he = MaxFacetEdgeLength(fvspace)('+')

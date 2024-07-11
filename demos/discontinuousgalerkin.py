@@ -26,7 +26,7 @@ from dune.grid import structuredGrid as leafGridView
 from dune.fem.space import dglegendre as dgSpace
 from dune.fem.scheme import galerkin as solutionScheme
 from dune.ufl import Constant
-from ufl import ( TestFunction, TrialFunction, SpatialCoordinate, triangle, FacetNormal,
+from ufl import ( TestFunction, TrialFunction, SpatialCoordinate, FacetNormal,
                   dx, ds, grad, div, grad, dot, inner, sqrt, exp, conditional,
                   as_vector, avg, jump, dS, CellVolume, FacetArea, atan )
 

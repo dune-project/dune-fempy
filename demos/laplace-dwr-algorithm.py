@@ -145,7 +145,7 @@ from dune.fem.operator import galerkin as estimatorOp
 fvspace = estimatorSpace(uh.space.gridView)
 estimate = fvspace.interpolate([0], name="estimate")
 
-u = TrialFunction(uh.space.as_ufl())
+u = TrialFunction(uh.space)
 v = TestFunction(fvspace)
 n = FacetNormal(fvspace)
 estimator_ufl = abs(div(grad(u)))*abs(z-zh) * v * dx +\
@@ -170,7 +170,7 @@ def compute(computeFunctional, tolerance):
             plot(uh, figure=(fig, 121), colorbar=False, linewidth=1)
         pointFunctional.clear()
         error = computeFunctional(point, pointFunctional,eh)
-        dual.solve(target=z, rhs=pointFunctional)
+        dual.solve(target=z, rightHandSide=pointFunctional)
         zh.interpolate(z)
         estimator(uh, estimate)
         eta = sum(estimate.dofVector)
