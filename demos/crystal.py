@@ -152,7 +152,7 @@ solverParameters = {
         "nonlinear.tolerance": 1e-8,
         "linear.tolerance": 1e-10,
         "nonlinear.verbose": False,
-        "nonlinear.linear.verbose": False
+        "linear.verbose": False
     }
 scheme = solutionScheme(a_im == a_ex, space, solver="gmres", parameters=solverParameters)
 
