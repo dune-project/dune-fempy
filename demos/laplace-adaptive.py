@@ -31,6 +31,11 @@ from dune.alugrid import aluConformGrid as leafGridView
 from dune.fem.function import gridFunction
 from dune.fem import integrate
 from ufl import *
+try:
+    from ufl import atan2
+except ImportError:
+    from ufl import atan_2 as atan2
+
 from dune.ufl import DirichletBC
 
 from functools import partial
@@ -79,7 +84,7 @@ def setup():
 
     # exact solution for this angle
     Phi = cornerAngle / 180 * pi
-    phi = atan_2(x[1], x[0]) + conditional(x[1] < 0, 2*pi, 0)
+    phi = atan2(x[1], x[0]) + conditional(x[1] < 0, 2*pi, 0)
     exact = dot(x, x)**(pi/2/Phi) * sin(pi/Phi * phi)
     a = dot(grad(u), grad(v)) * dx
 

@@ -124,8 +124,12 @@ a_ex = (inner(u_h_n, v) - inner(u_h_n[0], v[1])) * dx
 # For the left hand side we have the spatial derivatives and the implicit parts.
 
 # %%
-from ufl import pi, atan, atan_2, tan, grad, inner
-psi        = pi/8.0 + atan_2(grad(u_h_n[0])[1], (grad(u_h_n[0])[0]))
+try:
+    from ufl import atan2
+except ImportError:
+    from ufl import atan_2 as atan2
+from ufl import pi, atan, tan, grad, inner
+psi        = pi/8.0 + atan2(grad(u_h_n[0])[1], (grad(u_h_n[0])[0]))
 Phi        = tan(N / 2.0 * psi)
 beta       = (1.0 - Phi*Phi) / (1.0 + Phi*Phi)
 dbeta_dPhi = -2.0 * N * Phi / (1.0 + Phi*Phi)
