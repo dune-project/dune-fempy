@@ -69,7 +69,7 @@ def setup():
 
     u = TrialFunction(space)
     v = TestFunction(space)
-    x = SpatialCoordinate(space.cell())
+    x = SpatialCoordinate(space)
 
     # exact solution for this angle
     Phi = cornerAngle / 180 * pi
@@ -134,7 +134,7 @@ estimate = fvspace.interpolate([0], name="estimate")
 
 u = TrialFunction(uh.space.as_ufl())
 v = TestFunction(fvspace)
-n = FacetNormal(fvspace.cell())
+n = FacetNormal(fvspace)
 estimator_ufl = abs(div(grad(u)))*abs(z-zh) * v * dx +\
                 abs(inner(jump(grad(u)), n('+')))*abs(avg(z-zh)) * avg(v) * dS
 estimator = estimatorOp(estimator_ufl)

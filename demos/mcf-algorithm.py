@@ -127,7 +127,7 @@ def calculate(use_cpp, gridView):
     space = solutionSpace(gridView, dimRange=gridView.dimWorld, order=order)
     u = TrialFunction(space)
     v = TestFunction(space)
-    x = SpatialCoordinate(space.cell())
+    x = SpatialCoordinate(space)
     positions = space.interpolate(x, name="position")
 
     # space for discrete solution on Gamma(t)

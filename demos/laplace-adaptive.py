@@ -75,7 +75,7 @@ def setup():
     from dune.fem.scheme import galerkin as solutionScheme
     u = TrialFunction(space)
     v = TestFunction(space)
-    x = SpatialCoordinate(space.cell())
+    x = SpatialCoordinate(space)
 
     # exact solution for this angle
     Phi = cornerAngle / 180 * pi
@@ -149,9 +149,9 @@ estimate = fvspace.interpolate([0], name="estimate")
 
 u = TrialFunction(uh.space.as_ufl())
 v = TestFunction(fvspace)
-hT = MaxCellEdgeLength(fvspace.cell())
-he = MaxFacetEdgeLength(fvspace.cell())('+')
-n = FacetNormal(fvspace.cell())
+hT = MaxCellEdgeLength(fvspace)
+he = MaxFacetEdgeLength(fvspace)('+')
+n = FacetNormal(fvspace)
 estimator_ufl = hT**2 * (div(grad(u)))**2 * v * dx +        he * inner(jump(grad(u)), n('+'))**2 * avg(v) * dS
 estimator = estimatorOp(estimator_ufl)
 tolerance = 0.05
