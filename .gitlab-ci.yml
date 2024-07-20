@@ -23,15 +23,14 @@ before_script:
   - duneci-install-module https://gitlab.dune-project.org/dune-fem/dune-fem-dg.git
   - duneci-install-module https://gitlab.dune-project.org/dune-fem/dune-vem.git
 
-ubuntu-20.04-clang-10-17:
-  image: registry.dune-project.org/docker/ci/ubuntu:20.04
+ubuntu-24.04-clang-18-23:
+  image: registry.dune-project.org/docker/ci/ubuntu:24.04
   script:
     - cd $CI_PROJECT_DIR
     - source /duneci/modules/dune-env/bin/activate
     - ./citest.sh
   variables:
-    # bug in CI clang-10-17 and clang-10-20 are mixed up
-    DUNECI_TOOLCHAIN: clang-10-20
+    DUNECI_TOOLCHAIN: clang-18-23
   tags: [duneci]
 
 debian-11-gcc-9-17:
