@@ -25,6 +25,7 @@ before_script:
 
 ubuntu-24.04-clang-18-23:
   image: registry.dune-project.org/docker/ci/ubuntu:24.04
+  # note: this will use the newest fenics-ufl available on the gitlab registry (currently 2024.1.0.post1 as of 20/07/24)
   script:
     - cd $CI_PROJECT_DIR
     - source /duneci/modules/dune-env/bin/activate
