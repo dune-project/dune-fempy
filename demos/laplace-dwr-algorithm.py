@@ -30,9 +30,13 @@ import dune.generator.algorithm as algorithm
 from dune.fem.view import adaptiveLeafGridView as adaptiveGridView
 from dune.fem.space import lagrange as solutionSpace
 from dune.alugrid import aluConformGrid as leafGridView
-from ufl import *
 from dune.ufl import DirichletBC
 from dune.fem.function import gridFunction
+from ufl import *
+try: # this is needed to remain compatible with version 2022 of ufl
+    from ufl import atan_2 as atan2
+except:
+    pass
 
 
 # set the angle for the corner (0<angle<=360)

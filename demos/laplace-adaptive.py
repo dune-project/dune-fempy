@@ -33,7 +33,7 @@ from dune.fem import integrate
 from ufl import *
 try:
     from ufl import atan2
-except ImportError:
+except ImportError: # remain compatible with version 2022 of ufl
     from ufl import atan_2 as atan2
 
 from dune.ufl import DirichletBC
