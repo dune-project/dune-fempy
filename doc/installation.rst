@@ -34,6 +34,42 @@ coffee/tea at hand):
    available and that the API has changed in some places. See the
    description in the :doc:`changelog<changelog290>` for details.
 
+****************************
+Additional external packages
+****************************
+
+To use additional external packages like `petsc` or `umfpack` which are not
+in a default location, the cmake prefix variable can be set during
+installation process:
+
+.. code-block:: bash
+
+  CMAKE_FLAGS="-DCMAKE_PREFIX_PATH=PATHLIST" pip install --pre dune-fem
+
+where `PATHLIST` is a semicolon separated list of path containing external packages.
+
+************************
+Testing the installation
+************************
+
+.. important::
+
+   The current installation requires MPI to be available and requires the
+   additional installation of `mpi4py`:
+
+   .. code-block:: bash
+
+      pip install mpi4py
+
+.. note::
+
+   The first time you construct an object of a specific realization of one
+   of the Dune interfaces (e.g. here a structured grid),
+   the just in time compiler needs to be invoked. This can take quite some
+   time - especially for grid realizations. This needs to be done only once
+   so rerunning the above code a second time (even using other parameters
+   in the `structuredGrid` function) should execute almost instantaniously.
+
 To test that everything works you can download all the scripts described
 in this tutorial and try them out
 
@@ -54,29 +90,16 @@ the later `jupyter` is needed
 This has been tested with different Linux distributions, MacOS, and using
 the *Windows Subsystem for Linux*.
 
-.. important::
-
-   The current installation requires MPI to be available.
-
-.. note::
-
-   The first time you construct an object of a specific realization of one
-   of the Dune interfaces (e.g. here a structured grid),
-   the just in time compiler needs to be invoked. This can take quite some
-   time - especially for grid realizations. This needs to be done only once
-   so rerunning the above code a second time (even using other parameters
-   in the `structuredGrid` function) should execute almost instantaniously.
-
 
 *****************
 Hints for Windows
 *****************
 
-Some hints on getting Dune to 11 using the
+Some hints on getting Dune to work using the
 *Windows Subsystem for Linux* (tested on Windows 11).
 Installation in three steps:
 
-1. First we need to `install the wsl`_ (an Ubuntu version):
+1. First we need to `install the wsl`_ (here an `Ubuntu` version):
 
    Open ``PowerShell`` as administrator and run ``wsl --install``
    (find Windows ``PowerShell`` and right click;
@@ -100,12 +123,12 @@ Installation in three steps:
       source dune-env/bin/activate
       pip install jupyterlab
 
-3. We have reached the Dune specific part of the installation
-   (I would suggest some tea at this stage)
+3. We have reached the Dune specific part of the installation as desribed
+above in a lot more detail (I would suggest some tea at this stage)
 
    .. code-block:: bash
 
-      pip install dune-fem
+      pip install --pre dune-fem
       python -m dune.fem
 
    The last step downloads the tutorial scripts into the folder
@@ -213,15 +236,6 @@ get a colored figure and are hopefully ready to go...
 Troubleshooting
 ###############
 
-* **Compiling issue with ``Pyhon 3.11`` or above:**
-  If you are using ``Python 3.11`` or above the version of ``Pybind11``
-  shipped with the release version of ``Dune`` is not recent enough.
-  Please try the prerelease version by using
-
-  .. code-block:: bash
-
-    $ pip install --pre dune-fem
-
 * **Issue with C++ compiler:**
   If the gnu compiler is used, version needs to be 7 or later. This can be checked in terminal with
 
@@ -304,8 +318,7 @@ Troubleshooting
   same way, without the need for the `pip install petsc` line.
 
 * **Newly installed software is not used:**
-  after for example adding `petsc` to
-  your system one needs to remove an existing `dune-py` module which
+  After for example adding `petsc` to your system one needs to remove an existing `dune-py` module which
   contains the jit compiled modules. New software components are not
   automatically picked up. One can run
 
@@ -315,6 +328,18 @@ Troubleshooting
 
   to find the location of the `dune-py` folder. That folder needs to be
   removed before the new component can be used.
+
+  If issues remain reinstalling all `dune` packages might be required -
+  including the cached wheels:
+
+  .. code-block:: bash
+
+    pip uninstall -y `pip freeze | grep dune`
+    pip cache remove "dune*"
+
+  When running `pip install` for the `dune` packages setting prefix path
+  for cmake as described above might be necessary if the
+  new package is not in a default location.
 
 * **Output to terminal seems a bit random:**
   the issue is (probably) that
