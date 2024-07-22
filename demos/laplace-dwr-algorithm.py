@@ -30,9 +30,13 @@ import dune.generator.algorithm as algorithm
 from dune.fem.view import adaptiveLeafGridView as adaptiveGridView
 from dune.fem.space import lagrange as solutionSpace
 from dune.alugrid import aluConformGrid as leafGridView
-from ufl import *
 from dune.ufl import DirichletBC
 from dune.fem.function import gridFunction
+from ufl import *
+try: # this is needed to remain compatible with version 2022 of ufl
+    from ufl import atan_2 as atan2
+except:
+    pass
 
 
 # set the angle for the corner (0<angle<=360)
@@ -145,7 +149,7 @@ from dune.fem.operator import galerkin as estimatorOp
 fvspace = estimatorSpace(uh.space.gridView)
 estimate = fvspace.interpolate([0], name="estimate")
 
-u = TrialFunction(uh.space.as_ufl())
+u = TrialFunction(uh.space)
 v = TestFunction(fvspace)
 n = FacetNormal(fvspace)
 estimator_ufl = abs(div(grad(u)))*abs(z-zh) * v * dx +\
@@ -170,7 +174,7 @@ def compute(computeFunctional, tolerance):
             plot(uh, figure=(fig, 121), colorbar=False, linewidth=1)
         pointFunctional.clear()
         error = computeFunctional(point, pointFunctional,eh)
-        dual.solve(target=z, rhs=pointFunctional)
+        dual.solve(target=z, rightHandSide=pointFunctional)
         zh.interpolate(z)
         estimator(uh, estimate)
         eta = sum(estimate.dofVector)

@@ -82,7 +82,7 @@ else:
     spiral_eps = 0.08
     def spiral_h(u,v): return u**3 - v
 
-x = ufl.SpatialCoordinate(ufl.triangle)
+x = ufl.SpatialCoordinate(dune.ufl.domain(2))
 initial_u = ufl.conditional(x[1]>1.25,1,0)
 initial_v = ufl.conditional(x[0]<1.25,0.5,0)
 

@@ -52,9 +52,8 @@ else
 fi
 cd ..
 
-${DUNECONTROL} --current make doc
-
 if [[ $REBUILD == "on" ]]; then
+  ${DUNECONTROL} --current make doc
   tar cvzf doc.tar.gz --dereference doc
   curl --header "JOB-TOKEN: $CI_JOB_TOKEN" --upload-file $CI_PROJECT_DIR/doc.tar.gz $REGURL/tutorials/0.0.1/tutorial.tar.gz
 fi

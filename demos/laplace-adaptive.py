@@ -33,7 +33,7 @@ from dune.fem import integrate
 from ufl import *
 try:
     from ufl import atan2
-except ImportError:
+except ImportError: # remain compatible with version 2022 of ufl
     from ufl import atan_2 as atan2
 
 from dune.ufl import DirichletBC
@@ -152,7 +152,7 @@ from dune.fem.operator import galerkin as estimatorOp
 fvspace = estimatorSpace(uh.space.gridView)
 estimate = fvspace.interpolate([0], name="estimate")
 
-u = TrialFunction(uh.space.as_ufl())
+u = TrialFunction(uh.space)
 v = TestFunction(fvspace)
 hT = MaxCellEdgeLength(fvspace)
 he = MaxFacetEdgeLength(fvspace)('+')

@@ -23,6 +23,7 @@ from matplotlib import pyplot
 import numpy
 from ufl import *
 from dune.ufl import Space, Constant
+import dune.ufl
 
 import dune.fem as fem
 import dune.create as create
@@ -84,7 +85,7 @@ def brooksCorey(P,s_n):
 class AnisotropicLens:
     dimWorld = 2
     domain   = cartesianDomain([0,0.39],[0.9,0.65],[15,4])
-    x        = SpatialCoordinate(triangle)
+    x        = SpatialCoordinate(dune.ufl.cell(2))
 
     g     = [0,]*dimWorld ; g[dimWorld-1] = -9.810 # [m/s^2]
     g     = as_vector(g)

@@ -135,8 +135,9 @@ gridView.plot()
 # We can for example integrate a UFL expression over the grid:
 
 # %%
-from ufl import SpatialCoordinate, triangle
-x = SpatialCoordinate(triangle)
+from ufl import SpatialCoordinate
+from dune.ufl import cell
+x = SpatialCoordinate(cell(2))
 
 exact = 1/2*(x[0]**2+x[1]**2) - 1/3*(x[0]**3 - x[1]**3) + 1
 

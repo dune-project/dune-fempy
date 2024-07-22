@@ -164,9 +164,6 @@ import numpy as np
 from scipy.sparse.linalg import cg
 class Scheme1:
     def __init__(self, op):
-        print("========================")
-        print("Scheme1")
-        print("========================",flush=True)
         self.model = op.model
         self.jacobian = op.linear()
         self.op = op
@@ -176,7 +173,6 @@ class Scheme1:
         self.linIter += 1
 
     def solve(self, target):
-        print("Start solving",flush=True)
         # create a copy of target for the residual
         res = target.copy(name="residual")
         initialGuess = target.copy(name="initial-guess")
