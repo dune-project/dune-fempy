@@ -1,6 +1,18 @@
 Since 2.9 release
 =================
 
+Updating to newer version of UFL
+--------------------------------
+Currently we are compatible with the 2022 version of UFL but planning to
+move to the 2024 or newer versions soon. This requires some minor changes
+to the usage of UFL shown in the tutorial:
+
+- Replace ```ufl.SpatialCoordinate(ufl.triangle)``` with ```ufl.SpatialCoordinate(dune.ufl.domain(2))```
+- Replace ```ufl.atan_2``` with ```ufl.atan2```
+
+There is still an issue with `dune.ufl.Constant` which needs to be resolved
+before we can update the package requirements of `dune-fem`.
+
 Changes to solver parameter keys
 --------------------------------
 The parameter keys used to customize the (non)-linear solvers during the

@@ -281,6 +281,28 @@ Troubleshooting
   See `here <https://moyix.blogspot.com/2022/09/someones-been-messing-with-my-subnormals.html/>`_
   for a detailed description.
 
+* **Using petsc and petsc4py:**
+  It is important the all `dune` modules and `petsc4py` use the same
+  version of `petsc`. An runtime exception will be thrown if some
+  incompatibility is detected. The simplest way to avoid any issues is to
+  set the `PETSC_DIR` environment variable during the building, e.g., `pip`
+  installation of the `dune` packages and running the scripts. 
+  The following gives an example of how to first install `petsc` and
+  `petsc4py` into a virtual environment and then install `dune-fem`.
+  Assuming that the virtual environment with `python` version `X.Y`
+  is in `$HOME/dune-env` and we want a few extra `petsc` packages we could run:
+  ```
+  pip install mpi4py
+  PETSC_CONFIGURE_OPTIONS="--download-hypre --download-mumps --download-parmetis --download-ml --download-metis --download-scalapack" pip install petsc
+  export PETSC_DIR=$HOME/dune-env/lib/pythonX.Y/site-packages/petsc
+  pip install petsc4py
+  pip install dune-fem
+  ```
+  After this the `PETSC_DIR` environment variable should not be required anymore.
+  This is all a bit experimental so let us know if it is not working.
+  Of course an installed `petsc` or build from source should work in the
+  same way, without the need for the `pip install petsc` line.
+
 * **Newly installed software is not used:**
   after for example adding `petsc` to
   your system one needs to remove an existing `dune-py` module which
