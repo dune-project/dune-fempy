@@ -123,7 +123,7 @@ Installation in three steps:
       source dune-env/bin/activate
       pip install jupyterlab
 
-3. We have reached the Dune specific part of the installation as desribed
+3. We have reached the Dune specific part of the installation as described
 above in a lot more detail (I would suggest some tea at this stage)
 
    .. code-block:: bash

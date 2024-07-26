@@ -23,7 +23,7 @@
 
 # %%
 import matplotlib.pyplot as plt
-import numpy
+import numpy as np
 
 from dune.grid import structuredGrid as leafGridView
 from dune.fem.space import lagrange
@@ -45,7 +45,7 @@ bg = dot(grad(exact),n)*v*ds
 # simple function to show the result of a simulation
 def printResult(method,error,info):
     print(method,"L^2, H^1 error:",'{:0.5e}, {:0.5e}'.format(
-                 *[ numpy.sqrt(e) for e in integrate([error**2,inner(grad(error),grad(error))]) ]),
+                 *[ np.sqrt(e) for e in integrate([error**2,inner(grad(error),grad(error))]) ]),
           "\n\t","solver info=",info,flush=True)
 
 # %% [markdown]
@@ -76,7 +76,7 @@ operator = galerkin([a - (bf+bg), DirichletBC(space,exact,2)])
 # values directly changing `u_h` itself:
 
 # %%
-u_h.as_numpy[:] = numpy.random.rand(space.size)
+u_h.as_numpy[:] = np.random.rand(space.size)
 u_h.plot()
 
 # %% [markdown]
@@ -127,7 +127,7 @@ plt.spy(A, precision=1e-8, markersize=1)
 # random vector as dof vector for a discrete function:
 
 # %%
-v_coeff = numpy.random.rand(space.size)
+v_coeff = np.random.rand(space.size)
 vh = space.function("random", dofVector=v_coeff)
 vh.plot()
 
@@ -160,7 +160,6 @@ vh.plot()
 #    `setConstraints` method on the solver.
 
 # %%
-import numpy as np
 from scipy.sparse.linalg import cg
 class Scheme1:
     def __init__(self, op):
@@ -185,7 +184,7 @@ class Scheme1:
         n = 0
         while True:
             self.op(target, res)
-            absF = numpy.sqrt( np.dot(res_coeff,res_coeff) )
+            absF = np.sqrt( np.dot(res_coeff,res_coeff) )
             print(f"iter {n} : {absF}",flush=True)
             if absF < 1e-6:
                 break
@@ -339,7 +338,7 @@ if petsc4py is not None and petsc:
             numIter = 0
             while True:
                 self.op(target, res)
-                absF = numpy.sqrt( np.dot(res_coeff,res_coeff) )
+                absF = np.sqrt( np.dot(res_coeff,res_coeff) )
                 if absF < 1e-6:
                     break
                 dh.clear()
