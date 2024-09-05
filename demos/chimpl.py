@@ -30,8 +30,9 @@ dune.fem.threading.use = 4
 # %%
 order        = 3
 polyGrid = dune.vem.polyGrid( cartesianDomain([0,0],[1,1],[30,30]), cubes=True)
-ncC1testSpaces = [ [0], [order-3,order-2], [order-4] ]
-space = dune.vem.vemSpace(polyGrid, order=order, testSpaces=ncC1testSpaces)
+testSpaces = [ [0], [order-3,order-2], [order-4] ]
+# testSpaces   = [ [0,0],[order-4,order-3], [order-4] ]
+space = dune.vem.vemSpace(polyGrid, order=order, testSpaces=testSpaces)
 
 # %% [markdown]
 # To define the mathematical model, let $\psi\colon{\mathbb R} \rightarrow

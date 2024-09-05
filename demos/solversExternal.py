@@ -212,7 +212,7 @@ u_h.plot()
 #    previously.
 
 # %%
-from scipy.optimize import newton_krylov, root
+from scipy.optimize import newton_krylov
 from scipy.sparse.linalg import LinearOperator,spilu
 
 class Scheme2:

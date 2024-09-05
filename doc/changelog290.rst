@@ -1,5 +1,12 @@
+=================
 Since 2.9 release
 =================
+
+.. contents::
+   :local:
+
+General changes
+===============
 
 Updating to newer version of UFL
 --------------------------------
@@ -12,6 +19,22 @@ to the usage of UFL shown in the tutorial:
 
 There is still an issue with `dune.ufl.Constant` which needs to be resolved
 before we can update the package requirements of `dune-fem`.
+
+New `clone` method on spaces
+----------------------------
+This new method allows to build a new space from a given space with some
+parameters changed, e.g., using a different `dimRange`, `order` or
+storage.
+
+Dirichlet BCs for operators with different range/domain space
+-------------------------------------------------------------
+It is now possible to add Dirichlet boundary conditions to operators
+with different range and domain spaces. Boundary conditions have to be
+compatible with the range space and rows for dofs on the boundary are
+set to zero in the assembled matrix. The boundary values provided in the
+`dune.ufl.DirichletBC` structure are ignored. Applying the operator $L$
+to a $u$ in the domain space simply results in a function $v$ in the
+range space with $v_i=0$ for all degrees of freedom on the boundary.
 
 Changes to solver parameter keys
 --------------------------------
@@ -43,23 +66,6 @@ replaced with ``nonlinear.forcing``.
    with suitable deprecation warnings printed if old keys are still used,
    it is possible that some corner cases were missed.
 
-Deprecation of the ``rhs`` argument for ``scheme.solve``
---------------------------------------------------------
-The ``rhs`` argument has been replaced with ``rightHandSide`` and has to be provided
-as a named argument.
-
-.. warning:: ``schemes`` with Dirichlet constraints did not handle a given
-   ``rhs`` argument correctly. The returned ``target`` was always equal to
-   the Dirichlet conditions on the boundary independent of the values in
-   the provided ``rhs``. This has now been corrected so that
-   ``target=rhs+dirichlet`` at the boundary which is consistent with the
-   evaluation of the operator
-   (``operator(u,w)`` results in ``w=u-dirichlet`` on the boundary).
-   To obtain the old behavior add ``scheme.setConstraints(0,rhs)`` before
-   calling ``scheme.solve(target=target,rightHandSide=rhs)``. No changes
-   are needed for ``schemes`` without Dirichlet boundary constraints.
-   See `merge request 661`_.
-
 Added a ``solve`` method to the linearization of ``schemes``
 ------------------------------------------------------------
 The object returned by the `linear` method on a `scheme` now has a `solve` method.
@@ -73,59 +79,6 @@ two terms of its Taylor expansion. Like the object returned by
 Add operator ``__len__`` to spaces.
 -----------------------------------
 This allows to use the typical Python built-in function `len(space)`.
-
-Deprecation of ``dune.fem.function.integrate``
-----------------------------------------------
-This function is deprecated. Use ``dune.fem.integrate`` instead. The ufl
-expression to integrate is now the first argument. If possible the grid
-view and order will be determined from the ufl expression if possible but
-can be passed in as extra arguments similar to the old function:
-``dune.fem.function.integrate(grid,expression,order=None)``
-with
-``dune.fem.integrate(expression,gridView=None,order=None)``.
-
-Deprecation of ``dune.fem.function.uflFunction`` and ``dune.fem.function.cppFunction``
---------------------------------------------------------------------------------------
-To construct different versions of grid function use
-``dune.fem.function.gridFunction``. The signature of the new function is
-``def gridFunction(expr=None,gridView=None,*,name=None,order=None, fctName=None, view=None, **kwargs)``.
-
-* If ``expr`` is a ``gridView`` or is ``None`` (and the ``gridView`` is not ``None``)
-  then the function acts like the decorator from 2.9 version. Note that the
-  old ``view`` parameter is also deprecated and replaced by ``gridView``.
-
-  .. warning:: ``@gridFunction(gv,"name",5)`` will not work anymore since name and
-     order need to be named arguments. So this will lead to an error instead
-     of a deprecation warning and needs to be replaced by
-     ``@gridFunction(gv,name="name",order=5)``.
-
-* If ``expr`` is a ufl expression then this functions acts like the
-  ``uflFunction`` from 2.9 with the old ``ufl`` argument being replaced by
-  ``expr``. In addition ``gridView`` and ``order`` can be omitted in case where
-  the grid view can be determined from the ufl expression (e.g. the
-  expression contains a grid function). The order will be determined
-  heuristically from the expression if omitted. 
-
-* If ``expr`` is a string then the function acts as like the old ``cppFunction``.
-  If ``fctName`` is not provided the ``name`` argument is assumed to also
-  be the name of the cpp function to export.
-
-Deprecation of ``dune.ufl.expression2GF``
------------------------------------------
-Use the extended version of ``dune.fem.function.gridFunction`` instead.
-
-Deprecation of ``dune.fem.operator.linear``
--------------------------------------------
-Use the new method ``linear`` on the schemes or operators. Note that the
-new method has no ``ubar`` argument (use the ``jacobian`` method to
-assemble around a non zero value). The method has a new bool argument ``assemble``
-which is ``True`` by default. Passing in ``assemble=False`` returns an
-empty linear operator which can be passed into ``jacobian`` to be filled.
-
-Deprecation of ``dune.fem.space.combinedSpace``
------------------------------------------------
-This has been renamed to ``dune.fem.space.compositeSpace`` and will be
-deprecated soon.
 
 Add ``DirichletIndices`` method to operators and schemes
 --------------------------------------------------------
@@ -252,3 +205,93 @@ Logging of parameter values
 
 .. _merge request 581: https://gitlab.dune-project.org/dune-fem/dune-fem/-/merge_requests/581
 .. _merge request 661: https://gitlab.dune-project.org/dune-fem/dune-fem/-/merge_requests/661
+
+Deprecation of the ``rhs`` argument for ``scheme.solve``
+--------------------------------------------------------
+The ``rhs`` argument has been replaced with ``rightHandSide`` and has to be provided
+as a named argument.
+
+.. warning:: ``schemes`` with Dirichlet constraints did not handle a given
+   ``rhs`` argument correctly. The returned ``target`` was always equal to
+   the Dirichlet conditions on the boundary independent of the values in
+   the provided ``rhs``. This has now been corrected so that
+   ``target=rhs+dirichlet`` at the boundary which is consistent with the
+   evaluation of the operator
+   (``operator(u,w)`` results in ``w=u-dirichlet`` on the boundary).
+   To obtain the old behavior add ``scheme.setConstraints(0,rhs)`` before
+   calling ``scheme.solve(target=target,rightHandSide=rhs)``. No changes
+   are needed for ``schemes`` without Dirichlet boundary constraints.
+   See `merge request 661`_.
+
+Deprecation of ``dune.fem.function.integrate``
+----------------------------------------------
+This function is deprecated. Use ``dune.fem.integrate`` instead. The ufl
+expression to integrate is now the first argument. If possible the grid
+view and order will be determined from the ufl expression if possible but
+can be passed in as extra arguments similar to the old function:
+``dune.fem.function.integrate(grid,expression,order=None)``
+with
+``dune.fem.integrate(expression,gridView=None,order=None)``.
+
+Deprecation of ``dune.fem.function.uflFunction`` and ``dune.fem.function.cppFunction``
+--------------------------------------------------------------------------------------
+To construct different versions of grid function use
+``dune.fem.function.gridFunction``. The signature of the new function is
+``def gridFunction(expr=None,gridView=None,*,name=None,order=None, fctName=None, view=None, **kwargs)``.
+
+* If ``expr`` is a ``gridView`` or is ``None`` (and the ``gridView`` is not ``None``)
+  then the function acts like the decorator from 2.9 version. Note that the
+  old ``view`` parameter is also deprecated and replaced by ``gridView``.
+
+  .. warning:: ``@gridFunction(gv,"name",5)`` will not work anymore since name and
+     order need to be named arguments. So this will lead to an error instead
+     of a deprecation warning and needs to be replaced by
+     ``@gridFunction(gv,name="name",order=5)``.
+
+* If ``expr`` is a ufl expression then this functions acts like the
+  ``uflFunction`` from 2.9 with the old ``ufl`` argument being replaced by
+  ``expr``. In addition ``gridView`` and ``order`` can be omitted in case where
+  the grid view can be determined from the ufl expression (e.g. the
+  expression contains a grid function). The order will be determined
+  heuristically from the expression if omitted. 
+
+* If ``expr`` is a string then the function acts as like the old ``cppFunction``.
+  If ``fctName`` is not provided the ``name`` argument is assumed to also
+  be the name of the cpp function to export.
+
+Deprecation of ``dune.ufl.expression2GF``
+-----------------------------------------
+Use the extended version of ``dune.fem.function.gridFunction`` instead.
+
+Deprecation of ``dune.fem.operator.linear``
+-------------------------------------------
+Use the new method ``linear`` on the schemes or operators. Note that the
+new method has no ``ubar`` argument (use the ``jacobian`` method to
+assemble around a non zero value). The method has a new bool argument ``assemble``
+which is ``True`` by default. Passing in ``assemble=False`` returns an
+empty linear operator which can be passed into ``jacobian`` to be filled.
+
+Deprecation of ``dune.fem.space.combinedSpace``
+-----------------------------------------------
+This has been renamed to ``dune.fem.space.compositeSpace`` and will be
+deprecated soon.
+
+
+DUNE-VEM
+========
+
+Dirichlet constraints for conforming $C^1$ space
+------------------------------------------------
+
+The conforming $C^1$ VEM space can now be used with all types of Dirichlet
+boundary conditions, i.e., only setting the values, only setting the normal
+derivative, or setting both. 
+
+  .. warning::  setting only value or derivative dofs only works on axis aligned boundaries.
+
+Intersection integrals now use the edge projections
+---------------------------------------------------
+
+Integrals over the intersection (`ds` or `dS` in UFL) now correctly use the
+edge projections instead of the element projections, so an integral of the
+jump of a VEM function in a continuous VEM space will now be zero as expected.

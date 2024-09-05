@@ -17,24 +17,13 @@ python3 -m venv env
 source env/bin/activate
 python -m pip install pip-download twine
 
-# pip-download -d $(pwd)/downloads \
-#  dune-common \
-#  dune-geometry \
-#  dune-grid \
-#  dune-alugrid \
-#  dune-istl \
-#  dune-localfunctions \
-#  dune-fem \
-#  dune-vem \
-#  dune-fem-dg
-
 pip-download -d $(pwd)/downloads \
   pyparsing \
   mpi4py
 
 pip-download -d $(pwd)/downloads \
-  Pygments==2.7.3 \
-  jupyterlab-pygments==0.1.2 \
+  Pygments \
+  jupyterlab-pygments \
   fenics-ufl
 
 pip-download -d $(pwd)/downloads \
@@ -52,7 +41,6 @@ pip-download -d $(pwd)/downloads \
    pandoc\
    pygmsh\
    pyqt5\
-   scikit-umfpack\
    sparkmonitor\
    sphinx-autobuild\
    sphinx_rtd_theme\
@@ -62,6 +50,8 @@ pip-download -d $(pwd)/downloads \
    wheel\
    x3d\
    petsc4py
+
+#   scikit-umfpack
 
 pip-download -d $(pwd)/downloads gmsh
 # Upload the packages to the index

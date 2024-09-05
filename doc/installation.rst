@@ -241,9 +241,26 @@ Troubleshooting
 
   .. code-block:: bash
 
-    $ g++ --version
+    g++ --version
 
   If your version is out of date, you will need to upgrade your system to use Dune
+
+* **A terminated compilation:**
+  If you get a `CompileError` exception with an output of the form:
+
+  .. code-block:: bash
+
+    raise CompileError(buffer_to_str(stderr))
+      dune.generator.exceptions.CompileError: c++: fatal error: Killed signal
+      terminated program cc1plus
+      compilation terminated.
+
+  then this could be caused by the compiler running out of memory.
+  This can especially happen on a HPC cluster where memory can be
+  restricted. An option is to run a small part of the simulation on
+  a single core with a lot of memory so that all modules are compiled
+  before starting the production run which might require less memory
+  than the compilation process.
 
 * **Python version:**
   It is possible that the python version may be an issue. The scripts
@@ -254,9 +271,11 @@ Troubleshooting
 
     fatal error: pyconfig.h: No such file or directory
 
-  This can probably be fixed by installing additional python3 libraries with e.g. ::
+  This can probably be fixed by installing additional python3 libraries with e.g.
 
-  $ sudo apt-get install libpython3-dev
+  .. code-block:: bash
+
+    sudo apt-get install libpython3-dev
 
 * **MPI not found:**
   One other problem is that a default version of Open MPI may already be installed.
@@ -266,7 +285,7 @@ Troubleshooting
 
   .. code-block:: bash
 
-    $ make uninstall
+    make uninstall
 
   in the original MPI install directory, followed by removing the folder. It will then be necessary to reinstall Open MPI and Dune. It may also be necessary to direct mpi4py to the new MPI installation. It is possible to check whether this is a problem by running python and trying out 
 
@@ -278,10 +297,10 @@ Troubleshooting
 
   .. code-block:: bash
 
-    $ git clone https://bitbucket.org/mpi4py/mpi4py.git
-    $ cd mpi4py
-    $ python setup.py build --mpicc=/path/to/openmpi/bin/mpicc
-    $ python setup.py install --user
+    git clone https://bitbucket.org/mpi4py/mpi4py.git
+    cd mpi4py
+    python setup.py build --mpicc=/path/to/openmpi/bin/mpicc
+    python setup.py install --user
 
 * **User warning from numpy:**
 
@@ -305,17 +324,20 @@ Troubleshooting
   `petsc4py` into a virtual environment and then install `dune-fem`.
   Assuming that the virtual environment with `python` version `X.Y`
   is in `$HOME/dune-env` and we want a few extra `petsc` packages we could run:
-  ```
-  pip install mpi4py
-  PETSC_CONFIGURE_OPTIONS="--download-hypre --download-mumps --download-parmetis --download-ml --download-metis --download-scalapack" pip install petsc
-  export PETSC_DIR=$HOME/dune-env/lib/pythonX.Y/site-packages/petsc
-  pip install petsc4py
-  pip install dune-fem
-  ```
+
+  .. code-block:: bash
+
+   pip install mpi4py
+   PETSC_CONFIGURE_OPTIONS="--download-hypre --download-parmetis --download-ml --download-metis --download-scalapack" pip install petsc
+   export PETSC_DIR=$HOME/dune-env/lib/pythonX.Y/site-packages/petsc
+   pip install petsc4py
+   pip install --pre dune-fem
+
   After this the `PETSC_DIR` environment variable should not be required anymore.
   This is all a bit experimental so let us know if it is not working.
   Of course an installed `petsc` or build from source should work in the
-  same way, without the need for the `pip install petsc` line.
+  same way, without the need for the `pip install petsc` line, just make
+  sure to set the `PETSC_DIR` during the installation of `dune-fem`.
 
 * **Newly installed software is not used:**
   After for example adding `petsc` to your system one needs to remove an existing `dune-py` module which
