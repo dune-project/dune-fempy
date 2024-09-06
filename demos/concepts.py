@@ -538,7 +538,7 @@ print("Number of elements:",gridView.size(0),
 
 # %% [markdown]
 #
-# .. index:: Constant; Constant Definition
+# .. index:: Constants; Constant Definition
 #
 # .. note:: The **dune.ufl.Constant** class implements a scalar or vector
 #    valued constant with a name. This constant can be used within a ufl form

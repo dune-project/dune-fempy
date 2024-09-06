@@ -1,7 +1,7 @@
 # %% [markdown]
 # .. index:: Equations; Wave Equation
 #
-# # Wave Equation: double slit domain
+# # Wave Equation: double slit domain (using mass lumping)
 #
 # In the following we will consider the wave equation
 # \begin{align*}
@@ -155,6 +155,7 @@ S1 = M*S
 #
 
 # %%
+# This currently fails - needs checking
 from dune.fem.scheme import galerkin
 lumping = galerkin(u*v*dx(metadata={"quadrature_rule":"lumped"})==0)
 lumped = lumping.linear().as_numpy.diagonal()
@@ -175,7 +176,7 @@ step = 0
 while t <= T:
     step += 1
     phiVec[:] -= pVec[:]*dt/2
-    pVec[:]   += S2*phiVec[:]
+    pVec[:]   += S1*phiVec[:]
     t += dt
     # set the values on the Dirichlet boundary
     p_in.value = numpy.sin(2*numpy.pi*5*t)

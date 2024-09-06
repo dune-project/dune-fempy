@@ -19,5 +19,5 @@ x3d
 pygmsh
 # petsc4py
 # gmsh # - fails in CI for some reason
-# mayavi
+# mayavi configobj
 # scikit-umfpack
