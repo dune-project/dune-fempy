@@ -191,7 +191,7 @@ class Scheme1:
             self.op.jacobian(target,self.jacobian)
             self.op.setConstraints(res,initialGuess)
             dh_coeff = cg(self.jacobian.as_numpy, res_coeff, x0,
-                          callback=lambda x: self.callback(x) )
+                          callback=self.callback )
             sol_coeff -= dh_coeff[0]
             n += 1
         return {"iterations":n, "linear_iterations":self.linIter}
@@ -217,23 +217,24 @@ from scipy.sparse.linalg import LinearOperator,spilu
 
 class Scheme2:
     def __init__(self, op):
-        self.op = operator
+        self.op = op
         self.model = op.model
-        self.res = u_h.copy(name="residual")
         self.linIter = 0
 
-    def callback(self,x):
+    def linCallback(self,x):
         self.linIter += 1
-    def cgCallback(self,*args,**kwargs):
-        return cg(*args,**kwargs,callback=lambda x:self.callback(x))
+    def linSolver(self,*args,**kwargs):
+        return cg(*args,**kwargs,callback=self.linCallback)
 
     # non linear function
     def f(self, x_coeff):
         # the following converts a given numpy array
         # into a discrete function over the given space
-        x = space.function("tmp", dofVector=x_coeff)
+        x = self.op.domainSpace.function("tmp", dofVector=x_coeff)
         self.op(x, self.res)
         return self.res.as_numpy
+    def callback(self,x,fx):
+        print("Newton residual:",fx.dot(fx))
 
     # class for the derivative DS of S
     class Df(LinearOperator):
@@ -241,13 +242,13 @@ class Scheme2:
             self.op = op
             self.shape = (x_coeff.shape[0], x_coeff.shape[0])
             self.dtype = x_coeff.dtype
-            x = space.function("tmp", dofVector=x_coeff)
+            x = self.op.domainSpace.function("tmp", dofVector=x_coeff)
             self.jacobian = self.op.linear()
             self.n = -1
             self.update(x_coeff,None)
         # reassemble the matrix DF(u) given a DoF vector for u
         def update(self, x_coeff, f):
-            x = space.function("tmp", dofVector=x_coeff)
+            x = self.op.domainSpace.function("tmp", dofVector=x_coeff)
             self.op.jacobian(x, self.jacobian)
             self.invJac = spilu(self.jacobian.as_numpy.tocsc())
             self.n += 1
@@ -257,11 +258,13 @@ class Scheme2:
 
 
     def solve(self, target):
+        self.res = target.copy(name="residual")
         sol_coeff = target.as_numpy
         M = self.Df(self.op,sol_coeff)
         # call the newton krylov solver from scipy
         sol_coeff[:] = newton_krylov(self.f, sol_coeff,
-                    f_tol=1e-6, method=self.cgCallback, inner_M=M)
+                    f_tol=1e-6, callback=self.callback,
+                    method=self.linSolver, inner_M=M)
         return {"iterations":M.n, "linear_iterations":self.linIter}
 
 scheme2_cls = Scheme2(operator)
