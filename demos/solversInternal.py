@@ -67,12 +67,18 @@ def printResult(method,error,info):
 # The default solver is a `gmres`
 # method but since this problem is symmetric a `cg` solver is more
 # efficient. In addition we will use a Jacobi preconditioner and set
-# the tolerance for the Newton method to $10^{-8}$:
+# the tolerance for the Newton method to $10^{-8}$. In addition we also
+# use the `Eisenstat-Walker` strategy for choosing the tolerance for the
+# linear solver - this requires the error measure to be `residual
+# reduction`.
 
 # %%
 from dune.fem.scheme import galerkin
 scheme = galerkin(a == bf+bg, solver='cg',
                   parameters={"linear.preconditioning.method":"jacobi",
+                              "nonlinear.forcing":"eisenstatwalker",
+                              # this is the default for this forcing
+                              "linear.errormeasure":"residualreduction",
                               "nonlinear.tolerance":1e-7},
                  )
 
@@ -154,7 +160,9 @@ class Scheme2:
         self.scheme = scheme
         # let's use a `gmres` solver for demonstration purposes
         self.linear = linearized(scheme, ubar=u0,
-                      parameters={ "method":"gmres", "gmres.restart":50 })
+                      parameters={ "method":"gmres", "gmres.restart":50,
+                                   "errormeasure":"absolute",
+                                   })
 
     def solve(self, target):
         prev = target.copy()
@@ -176,6 +184,7 @@ class Scheme2:
             # Subtract the new iterate from the previous one
             prev.sub( target )
             absDiff = prev.scalarProductDofs(prev)
+            print(n,absDiff)
             if absDiff < 1e-7**2:
                 break
             prev.assign(target)
