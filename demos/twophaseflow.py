@@ -465,7 +465,7 @@ while t < endTime:
     t += dt
 
     if t>=saveStep:
-        print(t,grid.size(0),sum(estimate.dofVector),hTol,"# timestep",flush=True)
+        print(f"t = {t:7.2f}, size = {grid.size(0):5}, est = {sum(estimate.dofVector):.4e}, hTol = {hTol}", flush=True)# timestep",flush=True)
         plot(solution[1],figsize=(15,4))
         saveStep += 100
 
