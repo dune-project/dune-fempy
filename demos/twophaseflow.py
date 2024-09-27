@@ -49,9 +49,11 @@ endTime   = 800.
 coupled   = False
 tolerance = 3e-2
 penalty   = 5 * (maxOrder * ( maxOrder + 1 ))
-newtonParameters = {"tolerance": tolerance,
-                    "verbose": "false", "linear.verbose": "false",
-                    "linabstol": 1e-8, "reduction": 1e-8}
+newtonParameters = {"nonlinear.tolerance": tolerance,
+                    "nonlinear.verbose": "false",
+                    "linear.verbose": "false",
+                    "linear.tolerance": 1e-8,
+                    "linear.reduction": 1e-8}
 
 
 # %% [markdown]
@@ -283,8 +285,7 @@ if coupled:
     tpModel = create.model( "integrands", grid, form == 0)
     # tpModel.penalty  = penalty
     # tpModel.timeStep = dt
-    scheme = create.scheme("galerkin", tpModel, spc, ("suitesparse","umfpack"),
-                     parameters={"nonlinear." + k: v for k, v in newtonParameters.items()})
+    scheme = create.scheme("galerkin", tpModel, spc, ("suitesparse","umfpack"), parameters=newtonParameters)
 else:
     uflSpace1 = Space((P.dimWorld,P.dimWorld),1)
     u1        = TrialFunction(uflSpace1)
@@ -301,8 +302,7 @@ else:
     # tpModel[1].penalty  = penalty
     # tpModel[1].timeStep = dt
     scheme = [create.scheme("galerkin", m, s, ("suitesparse","umfpack"),
-                     parameters={"nonlinear." + k: v for k, v in newtonParameters.items()})
-                for m,s in zip(tpModel,spc.components)]
+                            parameters=newtonParameters) for m,s in zip(tpModel,spc.components)]
 
 
 # %% [markdown]
