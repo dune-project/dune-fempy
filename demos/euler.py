@@ -202,4 +202,3 @@ for i,(k,x) in enumerate(res.items()):
     ax.scatter(x[0],x[1], color=color[i], label=k)
     ax.legend()
     ax.grid(True)
-pyplot.show()

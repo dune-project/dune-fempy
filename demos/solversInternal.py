@@ -161,8 +161,11 @@ class Scheme2:
         # let's use a `gmres` solver for demonstration purposes
         self.linear = linearized(scheme, ubar=u0,
                       parameters={ "method":"gmres", "gmres.restart":50,
-                                   "errormeasure":"absolute",
-                                   })
+                               # the scheme uses Eisenstat-Walker forcing
+                               # with 'residual reduction' as error measure
+                               # without the forcing 'absolute' is the default error measure
+                               "errormeasure":"absolute",
+                            })
 
     def solve(self, target):
         prev = target.copy()
