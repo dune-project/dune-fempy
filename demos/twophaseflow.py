@@ -267,7 +267,7 @@ form_s = P.Phi*(u[1]-solution_old[1])*v[1] * dx + tau*form_s
 
 
 # %%
-limiter = createLimiter( spc, limiter="scaling" )
+limiter = createLimiter( spc, bounds=(None, (1e-12, 1.)), limiter="scaling" )
 tmp = solution.copy()
 def limit(target):
     tmp.assign(target)
