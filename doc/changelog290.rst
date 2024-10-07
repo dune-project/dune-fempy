@@ -190,7 +190,11 @@ construction.
 
 Storage setup in scheme
 -----------------------
-TODO
+
+When creating a ``scheme`` one can now select the storage for the underlying linear
+solver backend. This is demonstrated in the :ref:`Monolithic solver (Lagrange and DG formulation) </monolithicStokes_nb.ipynb>`
+where a scheme with storage ``istl`` is created while the discrete spaces have
+storage ``numpy``.
 
 Methods on space to return local mapper and for evaluating basis functions
 --------------------------------------------------------------------------
