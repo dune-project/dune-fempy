@@ -640,7 +640,7 @@ u_h.plot()
 
 # %%
 space = solutionSpace(gridView, order=2)
-u_h   = space.interpolate(0, name='u_h')
+u_h   = space.function(name='u_h')
 u_h_n = u_h.copy(name="previous")
 
 x = SpatialCoordinate(space)
