@@ -169,8 +169,8 @@ See the help text of `dune.fem.utility.boundarySample` for details.
 Point sampler returning (entity,local coordinate) for given global coordinate
 ------------------------------------------------------------------------------
 
-Improved Dirichlet Boundary Indexing in UFL Forms
--------------------------------------------------
+Improved Boundary Indexing in UFL Forms (for boundary integrals and Dirichlet conditions)
+-----------------------------------------------------------------------------------------
 To restrict a domain integral to a part of the boundary given by a boundary id 
 one can now use ``ufl.ds(id)`` or multiply the integral with ``dune.ufl.BoundaryId(space)``
 (see the section on

@@ -46,6 +46,7 @@ distclean: clean
 
 %_nb.ipynb: %.py
 	@jupytext $< --execute --set-kernel python3 --output $*_nb.ipynb
+	@jupyter nbconvert --execute --to notebook --inplace $*_nb.ipynb
 
 %_nb.rst: %_nb.ipynb
 	@jupyter-nbconvert $< --to rst
