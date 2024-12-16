@@ -36,14 +36,14 @@ ubuntu-24.04-clang-18-23:
     DUNECI_TOOLCHAIN: clang-18-23
   tags: [duneci]
 
-debian-11-gcc-9-17:
+debian:11 gcc-10-20:
   image: registry.dune-project.org/docker/ci/debian:11
   script:
     - cd $CI_PROJECT_DIR
     - source /duneci/modules/dune-env/bin/activate
     - ./citest2.sh
   variables:
-    DUNECI_TOOLCHAIN:  gcc-9-17
+    DUNECI_TOOLCHAIN: gcc-10-20
     DUNECI_CMAKE_FLAGS: '-ggdb -fsanitize=address'
     DUNE_CMAKE_FLAGS: '-ggdb -fsanitize=address'
   tags: [duneci]
