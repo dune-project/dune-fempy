@@ -27,12 +27,12 @@ coffee/tea at hand):
 
   pip install --pre dune-fem
 
-.. note:: This tutorial is based on the upcoming 2.10 version of Dune. A
-   2.9 release version is available in the Python package index and can be
+.. note:: This tutorial is based on the upcoming 2.11 version of Dune.
+   Older release versions are available in the Python package index and can be
    obtained by removing the `--pre` from the above install command. Note
    that a few of the features described in this tutorial will not be
    available and that the API has changed in some places. See the
-   description in the :doc:`changelog<changelog290>` for details.
+   description in the :doc:`changelog<changelog>` for details.
 
 ****************************
 Additional external packages
