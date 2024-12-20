@@ -140,7 +140,7 @@ scheme = dune.fem.scheme.galerkin( equation, space, solver="cg", parameters=solv
 def init():
     data = uh.pointData(1)
     C = plt.tricontourf(triangulation, data[:,0], cmap=plt.cm.rainbow, levels=levels)
-    return C.collections
+    return C.axes.collections
 def animate(count):
     global t,stepsize,nextstep
     nextstep += stepsize
@@ -155,7 +155,7 @@ def animate(count):
     data = uh.pointData(1)
     C = plt.tricontourf(triangulation, data[:,0], cmap=plt.cm.rainbow, levels=levels)
     # gridView.writeVTK("spiral", pointdata=[uh], number=count)
-    return C.collections
+    return C.axes.collections
 
 # %% [markdown]
 # And generate the movie:
