@@ -9,13 +9,13 @@
 # incompressible with no mass transfer between phases.
 # A detailed description of the mathematical model and parameters
 # can be found <cite data-cite="TwoPhaseFlow"></cite>.
+import sys
 
 # %%
 try:
     import dune.femdg
 except ImportError:
     print("This example needs 'dune.femdg' - skipping")
-    import sys
     sys.exit(0)
 
 from matplotlib import pyplot
@@ -26,17 +26,23 @@ from dune.ufl import Space, Constant
 import dune.ufl
 
 import dune.fem as fem
-import dune.create as create
+from dune.alugrid import aluCubeGrid
+from dune.fem.view import adaptiveLeafGridView
 from dune.generator import algorithm
 from dune.common import FieldVector
 from dune.grid import cartesianDomain, Marker
 from dune.fem.function import levelFunction, gridFunction
 from dune.fem import integrate
+from dune.fem.scheme import galerkin
+from dune.fem.operator import galerkin as galerkinOp
+from dune.fem.space import dglegendrehp, product, finiteVolume
+
 from dune.plotting import plotPointData as plot
 
-from limit import createOrderRedcution, createLimiter
+from dune.femdg import createOrderRedcution, createLimiter
 
 fem.threading.use = 4
+
 
 # %% [markdown]
 # Some parameters
@@ -45,8 +51,10 @@ fem.threading.use = 4
 maxLevel  = 3
 maxOrder  = 3
 dt        = 5.
-endTime   = 800.
+# shorter run time for nightly testing
+endTime   = 200. if len(sys.argv) > 1 and sys.argv[1] == 'testing' else 800.
 coupled   = False
+#coupled   = True
 tolerance = 3e-2
 penalty   = 5 * (maxOrder * ( maxOrder + 1 ))
 newtonParameters = {"nonlinear.tolerance": tolerance,
@@ -96,7 +104,9 @@ class AnisotropicLens:
     r_n   = 1460.  # [Kg/m^3]
     mu_n  = 9.e-4  # [Kg/m s]
 
-    lens = lambda x,a,b: (a-b)*                (conditional(abs(x[1]-0.49)<0.03,1.,0.)*                 conditional(abs(x[0]-0.45)<0.11,1.,0.))                + b
+    lens = lambda x,a,b: (a-b)* \
+            (conditional(abs(x[1]-0.49)<0.03,1.,0.)* \
+             conditional(abs(x[0]-0.45)<0.11,1.,0.)) + b
 
     p_c = brooksCorey
 
@@ -114,10 +124,10 @@ class AnisotropicLens:
     p_w0 = (0.65-x[1])*9810.       # hydrostatic pressure
     s_n0 = 0                       # fully saturated
     # boundary conditions
-    inflow = conditional(abs(x[0]-0.45)<0.06,1.,0.)*             conditional(abs(x[1]-0.65)<1e-8,1.,0.)
+    inflow = conditional(abs(x[0]-0.45)<0.06,1.,0.)* conditional(abs(x[1]-0.65)<1e-8,1.,0.)
     J_n  = -5.137*1e-5
     J_w  = 1e-20
-    dirichlet = conditional(abs(x[0])<1e-8,1.,0.) +                conditional(abs(x[0]-0.9)<1e-8,1.,0.)
+    dirichlet = conditional(abs(x[0])<1e-8,1.,0.) + conditional(abs(x[0]-0.9)<1e-8,1.,0.)
     p_wD = p_w0
     s_nD = s_n0
 
@@ -134,23 +144,23 @@ P = AnisotropicLens()
 
 
 # %%
-grid = create.view("adaptive", "ALUCube", P.domain, dimgrid=2)
+grid = adaptiveLeafGridView( aluCubeGrid( P.domain, dimgrid=2) )
 
 if coupled:
-    spc          = create.space("dglegendrehp", grid, dimRange=2, order=maxOrder)
+    spc          = dglegendrehp(grid, dimRange=2, order=maxOrder)
 else:
-    spc1         = create.space("dglegendrehp", grid, dimRange=1, order=maxOrder)
-    spc          = create.space("product", spc1,spc1, components=["p","s"] )
+    spc1         = dglegendrehp(grid, dimRange=1, order=maxOrder)
+    spc          = product( spc1,spc1, components=["p","s"] )
 
-solution     = spc.interpolate([0,0], name="solution")
-solution_old = spc.interpolate([0,0], name="solution_old")
-sol_pm1      = spc.interpolate([0,0], name="sol_pm1")
-intermediate = spc.interpolate([0,0], name="iterate")
+solution     = spc.function(name="solution")
+solution_old = spc.function(name="solution_old")
+sol_pm1      = spc.function(name="sol_pm1")
+intermediate = spc.function(name="iterate")
 persistentDF = [solution,solution_old,intermediate]
 
-fvspc        = create.space("finitevolume", grid, dimRange=1, storage="numpy")
-estimate     = fvspc.interpolate([0], name="estimate")
-estimate_pm1 = fvspc.interpolate([0], name="estimate-pm1")
+fvspc        = finiteVolume( grid, dimRange=1)
+estimate     = fvspc.function(name="estimate")
+estimate_pm1 = fvspc.function(name="estimate-pm1")
 
 
 # %% [markdown]
@@ -282,10 +292,7 @@ def limit(target):
 # %%
 if coupled:
     form = form_s + form_p
-    tpModel = create.model( "integrands", grid, form == 0)
-    # tpModel.penalty  = penalty
-    # tpModel.timeStep = dt
-    scheme = create.scheme("galerkin", tpModel, spc, ("suitesparse","umfpack"), parameters=newtonParameters)
+    scheme = galerkin( form == 0, spc, ("suitesparse","umfpack"), parameters=newtonParameters)
 else:
     uflSpace1 = Space((P.dimWorld,P.dimWorld),1)
     u1        = TrialFunction(uflSpace1)
@@ -296,13 +303,13 @@ else:
                              intermediate:as_vector([solution[0],intermediate[1]]),
                              v:as_vector([0.,v1[0]]) } )
     form = [form_p,form_s]
-    tpModel = [create.model( "integrands", grid, form[0] == 0),
-               create.model( "integrands", grid, form[1] == 0)]
+    tpModel = [form[0] == 0,
+               form[1] == 0]
     # tpModel[0].penalty  = penalty
     # tpModel[1].penalty  = penalty
     # tpModel[1].timeStep = dt
-    scheme = [create.scheme("galerkin", m, s, ("suitesparse","umfpack"),
-                            parameters=newtonParameters) for m,s in zip(tpModel,spc.components)]
+    scheme = [galerkin( m, s, ("suitesparse","umfpack"),
+                        parameters=newtonParameters) for m,s in zip(tpModel,spc.components)]
 
 
 # %% [markdown]
@@ -353,10 +360,7 @@ Rvol = P.Phi*(u[1]-solution_old[1])/tau - div(dBulk_s) - bulk_s
 estimator = hT**2 * Rvol**2 * v0[0] * dx +      he * inner(jump(dBulk_s), n('+'))**2 * avg(v0[0]) * dS +      heBnd * (s_N + inner(dBulk_s,n))**2 * v0[0] * P.inflow * ds +      penalty_s[0]**2/he * jump(u[1])**2 * avg(v0[0]) * dS +      penalty_s[1]**2/heBnd * (s_D - u[1])**2 * v0[0] * P.dirichlet * ds
 estimator = replace(estimator, {intermediate:u})
 
-estimatorModel = create.model("integrands", grid, estimator == 0)
-# estimatorModel.timeStep = dt
-# estimatorModel.penalty  = penalty
-estimator = create.operator("galerkin", estimatorModel, spc, fvspc)
+estimator = galerkinOp( estimator, spc, fvspc)
 
 
 # %% [markdown]
