@@ -465,7 +465,7 @@ while t < endTime:
     estimator(solution, estimate)
     orderreduce(solution,sol_pm1)
     estimator(sol_pm1, estimate_pm1)
-    fem.spaceAdapt(spc, markp, persistentDF)
+    fem.spaceAdapt(markp, persistentDF)
     t += dt
 
     if t>=saveStep:
