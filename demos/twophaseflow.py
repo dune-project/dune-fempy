@@ -54,7 +54,7 @@ dt        = 5.
 # shorter run time for nightly testing
 endTime   = 200. if len(sys.argv) > 1 and sys.argv[1] == 'testing' else 800.
 coupled   = False
-#coupled   = True
+# coupled   = True
 tolerance = 3e-2
 penalty   = 5 * (maxOrder * ( maxOrder + 1 ))
 newtonParameters = {"nonlinear.tolerance": tolerance,
@@ -95,7 +95,7 @@ def brooksCorey(P,s_n):
 class AnisotropicLens:
     dimWorld = 2
     domain   = cartesianDomain([0,0.39],[0.9,0.65],[15,4])
-    x        = SpatialCoordinate(dune.ufl.cell(2))
+    x        = SpatialCoordinate(dune.ufl.Space(2))
 
     g     = [0,]*dimWorld ; g[dimWorld-1] = -9.810 # [m/s^2]
     g     = as_vector(g)
@@ -170,8 +170,7 @@ estimate_pm1 = fvspc.function(name="estimate-pm1")
 uflSpace = Space((P.dimWorld,P.dimWorld),2)
 u        = TrialFunction(uflSpace)
 v        = TestFunction(uflSpace)
-cell     = uflSpace.cell()
-x        = SpatialCoordinate(cell)
+x        = SpatialCoordinate(uflSpace)
 tau      = Constant(dt, name="timeStep")
 beta     = Constant(penalty, name="penalty")
 
@@ -228,10 +227,10 @@ form_s += s_N * v[1] * P.inflow * ds
 
 # %%
 def sMax(a): return max_value(a('+'), a('-'))
-n         = FacetNormal(cell)
-hT        = MaxCellEdgeLength(cell)
-he        = avg( CellVolume(cell) ) / FacetArea(cell)
-heBnd     = CellVolume(cell) / FacetArea(cell)
+n         = FacetNormal(uflSpace)
+hT        = MaxCellEdgeLength(uflSpace)
+he        = avg( CellVolume(uflSpace) ) / FacetArea(uflSpace)
+heBnd     = CellVolume(uflSpace) / FacetArea(uflSpace)
 k         = dot(P.K*n,n)
 lambdaMax = k('+')*k('-')/avg(k)
 def wavg(z): return (k('-')*z('+')+k('+')*z('-'))/(k('+')+k('-'))
@@ -309,7 +308,7 @@ else:
     # tpModel[1].penalty  = penalty
     # tpModel[1].timeStep = dt
     scheme = [galerkin( m, s, ("suitesparse","umfpack"),
-                        parameters=newtonParameters) for m,s in zip(tpModel,spc.components)]
+                        parameters=newtonParameters) for m,s in zip(tpModel,spc.subSpaces)]
 
 
 # %% [markdown]
