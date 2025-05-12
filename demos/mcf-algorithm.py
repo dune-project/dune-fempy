@@ -36,7 +36,6 @@
 
 # %%
 import time, io
-import pickle
 import numpy
 from matplotlib import pyplot as plt
 from matplotlib.ticker import ScalarFormatter

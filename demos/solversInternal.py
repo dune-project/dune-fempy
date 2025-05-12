@@ -43,7 +43,7 @@ from ufl import TestFunction, TrialFunction, SpatialCoordinate, FacetNormal, \
                 dx, ds, div, grad, dot, inner, exp, sin, conditional
 
 gridView = leafGridView([0, 0], [1, 1], [24, 24])
-space = lagrange(gridView, order=2)
+space = lagrange(gridView, order=2, storage='istl')
 u_h = space.interpolate(0, name='u_h')
 
 x,u,v,n = ( SpatialCoordinate(space), TrialFunction(space), TestFunction(space), FacetNormal(space) )

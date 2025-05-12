@@ -64,7 +64,6 @@ T = 3
 dt = 0.005
 t = 0
 
-
 # %% [markdown]
 # .. index:: Grid construction; gmsh (from file)
 #
@@ -155,7 +154,6 @@ S1 = M*S
 #
 
 # %%
-# This currently fails - needs checking
 from dune.fem.scheme import galerkin
 lumping = galerkin(u*v*dx(metadata={"quadrature_rule":"lumped"})==0)
 lumped = lumping.linear().as_numpy.diagonal()
@@ -172,16 +170,23 @@ S2 = M*S
 # sparse matrix and vector encoding the boundary constraint.
 
 # %%
-step = 0
 while t <= T:
-    step += 1
-    phiVec[:] -= pVec[:]*dt/2
-    pVec[:]   += S2*phiVec[:]
-    t += dt
-    # set the values on the Dirichlet boundary
+    # first phi update (two possible approaches doing the same thing...)
+    # phiVec[:] -= pVec[:]*dt/2
+    phi.axpy(-dt/2, p)
+
+    # multiply p with S and set values on the Dirichlet boundary
+    pVec[:] += S2*phiVec[:]
     p_in.value = np.sin(2*np.pi*5*t)
     op.setConstraints(p)
+
+    # second phi updatw
     phiVec[:] -= pVec[:]*dt/2
+    # phi.axpy(-dt/2, p)
+
     # check for instabilities
     assert np.max(abs(pVec)) < 3
+
+    # update time
+    t += dt
 p.plot(gridLines=None, clim=[-0.25,0.25], figure=plt.figure(figsize=(10,10)))
