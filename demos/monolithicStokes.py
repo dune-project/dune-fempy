@@ -5,7 +5,7 @@
 # .. index::
 #    triple: Equations; Stokes; Saddle-Point;
 #
-# .. index:: Methods; Mixed Finite Elements
+# .. index:: Methods; Mixed FEM
 #
 # .. index:: Spaces; Taylor-Hood
 #

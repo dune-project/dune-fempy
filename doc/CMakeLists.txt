@@ -19,7 +19,7 @@ othergrids.py         gitlab-formatting.py  gmsh2dgf.py          pandoc-formatti
 vemdemo.py            chimpl.py             discontinuousgalerkin.py
 interpolation.py      wave.py               laplace-adaptive.py   laplace-dwr.py laplace-dwr-algorithm.py
 backuprestore.py      parallelization.py    boundary.py
-solversInternal.py    solversExternal.py    evalues_laplace.py    biharmonic_IPC0.py    mmesh.py
+solversInternal.py    solversExternal.py    evalues_laplace.py    biharmonic_IPC0.py    mixed_poisson.py    mmesh.py
 crystal_nb.ipynb           mcf_nb.ipynb               chemical_nb.ipynb
 dune-corepy_nb.ipynb       spiral_nb.ipynb            euler_nb.ipynb
 concepts_nb.ipynb          dune-fempy_nb.ipynb        twophaseflow_nb.ipynb
@@ -30,7 +30,7 @@ monolithicStokes_nb.ipynb  fieldsplitStokes_nb.ipynb
 laplace-dwr_nb.ipynb       laplace-dwr-algorithm_nb.ipynb
 lineplot_nb.ipynb          wave_nb.ipynb
 mcf-algorithm_nb.ipynb     parallelization_nb.ipynb   backuprestore_nb.ipynb
-boundary_nb.ipynb          mmesh_nb.ipynb
+boundary_nb.ipynb          mmesh_nb.ipynb             mixed_poisson_nb.ipynb
 solversInternal_nb.ipynb  solversExternal_nb.ipynb
 cppfunctions_nb.ipynb      laplace-dwr.hh             utility.hh
 uzawa.hh                   evalues_laplace_nb.ipynb   biharmonic_IPC0_nb.ipynb

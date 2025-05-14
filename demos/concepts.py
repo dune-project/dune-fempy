@@ -162,7 +162,7 @@ gridView.writeVTK('exact', pointdata={'exact': exact})
 # we provide more detail on how to access the grid interface).
 
 # .. index::
-#    pari: dune.fem.function; gridFunction
+#    pair: dune.fem.function; gridFunction
 #
 # .. note:: ``dune.fem.function.gridFunction`` provides different options for
 # constructing grid functions: it can be used as decorator of Python

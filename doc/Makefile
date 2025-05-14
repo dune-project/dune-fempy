@@ -4,7 +4,7 @@ PATH := bin:$(PATH)
 FIGURES = figures/3dexample.png figures/interpolation_discrete.png figures/interpolation_exact.png figures/interpolation_error.png
 NBS = spiral_nb.ipynb elasticity_nb.ipynb wave_nb.ipynb \
       uzawa-scipy_nb.ipynb monolithicStokes_nb.ipynb fieldsplitStokes_nb.ipynb\
-      laplace-adaptive_nb.ipynb crystal_nb.ipynb mmesh_nb.ipynb cppfunctions_nb.ipynb evalues_laplace_nb.ipynb biharmonic_IPC0_nb.ipynb \
+      laplace-adaptive_nb.ipynb crystal_nb.ipynb mmesh_nb.ipynb cppfunctions_nb.ipynb evalues_laplace_nb.ipynb biharmonic_IPC0_nb.ipynb mixed_poisson_bn.ipynb\
 			mcf_nb.ipynb boundary_nb.ipynb \
       solversInternal_nb.ipynb solversExternal_nb.ipynb \
 			mcf-algorithm_nb.ipynb lineplot_nb.ipynb laplace-dwr_nb.ipynb \
