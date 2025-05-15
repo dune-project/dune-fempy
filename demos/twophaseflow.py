@@ -20,6 +20,7 @@ except ImportError:
 
 from matplotlib import pyplot
 
+import sys
 import numpy
 from ufl import *
 from dune.ufl import Space, Constant
