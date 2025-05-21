@@ -12,12 +12,22 @@ from dune.grid import cartesianDomain
 from dune.alugrid import aluConformGrid as leafGridView
 from dune.fem.view import filteredGridView
 from dune.fem.space import lagrange
+from dune.fem.utility import inspectBoundaryIds
 
 # %% [markdown]
 # Create a host grid view of the underlying grid as usual.
+# We show the boundary ids and some discrete function - also note the size
+# of the Lagrange space in this example:
 
 # %%
 gridView = leafGridView( cartesianDomain([-1,0],[1,1],[50,25]) )
+space = lagrange(gridView, order=2)
+x = SpatialCoordinate(space)
+solution = space.interpolate(dot(x,x),name="solution")
+solution.plot(colorbar="horizontal")
+print("number of dofs:", solution.size,\
+      "integral over original domain",solution.integrate())
+inspectBoundaryIds(gridView).plot(colorbar="horizontal")
 
 # %% [markdown]
 # Now create a `filteredGridView` with a simple callable specifying which element belongs to the new domain.
@@ -31,29 +41,50 @@ def filterIds(e):
         return 15
     else:
         return 20
-filteredView10 = filteredGridView(gridView, filterIds, domainId=10)
+filteredView10 = filteredGridView(gridView, filterIds, domainId=10,
+                                  useFilteredIndexSet=True)
 space10 = lagrange(filteredView10, order=2)
-x = SpatialCoordinate(space10)
 solution10 = space10.interpolate(dot(x,x),name="solution")
 solution10.plot(colorbar="horizontal")
 print("number of dofs:", solution10.size,\
       "integral over filtered domain 10",solution10.integrate())
 
 # %% [markdown]
+# .. note::
+#    The final parameter `useFilteredIndexSet` changes the index set that
+#    is used over the filtered grid view. The default is `False` so that
+#    the index set is taken from the underlying grid view. If this is set
+#    to `True` as here a new index set is generated that only covers the
+#    the filtered part of the grid. Consequently, the size of the spaces
+#    over the underlying grid view and the filtered grid view are
+#    different as shown here.
+
+# %% [markdown]
+# One can quite easily transfer a grid function from the filtered grid view to
+# a discrete function over the containing grid or vice versa:
+# Note that simply using `solution10.interpolate(solution)` will not work
+# since this method requires the grid views to match:
+
+# %%
+solution.clear()
+filteredView10.interpolate(solution10,solution)
+solution.plot()
+solution10.clear()
+filteredView10.interpolate(solution,solution10)
+solution10.plot()
+
+# %% [markdown]
 # The boundary ids are set to original ids or to the id of the outside
 # domain for internal boundaries, i.e., 15 in the current setup:
 
 # %%
-from dune.fem.utility import inspectBoundaryIds
 inspectBoundaryIds(filteredView10).plot(colorbar="horizontal")
 
 # %% [markdown]
-# Show a different section of the domain and create a `filteredGridView` with also provides an overloaded index set
-# with a consecutive index for the entities belonging to the new domain.
+# Filter out a different section of the domain:
 
 # %%
-filteredView15 = filteredGridView(gridView, filterIds, domainId=15,
-                                useFilteredIndexSet=True)
+filteredView15 = filteredGridView(gridView, filterIds, domainId=15)
 space15 = lagrange(filteredView15, order=2)
 x = SpatialCoordinate(space15)
 solution15 = space15.interpolate(dot(x,x),name="solution")
@@ -63,10 +94,42 @@ print("number of dofs:", solution15.size,\
 inspectBoundaryIds(filteredView15).plot(colorbar="horizontal")
 
 # %% [markdown]
+# .. note::
+#    As mentioned already the default is for the index set over the
+#    filtered grid view to be identical to that of the underlying grid view.
+#    Consequently, a discrete function over this type of a filtered grid view
+#    has the same number of degrees of freedom as a discrete
+#    function in the same type of space over the underlying grid view.
+#
+# The `space15.interpolate` called above will only set the degrees of
+# freedom attached to the filtered elements and will contain random
+# values otherwise. For this reason it makes sense to construct a
+# discrete function in this case that is guaranteed to be zero
+# everywhere before performing the interpolation:
+
+# %%
+solution15 = space15.function(name="solution")
+solution15.interpolate(dot(x,x))
+
+# %% [markdown]
+# A consequence of not changing the index set is that layout of the degrees of freedom of
+# discrete functions over the same spaces one over the filtered grid view
+# and the other over the underlying grid view are identical.
+# This makes the transfer of data very easy to achieve:
+
+# %%
+solution.clear()
+solution.assign(solution15)  # here the '0' on the domain which is not in the filter is important
+solution.plot()
+solution15.assign(solution)
+solution15.plot()
+
+# %% [markdown]
 # Finally the outer part of the domain
 
 # %%
-filteredView20 = filteredGridView(gridView, filterIds, domainId=20)
+filteredView20 = filteredGridView(gridView, filterIds, domainId=20,
+                                  useFilteredIndexSet=True)
 space20 = lagrange(filteredView20, order=2)
 x = SpatialCoordinate(space20)
 solution20 = space20.interpolate(dot(x,x),name="solution")
@@ -74,17 +137,6 @@ solution20.plot(colorbar="horizontal")
 print("number of dofs:", solution20.size,\
       "integral over filtered domain 20",solution20.integrate())
 inspectBoundaryIds(filteredView20).plot(colorbar="horizontal")
-
-# %% [markdown]
-# Compare with the original grid view.
-
-# %%
-space = lagrange(gridView, order=2)
-solution = space.interpolate(dot(x,x),name="solution")
-solution.plot(colorbar="horizontal")
-print("number of dofs:", solution.size,\
-      "integral over original domain",solution.integrate())
-inspectBoundaryIds(gridView).plot(colorbar="horizontal")
 
 # %% [markdown]
 # Finally we solve a simple linear PDE but with some mixed boundary conditions taken
