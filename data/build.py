@@ -26,12 +26,12 @@ def main():
         from dune.fem.utility import FemThreadPoolExecutor
         from dune.generator import builder
 
-        module = "concepts"
+        modules = ["concepts"]
         workers = 4
         if len(sys.argv)>1:
             workers = int(sys.argv[1])
             if len(sys.argv)>2:
-                module = sys.argv[2]
+                modules = sys.argv[2:]
 
         builder.initialize()
 
@@ -39,13 +39,15 @@ def main():
         dataPath = os.path.join(".",femVersion)
         print(f"obtaining data from {dataPath}")
         onlyCompile = []
-        if not module == "all":
-            filename = os.path.join(dataPath,module+".modules")
-            with open(filename,"r") as f:
-                onlyCompile = f.readlines()
+        if not "all" in modules:
+            for m in modules:
+                filename = os.path.join(dataPath,m+".modules")
+                with open(filename,"r") as f:
+                    onlyCompile += f.readlines()
             onlyCompile = set([c.strip()+".cc" for c in onlyCompile])
         else:
             onlyCompile = os.listdir(dataPath)
+
         with FemThreadPoolExecutor(max_workers=workers) as executor:
             for file in onlyCompile:
                 filename = os.path.join(dataPath,os.fsdecode(file))
@@ -55,11 +57,11 @@ def main():
                 with open(filename,"r") as f:
                     executor.submit( builder.load, file.replace(".cc",""), f.read(), None )
 
+        """
         # make sure things are safe on Mac
         # https://docs.python.org/3/library/urllib.request.html
         os.environ["no_proxy"] = "*"
 
-        """
         url = "https://gitlab.dune-project.org/dune-fem/ddfem/-/raw/improveDocBuild/doc/XXX?ref_type=heads"
         if module == "all":
             modules = ["boundary","examples","intro",
