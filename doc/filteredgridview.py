@@ -68,10 +68,10 @@ print("number of dofs:", solution10.size,\
 # %%
 solution.clear()
 filteredView10.interpolate(solution10,solution)
-solution.plot()
+solution.plot(colorbar="horizontal")
 solution10.clear()
 filteredView10.interpolate(solution,solution10)
-solution10.plot()
+solution10.plot(colorbar="horizontal")
 
 # %% [markdown]
 # The boundary ids are set to original ids or to the id of the outside

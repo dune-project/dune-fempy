@@ -17,7 +17,13 @@ def getVersion():
             ver[-1] = 100 # try to find the largest matching release version
         lower = int(ver[-1])-1
         if lower < 0:
-            raise RuntimeError(f"no suitable data for {version("dune.fem")} found")
+            # final try with only major.minor
+            femVersion = femVersion.split(".")[0] + "." + femVersion.split(".")[1]
+            dataPath = os.path.join(".",femVersion)
+            if os.path.exists(dataPath):
+                return femVersion
+            # we give up
+            raise RuntimeError(f"no suitable data for {version('dune.fem')} found")
         ver[-1] = str(lower)
         femVersion = ".".join(ver)
 
@@ -38,6 +44,7 @@ def main():
         femVersion = getVersion()
         dataPath = os.path.join(".",femVersion)
         print(f"obtaining data from {dataPath}")
+
         onlyCompile = []
         if not "all" in modules:
             for m in modules:
