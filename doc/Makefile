@@ -20,9 +20,28 @@ NBS = spiral_nb.ipynb elasticity_nb.ipynb wave_nb.ipynb\
       vemdemo_nb.ipynb chimpl_nb.ipynb gmsh2dgf_nb.ipynb
 			# spiral_adapt_nb.ipynb
 
+MODULES = spiral.modules elasticity.modules wave.modules\
+      uzawa-scipy.modules monolithicStokes.modules fieldsplitStokes.modules\
+      laplace-adaptive.modules crystal.modules mmesh.modules\
+      cppfunctions.modules evalues_laplace.modules\
+      biharmonic_IPC0.modules mixed_poisson.modules\
+			mcf.modules boundary.modules \
+      solversInternal.modules solversExternal.modules \
+			mcf-algorithm.modules lineplot.modules laplace-dwr.modules \
+      laplace-dwr-algorithm.modules othergrids.modules \
+			concepts.modules dune-fempy.modules backuprestore.modules parallelization.modules \
+      dune-corepy.modules discontinuousgalerkin.modules \
+      twophaseflow.modules euler.modules chemical.modules \
+			geoview.modules \
+			levelgridview.modules \
+      filteredgridview.modules \
+      vemdemo.modules chimpl.modules
+
 # .EXPORT_ALL_VARIABLES:
 
-export DUNE_LOG_LEVEL=WARNING
+export DUNE_LOGMODULES=8
+export DUNE_FORCE_BUILD=1
+export DUNE_LOG_LEVEL=ERROR
 export ALUGRID_VERBOSITY_LEVEL=0
 export IPYTHONDIR=.
 # ignore SAVE_BUILD since this will appear in notebooks
@@ -31,6 +50,7 @@ export DUNE_SAVE_BUILD=none
 export PYTHONWARNINGS=ignore
 
 all: $(NBS) $(FIGURES)
+MODULES : $(MODULES)
 
 .PHONY: clean distclean linkcheck
 
@@ -38,13 +58,16 @@ linkcheck:
 	@sphinx-build -b linkcheck . html
 
 clean:
-	@rm -f *.vtu *.pvtu *.p $(FIGURES) $(NBS)
+	@rm -f *.vtu *.pvtu *.p $(FIGURES) $(NBS) $(MODULES)
 	@rm -f geoview_nb_files/geoview_nb_1_0.png
 distclean: clean
 	@rm -f *.bbl
 	@rm -rf html
 
 .SECONDARY:
+
+%.modules: %.py
+	DUNEPY_DISABLE_PLOTTING=1 DUNE_LOGMODULES=4 python $<
 
 %_nb.ipynb: %.py
 	@jupytext $< --execute --set-kernel python3 --output $*_nb.ipynb
