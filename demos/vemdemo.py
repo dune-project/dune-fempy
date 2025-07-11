@@ -94,7 +94,7 @@ polygons.plot(colorbar="horizontal")
 # `testSpaces=[0,order-2,order-2]` defines a conforming space.
 
 # %%
-order = 3
+order = 1
 space = dune.vem.vemSpace( polyGrid, order=order, storage="numpy",
                            testSpaces=[-1,order-1,order-2])
 
@@ -223,7 +223,8 @@ for i,m in enumerate(methods):
 # We can easily set up a non linear problem
 
 # %%
-space = dune.vem.vemSpace( polyGrid, order=1, conforming=True )
+# space = dune.vem.vemSpace( polyGrid, order=1, conforming=True )
+space = dune.vem.vemSpace( polyGrid, order=1, testSpaces=[-1,0,-1])
 u = TrialFunction(space)
 v = TestFunction(space)
 x = SpatialCoordinate(space)
