@@ -15,7 +15,7 @@ NBS = spiral_nb.ipynb elasticity_nb.ipynb wave_nb.ipynb\
       dune-corepy_nb.ipynb discontinuousgalerkin_nb.ipynb \
       twophaseflow_nb.ipynb euler_nb.ipynb chemical_nb.ipynb \
 			geoview_nb.ipynb geoview_nb.rst \
-			levelgridview_nb.ipynb levelgridview_nb.rst \
+			levelgridview_nb.ipynb levelgridview_nb.rst\
       filteredgridview_nb.ipynb \
       vemdemo_nb.ipynb chimpl_nb.ipynb gmsh2dgf_nb.ipynb
 			# spiral_adapt_nb.ipynb

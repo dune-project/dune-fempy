@@ -1,6 +1,6 @@
 # %% [markdown]
 #
-# # Alternative Solvers (Scipy and Petsc)
+# # Alternative Solvers (e.g. Scipy, Petsc)
 # Here we look at different ways of solving PDEs using external
 # packages.
 # Different linear algebra backends can be accessed by changing setting the
@@ -275,6 +275,64 @@ u_h.plot()
 
 # %% [markdown]
 # .. index::
+#    pair: Solvers; Umfpack (scikit)
+#
+# ## Using scikit-umfpack
+# While `umfpack` can be used as a direct [internal solver](solversInternal_nb.ipynb)
+# a more fine grained usage is sometimes available through the Python
+# binding for `umfpack` available through the `scikit` package.
+# which needs to be installed for the following to run:
+
+# %%
+try:
+    import scikits.umfpack as um
+except ModuleNotFoundError:
+    print("can not import scikits.umfpacl ")
+    um = None
+
+# %% [markdown]
+# We will demonstrate the usage by solving our non-linear problem with a
+# hand written Newton method assuming that the symbolic
+# decomposition of the system matrix can be reused in each step:
+
+class Scheme3:
+    def __init__(self, op):
+        self.model = op.model
+        self.jacobian = op.linear()
+        self.op = op
+        self.umfpack = um.UmfpackContext() # Use default 'di' family of UMFPACK routines.
+        self.umfpack.symbolic( self.jacobian.as_numpy )
+
+    def solve(self, target):
+        # create a copy of target for the residual
+        res = target.copy(name="residual")
+
+        # extract numpy vectors from target and res
+        sol_coeff = target.as_numpy
+        res_coeff = res.as_numpy
+
+        n = 0
+        while True:
+            self.op(target, res)
+            absF = np.sqrt( np.dot(res_coeff,res_coeff) )
+            print(f"iter {n} : {absF}",flush=True)
+            if absF < 1e-6:
+                break
+            self.op.jacobian(target,self.jacobian)
+            A = self.jacobian.as_numpy[:]
+            self.umfpack.numeric( A )
+            sol_coeff -= self.umfpack( um.UMFPACK_A, A, res_coeff, autoTranspose = True )
+            n += 1
+        return {"iterations":n, "linear_iterations":-1}
+
+scheme1_cls = Scheme3(operator)
+u_h.interpolate(2)
+info = scheme1_cls.solve(target=u_h)
+printResult("scikit-umfpack",u_h-exact,info)
+u_h.plot()
+
+# %% [markdown]
+# .. index::
 #    pair: Solvers; Petsc4Py
 #
 # ## Using PETSc4Py
@@ -315,7 +373,7 @@ if petsc4py is not None and petsc:
     opPetsc = galerkin([a==bf+bg,DirichletBC(spacePetsc,exact,2)],
                        domainSpace=spacePetsc,rangeSpace=spacePetsc)
 
-    class Scheme3:
+    class Scheme4:
         def __init__(self, op):
             self.op = op
             self.jacobian = op.linear()
@@ -355,7 +413,7 @@ if petsc4py is not None and petsc:
             return {"iterations":n, "linear_iterations":numIter}
 
     u_h.interpolate(2)
-    scheme3_cls = Scheme3(opPetsc)
+    scheme3_cls = Scheme4(opPetsc)
     info = scheme3_cls.solve(target=u_h)
     printResult("PETSc4py 1",u_h-exact,info)
     u_h.plot()
@@ -367,7 +425,7 @@ if petsc4py is not None and petsc:
 
 # %%
 if petsc4py is not None and petsc is not None:
-    class Scheme4:
+    class Scheme5:
         def __init__(self, op):
             self.op = op
             self.res = op.rangeSpace.interpolate(0,name="residual")
@@ -400,7 +458,7 @@ if petsc4py is not None and petsc is not None:
             return {"iterations":self.snes.getIterationNumber(),
                     "linear_iterations":self.snes.getLinearSolveIterations()}
 
-    scheme4_cls = Scheme4(opPetsc)
+    scheme4_cls = Scheme5(opPetsc)
     u_h.interpolate(2)
     info = scheme4_cls.solve(target=u_h)
     printResult("PETSc4py 2",u_h-exact,info)

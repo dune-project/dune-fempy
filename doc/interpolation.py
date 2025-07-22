@@ -8,6 +8,7 @@ view.ViewSize = [1036, 768]
 view.CenterAxesVisibility = 0
 view.OrientationAxesVisibility = 0
 
+
 # this does not work with newer ParaView versions
 try:
     view.UseGradientBackground = False

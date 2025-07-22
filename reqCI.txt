@@ -20,4 +20,4 @@ pygmsh
 # petsc4py
 # gmsh # - fails in CI for some reason
 # mayavi configobj
-# scikit-umfpack
+scikit-umfpack
