@@ -295,41 +295,42 @@ except ModuleNotFoundError:
 # hand written Newton method assuming that the symbolic
 # decomposition of the system matrix can be reused in each step:
 
-class Scheme3:
-    def __init__(self, op):
-        self.model = op.model
-        self.jacobian = op.linear()
-        self.op = op
-        self.umfpack = um.UmfpackContext() # Use default 'di' family of UMFPACK routines.
-        self.umfpack.symbolic( self.jacobian.as_numpy )
+if um:
+    class Scheme3:
+        def __init__(self, op):
+            self.model = op.model
+            self.jacobian = op.linear()
+            self.op = op
+            self.umfpack = um.UmfpackContext() # Use default 'di' family of UMFPACK routines.
+            self.umfpack.symbolic( self.jacobian.as_numpy )
 
-    def solve(self, target):
-        # create a copy of target for the residual
-        res = target.copy(name="residual")
+        def solve(self, target):
+            # create a copy of target for the residual
+            res = target.copy(name="residual")
 
-        # extract numpy vectors from target and res
-        sol_coeff = target.as_numpy
-        res_coeff = res.as_numpy
+            # extract numpy vectors from target and res
+            sol_coeff = target.as_numpy
+            res_coeff = res.as_numpy
 
-        n = 0
-        while True:
-            self.op(target, res)
-            absF = np.sqrt( np.dot(res_coeff,res_coeff) )
-            print(f"iter {n} : {absF}",flush=True)
-            if absF < 1e-6:
-                break
-            self.op.jacobian(target,self.jacobian)
-            A = self.jacobian.as_numpy[:]
-            self.umfpack.numeric( A )
-            sol_coeff -= self.umfpack( um.UMFPACK_A, A, res_coeff, autoTranspose = True )
-            n += 1
-        return {"iterations":n, "linear_iterations":-1}
+            n = 0
+            while True:
+                self.op(target, res)
+                absF = np.sqrt( np.dot(res_coeff,res_coeff) )
+                print(f"iter {n} : {absF}",flush=True)
+                if absF < 1e-6:
+                    break
+                self.op.jacobian(target,self.jacobian)
+                A = self.jacobian.as_numpy[:]
+                self.umfpack.numeric( A )
+                sol_coeff -= self.umfpack( um.UMFPACK_A, A, res_coeff, autoTranspose = True )
+                n += 1
+            return {"iterations":n, "linear_iterations":-1}
 
-scheme1_cls = Scheme3(operator)
-u_h.interpolate(2)
-info = scheme1_cls.solve(target=u_h)
-printResult("scikit-umfpack",u_h-exact,info)
-u_h.plot()
+    scheme1_cls = Scheme3(operator)
+    u_h.interpolate(2)
+    info = scheme1_cls.solve(target=u_h)
+    printResult("scikit-umfpack",u_h-exact,info)
+    u_h.plot()
 
 # %% [markdown]
 # .. index::
