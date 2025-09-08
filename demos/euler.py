@@ -21,6 +21,7 @@ from dune.fem.function import gridFunction
 from dune.femdg import femDGOperator
 from dune.femdg.rk import femdgStepper
 from dune.fem.utility import lineSample
+from dune.femdg import BndValue, BndFlux_v, BndFlux_c
 
 dune.fem.threading.use = 4
 
@@ -51,7 +52,8 @@ class Model:
         return U[0], v, pressure
 
     # interface methods for model
-    def F_c(t,x,U):
+    @classmethod
+    def F_c(cls,t,x,U):
         rho, v, p = Model.toPrim(U)
         return as_matrix( [
                   [rho*v[0], rho*v[1]],
@@ -63,7 +65,8 @@ class Model:
     boundary = {range(1,5): lambda t,x,U: U}
 
     # interface method needed for LLF and time step control
-    def maxWaveSpeed(t,x,U,n):
+    @classmethod
+    def maxWaveSpeed(cls,t,x,U,n):
         rho, v, p = Model.toPrim(U)
         return abs(dot(v,n)) + sqrt(Model.gamma*p/rho)
 
@@ -72,19 +75,19 @@ class Model:
 #
 # Add methods for limiting
 # %%
-def velocity(t,x,U):
+def velocity(cls,t,x,U):
     _, v ,_ = Model.toPrim(U)
     return v
-def physical(t,x,U):
+def physical(cls,t,x,U):
     rho, _, p = Model.toPrim(U)
     return conditional( rho>1e-8, conditional( p>1e-8 , 1, 0 ), 0 )
-def jump(t,x,U,V):
+def jump(cls,t,x,U,V):
     _,_, pL = Model.toPrim(U)
     _,_, pR = Model.toPrim(V)
     return (pL - pR)/(0.5*(pL + pR))
-Model.velocity = velocity
-Model.physical = physical
-Model.jump     = jump
+Model.velocity = classmethod(velocity)
+Model.physical = classmethod(physical)
+Model.jump     = classmethod(jump)
 
 # %% [markdown]
 # Method to evolve the solution in time

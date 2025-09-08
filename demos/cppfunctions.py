@@ -14,7 +14,7 @@
 # We start again by setting up a grid
 
 # %%
-import io, numpy
+import numpy
 from matplotlib import pyplot, ticker
 from dune.fem.plotting import plotComponents
 
@@ -79,6 +79,7 @@ code2="""
 template <class GridView, class GF>
 auto aTimesExact(const GF &gf,Dune::FieldVector<double,1> &a) {
   return [lgf=localFunction(gf),&a] (const auto& en,const auto& xLocal) mutable -> auto {
+
     lgf.bind(en); // lambda must be mutable so that the non const function can be called
     return a[0]*lgf(xLocal);
   };

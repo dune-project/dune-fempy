@@ -302,6 +302,20 @@ Troubleshooting
     python setup.py build --mpicc=/path/to/openmpi/bin/mpicc
     python setup.py install --user
 
+* If you get a
+
+  .. code-block:: bash
+
+    RuntimeError: ParallelError [Communication:dune-env/include/dune/common/parallel/mpicommunication.hh:???]:
+    You must call MPIHelper::instance(argc,argv) in your main() function before using the MPI Communication!
+
+  then the system did not correctly detect the missing `mpi4py` package -
+  you need to install it using e.g.
+
+  .. code-block:: bash
+
+    pip install mpi4py
+
 * **User warning from numpy:**
 
   .. code-block:: none

@@ -20,6 +20,7 @@ from dune.fem.space import lagrange, dgonb
 from dune.fem.scheme import galerkin
 from dune.femdg import femDGOperator
 from dune.femdg.rk import femdgStepper
+from dune.femdg import BndValue, BndFlux_v, BndFlux_c
 
 from dune.fem import threading
 threading.use = max(4,threading.max) # use at most 4 threads
@@ -44,7 +45,8 @@ def computeVelocity():
 # %%
 class Model:
     transportVelocity = computeVelocity()
-    def S_e(t,x,U,DU):
+    @classmethod
+    def S_e(cls,t,x,U,DU):
         P1 = as_vector([0.2*pi,0.2*pi]) # midpoint of first source
         P2 = as_vector([1.8*pi,1.8*pi]) # midpoint of second source
         f1 = conditional(dot(x-P1,x-P1) < 0.2, 1, 0)
@@ -52,18 +54,23 @@ class Model:
         f  = conditional(t<5, as_vector([f1,f2,0]), as_vector([0,0,0]))
         r = 10*as_vector([U[0]*U[1], U[0]*U[1], -2*U[0]*U[1]])
         return f - r
-    def F_c(t,x,U):
+    @classmethod
+    def F_c(cls,t,x,U):
         return as_matrix([ [*(Model.velocity(t,x,U)*u)] for u in U ])
-    def maxWaveSpeed(t,x,U,n):
+    @classmethod
+    def maxWaveSpeed(cls,t,x,U,n):
         return abs(dot(Model.velocity(t,x,U),n))
-    def velocity(t,x,U):
+    @classmethod
+    def velocity(cls,t,x,U):
         return Model.transportVelocity
-    def F_v(t,x,U,DU):
+    @classmethod
+    def F_v(cls,t,x,U,DU):
         return 0.02*DU
-    def physical(t,x,U):
+    @classmethod
+    def physical(cls,t,x,U):
         return conditional(U[0]>=0,1,0)*conditional(U[1]>=0,1,0)*\
                conditional(U[2]>=0,1,0)
-    boundary = {range(1,5): as_vector([0,0,0])}
+    boundary = {range(1,5): BndValue(as_vector([0,0,0]))}
 
 fig = pyplot.figure(figsize=(20,20))
 plot(Model.transportVelocity, gridView=gridView, gridLines=None, vectors=[0,1],figure=fig)
