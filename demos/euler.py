@@ -62,7 +62,7 @@ class Model:
                   [(U[3]+p)*v[0], (U[3]+p)*v[1]] ] )
 
     # simple 'outflow' boundary conditions on all boundaries
-    boundary = {range(1,5): lambda t,x,U: U}
+    boundary = {range(1,5): BndValue(lambda t,x,U: U)}
 
     # interface method needed for LLF and time step control
     @classmethod
