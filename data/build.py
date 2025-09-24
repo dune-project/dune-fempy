@@ -49,8 +49,11 @@ def main():
         if not "all" in modules:
             for m in modules:
                 filename = os.path.join(dataPath,m+".modules")
-                with open(filename,"r") as f:
-                    onlyCompile += f.readlines()
+                try:
+                    with open(filename,"r") as f:
+                        onlyCompile += f.readlines()
+                FileNotFoundError:
+                    pass
             onlyCompile = set([c.strip()+".cc" for c in onlyCompile])
         else:
             onlyCompile = os.listdir(dataPath)
