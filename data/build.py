@@ -52,7 +52,7 @@ def main():
                 try:
                     with open(filename,"r") as f:
                         onlyCompile += f.readlines()
-                FileNotFoundError:
+                except FileNotFoundError:
                     pass
             onlyCompile = set([c.strip()+".cc" for c in onlyCompile])
         else:
