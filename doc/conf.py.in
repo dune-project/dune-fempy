@@ -48,6 +48,10 @@ extensions = [
 ]
 bibtex_bibfiles = ['dune-fempy.bib']
 
+nbsphinx_thumbnails = {
+    'mcf_nb': '_images/mcf.gif',
+}
+
 html_theme = "sphinx_rtd_theme"   # 'sphinxdoc'
 #html_theme = "piccolo_theme"   # 'sphinxdoc'
 html_theme_options = {
