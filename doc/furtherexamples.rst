@@ -1,7 +1,9 @@
-.. title:: Further examples
+################
+Further examples
+################
 
-.. toctree::
-   :maxdepth: 1
+.. nbgallery::
+   :name: rst-gallery
 
    discontinuousgalerkin_nb
    elasticity_nb

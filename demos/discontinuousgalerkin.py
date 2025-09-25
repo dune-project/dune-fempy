@@ -75,7 +75,7 @@ form          = aInternal + diffSkeleton + advSkeleton
 # %% [markdown]
 # We solve the problem as in previous examples
 
-# %%
+# %% nbsphinx-thumbnail={}
 scheme = solutionScheme(form==0, solver="gmres",
             parameters={"linear.preconditioning.method":"jacobi",
                        # "nonlinear.verbose": True,

@@ -68,7 +68,7 @@ Table of Content
 
 .. toctree::
    :caption: Further Examples
-   :maxdepth: 2
+   :maxdepth: 1
 
    furtherexamples
 

@@ -27,6 +27,8 @@ A detailed description of the module is found in the :cite:`DuneFemDG`.
 
 .. todo:: dune-fem-dg examples need more details in notebooks
 
+.. todo:: add an example using dolfin-dg and the model2ufl functions
+
 .. toctree::
    :maxdepth: 2
 
