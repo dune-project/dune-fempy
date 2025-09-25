@@ -159,7 +159,8 @@ def animate(count):
 
 # %% [markdown]
 # And generate the movie:
-# %%
+
+# %% nbsphinx-thumbnail={"output-index": 1, "tooltip": "A time dependent diffusion-reaction problem leading to a spiral wave."}
 import matplotlib.pyplot as plt
 from matplotlib import animation
 

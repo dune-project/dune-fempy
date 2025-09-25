@@ -98,6 +98,9 @@ uh, exact, laplace = setup()
 # therefore need to implement this either using some lower level functions
 # on the space or using a small C++ function which we then export
 # to Python.
+# Here we implement a version based entirely on the available binding,
+# In a [second notebook](laplace-dwr-algorithm_nb.ipynb) we revisit this problem
+# but implement a version using some C++ code to speed up the evaluation of the functional.
 
 # %%
 
@@ -125,9 +128,7 @@ def computeFunctional(point, pointFunctional, eh):
     return lf(xLoc)
 
 # %% [markdown]
-#
-# %% [markdown]
-# Next we define the actual estimator
+# Next we define the actual estimator:
 
 # %%
 from dune.fem.space import finiteVolume as estimatorSpace
@@ -149,15 +150,14 @@ estimator = estimatorOp(estimator_ufl)
 # %%
 h1error = dot(grad(uh - exact), grad(uh - exact))
 
-def compute(tolerance):
-    fig = pyplot.figure(figsize=(20,10))
+def compute(tolerance, fig):
     count = 0
     errorVector    = []
     estimateVector = []
     dofs           = []
     while True:
         laplace.solve(target=uh)
-        if count%9 == 6:
+        if count == 10:
             plot(uh, figure=(fig, 121), colorbar=False, linewidth=1)
         pointFunctional.clear()
         error = computeFunctional(point, pointFunctional,eh)
@@ -168,8 +168,6 @@ def compute(tolerance):
         dofs           += [uh.space.size]
         errorVector    += [error]
         estimateVector += [eta]
-        if count%3 == 2:
-            print(count, ": size=", uh.space.gridView.size(0), "estimate=", eta, "error=", error)
         if eta < tolerance:
             break
         marked = fem.mark(estimate,eta/uh.space.gridView.size(0))
@@ -177,12 +175,24 @@ def compute(tolerance):
         fem.loadBalance(uh)
         count += 1
     plot(uh, figure=(fig, 122), colorbar=False, linewidth=1)
+    return dofs, estimateVector, errorVector
+
+# %% nbsphinx-thumbnail={"tooltip": "Goal oriented local adaptivity"}
+fig = pyplot.figure(figsize=(20,10))
+dofs, estimateVector, errorVector = compute( tolerance=1e-6, fig=fig )
 
 # %% [markdown]
-# We first use a version based entirely on the available binding:
+# Here is a table with the number of dofs, the estimated, and actual error:
 
 # %%
-compute( tolerance=1e-6 )
+try:
+    import pandas as pd
+    keys = {'dofs': dofs, 'estimate': estimateVector, "error": errorVector}
+    table = pd.DataFrame(keys, index=range(len(dofs)),columns=['dofs', 'estimate', 'error'])
+    print(table)
+except ImportError:
+    print("pandas module not found so not showing table - ignored")
+    pass
 
 # %% [markdown]
 # Let's take a close up look of the refined region around the point of

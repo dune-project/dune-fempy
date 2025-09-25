@@ -50,6 +50,7 @@ bibtex_bibfiles = ['dune-fempy.bib']
 
 nbsphinx_thumbnails = {
     'mcf_nb': '_images/mcf.gif',
+    'stokes': '_images/monolithicStokes_nb_16_0.jpg',
 }
 
 html_theme = "sphinx_rtd_theme"   # 'sphinxdoc'
