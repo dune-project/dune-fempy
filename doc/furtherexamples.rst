@@ -1,6 +1,6 @@
-#######
-Gallery
-#######
+############
+Main Gallery
+############
 
 .. nbgallery::
 

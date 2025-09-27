@@ -47,6 +47,12 @@ Table of Content
    overview
 
 .. toctree::
+   :caption: Teasers
+   :maxdepth: 1
+
+   furtherexamples
+
+.. toctree::
    :caption: Installation
    :maxdepth: 1
 
@@ -65,12 +71,6 @@ Table of Content
    :maxdepth: 2
 
    nextsteps
-
-.. toctree::
-   :caption: Further Examples
-   :maxdepth: 1
-
-   furtherexamples
 
 .. toctree::
    :caption: Further Topics
