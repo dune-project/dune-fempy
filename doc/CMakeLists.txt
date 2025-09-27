@@ -3,10 +3,10 @@ add_sphinx_targets(sphinx)
 dune_symlink_to_source_files(FILES
 additional.rst index.rst landlab_descr.rst twophaseflow_descr.rst contributions.rst
 mmesh_descr.rst todo.rst citing.rst
-corepy.rst installation.rst vemdemo_descr.rst overview.rst
+corepy.rst installation.rst overview.rst
 stokes.rst furtherexamples.rst nextsteps.rst furthertopics.rst
-extensionmodules.rst inforesources.rst userprojects.rst
-gridviews.rst cpp.rst femdg.rst developers.rst slurmbatchscript.rst
+inforesources.rst userprojects.rst
+gridviews.rst cpp.rst developers.rst slurmbatchscript.rst
 changelog.rst changelog290.rst changelog210.rst
 scheme_api.rst
 3dexample.py          limit.py              spiral.py
