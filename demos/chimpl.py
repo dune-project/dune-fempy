@@ -106,42 +106,27 @@ df = space.interpolate(initial, name="solution")
 
 
 # %% [markdown]
-# Finally the time loop:
+# Finally the time loop - for the final coarsening phase (time greater than 0.8)
+# we increase the time step a bit:
 
 # %%
 t.value = 0
 eps.value = 0.05
-tau.value = 1e-02
 
-fig = pyplot.figure(figsize=(40,20))
+fig = pyplot.figure(figsize=(30,30))
 count = 0
 pos = 1
-while t.value < 0.8:
+while t.value < 2.15:
+    if t.value < 0.6:
+        tau.value = 1e-02
+    else:
+        tau.value = 5e-02
     df_n.assign(df)
     info = scheme.solve(target=df)
     t.value += tau
     count += 1
     if count % 10 == 0:
-        df.plot(figure=(fig,240+pos),colorbar=None,clim=[-1,1])
-        energy = dune.fem.integrate(Eint(df),order=3)
-        print("[",pos,"]",t.value,tau.value,energy,info,flush=True)
-        pos += 1
-
-# %% [markdown]
-# For the final coarsening phase we increase the time step a bit:
-
-# %%
-tau.value = 4e-02
-fig = pyplot.figure(figsize=(30,10))
-count = 0
-pos = 1
-while t.value < 2.0:
-    df_n.assign(df)
-    info = scheme.solve(target=df)
-    t.value += tau
-    count += 1
-    if count % 10 == 0:
-        df.plot(figure=(fig,140+pos),colorbar=None,clim=[-1,1])
+        df.plot(figure=(fig,330+pos),colorbar=None,clim=[-1,1])
         energy = dune.fem.integrate(Eint(df),order=3)
         print("[",pos,"]",t.value,tau.value,energy,info,flush=True)
         pos += 1

@@ -81,6 +81,5 @@ For a focus on the analysis and testing of spaces for forth order problems have 
    chimpl_nb
 
 .. todo:: Give some details on the Uzawa algorithm, add dune-fempy version and an algorithm implementation
-.. todo:: Add an example using mass lumping to show how to change quadrature
 .. todo:: dune-fem-dg examples need more details in notebooks
 .. todo:: add an example using dolfin-dg and the model2ufl functions

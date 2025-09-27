@@ -77,7 +77,8 @@ plot(Model.transportVelocity, gridView=gridView, gridLines=None, vectors=[0,1],f
 
 # %% [markdown]
 # Time evolution scheme
-# %%
+
+# %% nbsphinx-thumbnail={"tooltip": "A chemical reaction problem with three reactants."}
 space    = dgonb( gridView, order=3, dimRange=3)
 u_h      = space.interpolate([0,0,0], name='u_h')
 operator = femDGOperator(Model, space, limiter="scaling")
@@ -85,16 +86,16 @@ stepper  = femdgStepper(order=3, operator=operator)
 operator.applyLimiter(u_h)
 
 t        = 0
-saveTime = 1.5
+saveTime = 1
 
-fig = pyplot.figure(figsize=(30,20))
+fig = pyplot.figure(figsize=(30,30))
 c = 0
 while t < 9:
     operator.setTime(t)
     t += stepper(u_h)
     if t > saveTime:
-        saveTime += 1.5
-        u_h.plot(gridLines=None, figure=(fig, 231+c), colorbar=False)
+        saveTime += 1
+        u_h.plot(gridLines=None, figure=(fig, 331+c), colorbar=False)
         c += 1
 
 # %% [markdown]
