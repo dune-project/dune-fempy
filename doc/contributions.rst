@@ -76,9 +76,7 @@ How to showcase your own work
 To provide an example of what you have been doing with this package,
 send us a file *projectname_descr.rst* with a short
 description of your project with the authors and links to the project web
-page, journal article and so on.
-The following is an example taken from the description file of the
-:download:`vem project<vemdemo_descr.rst>`
+page, journal article and so on. This could look like this:
 
 .. code-block:: rst
 
