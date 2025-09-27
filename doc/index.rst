@@ -79,12 +79,6 @@ Table of Content
    furthertopics
 
 .. toctree::
-   :caption: Extension Modules
-   :maxdepth: 1
-
-   extensionmodules
-
-.. toctree::
    :caption: User Projects
    :name: userprojects
    :maxdepth: 1
