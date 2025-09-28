@@ -325,15 +325,36 @@ rst_epilog = """
 todo_include_todos=True
 nbsphinx_timeout = -1
 nbsphinx_execute = 'never'
-nbsphinx_epilog = r"""
+
+nbsphinx_prolog = r"""
+
+{% set docUrl = "https://www.dune-project.org/sphinx/content/sphinx/dune-fem/"+env.doc2path(env.docname, base=None).__str__()[:-9] %}
+{% set docBase = env.doc2path(env.docname, base=None).__str__()[:-9] %}
 
 .. raw:: html
 
     <div class="admonition note">
       <p>
-            This page was generated from
-            the notebook {{ env.doc2path(env.docname, base=None) }}
-            and is part of the tutorial for the dune-fem python bindings
+            This document was generated from the notebook
+            <a href={{ docUrl }}_nb.ipynb>{{ docBase }}_nb.ipynb</a>.
+            This is part of the dune-fem tutorial
+            <a href="https://doi.org/10.5281/zenodo.3706994"><img src="https://zenodo.org/badge/DOI/10.5281/zenodo.3706994.svg" alt="DOI"></a>
+      </p>
+    </div>
+"""
+
+nbsphinx_epilog = r"""
+
+{% set docBase = env.doc2path(env.docname, base=None).__str__()[:-9] %}
+{% set docUrl = "https://www.dune-project.org/sphinx/content/sphinx/dune-fem/"+docBase %}
+
+.. raw:: html
+
+    <div class="admonition note">
+      <p>
+            This document was generated from the notebook
+            <a href={{ docUrl }}_nb.ipynb>{{ docBase }}_nb.ipynb</a>.
+            This is part of the dune-fem tutorial
             <a href="https://doi.org/10.5281/zenodo.3706994"><img src="https://zenodo.org/badge/DOI/10.5281/zenodo.3706994.svg" alt="DOI"></a>
       </p>
     </div>

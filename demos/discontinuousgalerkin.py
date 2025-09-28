@@ -235,4 +235,4 @@ uh.plot()
 # dependent advection-diffusion problem. The module includes
 # implicit-explicit Runge-Kutta methods and stabilization approaches for
 # non-linear advection dominated models. This module is described in
-# more details in [other places in this tutorial](femdg.rst).
+# more details in [other places in this tutorial](furtherexamples.rst#Discontinuous-Galerkin-Methods-with-DUNE-FEM-DG).
