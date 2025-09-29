@@ -7,8 +7,7 @@ Components for the Landlab software package
 The notebooks here are based on similar notebooks found in the tutorial of
 the `landlab`_ project.
 
-.. toctree::
-   :maxdepth: 2
+.. nbgallery::
 
    overview_of_advection_solver_nb.ipynb
    linear_diffusion_overland_flow_dune_nb.ipynb
