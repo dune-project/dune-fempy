@@ -1,12 +1,8 @@
 .. sectionauthor:: Andreas Dedner <a.s.dedner@warwick.ac.uk>, Robert Kl\ |oe|\ fkorn <robert.kloefkorn@iris.no>, Martin Nolte <nolte.mrtn@gmail.com>
 
-##################################################
-Adaptivity and Moving Domains: extended grid views
-##################################################
-
-=======================================================
-Overview and some basic grid views (level and filtered)
-=======================================================
+#############################################
+Grid View: Adaptivity, Sub and Moving Domains
+#############################################
 
 When constructing a grid, the object returned to Python is always the so
 called `LeafGridView`. Without any refinement this is simply a view on all
@@ -19,41 +15,43 @@ using the underlying `hierarchical grid`, i.e.,
 
    grid.hierarchicalGrid.globalRefine(1)
 
-For a given hierarchical grid one can use different views, i.e., a view on
-all the elements of a given level:
-
-.. toctree::
-   :maxdepth: 2
-   :name: levelGV
-
-   levelgridview_nb
-
 DUNE-FEM provides a number of additional views which will be discussed
 further in this chapter:
 
-*  `dune.fem.view.adaptiveLeafGridView`: this view should be used when
+*  :ref:`level-label`: these exists by default on all hierarchical grids in dune
+   and provide a view on all the elements in a given level of the
+   hierarchic tree.
+
+*  :ref:`adapt-label`: this view should be used when
    the grid is supposed to be locally adapted. The view is still on the leaf
    elements of the grid but way data is attached to the entities of the grid
    is optimized for frequent grid changes as caused by local adaptivity. Its
    usage is shown in the following examples.
 
-*  `dune.fem.view.geometryGridView`: this is an example of a `meta` grid
-   view which is constructed from an existing grid view and replaces some
-   aspect - in this case the geometry of each element using a given grid
-   function. This concept makes it easy to perform simulations for example on
-   complex domains or on moving grids as shown in :ref:`Evolving Domains<geomGV>`.
-
-*  `dune.fem.view.filteredGridView`: allows the user to select a subset of
+*  :ref:`filter-label`: allows the user to select a subset of
    a given grid view by providing a filter on the elements. In its simplest
    version only the iterator is replaced with an iterator over the elements
    in the filter but in addition it is also possible to obtain a new index
    set with indices restricted to the elements in the filter.
 
-.. toctree::
-   :maxdepth: 2
-   :name: filteredGV
+*  :ref:`geom-label`: this is another example of a `meta` grid
+   view which is constructed from an existing grid view and replaces some
+   aspect - in this case the geometry of each element using a given grid
+   function. This concept makes it easy to perform simulations for example on
+   complex domains or on moving grids.
 
-   filteredgridview_nb
+.. _level-label:
+
+=================
+Level grid viewas
+=================
+
+For a given hierarchical grid one can also obtain views on
+all the elements of a given level:
+
+.. include:: levelgridview_nb.rst
+
+.. _adapt-label:
 
 ============================================
 Dynamic Local Grid Refinement and Coarsening
@@ -125,21 +123,41 @@ A layered Doerfler strategy is also available
     def doerflerMark(indicator, theta, maxLevel=None, layered=0.05):
 
 
-The following two examples showcase adaptivity: the first one using a
-residual a-posteriori estimator for an elliptic problem, the second one
-shows adaptivity for a time dependent phase field model for crystal growth.
-At the end of this section a dual weighted residual approach is used to
-optimize the grid with respect to the error at a given point. While the
-first two examples can be implemented completely using the available Python
-bindings the final example requires using a small C++ snippet which is easy
-to integrate into the Python code.
+The following example showcases adaptivity using a
+residual a-posteriori estimator for an elliptic problem.
+A similar examples using mesh refinement based on a dual weighted residual
+estimator is also available in a [pure python version](laplace-dwr_nb.ipynb)
+or [using a C++ code snippet](laplace-dwr_algorithm-nb.ipynb).
+
+A further example showcases both dynamic grid refinement and coarsening for
+a time dependent phase field model for [crystal growth](crystal_nb.ipynb).
+
+.. toctree::
+   :maxdepth: 1
+
+   laplace-adaptive_nb
+
+
+.. _filter-label:
+
+==========
+Subdomains
+==========
+
+Starting with a given view and using a simple filter one can define a view that only takes
+only subset of the elements into account. Depending on its construction this grid
+view either uses the same index set as the original grid view or defines a
+new index set so that spaces defined over these filtered grid views are
+either of the same dimension as spaces on the original view or have a
+smaller dimension.
 
 .. toctree::
    :maxdepth: 2
+   :name: filteredGV
 
-   laplace-adaptive_nb
-   crystal_nb
+   filteredgridview_nb
 
+.. _geom-label:
 
 ================
 Evolving Domains
@@ -161,15 +179,9 @@ into a grid of a diamond shape:
 By using a discrete function to construct a geometry grid view, it becomes
 possible to simulate problems on evolving domains where the evolution is
 itself the solution of the partial differential equation. We demonstrate
-this approach based on the example of surface mean curvature flow first in
-its simplest setting and then with the evolution of the surface depending
-on values of a computed surface quantity satisfying a heat equation on the
-surface:
+this approach based on the example of [surface mean curvature
+flow](mcf_nb.ipynb).
 
+
+.. todo:: add an example of heat equation on surface with movement
 .. todo:: add a coupled surface diffusion/evolution problem
-
-.. toctree::
-   :maxdepth: 2
-   :name: geomGV
-
-   mcf_nb

@@ -18,8 +18,9 @@ uzawa-scipy.py        monolithicStokes.py   fieldsplitStokes.py
 othergrids.py         gitlab-formatting.py  gmsh2dgf.py          pandoc-formatting.py
 vemdemo.py            chimpl.py             discontinuousgalerkin.py
 interpolation.py      wave.py               laplace-adaptive.py   laplace-dwr.py laplace-dwr-algorithm.py
-backuprestore.py      parallelization.py    boundary.py
+backuprestore.py      parallelization.py    boundary.py           filteredgridview.py
 solversInternal.py    solversExternal.py    evalues_laplace.py    biharmonic_IPC0.py    mixed_poisson.py    mmesh.py
+overview_of_advection_solver.py linear_diffusion_overland_flow_dune.py
 crystal_nb.ipynb           mcf_nb.ipynb               chemical_nb.ipynb
 dune-corepy_nb.ipynb       spiral_nb.ipynb            euler_nb.ipynb
 concepts_nb.ipynb          dune-fempy_nb.ipynb        twophaseflow_nb.ipynb
@@ -34,19 +35,14 @@ boundary_nb.ipynb          mmesh_nb.ipynb             mixed_poisson_nb.ipynb
 solversInternal_nb.ipynb   solversExternal_nb.ipynb
 cppfunctions_nb.ipynb      laplace-dwr.hh             utility.hh
 uzawa.hh                   evalues_laplace_nb.ipynb   biharmonic_IPC0_nb.ipynb
-figures _static dune-fempy.bib .special.rst
-soap.dgf sphere.dgf triangles.dgf unitcube-2d.dgf wave_tank.msh quads.msh hugo_site.asc
-config.opts
-overview_of_advection_solver_nb.ipynb
-linear_diffusion_overland_flow_dune_nb.ipynb
-levelgridview_nb.ipynb
-levelgridview_nb.ipynb
+overview_of_advection_solver_nb.ipynb linear_diffusion_overland_flow_dune_nb.ipynb
+levelgridview_nb.rst geoview_nb.rst geoview_nb_files
 filteredgridview_nb.ipynb
-filteredgridview_nb_files
-geoview_nb.rst
-geoview_nb_files
-mcf.gif
 dune-python-logo.png
+figures _static dune-fempy.bib .special.rst
+soap.dgf sphere.dgf triangle.dgf unitcube-2d.dgf wave_tank.msh quads.msh hugo_site.asc
+config.opts
+mcf.gif
 favicon.ico
 )
 
