@@ -40,7 +40,7 @@ levelgridview_nb.rst geoview_nb.rst geoview_nb_files
 filteredgridview_nb.ipynb
 dune-python-logo.png
 figures _static dune-fempy.bib .special.rst
-soap.dgf sphere.dgf triangle.dgf unitcube-2d.dgf wave_tank.msh quads.msh hugo_site.asc
+horizontal.msh 3dmesh.dgf soap.dgf sphere.dgf triangle.dgf unitcube-2d.dgf wave_tank.msh quads.msh hugo_site.asc
 config.opts
 mcf.gif
 favicon.ico

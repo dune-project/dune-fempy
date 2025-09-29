@@ -7,7 +7,7 @@
 
 # %% [markdown]
 # Grid file
-# We create a grid file containing a rectangle grid with a horizontal centered interface using gmsh.
+# We create a [grid file](horizontal.msh) containing a rectangle grid with a horizontal centered interface using gmsh.
 
 
 # %%
