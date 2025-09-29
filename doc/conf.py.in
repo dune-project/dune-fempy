@@ -326,36 +326,41 @@ todo_include_todos=True
 nbsphinx_timeout = -1
 nbsphinx_execute = 'never'
 
+
 nbsphinx_prolog = r"""
 
-{% set docUrl = "https://www.dune-project.org/sphinx/content/sphinx/dune-fem/"+env.doc2path(env.docname, base=None).__str__()[:-9] %}
 {% set docBase = env.doc2path(env.docname, base=None).__str__()[:-9] %}
 
-.. raw:: html
+.. only:: html
 
-    <div class="admonition note">
-      <p>
-            This document was generated from the notebook
-            <a href={{ docUrl }}_nb.ipynb>{{ docBase }}_nb.ipynb</a>.
-            This is part of the dune-fem tutorial
-            <a href="https://doi.org/10.5281/zenodo.3706994"><img src="https://zenodo.org/badge/DOI/10.5281/zenodo.3706994.svg" alt="DOI"></a>
-      </p>
-    </div>
+    .. role:: raw-html(raw)
+        :format: html
+
+    .. note::
+
+        .. raw:: html
+
+              This document is part of the dune-fem tutorial
+              <a href="https://doi.org/10.5281/zenodo.3706994"><img src="https://zenodo.org/badge/DOI/10.5281/zenodo.3706994.svg" alt="DOI"></a>
+
+        | Download *{{ docBase }}* as :download:`Jupyter notebook (_nb.ipynb) <{{ docBase }}_nb.ipynb>` or as :download:`Python script (.py) <{{ docBase }}.py>`
 """
 
 nbsphinx_epilog = r"""
 
 {% set docBase = env.doc2path(env.docname, base=None).__str__()[:-9] %}
-{% set docUrl = "https://www.dune-project.org/sphinx/content/sphinx/dune-fem/"+docBase %}
 
-.. raw:: html
+.. only:: html
 
-    <div class="admonition note">
-      <p>
-            This document was generated from the notebook
-            <a href={{ docUrl }}_nb.ipynb>{{ docBase }}_nb.ipynb</a>.
-            This is part of the dune-fem tutorial
-            <a href="https://doi.org/10.5281/zenodo.3706994"><img src="https://zenodo.org/badge/DOI/10.5281/zenodo.3706994.svg" alt="DOI"></a>
-      </p>
-    </div>
+    .. role:: raw-html(raw)
+        :format: html
+
+    .. note::
+
+        .. raw:: html
+
+              This document is part of the dune-fem tutorial
+              <a href="https://doi.org/10.5281/zenodo.3706994"><img src="https://zenodo.org/badge/DOI/10.5281/zenodo.3706994.svg" alt="DOI"></a>
+
+        | Download *{{ docBase }}* as :download:`Jupyter notebook (.ipynb) <{{ docBase }}_nb.ipynb>` or as :download:`Python script (.py) <{{ docBase }}.py>`
 """

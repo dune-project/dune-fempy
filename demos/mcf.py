@@ -65,7 +65,9 @@ R0 = 2.
 # %% [markdown]
 # .. index: Grid construction; Dune Grid Format file (`DGF`_)
 #
-# We begin by setting up reference domain $\Gamma_0$ (```grid```), and the space on $\Gamma_0$ that describes $\Gamma(t)$ (```space```). From this we interpolate the non-spherical initial surface ```positions```, and, then reconstruct ```space``` for the discrete solution on $\Gamma(t)$.
+# We begin by setting up reference domain $\Gamma_0$ (```grid```)
+# ([a sphere](sphere.dgf)), and the space on $\Gamma_0$ that describes $\Gamma(t)$ (```space```).
+# From this we interpolate the non-spherical initial surface ```positions```, and, then reconstruct ```space``` for the discrete solution on $\Gamma(t)$.
 
 # %%
 from dune.fem.view import geometryGridView
@@ -120,7 +122,7 @@ while t < end_time:
              gridLines="", triplot=True)
 
 # %% [markdown]
-# By choosing an initial surface with boundary we can solve the _soap film_
+# By choosing an initial surface with boundary we can solve the [soap film](soap.dgf)
 # problem, i.e., compute the surface of minimum curvature:
 # %%
 pyplot.close('all')

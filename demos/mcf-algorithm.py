@@ -193,7 +193,7 @@ def calculate(use_cpp, gridView):
 # %% [markdown]
 # Compute the mean curvature flow evolution of a spherical surface. Compare
 # computational time of a pure Python implementation and using a C++
-# algorithm to compute the radius of the surface for verifying the
+# algorithm to compute the radius of the [surface](sphere.dgf) for verifying the
 # algorithm.
 
 # %%

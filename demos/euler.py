@@ -124,7 +124,7 @@ def evolve(space, u_h, limiter="MinMod"):
     return res
 
 # %% [markdown]
-# A radial Riemann problem
+# A radial Riemann problem using [a triangle grid](triangle.dgf)
 # %%
 x = SpatialCoordinate(dune.ufl.domain(2))
 initial = conditional(dot(x,x)<0.1,as_vector([1,0,0,2.5]),

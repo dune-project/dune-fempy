@@ -72,7 +72,8 @@ t = 0
 # construct general grids by either defining the grids directly in Python
 # (as demonstrated in the following example) or by reading the grid from
 # files using readers provided by Dune, e.g., Dune Grid Format (dgf) files
-# or Gmsh files.
+# or Gmsh files. Here we use a
+# [slit domain mesh](wave_tank.msh).
 
 # %%
 domain = (reader.gmsh, "wave_tank.msh")
