@@ -160,7 +160,7 @@ def animate(count):
 # %% [markdown]
 # And generate the movie:
 
-# %% nbsphinx-thumbnail={"output-index": 1, "tooltip": "A time dependent diffusion-reaction problem leading to a spiral wave."}
+# %%
 import matplotlib.pyplot as plt
 from matplotlib import animation
 
@@ -178,13 +178,15 @@ anim = animation.FuncAnimation(fig, animate, init_func=init, frames=20, interval
 
 try:
     movie = anim.to_html5_video()
+    # save and embed
+    anim.save('spiral.gif', writer=animation.ImageMagickWriter(fps=2))
     from IPython.display import HTML, display
     display( HTML(movie) )
 except: # ffmpeg probably missing
     try:
         anim.save("spiral.html")
         from IPython.display import IFrame
-        IFrame(src='./nice.html', width=700, height=600)
+        IFrame(src='./spiral.html', width=700, height=600)
     except:
         pass
 # %% [markdown]

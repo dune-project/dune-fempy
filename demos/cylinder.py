@@ -200,7 +200,7 @@ def animate(count):
 # %% [markdown]
 # And generate the movie:
 
-# %% nbsphinx-thumbnail={"output-index": 1, "tooltip": "Flow around a cylinder using a Taylor-Hood based split scheme."}
+# %%
 import matplotlib.pyplot as plt
 from matplotlib import animation
 
@@ -218,6 +218,8 @@ anim = animation.FuncAnimation(fig, animate, init_func=init, frames=20, interval
 
 try:
     movie = anim.to_html5_video()
+    # save and embed
+    anim.save('cylinder.gif', writer=animation.ImageMagickWriter(fps=2))
     from IPython.display import HTML, display
     display( HTML(movie) )
 except:
