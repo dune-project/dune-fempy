@@ -4,6 +4,7 @@ PATH := bin:$(PATH)
 FIGURES = figures/3dexample.png figures/interpolation_discrete.png figures/interpolation_exact.png figures/interpolation_error.png
 NBS = spiral_nb.ipynb elasticity_nb.ipynb wave_nb.ipynb\
       uzawa-scipy_nb.ipynb monolithicStokes_nb.ipynb fieldsplitStokes_nb.ipynb\
+      cylinder_nb.ipynb\
       laplace-adaptive_nb.ipynb crystal_nb.ipynb mmesh_nb.ipynb\
       cppfunctions_nb.ipynb evalues_laplace_nb.ipynb\
       biharmonic_IPC0_nb.ipynb mixed_poisson_nb.ipynb\
@@ -25,6 +26,7 @@ NBS = spiral_nb.ipynb elasticity_nb.ipynb wave_nb.ipynb\
 
 MODULES = spiral.modules elasticity.modules wave.modules\
       uzawa-scipy.modules monolithicStokes.modules fieldsplitStokes.modules\
+      cylinder.modules\
       laplace-adaptive.modules crystal.modules mmesh.modules\
       cppfunctions.modules evalues_laplace.modules\
       biharmonic_IPC0.modules mixed_poisson.modules\
@@ -74,7 +76,6 @@ distclean: clean
 
 %_nb.ipynb: %.py
 	@jupytext $< --execute --set-kernel python3 --output $*_nb.ipynb
-	@jupyter nbconvert --execute --to notebook --inplace $*_nb.ipynb
 
 %_nb.ipynb: %.ipynb
 	@jupyter nbconvert --execute --to notebook --output $*_nb.ipynb $<

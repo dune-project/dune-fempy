@@ -9,6 +9,7 @@ Main Gallery
    spiral_nb
    wave_nb
    stokes
+   cylinder_nb
    mixed_poisson_nb
    evalues_laplace_nb
    biharmonic_IPC0_nb
