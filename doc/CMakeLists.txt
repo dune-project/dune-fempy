@@ -9,7 +9,7 @@ inforesources.rst userprojects.rst
 gridviews.rst cpp.rst developers.rst slurmbatchscript.rst
 changelog.rst changelog290.rst changelog210.rst
 scheme_api.rst
-3dexample.py          limit.py              spiral.py
+3dexample.py          spiral.py
 crystal.py            lineplot.py           svg2pdf.py            cppfunctions.py
 dune-corepy.py        mcf-algorithm.py      twophaseflow.py       chemical.py
 concepts.py           dune-fempy.py         mcf_cmp_plot.py       euler.py
