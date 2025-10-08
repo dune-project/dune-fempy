@@ -8,7 +8,10 @@ from importlib.metadata import version
 
 def getVersion():
     femVersion = version("dune.fem")
-    print(f"Found fem-version {femVersion}")
+    ver = femVersion.split(".")
+    if len(ver) > 3: # ignore post version and use major.minor.micro
+        femVersion = ".".join(ver[:3])
+
     while True:
         dataPath = os.path.join(".",femVersion)
         if os.path.exists(dataPath):
@@ -19,12 +22,13 @@ def getVersion():
         lower = int(ver[-1])-1
         if lower < 0:
             # final try with only major.minor
-            femVersion = femVersion.split(".")[0] + "." + femVersion.split(".")[1]
+            femVersion = ".".join(ver[:2])
             dataPath = os.path.join(".",femVersion)
             if os.path.exists(dataPath):
                 return femVersion
+
             # we give up
-            raise RuntimeError(f"no suitable data for {version('dune.fem')} found. Found {femVersion}!")
+            raise RuntimeError(f"no suitable data for {version('dune.fem')} found.")
         ver[-1] = str(lower)
         femVersion = ".".join(ver)
 
