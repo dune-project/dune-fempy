@@ -23,7 +23,7 @@ def getVersion():
             if os.path.exists(dataPath):
                 return femVersion
             # we give up
-            raise RuntimeError(f"no suitable data for {version('dune.fem')} found")
+            raise RuntimeError(f"no suitable data for {version('dune.fem')} found. Found {femVersion}!")
         ver[-1] = str(lower)
         femVersion = ".".join(ver)
 
