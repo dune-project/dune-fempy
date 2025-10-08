@@ -8,6 +8,7 @@ from importlib.metadata import version
 
 def getVersion():
     femVersion = version("dune.fem")
+    print(f"Found fem-version {femVersion}")
     while True:
         dataPath = os.path.join(".",femVersion)
         if os.path.exists(dataPath):
