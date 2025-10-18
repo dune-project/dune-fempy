@@ -6,3 +6,4 @@
    twophaseflow_descr
    mmesh_descr
    landlab_descr
+   ddfem_descr

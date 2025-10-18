@@ -1,7 +1,8 @@
 include(DuneSphinxDoc)
 add_sphinx_targets(sphinx)
 dune_symlink_to_source_files(FILES
-additional.rst index.rst landlab_descr.rst twophaseflow_descr.rst contributions.rst
+additional.rst index.rst contributions.rst
+landlab_descr.rst twophaseflow_descr.rst ddfem_descr.rst
 mmesh_descr.rst todo.rst citing.rst
 corepy.rst installation.rst overview.rst
 stokes.rst furtherexamples.rst nextsteps.rst furthertopics.rst

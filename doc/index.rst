@@ -79,7 +79,7 @@ Table of Content
    furthertopics
 
 .. toctree::
-   :caption: User Projects
+   :caption: Other Projects using Dune-Fem
    :name: userprojects
    :maxdepth: 1
 

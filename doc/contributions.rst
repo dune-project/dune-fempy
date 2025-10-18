@@ -69,6 +69,16 @@ Contributions are very welcomed - these can include but are not restricted to
 The script in `demos`, the link to that in `doc` and the notebook
 generated in `doc` by running `make script_nb.ipynb` should be added to the repository. 
 
+The above assumes that you starting from a new script - if you already have
+a notebook you would like to add then you can use
+
+```
+jupytext --to py:percent notebook.ipynb
+```
+
+to generate the script in the correct format and then the above can be
+applied.
+
 #############################
 How to showcase your own work
 #############################
