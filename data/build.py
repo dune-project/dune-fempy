@@ -41,7 +41,12 @@ def main():
 
         builder.initialize()
 
-        femVersion = getVersion()
+        try:
+            femVersion = getVersion()
+        except:
+            print("no version found so precompilation available")
+            sys.exit(0)
+
         dataPath = os.path.join(".",femVersion)
         print(f"obtaining data from {dataPath}")
 
