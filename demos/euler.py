@@ -126,10 +126,6 @@ def evolve(space, u_h, limiter="MinMod"):
 # %% [markdown]
 # A radial Riemann problem using [a triangle grid](triangle.dgf)
 # %%
-x = SpatialCoordinate(dune.ufl.domain(2))
-initial = conditional(dot(x,x)<0.1,as_vector([1,0,0,2.5]),
-                                   as_vector([0.125,0,0,0.25]))
-
 domain = (reader.dgf, "triangle.dgf")
 
 # %% [markdown]
@@ -150,6 +146,10 @@ space = getSpace( gridView, order )
 # First solved on a triangle grid and minmod limiter
 
 # %%
+x = SpatialCoordinate(space)
+initial = conditional(dot(x,x)<0.1,as_vector([1,0,0,2.5]),
+                                   as_vector([0.125,0,0,0.25]))
+
 u_h   = space.interpolate( initial, name="solution")
 res["simplex (minmod)"] = evolve(space,u_h)
 
