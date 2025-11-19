@@ -392,7 +392,6 @@ def markh(element):
 # based ``markh``.
 
 # %%
-
 # this overwrites the above markh
 markh = GridMarker( estimate, # estimator or indicator piecewise constant values
                     refineTolerance  = lambda : hTol,      # float or callable
@@ -429,7 +428,6 @@ def markp(element):
 # based ``markp``.
 
 # %%
-
 markp = SpaceMarker(estimate_pm1, # indicator grid function
                     refineTolerance  = lambda : pTol,
                     coarsenTolerance = lambda : 0.01*pTol,

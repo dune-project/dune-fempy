@@ -70,7 +70,7 @@ Dynamic Local Grid Refinement and Coarsening (h-adaptation)
 For refining and coarsening a grid locally the ``dune.fem`` module provides a
 function ``gridAdapt``. The storage of **all** discrete functions will be
 automatically resized to accommodate the changes in the hierarchical grid those
-are associated with.
+are associated with. Please read the entire section carefully.
 
 .. attention::
     The resulting DOF vector will **not be initialized**. To prolong and restrict data
@@ -80,7 +80,13 @@ are associated with.
 
 .. code:: python
 
-    fem.gridAdapt(marker, [u1,u2,...,uN]) # marker is explained below
+    fem.gridAdapt(marker, [u1,u2,...,uN])
+
+This will adapt the grid with the marking of elements for refinement or coarsening
+provided by the ``marker`` which is either an instance of ``GridMarker`` or a callback (see below).
+A call to `fem.gridAdapt` will also re-distribute
+the work load in parallel runs. The load balancing can be done separately
+by providing an additional argument `loadBalance=False` as described below.
 
 .. note::
 
@@ -103,10 +109,6 @@ So the code has to be modified for example as follows
    underlying buffer change will not have been registered.
 
 
-.. note::
-    The marking of elements for refinement or coarsening is provided the by ``marker`` which
-    is either an instance of ``GridMarker`` or a callback (see below).
-
 The module ``dune.fem`` provides an object for marking elements for
 refinement/coarsening:
 
@@ -128,7 +130,7 @@ An element :math:`E` is marked for refinement if the value of ``indicator``
 evaluated at the center of :math:`E` is greater than ``refineTolerance`` and coarsened if the
 value is less than ``coarsenTolerance``. The element :math:`E` is not
 refined if its level is already at ``maxLevel`` and not coarsened if its
-level it at ``minLevel`` and accordingly for the ``minVolume`` and ``maxVolume``.
+level is at ``minLevel`` and accordingly for the ``minVolume`` and ``maxVolume``.
 This method can for example be used to refine the grid according to an equal distribution strategy by
 setting ``refineTolerance=theta/grid.size(0)`` with some tolerance ``theta``.
 A **layered Doerfler strategy** is also available. Select ``strategy='doerfler'``
@@ -136,18 +138,18 @@ in the above ``GridMarker`` object constructor.
 
 .. note::
    For debugging and testing the marking of elements can also be done by
-   providing a callback to the ``gridAdapt`` funtion with the following
+   providing a callback to the ``gridAdapt`` function with the following
    signature:
 
 .. code:: python
 
     from dune.grid import Marker
-    def marker( element ) -> Marker
-        if refine element: # if condition for refinement true
+    def marker( E ) -> Marker
+        if refine E: # if condition for refinement true
             return Marker.Refine
-        elif coarsen element: # if condition for coarsening true
+        elif coarsen E: # if condition for coarsening true
             return Marker.coarsen
-        else: # otherwise keep element as is (might still be changed)
+        else: # otherwise keep E as is (might still be changed)
             return Marker.keep
 
 The module ``dune.fem`` also provides a ``globalRefine(level,*dfs)`` method,
@@ -156,20 +158,42 @@ are passed in they will be prolonged (restricted) and resized correctly,
 the DOF vectors of all other discrete functions will only be resized, i.e.
 stored data will be lost.
 
+.. hint::
+    The call to ``gridAdapt`` will also lead to a subsequent call to ``loadBalance`` for a
+    re-distribution of work load. This can be prevented by passing the bool flag ``loadBalance=False`` when calling ``gridAdapt``.
+    The re-distribution can be initiated separately with a call to ``fem.loadBalance``.
+
+.. code:: python
+
+    fem.gridAdapt(marker, [u1,u2,...,uN], loadBalance=False) # no load balancing is carried out
+    ...
+    fem.loadBalance( [u1,u2,...,uN] ) # re-distribute work load (maybe less frequent than gridAdapt)
+
+
 The following two examples showcase adaptivity: the first one using a
 residual a-posteriori estimator for an elliptic problem, the second one
 shows adaptivity for a time dependent phase field model for crystal growth.
 At the end of this section a dual weighted residual approach is used to
-optimize the grid with respect to the error at a given point. While the
-first two examples can be implemented completely using the available Python
-bindings the final example requires using a small C++ snippet which is easy
-to integrate into the Python code.
+optimize the grid with respect to the error at a given point.
+
 
 .. toctree::
    :maxdepth: 2
 
    laplace-adaptive_nb
    crystal_nb
+
+While these
+examples can be implemented completely using the available Python
+bindings it is also fairly easy to implement a custom marking strategy in C++ and mark the grid before ``gridAdapt`` is called.
+
+.. code:: python
+
+    from dune.generator import algorithm
+    algorithm.run('marker', 'mymarking.hh', u1, u2, ..., uN )
+
+    # pass None for marker to avoid further marking
+    fem.gridAdapt(None, [u1,u2,...,uN])
 
 =================================================
 Overview on adaptivity for spaces (p-adaptation)
@@ -195,8 +219,9 @@ will be automatically resized to accommodate the changes in the space that is ad
     discrete spaces were constructed over an ``adaptiveLeafGridView``.
 
     Furthermore, the discrete space used has to **support p-adaptation**, which is
-    only the case for a handfull of space. This can be checked with
+    only the case for a handful of space. This can be checked with
     ``space.canAdapt``, which is true if the space supports p-adaptation.
+    Spaces that support **hp** adaptation typically have a **hp** in the name, e.g ``lagrangehp``.
 
 So the code has to be modified for example as follows
 
@@ -215,7 +240,7 @@ So the code has to be modified for example as follows
 
 
 .. note::
-    The marking of the local polynomial degree of a discrete space is provided the by ``pmarker`` which
+    The marking of the local polynomial degree of a discrete space is provided the by ``marker`` which
     is either an instance of ``SpaceMarker`` or a callback (see below).
 
 The module ``dune.fem`` provides an object for marking spaces for
@@ -224,32 +249,31 @@ p-refinement/p-coarsening:
 .. code:: python
 
     from dune.fem import SpaceMarker
-    pmarker = SpaceMarker( indicator, # grid function to be evaluated at cell center
-                           refineTolerance, coarsenTolerance=0, # tolerances (float or callable returning float)
-                           minOrder=0,  # minimal order to be assumed (in [0, space.order)
-                           maxOrder=-1, # maximal order to be assumed (in [minOrder, space.order])
-                           markNeighbors = False, # for elements marked for increase also mark neighboring elements
-                           statistics = False)    # element counts for marked refined or coarsen
+    marker = SpaceMarker( indicator, # grid function to be evaluated at cell center
+                          refineTolerance, coarsenTolerance=0, # tolerances (float or callable returning float)
+                          minOrder=0,  # minimal order to be assumed (in [0, space.order)
+                          maxOrder=-1, # maximal order to be assumed (in [minOrder, space.order]). -1 defaults to space.order
+                          markNeighbors = False, # for elements marked for increase also mark neighboring elements
+                          statistics = False)    # element counts for marked refined or coarsen
 
 where ``indicator`` is a piecewise constant grid function.
 The polynomial degree :math:`p` of a space for an element :math:`E` is increased by :math:`1`
 if the value of ``indicator`` evaluated at the center of :math:`E` is greater than ``refineTolerance`` and decreased by :math:`1`
-if the value is less than ``coarsenTolerance``. The polynomial degree remains of
-a space for :math:`E` is not changed if the result would be outside of :math:`[minOrder, maxOrder]`.
+if the value is less than ``coarsenTolerance``. The polynomial degree for :math:`E` is not changed if the result would be outside of the interval :math:`[` ``minOrder``, ``maxOrder`` :math:`]`.
 
 .. note::
    For debugging and testing the marking of elements can also be done by
-   providing a callback to the ``spaceAdapt`` funtion with the following
+   providing a callback to the ``spaceAdapt`` function with the following
    signature:
 
 .. code:: python
 
-    def pmarker( element ) -> int
-        # current polynomial degree
-        p = space.localOrder(element)
-        if increase degree:
+    def marker( E ) -> int
+        # current polynomial degree for E
+        p = space.localOrder( E )
+        if increase degree and p < maxOrder: # if condition for refinement
             return p+1
-        elif decrease degree: # if condition for coarsening true
+        elif decrease degree and p > minOrder: # if condition for coarsening
             return p-1
         else: # otherwise keep current degree
             return p
