@@ -37,6 +37,7 @@ from dune.fem import integrate
 from dune.fem.scheme import galerkin
 from dune.fem.operator import galerkin as galerkinOp
 from dune.fem.space import dglegendrehp, product, finiteVolume
+from dune.fem import GridMarker, SpaceMarker
 
 from dune.plotting import plotPointData as plot
 
@@ -366,8 +367,11 @@ estimator = galerkinOp( estimator, spc, fvspc)
 # %% [markdown]
 # .. index:: Adaptation; Marking for h-Adaptation
 #
-# # Marker for grid adaptivity (h)
+# # Marker for grid adaptivity (h).
 
+# The marking can be done via simple Python callback taking a grid element as
+# argument. This should be used for prototyping or debugging. For production
+# runs it is recommended to use the ``GridMarker`` explained below.
 
 # %%
 hTol = 1e-16                           # changed later
@@ -381,28 +385,56 @@ def markh(element):
     else:
       return Marker.keep
 
+# %% [markdown]
+#
+# The recommended way of marking a grid for adaptivity is to use the
+# ``GridMarker`` object. The following is doing the same as the above Python
+# based ``markh``.
+
+# %%
+
+# this overwrites the above markh
+markh = GridMarker( estimate, # estimator or indicator piecewise constant values
+                    refineTolerance  = lambda : hTol,      # float or callable
+                    coarsenTolerance = lambda : 0.01*hTol, # float or callable
+                    minLevel=0, maxLevel=maxLevel) # min and max level
 
 # %% [markdown]
 # .. index:: Adaptation; Marking for p-Adaptation
 #
 # # Marker for space adaptivity (p)
 
+# The marking can be done via simple Python callback taking a grid element as
+# argument, similar to the above ``markh``.
+# This should be used for prototyping or debugging. For production
+# runs it is recommended to use the ``SpaceMarker`` explained below.
 
 # %%
-pTol = 1e-16
+pTol = 1e-14
 def markp(element):
     center = element.geometry.referenceElement.center
-    r      = estimate.localFunction(element).evaluate(center)[0]
-    r_p1   = estimate_pm1.localFunction(element).evaluate(center)[0]
-    eta = abs(r-r_p1)
+    eta    = abs(estimate_pm1.localFunction(element).evaluate(center)[0])
     polorder = spc.localOrder(element)
-    if eta < pTol:
-        return polorder-1 if polorder > 1 else polorder
-    elif eta > 100.*pTol:
+    if eta > pTol: # p-refinement
         return polorder+1 if polorder < maxOrder else polorder
-    else:
+    elif eta < 0.01*pTol: # p-coarsening
+        return polorder-1 if polorder > 1 else polorder
+    else: # do nothing
         return polorder
 
+# %% [markdown]
+#
+# The recommended way of marking a space for p-adaptivity is to use the
+# ``SpaceMarker`` object. The following is doing the same as the above Python
+# based ``markp``.
+
+# %%
+
+markp = SpaceMarker(estimate_pm1, # indicator grid function
+                    refineTolerance  = lambda : pTol,
+                    coarsenTolerance = lambda : 0.01*pTol,
+                    minOrder = 1,
+                    maxOrder = maxOrder)
 
 # %% [markdown]
 # Operator for projecting into space with a reduced order on every element
@@ -427,8 +459,7 @@ for i in range(maxLevel):
     limit(solution)
     step()
     estimator(solution, estimate)
-    hgrid.mark(markh)
-    fem.adapt(persistentDF)
+    fem.gridAdapt(markh, persistentDF)
 
 print("final pre adaptive (",i,"): ",dt,grid.size(0),end="\n")
 
@@ -458,13 +489,17 @@ while t < endTime:
     # h adaptivity
     hTol = timeTol * dt / grid.size(0)
     estimator(solution, estimate)
-    hgrid.mark(markh)
-    fem.adapt(persistentDF)
 
-    # p adaptivity
+    # h adapt grid
+    fem.gridAdapt(markh, persistentDF)
+
+    # p adaptivity, compute difference between estimate and estimate_pm1
     estimator(solution, estimate)
     orderreduce(solution,sol_pm1)
     estimator(sol_pm1, estimate_pm1)
+    estimate_pm1 -= estimate
+
+    # adapt space
     fem.spaceAdapt(markp, persistentDF)
     t += dt
 

@@ -7,7 +7,7 @@ mmesh_descr.rst todo.rst citing.rst
 corepy.rst installation.rst overview.rst
 stokes.rst furtherexamples.rst nextsteps.rst furthertopics.rst
 inforesources.rst userprojects.rst
-gridviews.rst cpp.rst developers.rst slurmbatchscript.rst
+gridviews_and_adaptivity.rst cpp.rst developers.rst slurmbatchscript.rst
 changelog.rst changelog290.rst changelog210.rst
 scheme_api.rst
 3dexample.py          spiral.py

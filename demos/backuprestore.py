@@ -20,7 +20,7 @@ from dune.fem.view import adaptiveLeafGridView as view
 from dune.grid import cartesianDomain, Marker
 from dune.fem.function import gridFunction
 from dune.fem.space import lagrange
-from dune.fem import adapt
+from dune.fem import gridAdapt
 from dune.ufl import Constant
 import ufl
 
@@ -35,11 +35,9 @@ def setup():
     df = space.interpolate(gf,name="test")
 
     gridView.hierarchicalGrid.globalRefine(4)
+    marker = lambda e: Marker.refine if df.localFunction(e).jacobian([1./3.,1./3.]).infinity_norm > 1 else Marker.coarsen
     for i in range(5):
-        gridView.hierarchicalGrid.mark(lambda e:
-             Marker.refine if df.localFunction(e).jacobian([1./3.,1./3.]).infinity_norm > 1
-             else Marker.coarsen)
-        adapt(gridView.hierarchicalGrid)
+        gridAdapt(marker, gridView.hierarchicalGrid)
         df.interpolate( gf )
     print("size of adapted grid view:", gridView.size(0))
 
@@ -76,11 +74,9 @@ def dump():
         p -= [numpy.cos(t),numpy.sin(t)]
         return p.two_norm < 0.3
     for i,tsp in enumerate(tsps):
+        marker = lambda e: Marker.refine if inCircle(e.geometry.center,tsp) else Marker.keep
         for i in range(3):
-            df1.gridView.hierarchicalGrid.mark(lambda e:
-                 Marker.refine if inCircle(e.geometry.center,tsp)
-                 else Marker.keep)
-            adapt([df1,df2])
+            gridAdapt(marker, [df1,df2])
         gf.time = tsp
         df2.interpolate(gf)
         series.dump({"time":tsp})

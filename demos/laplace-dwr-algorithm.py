@@ -32,6 +32,8 @@ from dune.fem.space import lagrange as solutionSpace
 from dune.alugrid import aluConformGrid as leafGridView
 from dune.ufl import DirichletBC
 from dune.fem.function import gridFunction
+from dune.fem import GridMarker
+
 from ufl import *
 try: # this is needed to remain compatible with version 2022 of ufl
     from ufl import atan_2 as atan2
@@ -168,6 +170,10 @@ def compute(computeFunctional, tolerance):
     errorVector    = []
     estimateVector = []
     dofs           = []
+
+    hTol = 1.
+    marker = GridMarker( estimate, lambda : hTol )
+
     while True:
         laplace.solve(target=uh)
         if count%9 == 6:
@@ -185,9 +191,9 @@ def compute(computeFunctional, tolerance):
             print(count, ": size=", uh.space.gridView.size(0), "estimate=", eta, "error=", error)
         if eta < tolerance:
             break
-        marked = fem.mark(estimate,eta/uh.space.gridView.size(0))
-        fem.adapt(uh) # can also be a list or tuple of function to prolong/restrict
-        fem.loadBalance(uh)
+        # update refinement tolerance
+        hTol = eta/uh.space.gridView.size(0)
+        fem.gridAdapt(marker, uh) # can also be a list or tuple of function to prolong/restrict
         count += 1
     plot(uh, figure=(fig, 122), colorbar=False, linewidth=1)
 

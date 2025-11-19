@@ -30,6 +30,7 @@ from dune.fem.space import lagrange as solutionSpace
 from dune.alugrid import aluConformGrid as leafGridView
 from dune.fem.function import gridFunction
 from dune.fem import integrate
+from dune.fem import GridMarker
 from ufl import *
 try:
     from ufl import atan2
@@ -174,6 +175,13 @@ count = 0
 errorVector    = []
 estimateVector = []
 dofs           = []
+
+marker = GridMarker( estimate, # grid function to be evaluated at cell center
+                     0.6,                    # refinement tolerance
+                     strategy = 'doerfler',  # marking strategy doerfler
+                     layered = 0.1)          # parameter for Doerfler layered strategy.
+
+
 while True:
     laplace.solve(target=uh)
     if count%9 == 8:
@@ -188,9 +196,8 @@ while True:
         print(count, ": size=", uh.space.gridView.size(0), "estimate=", eta, "error=", error)
     if eta < tolerance:
         break
-    marked = fem.doerflerMark(estimate,0.6,layered=0.1)
-    fem.adapt(uh) # can also be a list or tuple of function to prolong/restrict
-    fem.loadBalance(uh) # can also be a list or tuple of function
+
+    fem.gridAdapt(marker, uh) # can also be a list or tuple of function to prolong/restrict
     count += 1
 plot(uh, figure=(fig, 131+2), colorbar=False)
 
