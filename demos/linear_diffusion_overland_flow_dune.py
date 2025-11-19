@@ -34,7 +34,7 @@
 #    R - I_c \left( 1 - e^{-H^{n}/H_i} \right),\qquad
 #    \mathbf{U} = \frac{(H^{n})^{4/3}}{n^2 u_c} \nabla (H^{n+1}+w) $$
 #
-# For stability need to add artificail diffusion $\varepsilon \triangle H$
+# For stability need to add artificial diffusion $\varepsilon \triangle H$
 
 # %% [markdown]
 # ### The component
