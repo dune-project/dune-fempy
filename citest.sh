@@ -7,9 +7,18 @@ DUNECONTROL=dunecontrol
 # export PETSC_DIR=/usr/lib/petsc # petsc4py doesn't build with version available in docker container
 
 # was 812 now 541?
-pip install -i https://gitlab.dune-project.org/api/v4/projects/541/packages/pypi/simple --no-build-isolation wheel
-pip install -i https://gitlab.dune-project.org/api/v4/projects/541/packages/pypi/simple --no-build-isolation --upgrade Pygments
-pip install -i https://gitlab.dune-project.org/api/v4/projects/541/packages/pypi/simple --no-build-isolation --upgrade -r reqCI.txt
+pip install \
+-i https://gitlab.dune-project.org/api/v4/projects/541/packages/pypi/simple \
+--extra-index https://gitlab.dune-project.org/api/v4/projects/133/packages/pypi/simple \
+--no-build-isolation wheel
+pip install \
+-i https://gitlab.dune-project.org/api/v4/projects/541/packages/pypi/simple \
+--extra-index https://gitlab.dune-project.org/api/v4/projects/133/packages/pypi/simple \
+--no-build-isolation --upgrade Pygments
+pip install \
+-i https://gitlab.dune-project.org/api/v4/projects/541/packages/pypi/simple \
+--extra-index https://gitlab.dune-project.org/api/v4/projects/133/packages/pypi/simple \
+--no-build-isolation --upgrade -r reqCI.txt
 # check including portalocker
 # pip install -i https://gitlab.dune-project.org/api/v4/projects/812/packages/pypi/simple --no-build-isolation portalocker
 

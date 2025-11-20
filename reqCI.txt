@@ -14,10 +14,10 @@ sphinx_rtd_theme
 sphinxcontrib-bibtex
 sortedcontainers
 triangle
-fenics-ufl
+fenics-ufl==2022.2.0
 x3d
 pygmsh
 # petsc4py
 # gmsh # - fails in CI for some reason
 # mayavi configobj
-scikit-umfpack
+# scikit-umfpack (needs meson-python and perhaps more - skip for now)
