@@ -8,7 +8,7 @@
 # # Moving surface grid: flow under mean curvature
 #
 # This example uses a
-# [moving grid](gridviews.rst#Evolving-Domains).
+# [moving grid](gridviews_and_adaptivity.rst#Evolving-Domains).
 
 # Mean curvature flow is a specific example of a geometric evolution
 # equation where the evolution is governed by the mean curvature $H$.
