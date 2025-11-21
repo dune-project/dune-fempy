@@ -8,7 +8,7 @@
 # # Moving surface grid: flow under mean curvature
 #
 # This example uses a
-# [moving grid](gridviews.rst#Evolving-Domains).
+# [moving grid](gridviews_and_adaptivity.rst#Evolving-Domains).
 
 # Mean curvature flow is a specific example of a geometric evolution
 # equation where the evolution is governed by the mean curvature $H$.
@@ -195,7 +195,7 @@ try:
         mlab.figure(bgcolor = (1,1,1))
         s = mlab.triangular_mesh(x[:,0],x[:,1],x[:,2],triangles)
         display( s )
-except ImportError:
+except (ImportError, ModuleNotFoundError):
     print("mayavi module not found so not showing plot - ignored")
     def plot3d(uh,level):
         pass

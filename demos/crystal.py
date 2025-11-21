@@ -6,7 +6,7 @@
 # # Adaptive phase field: crystal growth model
 # Here we demonstrate crystallisation on the surface of a liquid due to cooling from [@Guyer].
 # This example uses
-# [dynamic grid refinement](gridviews.rst#Dynamic-Local-Grid-Refinement-and-Coarsening).
+# [dynamic grid refinement](gridviews_and_adaptivity.rst#Dynamic-Local-Grid-Refinement-and-Coarsening).
 #
 # Let us first set up the grid and the function space. We use the default DoF storage available in ``dune-fem`` - this can be changed for example to ``istl`` or ``petsc``.
 
@@ -18,6 +18,7 @@ from dune.alugrid import aluConformGrid as leafGridView
 from dune.fem.view import adaptiveLeafGridView as adaptiveGridView
 from dune.fem.space import lagrange as solutionSpace
 from dune.fem import threading
+from dune.fem import GridMarker
 threading.use = max(4,threading.max) # use at most 4 threads
 
 order = 1
@@ -177,10 +178,15 @@ maxLevel = 11
 startLevel = 5
 gridView.hierarchicalGrid.globalRefine(startLevel)
 u_h.interpolate(initial)
+
+# default marking strategy based on indicator values
+marker = GridMarker(indicator,
+                    refineTolerance  = 1.4,
+                    coarsenTolerance = 1.2,
+                    minLevel=0, maxLevel=maxLevel)
+
 for i in range(startLevel, maxLevel):
-    fem.mark(indicator,1.4,1.2,0,maxLevel)
-    fem.adapt(u_h)
-    fem.loadBalance(u_h)
+    fem.gridAdapt(marker, u_h)
     u_h.interpolate(initial)
     print(gridView.size(0), end=" ")
 print()
@@ -246,10 +252,8 @@ while t < endTime:
     scheme.solve(target=u_h)
     # print(t, gridView.size(0), end="\r")
     t += dt.value
-    fem.mark(indicator,1.4,1.2,0,maxLevel)
-    fem.adapt(u_h) # can also be a list or tuple of function to prolong/restrict
-    fem.loadBalance(u_h) # can also be a list or tuple of function
-    vtk()                # store result in sequence of vtk file
+    fem.gridAdapt(marker, u_h) # can also be a list or tuple of function to prolong/restrict
+    vtk()                      # store result in sequence of vtk file
 print()
 
 fig = pyplot.figure(figsize=(30,10))
