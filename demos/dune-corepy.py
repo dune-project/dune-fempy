@@ -459,7 +459,7 @@ try:
     display( s )
     # mlab.savefig("mayavi.png", size=(400,300))
     mlab.close(all=True)
-except ImportError:
+except (ImportError, ModuleNotFoundError):
     print("mayavi module not found so not rendering plot - ignored")
     pass
 
