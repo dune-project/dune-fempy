@@ -184,7 +184,7 @@ aluView = aluSimplexGrid({"vertices": vertices, "simplices": triangles})
 #    lost. Use `dune.fem.adapt` and `dune.fem.globalRefine` if data is
 #    supposed to be retained during grid modification. This is described in
 #    detail in the section on
-#    [dynamic grid modification](gridviews_and_adaptivity.rst#Dynamic-Local-Grid-Refinement-and-Coarsening-(h-adaptation)).
+#    [dynamic grid modification](gridviews_and_adaptivity.rst#Dynamic-Local-Grid-Refinement-and-Coarsening).
 
 # %% [markdown]
 # .. index::

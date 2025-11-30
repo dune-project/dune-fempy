@@ -27,7 +27,7 @@
 #    Grids can be refined in a hierarchic manner, meaning that elements are subdivided into several smaller elements. The
 #    element to be refined is kept in the grid and remains accessible. One
 #    can either refine all elements (global refinement) as described below.
-#    We will discuss [local refinement](gridviews_and_adaptivity.rst#Dynamic-Local-Grid-Refinement-and-Coarsening-(h-adaptation))
+#    We will discuss [local refinement](gridviews_and_adaptivity.rst#Dynamic-Local-Grid-Refinement-and-Coarsening)
 #    in a later section.
 #
 # After some general import statements we start our tutorial by setting up
@@ -72,7 +72,7 @@ gridView.plot()
 # i.e., only contains of a view of the finest grid elements.
 # We also provide some special grid views to for example simulate on
 # [evolving domains](gridviews_and_adaptivity.rst#Evolving-Domains) or
-# to simplify efficient [local grid adaptivity](gridviews_and_adaptivity.rst#Dynamic-Local-Grid-Refinement-and-Coarsening-(h-adaptation)).
+# to simplify efficient [local grid adaptivity](gridviews_and_adaptivity.rst#Dynamic-Local-Grid-Refinement-and-Coarsening).
 #
 # Since a `gridView` can not be changed
 # directly we need to access the underlying `hierarchicalGrid` to perform
@@ -96,7 +96,7 @@ gridView.plot()
 # `dune-fem` also provides a `globalRefine` function, which takes the
 # `level` as the first argument and a hierarchical grid as second argument.
 # This method can also be used to prolong and restrict discrete functions
-# as will be discussed in [a later section](gridviews_and_adaptivity.rst#Dynamic-Local-Grid-Refinement-and-Coarsening-(h-adaptation)).
+# as will be discussed in [a later section](gridviews_and_adaptivity.rst#Dynamic-Local-Grid-Refinement-and-Coarsening).
 
 # %%
 from dune.fem import globalRefine

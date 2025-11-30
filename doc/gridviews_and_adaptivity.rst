@@ -69,9 +69,9 @@ further in this chapter:
 
 .. _adapt-label:
 
-===========================================================
-Dynamic Local Grid Refinement and Coarsening (h-adaptation)
-===========================================================
+============================================
+Dynamic Local Grid Refinement and Coarsening
+============================================
 
 For refining and coarsening a grid locally the ``dune.fem`` module provides a
 function ``gridAdapt``. The storage of **all** discrete functions will be
@@ -296,10 +296,11 @@ An example where p-adaptation is used can be found here:
 
 .. _geom-label:
 
-=================================================
-Overview on moving grids (r-adaptation)
-=================================================
+================
+Evolving Domains
+================
 
+Moving grids are also sometimes referred to as **r-adaptation**.
 An example of `r-adaptation` for a two-phase flow problem in porous media is found
 on the `Dune-MMesh`_ documentation page.
 
