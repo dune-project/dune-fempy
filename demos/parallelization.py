@@ -125,5 +125,5 @@ vtk()
 # For load balancing with re-distribution of user data the function
 # `dune.fem.loadBalance` should be used. This method is similar to the
 # ``dune.fem.adapt`` method discussed in the
-# [section on adaptivity](gridviews_and_adaptivity.rst#Dynamic-Local-Grid-Refinement-and-Coarsening).
+# [section on adaptivity](gridviews_and_adaptivity.rst#Dynamic-Local-Grid-Refinement-and-Coarsening-(h-adaptation)).
 # See also the [crystal growth](crystal_nb.ipynb) or [Re-entrant Corner Problem](laplace-adaptive_nb.ipynb) examples.

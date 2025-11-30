@@ -7,6 +7,9 @@
 Grid views and adaptivity
 ###############################################
 
+
+.. _filter-label:
+
 =======================================================
 Overview and some basic grid views (level and filtered)
 =======================================================
@@ -62,6 +65,9 @@ further in this chapter:
    :name: filteredGV
 
    filteredgridview_nb
+
+
+.. _adapt-label:
 
 ===========================================================
 Dynamic Local Grid Refinement and Coarsening (h-adaptation)
@@ -195,6 +201,8 @@ bindings it is also fairly easy to implement a custom marking strategy in C++ an
     # pass None for marker to avoid further marking
     fem.gridAdapt(None, [u1,u2,...,uN])
 
+.. _padapt-label:
+
 =================================================
 Overview on adaptivity for spaces (p-adaptation)
 =================================================
@@ -285,6 +293,8 @@ An example where p-adaptation is used can be found here:
 
    twophaseflow_descr
 
+
+.. _geom-label:
 
 =================================================
 Overview on moving grids (r-adaptation)
