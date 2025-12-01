@@ -237,7 +237,7 @@ Troubleshooting
 ###############
 
 * **Issue with C++ compiler:**
-  If the gnu compiler is used, version needs to be 7 or later. This can be checked in terminal with
+  If the gnu compiler is used, version needs to be 10 or later. This can be checked in terminal with
 
   .. code-block:: bash
 
