@@ -221,9 +221,9 @@ gridView2d = leafGridView(domain2d, dimgrid=2)
 #
 
 # %%
-from gmsh2dgf import projectBoundaryIds
+from dune.fem.utility import inspectBoundaryIds
 
-bndIds = projectBoundaryIds( gridView2d )
+bndIds = inspectBoundaryIds( gridView2d )
 bndIds.plot()
 
 # %% [markdown]
