@@ -73,6 +73,12 @@ Table of Content
    nextsteps
 
 .. toctree::
+   :caption: Examples
+   :maxdepth: 2
+
+   Examples <furtherexamples>
+
+.. toctree::
    :caption: Further Topics
    :maxdepth: 2
 
