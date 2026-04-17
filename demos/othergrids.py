@@ -105,22 +105,20 @@ gridView3d.writeVTK('3dexample', pointdata=[uh3d],
 
 # %% [markdown]
 #
-# .. index:: Grid construction; gmsh2dgf (from Python)
+# .. index:: Grid construction; mesh2dgf (from Python)
 #
-# ### Converting gmsh to DGF
+# ### Converting a mesh to DGF
 #
 # Using the above convenient way of generating grids
 # in Python we can then store those as DGF which allows to
 # add boundary ids of vertex and element parameters
-# in a simple way (see next section). Use `gmsh2DGF` from
-# [gmsh2dgf](gmsh2dgf_nb.ipynb) to convert the above `points` and `cells`
-# to a string which can be read by `reader.dgfString`.
+# in a simple way (see next section).
 #
 # %%
-from gmsh2dgf import gmsh2DGF
+from dune.grid.mesh2dgf import mesh2DGF
 from dune.grid import reader
 
-dgf = gmsh2DGF(points, cells)
+dgf, _,_ = mesh2DGF((points, cells))
 domain3d = (reader.dgfString, dgf)
 gridView3d  = leafGridView(domain3d, dimgrid=3)
 
@@ -259,7 +257,7 @@ try:
                     }
 
         # return dgf string which can be read by DGF parser or written to file for later use
-        dgf = gmsh2DGF(mesh.points, mesh.cells_dict, bndDomain=bndDomain, dim=2)
+        dgf, _,_ = mesh2DGF((mesh.points, mesh.cells_dict), bndDomain=bndDomain, dim=2)
         domain2d = (reader.dgfString, dgf)
 except ImportError: # pygmsh not installed - use a simple cartesian domain
     print("pygmsh module not found using a simple Cartesian domain - ignored")

@@ -338,6 +338,8 @@ solution.plot()
 #
 # .. index:: pair: Grid construction; Boundary Ids
 #
+# .. index:: Boundary Ids; dictionary approach
+#
 # ### Using a dictionary to define the grid with boundary ids
 #
 # We have already used a dictionary to define the `vertices` and the
