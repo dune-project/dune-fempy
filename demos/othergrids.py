@@ -185,7 +185,9 @@ if meshio:
 
 # %% [markdown]
 #
-# .. index:: Grid construction; Boundary Ids
+# .. index:: pair: Grid construction; Boundary Ids
+#
+# .. index:: Boundary Ids; dgf and gmsh/pygmsh
 #
 # ## Providing IDs for boundary conditions using dgf and gmsh/pygmsh
 #
@@ -269,6 +271,8 @@ gridView2d = leafGridView(domain2d, dimgrid=2)
 #
 # .. index:: Grid construction; Visualize boundary Ids
 #
+# .. index:: Boundary Ids; Visualize boundary Ids
+#
 # ### Visualizing Boundary Ids
 #
 # After construction of a grid we can visualize boundary ids
@@ -282,6 +286,8 @@ boundaryFunction( gridView2d ).plot()
 # %% [markdown]
 #
 # .. index:: Grid construction; reader.meshio
+#
+# .. index:: Boundary Ids; reader.meshio
 #
 # ### Using gmsh's 'add_physical` to set boundary ids
 # This is the same basic geometry as above:
