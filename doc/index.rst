@@ -101,7 +101,6 @@ Table of Content
    :caption: Additional pages
    :hidden:
 
-   gmsh2dgf_nb
    slurmbatchscript
    scheme_api
    todo
