@@ -276,7 +276,7 @@ gridView2d = leafGridView(domain2d, dimgrid=2)
 # ### Visualizing Boundary Ids
 #
 # After construction of a grid we can visualize boundary ids
-# by assigning a discontinous piecewise linear function to hold the value of
+# by assigning a discontinuous piecewise linear function to hold the value of
 # boundary faces (and zero towards the interior).
 
 # %%
