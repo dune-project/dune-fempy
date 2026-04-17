@@ -220,14 +220,14 @@ try:
 
         # Grid size function
         def size(dim, tag, x, y, z, lc):
-            resolution = 0.06
+            resolution = 0.1
             d = ((x - c)**2 + (y - c)**2)**0.5
             if d < 3 * r:
-                return 0.25*resolution
+                return 0.4*resolution
 
             d = ((x - (1-c))**2 + (y - (1-c))**2)**0.5
             if d < 3 * r:
-                return 0.25*resolution
+                return 0.4*resolution
 
             # default is a coarser mesh
             return resolution
@@ -279,7 +279,9 @@ gridView2d = leafGridView(domain2d, dimgrid=2)
 
 # %%
 from dune.fem.function import boundaryFunction
-boundaryFunction( gridView2d ).plot()
+fig = pyplot.figure()
+boundaryFunction( gridView2d).plot(gridLines="white",linewidth=2,figure=fig)
+fig.get_axes()[0].set_facecolor("lightgray")
 
 # %% [markdown]
 #
@@ -301,14 +303,14 @@ with pygmsh.geo.Geometry() as geom:
     c,r = 0.2, 0.05
     # Grid size function
     def size(dim, tag, x, y, z, lc):
-        resolution = 0.06
+        resolution = 0.1
         d = ((x - c)**2 + (y - c)**2)**0.5
         if d < 3 * r:
-            return 0.25*resolution
+            return 0.4*resolution
 
         d = ((x - (1-c))**2 + (y - (1-c))**2)**0.5
         if d < 3 * r:
-            return 0.25*resolution
+            return 0.4*resolution
 
         # default is a coarser mesh
         return resolution
@@ -353,8 +355,9 @@ with pygmsh.geo.Geometry() as geom:
         # if not prescribed then '1' will be used
         gridView = dune.alugrid.aluGrid((reader.meshio,f.name),defaultBndId=3)
 
-bndIds = boundaryFunction(gridView)
-bndIds.plot(gridLines="white")
+fig = pyplot.figure()
+boundaryFunction(gridView).plot(gridLines="white",linewidth=2, figure=fig)
+fig.get_axes()[0].set_facecolor("lightgray")
 
 # %% [markdown]
 # The `wave_tank` mesh file already used previously also contains boundary
@@ -363,8 +366,8 @@ bndIds.plot(gridLines="white")
 
 # %%
 gridView = dune.alugrid.aluGrid((reader.meshio,"wave_tank.msh"))
-bndIds = boundaryFunction(gridView)
-bndIds.plot(gridLines="white", figure=pyplot.figure(figsize=(10,10)),xlim=[0,1.5],ylim=[-0.1,1.1] )
+boundaryFunction(gridView).plot(gridLines="white", linewidth=1,
+                figure=pyplot.figure(figsize=(16,10)),xlim=[-0.05,1.2],ylim=[-0.1,0.6] )
 
 # %% [markdown]
 #
