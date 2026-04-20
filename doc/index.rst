@@ -73,6 +73,12 @@ Table of Content
    nextsteps
 
 .. toctree::
+   :caption: Examples
+   :maxdepth: 2
+
+   Examples <furtherexamples>
+
+.. toctree::
    :caption: Further Topics
    :maxdepth: 2
 
@@ -95,7 +101,6 @@ Table of Content
    :caption: Additional pages
    :hidden:
 
-   gmsh2dgf_nb
    slurmbatchscript
    scheme_api
    todo
