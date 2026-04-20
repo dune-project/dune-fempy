@@ -72,11 +72,22 @@ Table of Content
 
    nextsteps
 
-.. toctree::
+.. nbgallery::
    :caption: Examples
-   :maxdepth: 2
+   :maxdepth: 1
 
-   Examples <furtherexamples>
+   discontinuousgalerkin_nb
+   elasticity_nb
+   spiral_nb
+   wave_nb
+   stokes
+   cylinder_nb
+   mixed_poisson_nb
+   evalues_laplace_nb
+   biharmonic_IPC0_nb
+   crystal_nb
+   mcf_nb
+   laplace-dwr_nb
 
 .. toctree::
    :caption: Further Topics
