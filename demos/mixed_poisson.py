@@ -61,16 +61,20 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
-from dune.grid import structuredGrid
+from dune.grid import yaspGrid, cartesianDomain
 from dune.alugrid import aluSimplexGrid
 from dune.fem.space import dgonb, dglegendre, raviartThomas, bdm, bdfm
-def getGridSpace(element,space,order):
-    if element == "simplex":
+def getGridSpace(element,space,order, dim=2):
+    if element == "simplex" and dim == 2:
         vertices = [ (0,0), (0,1), (1,1), (1,0), (0.5,0.5)]
         triangles = [ [0,1,4], [1,2,4], [2,3,4], [3,0,4] ]
         gridView = aluSimplexGrid({"vertices":vertices, "simplices":triangles})
     else:
-        gridView = structuredGrid([0, 0], [1, 1], [2, 2])
+        domain = cartesianDomain([0]*dim, [1]*dim, [4-dim]*dim)
+        if element == "simplex":
+            gridView = aluSimplexGrid(domain)
+        else:
+            gridView = yaspGrid(domain)
 
     if space == "RT":
         spaceHDiv = raviartThomas(gridView,order = order)
@@ -96,11 +100,14 @@ from dune.ufl import DirichletBC
 from dune.fem import assemble, integrate
 from dune.fem.function import gridFunction
 def getMatrices(spaceHDiv, spaceDG, dirichlet):
+    dim = spaceHDiv.gridView.dimension
     x = SpatialCoordinate(spaceHDiv)
-    if dirichlet:
-        exSol = sin(pi*x[0])*sin(pi*x[1])
-    else:
-        exSol = cos(pi*x[0])*cos(pi*x[1])
+
+    f = sin if dirichlet else cos
+    exSol = f(pi*x[0])*f(pi*x[1])
+    if dim > 2:
+        exSol *= f(pi*x[2])
+
     f = -div(grad(exSol))
 
     sigma = TrialFunction(spaceHDiv)
@@ -157,7 +164,7 @@ def simulate(gridView, spaceHDiv, spaceDG, dirichlet):
     refs = 4
     fig, axs = plt.subplots(1,refs, figsize=(10,10))
 
-    print("L^2    H^1    div",flush=True)
+    print("     L^2         H^1         div",flush=True)
     for i in range(refs):
         gridView.hierarchicalGrid.globalRefine()
         A,BT,B,b,exSol = getMatrices(spaceHDiv, spaceDG, dirichlet)
@@ -168,43 +175,65 @@ def simulate(gridView, spaceHDiv, spaceDG, dirichlet):
                          (sol-exSol)**2,
                          inner(gradSol-grad(exSol),gradSol-grad(exSol)),
                          (div(gradSol-grad(exSol)))**2
-                       ]) )
-        print(err,flush=True)
-        gridFunction(div(gradSol)).plot( level=spaceDG.order+1, figure=(fig, axs[i]) )
-    print("---------------------",flush=True)
+                       ], order=8) )
+        print(f"{err[0]:.6e} {err[1]:.6e} {err[2]:.6e}",flush=True)
+        if gridView.dimension <= 2:
+            gridFunction(div(gradSol)).plot( level=spaceDG.order+1, figure=(fig, axs[i]) )
+    print("\n--------------------------------------",flush=True)
 
 # %% [markdown]
 # Test this on cubes with the RT space and on simplices using BDM
 
 # %%
+mth = 'RT'
+element = 'cube'
 for order in [0,1,2,3,4]:
-    gridView, spaceHDiv, spaceDG = getGridSpace("cube", "RT", order)
-    print("RTc",spaceHDiv.order,"\n-----------",flush=True)
+    gridView, spaceHDiv, spaceDG = getGridSpace(element, mth, order)
+    print(f"{mth} ({element}) order = {spaceHDiv.order}\n--------------------------------------",flush=True)
     simulate(gridView, spaceHDiv, spaceDG, dirichlet=False)
 
+mth = 'BDM'
+element = 'simplex'
 for order in [0,1]:
     # Note that the bdm space is constructed with order+1
-    gridView, spaceHDiv, spaceDG = getGridSpace("simplex", "BDM", order)
-    print("BDMs",spaceHDiv.order,"\n-----------",flush=True)
+    gridView, spaceHDiv, spaceDG = getGridSpace(element, mth, order)
+    print(f"{mth} ({element}) order = {spaceHDiv.order}\n--------------------------------------",flush=True)
     simulate(gridView, spaceHDiv, spaceDG, dirichlet=False)
 
 # %% [markdown]
 # Let's switch the grids around
 
 # %%
+mth = 'RT'
+element = 'simplex'
 for order in [0,1]:
-    gridView, spaceHDiv, spaceDG = getGridSpace("simplex", "RT", order)
-    print("RTs",spaceHDiv.order,"\n-----------",flush=True)
+    gridView, spaceHDiv, spaceDG = getGridSpace(element, mth, order)
+    print(f"{mth} ({element}) order = {spaceHDiv.order}\n--------------------------------------",flush=True)
     simulate(gridView, spaceHDiv, spaceDG, dirichlet=True)
 
 # %%
+mth = 'BDM'
+element = 'cube'
 for order in [0,1]:
-    gridView, spaceHDiv, spaceDG = getGridSpace("cube", "BDM", order)
-    print("BDMc",spaceHDiv.order,"\n-----------",flush=True)
+    gridView, spaceHDiv, spaceDG = getGridSpace(element, mth, order)
+    print(f"{mth} ({element}) order = {spaceHDiv.order}\n--------------------------------------",flush=True)
     simulate(gridView, spaceHDiv, spaceDG, dirichlet=True)
 
 # %%
+mth = 'BDFM'
 for order in [0,1]:
-    gridView, spaceHDiv, spaceDG = getGridSpace("cube", "BDFM", order)
-    print("BDFMc",spaceHDiv.order,"\n-----------",flush=True)
+    gridView, spaceHDiv, spaceDG = getGridSpace(element, mth, order)
+    print(f"{mth} ({element}) order = {spaceHDiv.order}\n--------------------------------------",flush=True)
+    simulate(gridView, spaceHDiv, spaceDG, dirichlet=True)
+
+# %% [markdown]
+# Let's also check 3d
+
+# %%
+
+mth = 'RT'
+element = 'simplex'
+for order in [0]:
+    gridView, spaceHDiv, spaceDG = getGridSpace(element, mth, order, dim=3)
+    print(f"{mth} ({element}) order = {spaceHDiv.order}\n--------------------------------------",flush=True)
     simulate(gridView, spaceHDiv, spaceDG, dirichlet=True)
