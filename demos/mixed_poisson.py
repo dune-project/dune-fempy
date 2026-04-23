@@ -63,7 +63,13 @@ import numpy as np
 
 from dune.grid import yaspGrid, cartesianDomain
 from dune.alugrid import aluSimplexGrid
-from dune.fem.space import dgonb, dglegendre, raviartThomas, bdm, bdfm
+# we use the hp spaces here to avoid re-compilation
+from dune.fem.space import dgonbhp, dglegendrehp, raviartThomas, bdm, bdfm
+
+from dune.fem import threading
+
+threading.use = 6
+
 def getGridSpace(element,space,order, dim=2):
     if element == "simplex" and dim == 2:
         vertices = [ (0,0), (0,1), (1,1), (1,0), (0.5,0.5)]
@@ -84,9 +90,9 @@ def getGridSpace(element,space,order, dim=2):
         spaceHDiv = bdfm(gridView,order = order+1)
 
     if element == "simplex" or not space == "RT":
-        spaceDG = dgonb(gridView, order = order)
+        spaceDG = dgonbhp(gridView, order = order)
     else:
-        spaceDG = dglegendre(gridView, order = order)
+        spaceDG = dglegendrehp(gridView, order = order)
     print(f"{mth} ({gridView.type}) order = {spaceHDiv.order}\n--------------------------------------",flush=True)
     return gridView, spaceHDiv, spaceDG
 
@@ -233,6 +239,6 @@ for order in [0]:
     simulate(gridView, spaceHDiv, spaceDG, dirichlet=True)
 
 element = 'cube'
-for order in [0]:
+for order in [0,1]:
     gridView, spaceHDiv, spaceDG = getGridSpace(element, mth, order, dim=3)
     simulate(gridView, spaceHDiv, spaceDG, dirichlet=True)
