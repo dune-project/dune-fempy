@@ -87,6 +87,7 @@ def getGridSpace(element,space,order, dim=2):
         spaceDG = dgonb(gridView, order = order)
     else:
         spaceDG = dglegendre(gridView, order = order)
+    print(f"{mth} ({gridView.type}) order = {spaceHDiv.order}\n--------------------------------------",flush=True)
     return gridView, spaceHDiv, spaceDG
 
 # %% [markdown]
@@ -189,15 +190,13 @@ mth = 'RT'
 element = 'cube'
 for order in [0,1,2,3,4]:
     gridView, spaceHDiv, spaceDG = getGridSpace(element, mth, order)
-    print(f"{mth} ({element}) order = {spaceHDiv.order}\n--------------------------------------",flush=True)
     simulate(gridView, spaceHDiv, spaceDG, dirichlet=False)
 
 mth = 'BDM'
 element = 'simplex'
 for order in [0,1]:
     # Note that the bdm space is constructed with order+1
-    gridView, spaceHDiv, spaceDG = getGridSpace(element, mth, order)
-    print(f"{mth} ({element}) order = {spaceHDiv.order}\n--------------------------------------",flush=True)
+    gridView, spaceHDiv, spaceDG = getGridSpace(element, mth, order, dim=2)
     simulate(gridView, spaceHDiv, spaceDG, dirichlet=False)
 
 # %% [markdown]
@@ -208,7 +207,6 @@ mth = 'RT'
 element = 'simplex'
 for order in [0,1]:
     gridView, spaceHDiv, spaceDG = getGridSpace(element, mth, order)
-    print(f"{mth} ({element}) order = {spaceHDiv.order}\n--------------------------------------",flush=True)
     simulate(gridView, spaceHDiv, spaceDG, dirichlet=True)
 
 # %%
@@ -216,24 +214,25 @@ mth = 'BDM'
 element = 'cube'
 for order in [0,1]:
     gridView, spaceHDiv, spaceDG = getGridSpace(element, mth, order)
-    print(f"{mth} ({element}) order = {spaceHDiv.order}\n--------------------------------------",flush=True)
     simulate(gridView, spaceHDiv, spaceDG, dirichlet=True)
 
 # %%
 mth = 'BDFM'
 for order in [0,1]:
     gridView, spaceHDiv, spaceDG = getGridSpace(element, mth, order)
-    print(f"{mth} ({element}) order = {spaceHDiv.order}\n--------------------------------------",flush=True)
     simulate(gridView, spaceHDiv, spaceDG, dirichlet=True)
 
 # %% [markdown]
 # Let's also check 3d
 
 # %%
-
 mth = 'RT'
 element = 'simplex'
 for order in [0]:
     gridView, spaceHDiv, spaceDG = getGridSpace(element, mth, order, dim=3)
-    print(f"{mth} ({element}) order = {spaceHDiv.order}\n--------------------------------------",flush=True)
+    simulate(gridView, spaceHDiv, spaceDG, dirichlet=True)
+
+element = 'cube'
+for order in [0]:
+    gridView, spaceHDiv, spaceDG = getGridSpace(element, mth, order, dim=3)
     simulate(gridView, spaceHDiv, spaceDG, dirichlet=True)
