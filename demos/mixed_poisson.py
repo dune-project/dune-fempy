@@ -66,10 +66,6 @@ from dune.alugrid import aluSimplexGrid
 # we use the hp spaces here to avoid re-compilation
 from dune.fem.space import dgonbhp, dglegendrehp, raviartThomas, bdm, bdfm
 
-from dune.fem import threading
-
-threading.use = 6
-
 def getGridSpace(element,space,order, dim=2):
     if element == "simplex" and dim == 2:
         vertices = [ (0,0), (0,1), (1,1), (1,0), (0.5,0.5)]
