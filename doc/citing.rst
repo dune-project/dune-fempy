@@ -18,20 +18,22 @@ in your work then all of those contributing to the project past and present
 would appreciate an acknowledgment of their work.
 To make finding the right entries to cite easy you can add
 
-```
-import dune.citationfile
-```
+.. code:: python
+
+  import dune.citationfile
+
 to your script - this will generate a bibtex file
 
-```
-myscript.py.bib
-```
+.. code:: bash
+
+  myscript.py.bib
+
 (assuming your script is named `myscript.py`) containing bibtex entries for
 the Dune modules that were imported in the script. Alternatively, add
 
-```
-import dune.citations
-```
+.. code:: python
+
+  import dune.citations
 
 to get the list printed to the terminal. A full list of citations for all
 installed Dune modules can be obtained by running
