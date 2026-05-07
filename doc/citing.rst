@@ -38,9 +38,9 @@ the Dune modules that were imported in the script. Alternatively, add
 to get the list printed to the terminal. A full list of citations for all
 installed Dune modules can be obtained by running
 
-```
-python -m dune citations [--file filename]
-```
+.. code:: python
+
+  python -m dune citations [--file filename]
 
 
 .. _Dune: https://www.dune-project.org
