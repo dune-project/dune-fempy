@@ -1,3 +1,5 @@
+:orphan:
+
 .. code:: ipython3
 
     from matplotlib import pyplot
