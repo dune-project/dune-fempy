@@ -1,5 +1,3 @@
-:orphan:
-
 .. code:: ipython3
 
     from matplotlib import pyplot
@@ -20,7 +18,7 @@
 
 
 
-.. image:: geoview_nb_files/geoview_nb_2_0.jpg
+.. image:: geoview_nb_files/geoview_nb_1_0.jpg
 
 
 In a second example we embed a 1D interval into 3D:
@@ -44,5 +42,5 @@ but we can plot some grid function, e.g., given by ufl expressions
 
 
 
-.. image:: geoview_nb_files/geoview_nb_6_0.jpg
+.. image:: geoview_nb_files/geoview_nb_5_0.jpg
 
