@@ -8,25 +8,25 @@ from importlib.metadata import version
 
 def getVersion():
     femVersion = version("dune.fem")
-    while True:
-        dataPath = os.path.join(".",femVersion)
-        if os.path.exists(dataPath):
-            return femVersion
-        ver = femVersion.split(".")
-        if "dev" in ver[-1]:
-            ver[-1] = 100 # try to find the largest matching release version
-        lower = int(ver[-1])-1
-        if lower < 0:
-            # final try with only major.minor
-            femVersion = femVersion.split(".")[0] + "." + femVersion.split(".")[1]
-            dataPath = os.path.join(".",femVersion)
-            if os.path.exists(dataPath):
-                return femVersion
-            # we give up
-            raise RuntimeError(f"no suitable data for {version('dune.fem')} found")
-        ver[-1] = str(lower)
-        femVersion = ".".join(ver)
-
+    tried = [femVersion]
+    dataPath = os.path.join(".",femVersion)
+    if os.path.exists(dataPath):
+        return femVersion
+    # femVersion might be 2.12.1.3 but jit modules are only stored for 2.12.0
+    # Currently we just try 2.12.0 and 2.12 and then give up
+    femVersion = femVersion.split(".")[:-1]
+    femVersion = '.'.join(femVersion)
+    tried += [femVersion]
+    dataPath = os.path.join(".",femVersion)
+    if os.path.exists(dataPath):
+        return femVersion
+    femVersion = femVersion.split(".")[:-1]
+    femVersion = '.'.join(femVersion)
+    tried += [femVersion]
+    dataPath = os.path.join(".",femVersion)
+    if os.path.exists(dataPath):
+        return femVersion
+    raise RuntimeError(f"no suitable data for {version('dune.fem')} found. Tried {tried}.")
 def main():
     if dune:
         from dune.fem.utility import FemThreadPoolExecutor
@@ -43,8 +43,9 @@ def main():
 
         try:
             femVersion = getVersion()
-        except:
-            print("no version found so precompilation available")
+        except Exception as e:
+            print("no version found so no precompilation available")
+            print(e)
             sys.exit(0)
 
         dataPath = os.path.join(".",femVersion)
