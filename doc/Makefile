@@ -24,23 +24,23 @@ NBS = spiral_nb.ipynb elasticity_nb.ipynb wave_nb.ipynb\
 			# spiral_adapt_nb.ipynb 
 
 
-MODULES = spiral.modules elasticity.modules wave.modules\
-      uzawa-scipy.modules monolithicStokes.modules fieldsplitStokes.modules\
-      cylinder.modules\
-      laplace-adaptive.modules crystal.modules mmesh.modules\
-      cppfunctions.modules evalues_laplace.modules\
-      biharmonic_IPC0.modules mixed_poisson.modules\
-			mcf.modules boundary.modules \
-      solversInternal.modules solversExternal.modules \
-			mcf-algorithm.modules lineplot.modules laplace-dwr.modules \
-      laplace-dwr-algorithm.modules othergrids.modules \
-			concepts.modules dune-fempy.modules backuprestore.modules parallelization.modules \
-      dune-corepy.modules discontinuousgalerkin.modules \
-      twophaseflow.modules euler.modules chemical.modules \
-			geoview.modules \
-			levelgridview.modules \
-      filteredgridview.modules \
-      vemdemo.modules chimpl.modules
+MODULES = spiral.py.jitmodules elasticity.py.jitmodules wave.py.jitmodules\
+      uzawa-scipy.py.jitmodules monolithicStokes.py.jitmodules fieldsplitStokes.py.jitmodules\
+      cylinder.py.jitmodules\
+      laplace-adaptive.py.jitmodules crystal.py.jitmodules mmesh.py.jitmodules\
+      cppfunctions.py.jitmodules evalues_laplace.py.jitmodules\
+      biharmonic_IPC0.py.jitmodules mixed_poisson.py.jitmodules\
+			mcf.py.jitmodules boundary.py.jitmodules \
+      solversInternal.py.jitmodules solversExternal.py.jitmodules \
+			mcf-algorithm.py.jitmodules lineplot.py.jitmodules laplace-dwr.py.jitmodules \
+      laplace-dwr-algorithm.py.jitmodules othergrids.py.jitmodules \
+			concepts.py.jitmodules dune-fempy.py.jitmodules backuprestore.py.jitmodules parallelization.py.jitmodules \
+      dune-corepy.py.jitmodules discontinuousgalerkin.py.jitmodules \
+      twophaseflow.py.jitmodules euler.py.jitmodules chemical.py.jitmodules \
+			geoview.py.jitmodules \
+			levelgridview.py.jitmodules \
+      filteredgridview.py.jitmodules \
+      vemdemo.py.jitmodules chimpl.py.jitmodules
 
 # .EXPORT_ALL_VARIABLES:
 
@@ -71,7 +71,7 @@ distclean: clean
 
 .SECONDARY:
 
-%.modules: %.py
+%.py.jitmodules: %.py
 	DUNEPY_DISABLE_PLOTTING=1 DUNE_LOGMODULES=4 python $<
 
 %_nb.ipynb: %.py
