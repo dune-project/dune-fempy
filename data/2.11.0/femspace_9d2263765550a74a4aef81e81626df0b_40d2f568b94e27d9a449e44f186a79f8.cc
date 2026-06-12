@@ -31,7 +31,7 @@ PYBIND11_MODULE( femspace_9d2263765550a74a4aef81e81626df0b_40d2f568b94e27d9a449e
       } ), "spaceTuple"_a, pybind11::keep_alive<1,2>() );
     cls.def( pybind11::pickle(
       [](const pybind11::object &self) {
-    
+
                 auto& tsp = self.cast<DuneType&>();
                 /* Return a tuple that fully encodes the state of the object */
                 pybind11::dict d;
@@ -41,7 +41,7 @@ PYBIND11_MODULE( femspace_9d2263765550a74a4aef81e81626df0b_40d2f568b94e27d9a449e
                 return pybind11::make_tuple(tsp.spaceTuple(),d);
           }
     , [](pybind11::tuple t) {
-    
+
                 if (t.size() != 2)
                     throw std::runtime_error("Invalid state in AdaptGV with "+std::to_string(t.size())+"arguments!");
                 pybind11::handle pyspaceTuple = t[0];

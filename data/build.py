@@ -53,7 +53,7 @@ def main():
         onlyCompile = []
         if not "all" in modules:
             for m in modules:
-                filename = os.path.join(dataPath,m+".modules")
+                filename = os.path.join(dataPath,m+".jitmodules")
                 try:
                     with open(filename,"r") as f:
                         onlyCompile += f.readlines()

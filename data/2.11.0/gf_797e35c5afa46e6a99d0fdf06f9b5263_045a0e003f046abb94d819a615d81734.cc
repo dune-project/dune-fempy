@@ -26,7 +26,7 @@ auto aTimesExact(double a) {
 PYBIND11_MODULE( gf_797e35c5afa46e6a99d0fdf06f9b5263_045a0e003f046abb94d819a615d81734, module )
 {
   module.def( "gf", [module] ( Dune::YaspGrid< 2, Dune::EquidistantOffsetCoordinates< double, 2 > >::LeafGridView &gv, double arg0 ) {
-      auto callback=aTimesExact<Dune::YaspGrid< 2, Dune::EquidistantOffsetCoordinates< double, 2 > >::LeafGridView>( arg0); 
+      auto callback=aTimesExact<Dune::YaspGrid< 2, Dune::EquidistantOffsetCoordinates< double, 2 > >::LeafGridView>( arg0);
       return Dune::Python::registerGridFunction<Dune::YaspGrid< 2, Dune::EquidistantOffsetCoordinates< double, 2 > >::LeafGridView,decltype(callback)>(module,pybind11::cast(gv),"tmp",callback);
     },    pybind11::keep_alive<0,1>(),pybind11::keep_alive<0,2>());
 }

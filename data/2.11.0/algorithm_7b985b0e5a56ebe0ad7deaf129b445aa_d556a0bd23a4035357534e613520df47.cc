@@ -24,7 +24,7 @@
                 }
                 #endif // FEMPY_UTILITY_HH
 
-                
+
 #include <dune/alugrid/dgf.hh>
 #include <dune/alugrid/grid.hh>
 #include <dune/common/fvector.hh>

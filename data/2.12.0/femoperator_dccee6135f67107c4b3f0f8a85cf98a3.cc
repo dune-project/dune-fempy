@@ -1,0 +1,39 @@
+#ifndef Guard_femoperator_dccee6135f67107c4b3f0f8a85cf98a3
+#define Guard_femoperator_dccee6135f67107c4b3f0f8a85cf98a3
+
+#include <config.h>
+
+#define USING_DUNE_PYTHON 1
+
+#include </home/dedner/dune-core/lib/python3.12/site-packages/petsc4py/include/petsc4py/petsc4py.h>
+#include <dune/fem/function/adaptivefunction.hh>
+#include <dune/fem/function/petscdiscretefunction.hh>
+#include <dune/fem/operator/linear/petscoperator.hh>
+#include <dune/fem/schemes/galerkin.hh>
+#include <dune/fem/space/lagrange.hh>
+#include <dune/fempy/py/discretefunction.hh>
+#include <dune/fempy/py/grid/gridpart.hh>
+#include <dune/fempy/py/operator.hh>
+#include <dune/fempy/py/space.hh>
+#include <dune/grid/io/file/dgfparser/dgfyasp.hh>
+#include <dune/grid/yaspgrid.hh>
+#include <dune/python/grid/hierarchical.hh>
+
+#include <dune/python/common/typeregistry.hh>
+#include <pybind11/pybind11.h>
+#include <pybind11/stl.h>
+
+PYBIND11_MODULE( femoperator_dccee6135f67107c4b3f0f8a85cf98a3, module )
+{
+  using pybind11::operator""_a;
+  pybind11::module cls0 = module;
+  {
+    using DuneType = DirichletWrapperOperator< Dune::Fem::DifferentiableGalerkinOperator< Dune::Fem::VirtualizedIntegrands< typename Dune::Fem::DynamicLagrangeDiscreteFunctionSpace< Dune::Fem::FunctionSpace< double, double, 2, 1 >, Dune::FemPy::GridPart< Dune::YaspGrid< 2, Dune::EquidistantOffsetCoordinates< double, 2 > >::LeafGridView >, Dune::Fem::CodegenStorage>::GridPartType, std::tuple< Dune::FieldVector< double, 1 >, Dune::FieldMatrix< double, 1, 2 > >, std::tuple< Dune::FieldVector< double, 1 >, Dune::FieldMatrix< double, 1, 2 > > >, Dune::Fem::PetscLinearOperator< Dune::Fem::PetscDiscreteFunction< Dune::Fem::DynamicLagrangeDiscreteFunctionSpace< Dune::Fem::FunctionSpace< double, double, 2, 1 >, Dune::FemPy::GridPart< Dune::YaspGrid< 2, Dune::EquidistantOffsetCoordinates< double, 2 > >::LeafGridView >, Dune::Fem::CodegenStorage> >,Dune::Fem::PetscDiscreteFunction< Dune::Fem::DynamicLagrangeDiscreteFunctionSpace< Dune::Fem::FunctionSpace< double, double, 2, 1 >, Dune::FemPy::GridPart< Dune::YaspGrid< 2, Dune::EquidistantOffsetCoordinates< double, 2 > >::LeafGridView >, Dune::Fem::CodegenStorage> >> > >;
+    auto cls = Dune::Python::insertClass< DuneType >( cls0, "Operator",pybind11::dynamic_attr(), Dune::Python::GenerateTypeName("DirichletWrapperOperator< Dune::Fem::DifferentiableGalerkinOperator< Dune::Fem::VirtualizedIntegrands< typename Dune::Fem::DynamicLagrangeDiscreteFunctionSpace< Dune::Fem::FunctionSpace< double, double, 2, 1 >, Dune::FemPy::GridPart< Dune::YaspGrid< 2, Dune::EquidistantOffsetCoordinates< double, 2 > >::LeafGridView >, Dune::Fem::CodegenStorage>::GridPartType, std::tuple< Dune::FieldVector< double, 1 >, Dune::FieldMatrix< double, 1, 2 > >, std::tuple< Dune::FieldVector< double, 1 >, Dune::FieldMatrix< double, 1, 2 > > >, Dune::Fem::PetscLinearOperator< Dune::Fem::PetscDiscreteFunction< Dune::Fem::DynamicLagrangeDiscreteFunctionSpace< Dune::Fem::FunctionSpace< double, double, 2, 1 >, Dune::FemPy::GridPart< Dune::YaspGrid< 2, Dune::EquidistantOffsetCoordinates< double, 2 > >::LeafGridView >, Dune::Fem::CodegenStorage> >,Dune::Fem::PetscDiscreteFunction< Dune::Fem::DynamicLagrangeDiscreteFunctionSpace< Dune::Fem::FunctionSpace< double, double, 2, 1 >, Dune::FemPy::GridPart< Dune::YaspGrid< 2, Dune::EquidistantOffsetCoordinates< double, 2 > >::LeafGridView >, Dune::Fem::CodegenStorage> >> > >"), Dune::Python::IncludeFiles{"/home/dedner/dune-core/lib/python3.12/site-packages/petsc4py/include/petsc4py/petsc4py.h","dune/fem/function/adaptivefunction.hh","dune/fem/function/petscdiscretefunction.hh","dune/fem/operator/linear/petscoperator.hh","dune/fem/schemes/galerkin.hh","dune/fem/space/lagrange.hh","dune/fempy/py/discretefunction.hh","dune/fempy/py/grid/gridpart.hh","dune/fempy/py/operator.hh","dune/fempy/py/space.hh","dune/grid/io/file/dgfparser/dgfyasp.hh","dune/grid/yaspgrid.hh","dune/python/grid/hierarchical.hh"}).first;
+    Dune::FemPy::registerOperator( cls0, cls );
+    cls.def( "setCommunicate", []( DuneType &self, const bool communicate ) { self.setCommunicate( communicate ); } );
+    cls.def( pybind11::init( [] ( const Dune::Fem::DynamicLagrangeDiscreteFunctionSpace< Dune::Fem::FunctionSpace< double, double, 2, 1 >, Dune::FemPy::GridPart< Dune::YaspGrid< 2, Dune::EquidistantOffsetCoordinates< double, 2 > >::LeafGridView >, Dune::Fem::CodegenStorage>& dSpace, const Dune::Fem::DynamicLagrangeDiscreteFunctionSpace< Dune::Fem::FunctionSpace< double, double, 2, 1 >, Dune::FemPy::GridPart< Dune::YaspGrid< 2, Dune::EquidistantOffsetCoordinates< double, 2 > >::LeafGridView >, Dune::Fem::CodegenStorage> &rSpace, Dune::Fem::VirtualizedIntegrands< typename Dune::Fem::DynamicLagrangeDiscreteFunctionSpace< Dune::Fem::FunctionSpace< double, double, 2, 1 >, Dune::FemPy::GridPart< Dune::YaspGrid< 2, Dune::EquidistantOffsetCoordinates< double, 2 > >::LeafGridView >, Dune::Fem::CodegenStorage>::GridPartType, std::tuple< Dune::FieldVector< double, 1 >, Dune::FieldMatrix< double, 1, 2 > >, std::tuple< Dune::FieldVector< double, 1 >, Dune::FieldMatrix< double, 1, 2 > > > &integrands ) {return new DuneType( dSpace, rSpace, integrands );
+      } ), pybind11::keep_alive< 1, 2 >(), pybind11::keep_alive< 1, 3 >(), pybind11::keep_alive< 1, 4 >() );
+  }
+}
+#endif

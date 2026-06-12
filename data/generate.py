@@ -1,6 +1,5 @@
 # Step 1: in the doc folder run
-#         make clean
-#         DUNE_LOGMODULES=8 make -ij8
+#         make -Bij8 MODULES
 # Step 2: in this folder run
 #         python generate.py
 
@@ -26,11 +25,12 @@ def main():
     names = set()
     for file in os.listdir(docPath):
         filename = os.path.join(docPath,os.fsdecode(file))
-        if filename.endswith(".modules"):
+        if filename.endswith(".jitmodules"):
+            print(filename)
             with open(filename,"r") as f:
                 names.update(f.readlines())
             shutil.copy(filename, femVersion)
-
+    print(names)
     for name in names:
         name = name.strip()
         print(name)

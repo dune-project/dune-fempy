@@ -24,7 +24,7 @@ void filteredInterpolate( const GF &gf, DF& df )
     interpolation(gfLocal,dfLocal);
   }
 }
-        
+
 #include <dune/alugrid/dgf.hh>
 #include <dune/alugrid/grid.hh>
 #include <dune/fem/function/adaptivefunction.hh>

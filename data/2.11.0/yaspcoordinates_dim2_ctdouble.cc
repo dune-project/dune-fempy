@@ -1,4 +1,3 @@
-
 #include <dune/python/pybind11/pybind11.h>
 #include <dune/python/pybind11/numpy.h>
 #include <dune/python/pybind11/stl.h>
@@ -52,4 +51,3 @@ PYBIND11_MODULE(yaspcoordinates_dim2_ctdouble, module)
   registerCoords<TensorProductCoordinates<double,2>>(module, "TensorProductCoordinates")
     .def(py::init<std::array<std::vector<double>,2>, std::array<int,2>>());
 }
-

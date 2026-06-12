@@ -29,13 +29,13 @@ PYBIND11_MODULE( view_b73b710c6108b8ff39d4173a60c38fbd, module )
     using DuneType = Dune::Fem::GeometryGridPart< Dune::Fem::AdaptiveDiscreteFunction< Dune::Vem::AgglomerationVEMSpace< Dune::Fem::FunctionSpace< double, double, 2, 2 >, Dune::FemPy::GridPart< Dune::Vem::Grid<2,2>::LeafGridView >, false , false , double, long double > > >;
     auto cls = Dune::Python::insertClass< DuneType >( cls0, "GridView",pybind11::dynamic_attr(), Dune::Python::GenerateTypeName("Dune::Fem::GeometryGridPart< Dune::Fem::AdaptiveDiscreteFunction< Dune::Vem::AgglomerationVEMSpace< Dune::Fem::FunctionSpace< double, double, 2, 2 >, Dune::FemPy::GridPart< Dune::Vem::Grid<2,2>::LeafGridView >, false , false , double, long double > > >"), Dune::Python::IncludeFiles{"dune/common/quadmath.hh","dune/fem/function/adaptivefunction.hh","dune/fem/gridpart/common/gridpart.hh","dune/fem/gridpart/geometrygridpart.hh","dune/fempy/py/discretefunction.hh","dune/fempy/py/gridview.hh","dune/fempy/py/space.hh","dune/python/grid/gridview.hh","dune/python/grid/hierarchical.hh","dune/vem/misc/grid.hh","dune/vem/space/hk.hh"}).first;
     Dune::Python::registerGridView( cls0, cls );
-    
+
     Dune::FemPy::registerGridView ( cls );
     cls.def( pybind11::init( [] ( Dune::Fem::AdaptiveDiscreteFunction< Dune::Vem::AgglomerationVEMSpace< Dune::Fem::FunctionSpace< double, double, 2, 2 >, Dune::FemPy::GridPart< Dune::Vem::Grid<2,2>::LeafGridView >, false , false , double, long double > > &coordFunction ) {return Dune::Fem::GeometryGridPart< Dune::Fem::AdaptiveDiscreteFunction< Dune::Vem::AgglomerationVEMSpace< Dune::Fem::FunctionSpace< double, double, 2, 2 >, Dune::FemPy::GridPart< Dune::Vem::Grid<2,2>::LeafGridView >, false , false , double, long double > > >( coordFunction );
       } ), pybind11::keep_alive< 1, 2 >() );
     cls.def( pybind11::pickle(
       [](const pybind11::object &self) {
-    
+
                 auto& gv = self.cast<DuneType&>();
                 /* Return a tuple that fully encodes the state of the object */
                 pybind11::dict d;
@@ -45,7 +45,7 @@ PYBIND11_MODULE( view_b73b710c6108b8ff39d4173a60c38fbd, module )
                 return pybind11::make_tuple(gv.gridFunction(),d);
           }
     , [](pybind11::tuple t) {
-    
+
                 if (t.size() != 2)
                     throw std::runtime_error("Invalid state in GeoGV with "+std::to_string(t.size())+"arguments!");
                 pybind11::handle pyGF = t[0];

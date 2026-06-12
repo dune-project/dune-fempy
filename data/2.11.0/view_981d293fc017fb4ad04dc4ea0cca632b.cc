@@ -28,13 +28,13 @@ PYBIND11_MODULE( view_981d293fc017fb4ad04dc4ea0cca632b, module )
     using DuneType = Dune::Fem::GeometryGridPart< Dune::Fem::AdaptiveDiscreteFunction< Dune::Fem::DynamicLagrangeDiscreteFunctionSpace< Dune::Fem::FunctionSpace< double, double, 3, 3 >, Dune::FemPy::GridPart< Dune::ALUGrid< 2, 3, Dune::simplex >::LeafGridView >, Dune::Fem::CodegenStorage> > >;
     auto cls = Dune::Python::insertClass< DuneType >( cls0, "GridView",pybind11::dynamic_attr(), Dune::Python::GenerateTypeName("Dune::Fem::GeometryGridPart< Dune::Fem::AdaptiveDiscreteFunction< Dune::Fem::DynamicLagrangeDiscreteFunctionSpace< Dune::Fem::FunctionSpace< double, double, 3, 3 >, Dune::FemPy::GridPart< Dune::ALUGrid< 2, 3, Dune::simplex >::LeafGridView >, Dune::Fem::CodegenStorage> > >"), Dune::Python::IncludeFiles{"dune/alugrid/dgf.hh","dune/alugrid/grid.hh","dune/fem/function/adaptivefunction.hh","dune/fem/gridpart/geometrygridpart.hh","dune/fem/space/lagrange.hh","dune/fempy/py/discretefunction.hh","dune/fempy/py/gridview.hh","dune/fempy/py/space.hh","dune/python/grid/gridview.hh","dune/python/grid/hierarchical.hh"}).first;
     Dune::Python::registerGridView( cls0, cls );
-    
+
     Dune::FemPy::registerGridView ( cls );
     cls.def( pybind11::init( [] ( Dune::Fem::AdaptiveDiscreteFunction< Dune::Fem::DynamicLagrangeDiscreteFunctionSpace< Dune::Fem::FunctionSpace< double, double, 3, 3 >, Dune::FemPy::GridPart< Dune::ALUGrid< 2, 3, Dune::simplex >::LeafGridView >, Dune::Fem::CodegenStorage> > &coordFunction ) {return Dune::Fem::GeometryGridPart< Dune::Fem::AdaptiveDiscreteFunction< Dune::Fem::DynamicLagrangeDiscreteFunctionSpace< Dune::Fem::FunctionSpace< double, double, 3, 3 >, Dune::FemPy::GridPart< Dune::ALUGrid< 2, 3, Dune::simplex >::LeafGridView >, Dune::Fem::CodegenStorage> > >( coordFunction );
       } ), pybind11::keep_alive< 1, 2 >() );
     cls.def( pybind11::pickle(
       [](const pybind11::object &self) {
-    
+
                 auto& gv = self.cast<DuneType&>();
                 /* Return a tuple that fully encodes the state of the object */
                 pybind11::dict d;
@@ -44,7 +44,7 @@ PYBIND11_MODULE( view_981d293fc017fb4ad04dc4ea0cca632b, module )
                 return pybind11::make_tuple(gv.gridFunction(),d);
           }
     , [](pybind11::tuple t) {
-    
+
                 if (t.size() != 2)
                     throw std::runtime_error("Invalid state in GeoGV with "+std::to_string(t.size())+"arguments!");
                 pybind11::handle pyGF = t[0];
