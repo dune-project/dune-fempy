@@ -75,7 +75,10 @@ distclean: clean
 	DUNEPY_DISABLE_PLOTTING=1 DUNE_LOGMODULES=4 python $<
 
 %_nb.ipynb: %.py
-	@jupytext $< --execute --set-kernel python3 --output $*_nb.ipynb
+	(temp_file=$$(mktemp ./jupytext_XXXXXX.ipynb) && \
+	trap 'rm -f "$$temp_file"' EXIT && \
+	jupytext $< --output $$temp_file && \
+	jupyter nbconvert --execute --to notebook --output $*_nb.ipynb $$temp_file)
 
 %_nb.ipynb: %.ipynb
 	@jupyter nbconvert --execute --to notebook --output $*_nb.ipynb $<
