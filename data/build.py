@@ -54,7 +54,7 @@ def main():
         onlyCompile = []
         if not "all" in modules:
             for m in modules:
-                filename = os.path.join(dataPath,m+".jitmodules")
+                filename = os.path.join(dataPath,m+".py.jitmodules")
                 try:
                     with open(filename,"r") as f:
                         onlyCompile += f.readlines()
@@ -70,6 +70,7 @@ def main():
                 if ( not filename.endswith(".cc") or
                      not os.path.exists(filename) ):
                     continue
+                print("compiling:",filename)
                 with open(filename,"r") as f:
                     executor.submit( builder.load, file.replace(".cc",""), f.read(), None )
 
