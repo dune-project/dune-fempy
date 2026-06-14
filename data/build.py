@@ -1,4 +1,4 @@
-import sys, os, urllib
+import sys, os, urllib, shutil
 try:
     import dune
 except ImportError:
@@ -31,6 +31,7 @@ def main():
     if dune:
         from dune.fem.utility import FemThreadPoolExecutor
         from dune.generator import builder
+        from dune.packagemetadata import getDunePyDir
 
         modules = ["concepts"]
         workers = 4
@@ -63,6 +64,20 @@ def main():
             onlyCompile = set([c.strip()+".cc" for c in onlyCompile])
         else:
             onlyCompile = os.listdir(dataPath)
+
+        # If one jit modules depends on another compilation can fail due to order of building
+        # (the jit module's cc file is not available
+        # So let's first copy all the files to dune-py
+        generated_dir = os.path.join(getDunePyDir(), 'python', 'dune', 'generated')
+        for file in onlyCompile:
+            filename = os.path.join(dataPath,os.fsdecode(file))
+            if ( not filename.endswith(".cc") or
+                 not os.path.exists(filename) ):
+                continue
+            destfile = os.path.join(generated_dir,os.fsdecode(file))
+            if os.path.exists(destfile):
+                continue
+            shutil.copyfile(filename, destfile)
 
         with FemThreadPoolExecutor(max_workers=workers) as executor:
             for file in onlyCompile:
