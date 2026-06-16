@@ -6,7 +6,6 @@
 #define USING_DUNE_PYTHON 1
 
 #define BACKENDNAME "as_numpy"
-#include <dune/common/quadmath.hh>
 #include <dune/fem/function/adaptivefunction.hh>
 #include <dune/fem/gridpart/common/gridpart.hh>
 #include <dune/fempy/py/discretefunction.hh>
@@ -25,9 +24,9 @@ PYBIND11_MODULE( femspace_e9fda8491626e643455f3a4430969f6f_88e549f7231105b6ea214
   pybind11::module cls0 = module;
   {
     using DuneType = Dune::Vem::AgglomerationVEMSpace< Dune::Fem::FunctionSpace< double, double, 2, 1 >, Dune::FemPy::GridPart< Dune::Vem::CubeGrid<2,2>::LeafGridView >, false , false , double, long double >;
-    auto cls = Dune::Python::insertClass< DuneType, std::shared_ptr<DuneType> >( cls0, "Space",pybind11::dynamic_attr(), Dune::Python::GenerateTypeName("Dune::Vem::AgglomerationVEMSpace< Dune::Fem::FunctionSpace< double, double, 2, 1 >, Dune::FemPy::GridPart< Dune::Vem::CubeGrid<2,2>::LeafGridView >, false , false , double, long double >"), Dune::Python::IncludeFiles{"dune/common/quadmath.hh","dune/fem/function/adaptivefunction.hh","dune/fem/gridpart/common/gridpart.hh","dune/fempy/py/discretefunction.hh","dune/fempy/py/space.hh","dune/python/grid/hierarchical.hh","dune/vem/misc/grid.hh","dune/vem/space/hk.hh"}).first;
+    auto cls = Dune::Python::insertClass< DuneType, std::shared_ptr<DuneType> >( cls0, "Space",pybind11::dynamic_attr(), Dune::Python::GenerateTypeName("Dune::Vem::AgglomerationVEMSpace< Dune::Fem::FunctionSpace< double, double, 2, 1 >, Dune::FemPy::GridPart< Dune::Vem::CubeGrid<2,2>::LeafGridView >, false , false , double, long double >"), Dune::Python::IncludeFiles{"dune/fem/function/adaptivefunction.hh","dune/fem/gridpart/common/gridpart.hh","dune/fempy/py/discretefunction.hh","dune/fempy/py/space.hh","dune/python/grid/hierarchical.hh","dune/vem/misc/grid.hh","dune/vem/space/hk.hh"}).first;
     Dune::FemPy::registerSpace( cls0, cls );
-    cls.def( pybind11::init( [] ( pybind11::handle gridView, const pybind11::object agglomerate, unsigned int order, const std::array<unsigned int,3> orderTuple, const std::array<std::vector<int>,3> &testSpaces, int basisChoice, bool edgeInterpolation, bool rotatedBB ) {typedef Dune::Vem::Agglomeration<Dune::FemPy::GridPart< Dune::Vem::CubeGrid<2,2>::LeafGridView >> AggloType;
+    cls.def( pybind11::init( [] ( pybind11::handle gridView, const pybind11::object agglomerate, unsigned int order, const std::array<int,3> orderTuple, const std::array<std::vector<int>,3> &testSpaces, int basisChoice, bool edgeInterpolation, bool rotatedBB ) {typedef Dune::Vem::Agglomeration<Dune::FemPy::GridPart< Dune::Vem::CubeGrid<2,2>::LeafGridView >> AggloType;
         AggloType *agglo = nullptr;
         // check storage
         pybind11::function retrieve = pybind11::module::import("dune.vem.vem").attr("retrieveAgglo_");
@@ -63,7 +62,7 @@ PYBIND11_MODULE( femspace_e9fda8491626e643455f3a4430969f6f_88e549f7231105b6ea214
   using pybind11::operator""_a;
   {
     using DuneType = Dune::Fem::AdaptiveDiscreteFunction< Dune::Vem::AgglomerationVEMSpace< Dune::Fem::FunctionSpace< double, double, 2, 1 >, Dune::FemPy::GridPart< Dune::Vem::CubeGrid<2,2>::LeafGridView >, false , false , double, long double > >;
-    auto cls = Dune::Python::insertClass< DuneType >( cls0, "DiscreteFunction",pybind11::buffer_protocol(),pybind11::dynamic_attr(), Dune::Python::GenerateTypeName("Dune::Fem::AdaptiveDiscreteFunction< Dune::Vem::AgglomerationVEMSpace< Dune::Fem::FunctionSpace< double, double, 2, 1 >, Dune::FemPy::GridPart< Dune::Vem::CubeGrid<2,2>::LeafGridView >, false , false , double, long double > >"), Dune::Python::IncludeFiles{"dune/common/quadmath.hh","dune/fem/function/adaptivefunction.hh","dune/fem/gridpart/common/gridpart.hh","dune/fempy/py/discretefunction.hh","dune/fempy/py/space.hh","dune/python/grid/hierarchical.hh","dune/vem/misc/grid.hh","dune/vem/space/hk.hh"}).first;
+    auto cls = Dune::Python::insertClass< DuneType >( cls0, "DiscreteFunction",pybind11::buffer_protocol(),pybind11::dynamic_attr(), Dune::Python::GenerateTypeName("Dune::Fem::AdaptiveDiscreteFunction< Dune::Vem::AgglomerationVEMSpace< Dune::Fem::FunctionSpace< double, double, 2, 1 >, Dune::FemPy::GridPart< Dune::Vem::CubeGrid<2,2>::LeafGridView >, false , false , double, long double > >"), Dune::Python::IncludeFiles{"dune/fem/function/adaptivefunction.hh","dune/fem/gridpart/common/gridpart.hh","dune/fempy/py/discretefunction.hh","dune/fempy/py/space.hh","dune/python/grid/hierarchical.hh","dune/vem/misc/grid.hh","dune/vem/space/hk.hh"}).first;
     Dune::FemPy::registerDiscreteFunction( cls0, cls );
     cls.def( pybind11::init( [] ( const std::string &name, const Dune::Vem::AgglomerationVEMSpace< Dune::Fem::FunctionSpace< double, double, 2, 1 >, Dune::FemPy::GridPart< Dune::Vem::CubeGrid<2,2>::LeafGridView >, false , false , double, long double >&space, pybind11::array_t<double> dofVector ) {double *dof = static_cast< double* >( dofVector.request(false).ptr );
         return new DuneType(name,space,dof);

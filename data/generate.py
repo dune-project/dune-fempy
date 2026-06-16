@@ -10,16 +10,19 @@ femVersion = version("dune.fem")
 def main():
     if len(sys.argv)>1:
         path = sys.argv[1:]
+        docPath = os.path.join(*path)
     else:
         path = ["doc"]
-    docPath = os.path.join("..",*path)
+        docPath = os.path.join("..",*path)
     print(f"using modules files from {docPath}")
     if not os.path.exists(docPath):
         raise RuntimeError(f"folder {docPath} does not exist")
 
     if os.path.exists(femVersion):
-        shutil.rmtree(femVersion)
-    os.makedirs(femVersion)
+        # shutil.rmtree(femVersion)
+        pass
+    else:
+        os.makedirs(femVersion)
 
     dunepy = getDunePyDir()
     names = set()
