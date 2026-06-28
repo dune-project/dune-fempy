@@ -242,6 +242,7 @@ class Scheme2:
             self.op = op
             self.shape = (x_coeff.shape[0], x_coeff.shape[0])
             self.dtype = x_coeff.dtype
+            super().__init__(dtype=self.dtype, shape=self.shape)
             x = self.op.domainSpace.function("tmp", dofVector=x_coeff)
             self.jacobian = self.op.linear()
             self.n = -1
@@ -258,18 +259,14 @@ class Scheme2:
 
 
     def solve(self, target):
-        try:
-            self.res = target.copy(name="residual")
-            sol_coeff = target.as_numpy
-            M = self.Df(self.op,sol_coeff)
-            # call the newton krylov solver from scipy
-            sol_coeff[:] = newton_krylov(self.f, sol_coeff,
-                        f_tol=1e-6, callback=self.callback,
-                        method=self.linSolver, inner_M=M)
-            return {"iterations":M.n, "linear_iterations":self.linIter}
-        except AttributeError:
-            target.clear()
-            return {"iterations": -1, "linear_iterations": -1}
+        self.res = target.copy(name="residual")
+        sol_coeff = target.as_numpy
+        M = self.Df(self.op,sol_coeff)
+        # call the newton krylov solver from scipy
+        sol_coeff[:] = newton_krylov(self.f, sol_coeff,
+                    f_tol=1e-6, callback=self.callback,
+                    method=self.linSolver, inner_M=M)
+        return {"iterations":M.n, "linear_iterations":self.linIter}
 
 scheme2_cls = Scheme2(operator)
 u_h.interpolate(2)
