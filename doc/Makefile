@@ -51,6 +51,7 @@ export ALUGRID_VERBOSITY_LEVEL=0
 export IPYTHONDIR=.
 # ignore SAVE_BUILD since this will appear in notebooks
 export DUNE_SAVE_BUILD=none
+# export DUNE_SAVE_BUILD=append
 # ignore Python warnings since these will appear in notebooks
 export PYTHONWARNINGS=ignore
 
@@ -76,10 +77,6 @@ distclean: clean
 
 %_nb.ipynb: %.py
 	@jupytext $< --execute --set-kernel python3 --output $*_nb.ipynb
-	# (temp_file=$$(mktemp ./jupytext_XXXXXX.ipynb) && \
-	# trap 'rm -f "$$temp_file"' EXIT && \
-	# jupytext $< --output $$temp_file && \
-	# jupyter nbconvert --execute --to notebook --output $*_nb.ipynb $$temp_file)
 
 %_nb.ipynb: %.ipynb
 	@jupyter nbconvert --execute --to notebook --output $*_nb.ipynb $<
