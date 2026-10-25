@@ -20,7 +20,8 @@ NBS = spiral_nb.ipynb elasticity_nb.ipynb wave_nb.ipynb\
       filteredgridview_nb.ipynb \
       vemdemo_nb.ipynb chimpl_nb.ipynb \
       overview_of_advection_solver_nb.ipynb \
-      linear_diffusion_overland_flow_dune_nb.ipynb
+      linear_diffusion_overland_flow_dune_nb.ipynb \
+      parallelrun_nb.ipynb
 			# spiral_adapt_nb.ipynb 
 
 

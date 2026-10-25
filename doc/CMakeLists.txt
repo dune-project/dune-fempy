@@ -21,13 +21,14 @@ vemdemo.py            chimpl.py             discontinuousgalerkin.py
 interpolation.py      wave.py               laplace-adaptive.py   laplace-dwr.py laplace-dwr-algorithm.py
 backuprestore.py      parallelization.py    boundary.py           filteredgridview.py
 solversInternal.py    solversExternal.py    evalues_laplace.py    biharmonic_IPC0.py    mixed_poisson.py    mmesh.py
+parallelrun.py
 overview_of_advection_solver.py linear_diffusion_overland_flow_dune.py
 crystal_nb.ipynb           mcf_nb.ipynb               chemical_nb.ipynb
 dune-corepy_nb.ipynb       spiral_nb.ipynb            euler_nb.ipynb
 concepts_nb.ipynb          dune-fempy_nb.ipynb        twophaseflow_nb.ipynb
 elasticity_nb.ipynb        uzawa-scipy_nb.ipynb       othergrids_nb.ipynb
 laplace-adaptive_nb.ipynb  vemdemo_nb.ipynb           chimpl_nb.ipynb
-discontinuousgalerkin_nb.ipynb
+discontinuousgalerkin_nb.ipynb parallelrun_nb.ipynb
 monolithicStokes_nb.ipynb  fieldsplitStokes_nb.ipynb  cylinder_nb.ipynb
 laplace-dwr_nb.ipynb       laplace-dwr-algorithm_nb.ipynb
 lineplot_nb.ipynb          wave_nb.ipynb
