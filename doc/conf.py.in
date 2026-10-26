@@ -365,4 +365,10 @@ nbsphinx_epilog = r"""
               <a href="https://doi.org/10.5281/zenodo.3706994"><img src="https://zenodo.org/badge/DOI/10.5281/zenodo.3706994.svg" alt="DOI"></a>
 
         | Download *{{ docBase }}* as :download:`Jupyter notebook (.ipynb) <{{ docBase }}_nb.ipynb>` or as :download:`Python script (.py) <{{ docBase }}.py>`
+
+    .. rubric:: Python source for this notebook (code only)
+
+    .. literalinclude:: {{ docBase }}_script.py
+        :language: python
+        :linenos:
 """

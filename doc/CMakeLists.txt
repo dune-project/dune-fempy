@@ -1,54 +1,51 @@
 include(DuneSphinxDoc)
 add_sphinx_targets(sphinx)
-dune_symlink_to_source_files(FILES
-index.rst contributions.rst
+
+set(bases
+crystal            lineplot           cppfunctions       biharmonic_IPC0
+dune-corepy        mcf-algorithm      twophaseflow       chemical
+concepts           dune-fempy         euler
+elasticity         mcf                othergrids         mmesh
+uzawa-scipy        monolithicStokes   fieldsplitStokes   cylinder
+vemdemo            chimpl             discontinuousgalerkin
+spiral             wave               laplace-adaptive   laplace-dwr laplace-dwr-algorithm
+backuprestore      parallelization    boundary           filteredgridview
+solversInternal    solversExternal    evalues_laplace    mixed_poisson
+parallelrun        overview_of_advection_solver linear_diffusion_overland_flow_dune
+)
+
+foreach(base IN LISTS bases)
+  list(APPEND files
+    "${base}.py"
+    "${base}_nb.ipynb"
+    "${base}_script.py"
+  )
+endforeach()
+list(APPEND files
+3dexample interpolation
+gitlab-formatting.py pandoc-formatting.py svg2pdf.py
 landlab_descr.rst twophaseflow_descr.rst ddfem_descr.rst
-mmesh_descr.rst todo.rst citing.rst
+mmesh_descr.rst todo.rst citing.rst index.rst contributions.rst
 corepy.rst installation.rst overview.rst
 stokes.rst furtherexamples.rst nextsteps.rst furthertopics.rst
 inforesources.rst userprojects.rst versions.rst
 gridviews_and_adaptivity.rst cpp.rst developers.rst slurmbatchscript.rst
 changelog.rst changelog290.rst changelog210.rst changelog212.rst
-scheme_api.rst
-3dexample.py          spiral.py
-crystal.py            lineplot.py           svg2pdf.py            cppfunctions.py
-dune-corepy.py        mcf-algorithm.py      twophaseflow.py       chemical.py
-concepts.py           dune-fempy.py         mcf_cmp_plot.py       euler.py
-elasticity.py         mcf.py
-uzawa-scipy.py        monolithicStokes.py   fieldsplitStokes.py  cylinder.py
-othergrids.py         gitlab-formatting.py  pandoc-formatting.py
-vemdemo.py            chimpl.py             discontinuousgalerkin.py
-interpolation.py      wave.py               laplace-adaptive.py   laplace-dwr.py laplace-dwr-algorithm.py
-backuprestore.py      parallelization.py    boundary.py           filteredgridview.py
-solversInternal.py    solversExternal.py    evalues_laplace.py    biharmonic_IPC0.py    mixed_poisson.py    mmesh.py
-parallelrun.py
-overview_of_advection_solver.py linear_diffusion_overland_flow_dune.py
-crystal_nb.ipynb           mcf_nb.ipynb               chemical_nb.ipynb
-dune-corepy_nb.ipynb       spiral_nb.ipynb            euler_nb.ipynb
-concepts_nb.ipynb          dune-fempy_nb.ipynb        twophaseflow_nb.ipynb
-elasticity_nb.ipynb        uzawa-scipy_nb.ipynb       othergrids_nb.ipynb
-laplace-adaptive_nb.ipynb  vemdemo_nb.ipynb           chimpl_nb.ipynb
-discontinuousgalerkin_nb.ipynb parallelrun_nb.ipynb
-monolithicStokes_nb.ipynb  fieldsplitStokes_nb.ipynb  cylinder_nb.ipynb
-laplace-dwr_nb.ipynb       laplace-dwr-algorithm_nb.ipynb
-lineplot_nb.ipynb          wave_nb.ipynb
-mcf-algorithm_nb.ipynb     parallelization_nb.ipynb   backuprestore_nb.ipynb
-boundary_nb.ipynb          mmesh_nb.ipynb             mixed_poisson_nb.ipynb
-solversInternal_nb.ipynb   solversExternal_nb.ipynb
-cppfunctions_nb.ipynb      laplace-dwr.hh             utility.hh
-uzawa.hh                   evalues_laplace_nb.ipynb   biharmonic_IPC0_nb.ipynb
-overview_of_advection_solver_nb.ipynb linear_diffusion_overland_flow_dune_nb.ipynb
-levelgridview_nb.rst geoview_nb.rst geoview_nb_files
-filteredgridview_nb.ipynb
-dune-python-logo.png
-figures _static dune-fempy.bib .special.rst
-horizontal.msh 3dmesh.dgf soap.dgf sphere.dgf triangle.dgf unitcube-2d.dgf wave_tank.msh quads.msh hugo_site.asc
-config.opts
-mcf.gif
-favicon.ico
+levelgridview_nb.rst geoview_nb.rst geoview_nb_files scheme_api.rst
+utility.hh uzawa.hh laplace-dwr.hh
+dune-python-logo.png figures _static dune-fempy.bib .special.rst
+horizontal.msh 3dmesh.dgf soap.dgf sphere.dgf triangle.dgf unitcube-2d.dgf
+wave_tank.msh quads.msh hugo_site.asc
+config.opts mcf.gif favicon.ico
+crystal03_0.png  crystal13_0.png  crystal23_0.png  crystal3_0.png
+crystal03_1.png  crystal13_1.png  crystal23_1.png  crystal3_1.png
+crystal03_2.png  crystal13_2.png  crystal23_2.png  crystal3_2.png
+crystal03_3.png  crystal13_3.png  crystal23_3.png  crystal3_3.png
+crystal03_4.png  crystal13_4.png  crystal23_4.png  crystal3_4.png
+crystal03_5.png  crystal13_5.png  crystal23_5.png  crystal3_5.png
+wave_mpi0.png    wave_mpi1.png
 )
 
-add_subdirectory("_templates")
+dune_symlink_to_source_files(FILES ${files})
 
-#add_custom_target(compilegrids2 ${PYTHON_EXECUTABLE} compilegrids.py 2)
-#add_custom_target(compilegrids3 ${PYTHON_EXECUTABLE} compilegrids.py 3)
+add_subdirectory("_templates")

@@ -12,6 +12,12 @@ import sys
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
 
+try:
+    import mpi4py
+except ImportError:
+    print("Example requires an `mpi` installation - skipping")
+    sys.exit(0)
+
 oversub = ["--map-by", ":OVERSUBSCRIBE"] # allow oversubscription for this simple test
 
 # %% [markdown]
@@ -33,16 +39,36 @@ subprocess.run(
 # at five different point in the simulation. Note how the call
 # `fem.gridAdapt(marker, u_h)` within the time loop does not only refine
 # and coarsen the grid but also leads to occasional repartitioning of
-# the grid to balance the load between the three processors:
+# the grid to balance the load between the three processors.
+# We first use pvpython if available to generate figures showing the
+# combined grid and solution with the partitioning. Then we show the
+# individual domains - those figures were generated during the above call
+# to `crystal.py`:
 
 # %%
+try:
+    for i in range(6):
+        subprocess.run(['pvpython','pvcrystal.py', str(nprocs), str(i)],
+                    stdout=subprocess.DEVNULL,
+                    stderr=subprocess.DEVNULL,
+                    check=True
+        )
+    figGenerated = True
+except: # probably no pvpython available
+    figGenerated = False
 for i in range(6):
-    fig, axes = plt.subplots(1, nprocs, figsize=(5*nprocs, 4))
-    for rank, ax in enumerate(axes):
+    fig, axes = plt.subplots(1, nprocs+1, figsize=(5*(nprocs+1), 4),
+                             gridspec_kw={"width_ratios": [3] + [1] * nprocs})
+    for rank, ax in enumerate(axes[1:]):
         image = mpimg.imread(f"crystal{rank}{nprocs}_{i}.png")
         ax.imshow(image)
         ax.set_title(f"Rank {rank}")
         ax.axis("off")
+    if figGenerated:
+        image = mpimg.imread(f"crystal{nprocs}_{i}.png")
+        axes[0].imshow(image)
+        axes[0].set_title(f"Full")
+        axes[0].axis("off")
     fig.tight_layout()
 
 # %% [markdown]

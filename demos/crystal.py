@@ -214,10 +214,6 @@ from dune.fem.plotting import plotComponents
 import matplotlib.pyplot as pyplot
 from dune.fem.function import levelFunction, partitionFunction
 
-# dummy vtk
-def vtk():
-    pass
-
 # %% [markdown]
 # .. index:: Grids; Visualization time series
 #
@@ -225,11 +221,12 @@ def vtk():
 #
 # We can construct a vtk writer that generates a sequence of files:
 #
-# ```
-# vtk = gridView.sequencedVTK("crystal", pointdata=[u_h],
-#          celldata=[levelFunction(gridView), partitionFunction(gridView)])
-# ```
-#
+
+# %%
+vtk = gridView.sequencedVTK("crystal", pointdata=[u_h],
+         celldata=[levelFunction(gridView), partitionFunction(gridView)])
+
+# %% [markdown]
 # This can be for example used in a time loop. Simply adding `vtk()` in the
 # loop will write files `crystalXXXX.vtu` where the sequence counter `XXXX`
 # is automatically increased by one each time `vtk()` is called.
@@ -241,7 +238,6 @@ matplotlib.rcParams['figure.figsize'] = [10, 5]
 
 # %% [markdown]
 # We set ``dt`` and the initial time t=0.
-
 
 # %%
 dt.value = 0.0005

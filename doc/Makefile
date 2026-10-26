@@ -65,7 +65,7 @@ linkcheck:
 	@sphinx-build -b linkcheck . html
 
 clean:
-	@rm -f *.vtu *.pvtu *.p $(FIGURES) $(NBS) $(MODULES)
+	@rm -f *_script.py crystal*.png wave*.png *.vtu *.pvtu *.p $(FIGURES) $(NBS) $(MODULES)
 	@rm -f geoview_nb_files/geoview_nb_1_0.png
 distclean: clean
 	@rm -f *.bbl
@@ -76,7 +76,11 @@ distclean: clean
 %.py.jitmodules: %.py
 	DUNEPY_DISABLE_PLOTTING=1 DUNE_LOGMODULES=4 python $<
 
-%_nb.ipynb: %.py
+%_script.py: %.py
+	@python extractpy.py $*
+	# DUNEPY_DISABLE_PLOTTING=1 python $*_script.py
+
+%_nb.ipynb: %.py %_script.py
 	@jupytext $< --execute --set-kernel python3 --output $*_nb.ipynb
 
 %_nb.ipynb: %.ipynb
