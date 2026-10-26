@@ -1,4 +1,4 @@
-Module: dune-fempy
+Module: dunefempy
 Version: 2.12-git
 Maintainer: a.s.dedner@warwick.ac.uk, nolte.mrtn@gmail.com
 Whitespace-Hook: Yes
