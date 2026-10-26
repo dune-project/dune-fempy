@@ -12,6 +12,8 @@ import sys
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
 
+oversub = ["--map-by", ":OVERSUBSCRIBE"] # allow oversubscription for this simple test
+
 # %% [markdown]
 # .. index:: Adaptation; Phase Field; MPI
 #
@@ -22,7 +24,7 @@ import matplotlib.image as mpimg
 # %%
 nprocs = 3
 subprocess.run(
-    ["mpiexec", "-n", str(nprocs), sys.executable, "crystal.py"],
+    ["mpiexec", *oversub, "-n", str(nprocs), sys.executable, "crystal.py"],
     check=True,
 )
 
@@ -58,7 +60,7 @@ for i in range(6):
 # %%
 nprocs = 2
 subprocess.run(
-    ["mpiexec", "-n", str(nprocs), sys.executable, "wave_mpi.py"],
+    ["mpiexec", *oversub, "-n", str(nprocs), sys.executable, "wave_mpi.py"],
     check=True,
 )
 
