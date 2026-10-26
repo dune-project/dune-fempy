@@ -29,6 +29,9 @@ oversub = ["--map-by", ":OVERSUBSCRIBE"] # allow oversubscription for this simpl
 
 # %%
 nprocs = 3
+print("==========================================")
+print(["mpiexec", *oversub, "-n", str(nprocs), sys.executable, "crystal.py"],flush=True)
+print("==========================================")
 subprocess.run(
     ["mpiexec", *oversub, "-n", str(nprocs), sys.executable, "crystal.py"],
     check=True,
@@ -46,8 +49,10 @@ subprocess.run(
 # to `crystal.py`:
 
 # %%
+print("============================================")
 try:
     for i in range(6):
+        print(f"pvpython call {i}")
         subprocess.run(['pvpython','pvcrystal.py', str(nprocs), str(i)],
                     stdout=subprocess.DEVNULL,
                     stderr=subprocess.DEVNULL,
@@ -56,6 +61,7 @@ try:
     figGenerated = True
 except: # probably no pvpython available
     figGenerated = False
+print("============================================")
 for i in range(6):
     fig, axes = plt.subplots(1, nprocs+1, figsize=(5*(nprocs+1), 4),
                              gridspec_kw={"width_ratios": [3] + [1] * nprocs})
@@ -85,6 +91,9 @@ for i in range(6):
 
 # %%
 nprocs = 2
+print("==========================================")
+print(["mpiexec", *oversub, "-n", str(nprocs), sys.executable, "wave_mpi.py"],flush=True)
+print("==========================================")
 subprocess.run(
     ["mpiexec", *oversub, "-n", str(nprocs), sys.executable, "wave_mpi.py"],
     check=True,

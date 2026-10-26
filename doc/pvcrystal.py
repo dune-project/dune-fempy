@@ -252,13 +252,13 @@ SaveScreenshot(f"crystal{size}_{time}.png", view)
 ## Render all views to see them appears
 # RenderAllViews()
 #
-## Interact with the view, usefull when running from pvpython
+## Interact with the view, useful when running from pvpython
 # Interact()
 #
 ## Save a screenshot of the active view
 # SaveScreenshot("path/to/screenshot.png")
 #
-## Save a screenshot of a layout (multiple splitted view)
+## Save a screenshot of a layout (multiple split view)
 # SaveScreenshot("path/to/screenshot.png", GetLayout())
 #
 ## Save all "Extractors" from the pipeline browser
