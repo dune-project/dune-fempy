@@ -10,6 +10,7 @@ from dune.fem import assemble, integrate
 from dune.fem.function import gridFunction
 from scipy.sparse.linalg import cg, splu, LinearOperator
 
+# we use the hp spaces here to avoid re-compilation
 def getGridSpace(element,space,order, dim=2):
     if element == "simplex" and dim == 2:
         vertices = [ (0,0), (0,1), (1,1), (1,0), (0.5,0.5)]
@@ -97,6 +98,7 @@ for order in [0,1,2,3,4]:
 mth = 'BDM'
 element = 'simplex'
 for order in [0,1]:
+    # Note that the bdm space is constructed with order+1
     gridView, spaceHDiv, spaceDG = getGridSpace(element, mth, order, dim=2)
     simulate(gridView, spaceHDiv, spaceDG, dirichlet=False)
 mth = 'RT'

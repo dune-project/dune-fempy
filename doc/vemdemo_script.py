@@ -31,6 +31,7 @@ exact = x[0]*x[1] * cos(pi*x[0]*x[1])
 massCoeff = 1+sin(dot(x,x))       # factor for mass term
 diffCoeff = 1-0.9*cos(dot(x,x))   # factor for diffusion term
 a = (diffCoeff*inner(grad(u),grad(v)) + massCoeff*dot(u,v) ) * dx
+# finally the right hand side and the boundary conditions
 b = (-div(diffCoeff*grad(exact)) + massCoeff*exact ) * v * dx
 dbc = [dune.ufl.DirichletBC(space, exact, i+1) for i in range(4)]
 parameters = {"nonlinear.verbose": False,
@@ -80,6 +81,7 @@ def compute(grid, space,spaceArgs, schemeName,schemeArgs):
     scheme = schemeName( [a==b, *dbc], space, solver="cg", **schemeArgs,
                          parameters=parameters )
     info = scheme.solve(target=df)
+    # compute the error
     edf = exact-df
     err = [inner(edf,edf),
            inner(grad(edf),grad(edf))]
@@ -94,6 +96,7 @@ for i,m in enumerate(methods):
           "L^2: ", errors[0], "H^1: ", errors[1],
           info["linear_iterations"], flush=True)
     dfs.plot(figure=(fig,figPos+i), gridLines=None, colorbar="horizontal")
+# space = dune.vem.vemSpace( polyGrid, order=1, conforming=True )
 space = dune.vem.vemSpace( polyGrid, order=1, testSpaces=[-1,0,-1])
 u = TrialFunction(space)
 v = TestFunction(space)
@@ -119,7 +122,9 @@ indexSet = beamGrid.indexSet
 def polygons(en,x):
     return beamGrid.hierarchicalGrid.agglomerate(indexSet.index(en))
 polygons.plot(colorbar="horizontal")
+# instead of providing the moments we can simply add a parameter 'conforming' to construct the H^1-conforming space
 space = dune.vem.vemSpace( beamGrid, order=2, dimRange=2, conforming=True)
+# some model constants
 mu = 1
 rho = 1
 delta = W/L
@@ -127,17 +132,21 @@ gamma = 0.4*delta**2
 beta = 1.25
 lambda_ = beta
 g = gamma
+# clamped boundary on the left
 x = SpatialCoordinate(space)
 dbc = dune.ufl.DirichletBC(space, as_vector([0,0]), x[0]<1e-10)
+# Define strain and stress
 def epsilon(u):
     return 0.5*(nabla_grad(u) + nabla_grad(u).T)
 def sigma(u):
     return lambda_*nabla_div(u)*Identity(2) + 2*mu*epsilon(u)
+# Define the variational problem
 u = TrialFunction(space)
 v = TestFunction(space)
 f = dune.ufl.Constant((0, -rho*g))
 a = inner(sigma(u), epsilon(v))*dx
 b = dot(as_vector([0,-rho*g]),v)*dx
+# Compute solution
 displacement = space.function(name="displacement")
 scheme = dune.vem.vemScheme( [a==b, dbc], space,
         gradStabilization = as_vector([lambda_+2*mu, lambda_+2*mu]),
@@ -161,10 +170,12 @@ H = lambda w: grad(grad(w))
 u = TrialFunction(space)
 v = TestFunction(space)
 a = ( inner(H(u),H(v)) ) * dx
+# finally the right hand side and the boundary conditions
 b = laplace(laplace(exact)) * v * dx
 dbcs = [dune.ufl.DirichletBC(space, [0], i+1) for i in range(4)]
 scheme = dune.vem.vemScheme( [a==b, *dbcs], space, hessStabilization=1,
                              solver="cg", parameters=parameters )
+# solution = space.interpolate(0, name="solution") # issue here for C^1 spaces
 solution = discreteFunction(space, name="solution")
 info = scheme.solve(target=solution)
 edf = exact-solution

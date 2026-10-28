@@ -57,6 +57,8 @@ while True:
     print(data)
     df[1].plot()
 class CheckPointer:
+    # if 'gridView=None' then restore grid view using given file name
+    # otherwise backup 'gridView' to given file
     def __init__(self,fileName,gridView=None):
         if gridView is None: # restore file
             self.file = open(fileName,'rb')
@@ -66,6 +68,7 @@ class CheckPointer:
             self.gridView = gridView
             pickle.dump(self.gridView,self.file)
         self.items = []
+    # add an item to pickle when backup is called (or restore)
     def add(self,item):
         assert hasattr(item,"write") and hasattr(item,"read")
         self.items += [item]

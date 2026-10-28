@@ -15,6 +15,8 @@ from dune.ufl import DirichletBC, Constant
 
 gridView = leafGridView([0, 0], [1, 1], [4, 4])
 code="""
+#include <cmath>
+#include <dune/common/fvector.hh>
 template <class GridView>
 auto aTimesExact(double a) {
   return [a](const auto& en,const auto& xLocal) -> auto {
@@ -30,6 +32,8 @@ exact = (x[0]**2+x[1]**2) - 1/3*(x[0]**3 - x[1]**3) + 1
 exact_gf = gridFunction(exact, gridView, name="ufl", order=1)
 print( integrate(abs(exact-exactCpp)) )
 code2="""
+#include <cmath>
+#include <dune/common/fvector.hh>
 template <class GridView, class GF>
 auto aTimesExact(const GF &gf,Dune::FieldVector<double,1> &a) {
   return [lgf=localFunction(gf),&a] (const auto& en,const auto& xLocal) mutable -> auto {
@@ -52,6 +56,8 @@ a += ( ( 10*(1-2*uVec[1])+uVec[0] ) * vVec[0] +\
        ( 10*sin(2*pi*x[1]) + (1-2*uVec[0])**2*uVec[1] ) * vVec[1]
      ) * dx
 code="""
+#include <cmath>
+#include <dune/python/pybind11/numpy.h>
 template <class GridView>
 auto bnd(pybind11::array_t<double> &a, double h) {
   return [ptr=static_cast<double*>(a.request(true).ptr),h](const auto& en,const auto& xLocal) -> auto {

@@ -49,6 +49,7 @@ for _ in range(maxRefs):
     errorH2.append( sqrt(integrate(laplace(solution - exactFunction)**2, gridView, order = 2*(order-1)) + sum(assemble(jump(grad(solution),normal)**2*avg(v)*dS).as_numpy ) + sum(assemble(inner(grad(solution),normal)**2*v*ds).as_numpy ) ))
 for i in range(len(dofs)):
     print(dofs[i], "\t", errorL2[i], "\t", errorH1[i], "\t", errorH2[i])
+#sort out the graphs
 plt.plot( dofs, errorL2, label = "L2", marker = 'x' )
 plt.plot( dofs, errorH1, label = "H1", marker = 'x' )
 plt.plot( dofs, errorH2, label = "H2", marker = 'x' )
@@ -80,6 +81,7 @@ for _ in range(maxRefs):
     errorH2.append( sqrt(integrate(laplace(solution - exactFunction)**2, gridView, order = 2*(order-1)) + sum(assemble(jump(grad(solution),normal)**2*avg(v)*dS).as_numpy ) ))
 for i in range(len(dofs)):
     print(dofs[i], "\t", errorL2[i], "\t", errorH1[i], "\t", errorH2[i])
+#sort out the graphs
 plt.plot( dofs, errorL2, label = "L2", marker = 'x' )
 plt.plot( dofs, errorH1, label = "H1", marker = 'x' )
 plt.plot( dofs, errorH2, label = "H2", marker = 'x' )

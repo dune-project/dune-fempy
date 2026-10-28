@@ -26,13 +26,16 @@ try:
 except ImportError:
     print("This example needs 'dune.femdg' - skipping")
     sys.exit(0)
+# use callback adaptation since the 'generic' produces non-consecutive dof mappings
 parameter.append({"fem.adaptation.method": "callback"})
 fem.threading.use = 4
 maxLevel  = 3
 maxOrder  = 3
 dt        = 5.
+# shorter run time for nightly testing
 endTime   = 200. if len(sys.argv) > 1 and sys.argv[1] == 'testing' else 800.
 coupled   = False
+# coupled   = True
 tolerance = 3e-2
 penalty   = 5 * (maxOrder * ( maxOrder + 1 ))
 newtonParameters = {"nonlinear.tolerance": tolerance,
@@ -77,8 +80,10 @@ class AnisotropicLens:
     s_nr  = lens(x, 0.00, 0.00)             # [-]
     theta = lens(x, 2.00, 2.70)             # [-]
     pd    = lens(x, 5000., 755.)            # [Pa]
+    #### initial conditions
     p_w0 = (0.65-x[1])*9810.       # hydrostatic pressure
     s_n0 = 0                       # fully saturated
+    # boundary conditions
     inflow = conditional(abs(x[0]-0.45)<0.06,1.,0.)* conditional(abs(x[1]-0.65)<1e-8,1.,0.)
     J_n  = -5.137*1e-5
     J_w  = 1e-20
@@ -167,6 +172,9 @@ else:
     form = [form_p,form_s]
     tpModel = [form[0] == 0,
                form[1] == 0]
+    # tpModel[0].penalty  = penalty
+    # tpModel[1].penalty  = penalty
+    # tpModel[1].timeStep = dt
     scheme = [galerkin( m, s, solver=("suitesparse","umfpack"),
                         parameters=newtonParameters) for m,s in zip(tpModel,spc.subSpaces)]
 def errorMeasure(w,dw):
@@ -184,6 +192,7 @@ def step():
             scheme[1].solve(target=solution.s)
         limit(solution)
         n += 1
+        # print("step",n,flush=True)
         if errorMeasure(solution,solution-intermediate) or n==20:
             break
 uflSpace0 = Space((P.dimWorld,P.dimWorld),1)
@@ -202,6 +211,7 @@ def markh(element):
       return Marker.coarsen
     else:
       return Marker.keep
+# this overwrites the above markh
 markh = GridMarker( estimate, # estimator or indicator piecewise constant values
                     refineTolerance  = lambda : hTol,      # float or callable
                     coarsenTolerance = lambda : 0.01*hTol, # float or callable
@@ -242,13 +252,17 @@ t = 0
 saveStep = 0
 while t < endTime:
     step()
+    # h adaptivity
     hTol = timeTol * dt / grid.size(0)
     estimator(solution, estimate)
+    # h adapt grid
     fem.gridAdapt(markh, persistentDF)
+    # p adaptivity, compute difference between estimate and estimate_pm1
     estimator(solution, estimate)
     orderreduce(solution,sol_pm1)
     estimator(sol_pm1, estimate_pm1)
     estimate_pm1 -= estimate
+    # adapt space
     fem.spaceAdapt(markp, persistentDF)
     t += dt
     if t>=saveStep:

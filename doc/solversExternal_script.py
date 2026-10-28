@@ -20,6 +20,7 @@ exact = 1/2*(x[0]**2+x[1]**2) - 1/3*(x[0]**3 - x[1]**3) + 1
 a  = ( inner(grad(u),grad(v)) + (1+u**2)*u*v ) * dx
 bf = (-div(grad(exact)) + (1+exact**2)*exact) * v * dx
 bg = dot(grad(exact),n)*v*ds
+# simple function to show the result of a simulation
 def printResult(method,error,info):
     print(method,"L^2, H^1 error:",'{:0.5e}, {:0.5e}'.format(
                  *[ np.sqrt(e) for e in integrate([error**2,inner(grad(error),grad(error))]) ]),
@@ -49,8 +50,10 @@ class Scheme1:
     def callback(self,x):
         self.linIter += 1
     def solve(self, target):
+        # create a copy of target for the residual
         res = target.copy(name="residual")
         initialGuess = target.copy(name="initial-guess")
+        # extract numpy vectors from target and res
         sol_coeff = target.as_numpy
         res_coeff = res.as_numpy
         x0 = initialGuess.as_numpy
@@ -82,12 +85,16 @@ class Scheme2:
         self.linIter += 1
     def linSolver(self,*args,**kwargs):
         return cg(*args,**kwargs,callback=self.linCallback)
+    # non linear function
     def f(self, x_coeff):
+        # the following converts a given numpy array
+        # into a discrete function over the given space
         x = self.op.domainSpace.function("tmp", dofVector=x_coeff)
         self.op(x, self.res)
         return self.res.as_numpy
     def callback(self,x,fx):
         print("Newton residual:",fx.dot(fx))
+    # class for the derivative DS of S
     class Df(LinearOperator):
         def __init__(self, op, x_coeff):
             self.op = op
@@ -98,17 +105,20 @@ class Scheme2:
             self.jacobian = self.op.linear()
             self.n = -1
             self.update(x_coeff,None)
+        # reassemble the matrix DF(u) given a DoF vector for u
         def update(self, x_coeff, f):
             x = self.op.domainSpace.function("tmp", dofVector=x_coeff)
             self.op.jacobian(x, self.jacobian)
             self.invJac = spilu(self.jacobian.as_numpy.tocsc())
             self.n += 1
+        # compute DS(u)^{-1}x for a given DoF vector x
         def _matvec(self, x_coeff):
             return self.invJac.solve(x_coeff)
     def solve(self, target):
         self.res = target.copy(name="residual")
         sol_coeff = target.as_numpy
         M = self.Df(self.op,sol_coeff)
+        # call the newton krylov solver from scipy
         sol_coeff[:] = newton_krylov(self.f, sol_coeff,
                     f_tol=1e-6, callback=self.callback,
                     method=self.linSolver, inner_M=M)
@@ -149,7 +159,11 @@ if petsc4py is not None and petsc:
             self.jacobian = op.linear()
             self.ksp = PETSc.KSP()
             self.ksp.create(PETSc.COMM_WORLD)
+            # use conjugate gradients method
             self.ksp.setType("cg")
+            # use sor preconditioner
+            # self.ksp.getPC().setType("sor")
+            # or ILU(1)
             self.ksp.getPC().setType("ilu")
             petsc_options['pc_factor_levels'] = 1
             self.ksp.setOperators(self.jacobian.as_petsc)
@@ -198,6 +212,7 @@ if petsc4py is not None and petsc is not None:
             petsc_options['pc_hypre_type'] = 'boomeramg'
             self.snes.setFromOptions()
         def f(self, snes, x, f):
+            # setup discrete function using the provide petsc vectors
             inDF = self.op.domainSpace.function("tmp",dofVector=x)
             outDF = self.op.rangeSpace.function("tmp",dofVector=f)
             self.op(inDF,outDF)

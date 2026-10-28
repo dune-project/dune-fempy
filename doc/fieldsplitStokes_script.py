@@ -81,6 +81,7 @@ subksps[1].setType("preonly")
 subksps[1].getPC().setType("hypre")
 ksp.setOperators(A, M)
 ksp.setFromOptions()
+# petsc API change (at least starting 3.20.6 Mat uses 'createVects' not 'getVecs'
 if hasattr(A, "createVecs"):
     x, _ = A.createVecs()
 else:

@@ -65,7 +65,12 @@ localPoint = [0.1,0.1] # this is in the reference element
 for i,element in enumerate(gridView.elements):
     print( space.evaluateBasis(element, localPoint) )
     if i == 4: break
+# The next line fails on MacOS (with a Bus Error 10)
+# (tested 28/04/2024). Removed for now
+# print("convert to a numpy array:", np.array( space.jacobianBasis(element, localPoint) ) )
+# initialized with an analytical expression
 u_h = space.interpolate(exact, name='u_h')
+# initialized with zeros
 u_h = space.function(name='u_h')
 u_h.interpolate( lambda x: 1/2.*(x[0]**2+x[1]**2) - 1/3*(x[0]**3 - x[1]**3) + 1 )
 u_h.plot()
@@ -87,6 +92,7 @@ for d in u_h.dofVector:
 print()
 u_h_n *= 2
 u_h   += u_h_n
+# this is equivalent to
 u_h.axpy(2,u_h_n)
 for d in u_h.dofVector:
     print(d,end=", ")
@@ -141,6 +147,7 @@ g = lambda s: K(exact(s))*grad(exact(s))
 n = FacetNormal(space)
 b = 0.5*(f(t)+f(t+dt))*v*dx + 0.5*dot(g(t)+g(t+dt),n)*v*ds
 scheme = solutionScheme(a == b, solver='cg')
+#scheme.setQuadratureOrders( 2*space.order, 2*space.order+1 )
 endTime    = 0.25
 exact_end  = exact(endTime)
 l2error = gridFunction(dot(u_h - exact_end, u_h - exact_end), name="l2error")
@@ -176,7 +183,9 @@ u_h.plot()
 eocs = [ round(np.log(fine/coarse)/np.log(0.5),2)
          for fine,coarse in zip(errorsFine,errors) ]
 print("EOCs:",eocs)
+# to get a list of all available components:
 components()
+# to get for example all available grid implementations:
 components("grid")
 components("space")
 components("function")

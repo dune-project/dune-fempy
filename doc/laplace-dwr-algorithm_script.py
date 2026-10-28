@@ -22,7 +22,9 @@ try: # this is needed to remain compatible with version 2022 of ufl
     from ufl import atan_2 as atan2
 except:
     pass
+# set the angle for the corner (0<angle<=360)
 cornerAngle = 320.
+# use a second order space
 order = 2
 def setup():
     vertices = numpy.zeros((8, 2))
@@ -40,10 +42,12 @@ def setup():
     u = TrialFunction(space)
     v = TestFunction(space)
     x = SpatialCoordinate(space)
+    # exact solution for this angle
     Phi = cornerAngle / 180 * pi
     phi = atan2(x[1], x[0]) + conditional(x[1] < 0, 2*pi, 0)
     exact = dot(x, x)**(pi/2/Phi) * sin(pi/Phi * phi)
     a = dot(grad(u), grad(v)) * dx
+    # set up the scheme
     laplace = solutionScheme([a==0, DirichletBC(space, exact, 1)], solver="cg",
             parameters={"linear.preconditioning.method":"jacobi"})
     uh = space.interpolate(0, name="solution")
@@ -109,6 +113,7 @@ def compute(computeFunctional, tolerance):
             print(count, ": size=", uh.space.gridView.size(0), "estimate=", eta, "error=", error)
         if eta < tolerance:
             break
+        # update refinement tolerance
         hTol = eta/uh.space.gridView.size(0)
         fem.gridAdapt(marker, uh) # can also be a list or tuple of function to prolong/restrict
         count += 1

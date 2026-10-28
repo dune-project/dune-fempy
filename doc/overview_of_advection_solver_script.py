@@ -7,6 +7,9 @@ if False:
     from landlab.components import AdvectionSolverTVD as AdvectionSolver
 else:
     from dune.femdg.landlab import DuneAdvectionSolver as AdvectionSolver
+    # parameters = {"limiter":"default","order":1}
+    # parameters = {"limiter":None,"order":1}
+    # parameters = {"limiter":None,"order":0}
 def make_gaussian_bump(grid, field, width, center=[0.5,0.5]):
     midx = 0.5 * np.amax(grid.x_of_node) - 0.5 + center[0]
     midy = 0.5 * np.amax(grid.y_of_node) - 0.5 + center[1]
@@ -24,6 +27,7 @@ def calc_translation_distance(grid, elev, x0, y0, u, dt=None, nt=None):
         print("Predicted distance is", u * dt * nt)
     print("Modeled distance is", distance)
     print("Min/Max",min(elev),"/",max(elev))
+# Parameters
 nrows = 51
 ncols = 51
 ux = 1.0
@@ -32,12 +36,16 @@ c = 0.2
 nnodes = 100
 ntimesteps = 100
 bump_width = 0.01  # width of Gaussian bump
+# Setup
 dx = 1.0 / (nrows - 1)
 u = (ux * ux + uy * uy) ** 0.5
 dt = c * dx / u
+# create grid
 grid = RasterModelGrid((nrows, ncols), xy_spacing=dx)
+# create fields
 elev = grid.add_zeros("topographic__elevation", at="node")
 vel = grid.add_zeros("advection__velocity", at="link")
+# initialize fields
 make_gaussian_bump(grid, elev, bump_width,center=[0.25,0.5])
 maxnode = np.argmax(elev)
 x0 = grid.x_of_node[maxnode]
@@ -50,19 +58,23 @@ for _ in range(ntimesteps):
     adv.update(dt)
 imshow_grid(adv.grid, elev)
 calc_translation_distance(grid, elev, x0, y0, u, dt, ntimesteps)
+# Re-initialize and run again, this time with y-directed motion
 ux = 0.0
 uy = 1.0
 vel[grid.horizontal_links] = ux
 vel[grid.vertical_links] = uy
+# Re-initialize the Gaussian bump
 make_gaussian_bump(grid, elev, bump_width, center=[0.5,0.25])
 elev0 = elev.copy()
 try:
     adv.initial()
 except:
     pass
+# for _ in range(ntimesteps):
 adv.update(dt)
 imshow_grid(adv.grid, elev - elev0)
 calc_translation_distance(grid, elev, x0, y0, u, dt, ntimesteps)
+# Re-initialize and run again, this time with anti-x-directed motion
 ux = -(1.5**0.5)
 uy = -(1.5**0.5)
 u = (ux * ux + uy * uy) ** 0.5
@@ -78,6 +90,7 @@ for _ in range(ntimesteps):
     adv.update(dt)
 imshow_grid(adv.grid, elev - elev0)
 calc_translation_distance(grid, elev, x0, y0, u, dt, ntimesteps)
+# Re-initialize and run again, this time with anti-x-directed motion
 ux_max = 1.0
 uy = 0.0
 u = ux_max
@@ -95,6 +108,7 @@ for _ in range(ntimesteps):
     adv.update(dt)
 imshow_grid(adv.grid, elev)
 calc_translation_distance(grid, elev, x0, y0, u, dt, ntimesteps)
+# Identify places with positive vs. negative x-wise velocity
 make_gaussian_bump(grid, elev, bump_width)
 elev0 = elev.copy()
 vel_is_neg = grid.x_of_node[grid.node_at_link_head] <= 0.5

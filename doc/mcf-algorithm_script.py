@@ -32,8 +32,11 @@ def plot(ct, ct2):
     plt.xlabel('Number of Grid Elements (log)',fontsize=20)
     plt.gcf().subplots_adjust(bottom=0.17, left=0.16)
     plt.ylabel('Runtime in s (log)',fontsize=20)
+# polynomial order of surface approximation
 order = 2
+# initial radius
 R0 = 2.
+# end time
 endTime = 0.1
 def calcRadius(surface):
     R,vol = 0, 0
@@ -46,6 +49,7 @@ def calcRadius(surface):
             vol += weight
     return R/vol
 code = """
+#include <dune/geometry/quadraturerules.hh>
 template< class Surface >
 double calcRadius( const Surface &surface ) {
   double R = 0, vol = 0.;
@@ -65,14 +69,17 @@ switchCalcRadius = lambda use_cpp,surface: \
              algorithm.load('calcRadius', io.StringIO(code), surface) \
              if use_cpp else calcRadius
 def calculate(use_cpp, gridView):
+    # space on Gamma_0 to describe position of Gamma(t)
     space = solutionSpace(gridView, dimRange=gridView.dimWorld, order=order)
     u = TrialFunction(space)
     v = TestFunction(space)
     x = SpatialCoordinate(space)
     positions = space.interpolate(x, name="position")
+    # space for discrete solution on Gamma(t)
     surface = geoGridView(positions)
     space = solutionSpace(surface, dimRange=surface.dimWorld, order=order)
     solution  = space.interpolate(x, name="solution")
+    # set up model using theta scheme
     theta = 0.5   # Crank-Nicolson
     I = Identity(3)
     dt = dune.ufl.Constant(0,"dt")
@@ -96,7 +103,9 @@ def calculate(use_cpp, gridView):
         start = time.time()
         while t < endTime:
             info = scheme.solve(target=solution)
+            # move the surface
             positions.assign(solution)
+            # store some information about the solution process
             iterations += int( info["linear_iterations"] )
             t          += scheme.model.dt
             error       = max(error, abs(radius(surface)-Rexact(t)))
@@ -118,6 +127,7 @@ def calculate(use_cpp, gridView):
         print("pandas module not found so not showing table - ignored")
         pass
     return gridSizes, times
+# set up reference domain Gamma_0
 results = []
 gridView = leafGridView("sphere.dgf", dimgrid=2, dimworld=3)
 results += [calculate(True, gridView)]

@@ -17,6 +17,7 @@ space = solutionSpace(gridView, dimRange=gridView.dimWorld, order=order)
 u = TrialFunction(space)
 v = TestFunction(space)
 x = SpatialCoordinate(space)
+# positions = space.interpolate(x * (1 + 0.5*sin(2*pi*x[0]*x[1])* cos(pi*x[2])), name="position")
 positions = space.interpolate(x * (1 + 0.5*sin(2*pi*(x[0]+x[1]))*cos(0.25*pi*x[2])), name="position")
 surface = geometryGridView(positions)
 space = solutionSpace(surface, dimRange=surface.dimWorld, order=order)
@@ -46,7 +47,10 @@ referenceView = leafGridView("soap.dgf", dimgrid=2, dimworld=3)
 referenceView.hierarchicalGrid.globalRefine(8)
 space = solutionSpace(referenceView, dimRange=referenceView.dimWorld,
         order=order)
+# setup deformed surface
 x         = SpatialCoordinate(space)
+# note that 'positions' also deforms the boundary which will then be fixed
+# during the evolution by the chosen boundary conditions:
 positions = space.interpolate(x * (1 + 0.5*sin(2*pi*(x[0]+x[1]))*cos(0.25*pi*x[2])), name="position")
 gridView  = geometryGridView(positions)
 space     = solutionSpace(gridView, dimRange=gridView.dimWorld, order=order)
@@ -56,10 +60,15 @@ dt    = Constant(0.01, "timeStep")
 t     = Constant(0.0, "time")
 endTime      = 0.4
 saveInterval = 0.1
+# define storage for discrete solutions
 uh     = space.interpolate(x, name="uh")
 uh_old = uh.copy()
+# problem definition
+# space form
 xForm = inner(grad(u), grad(phi)) * dx
+# add time discretization
 form = dot(u - uh_old, phi) * dx + dt * xForm
+# define Dirichlet boundary conditions - freezing the boundary
 bc = DirichletBC(space,x)
 solverParameters =\
        {"nonlinear.tolerance": 1e-9,
@@ -67,6 +76,7 @@ solverParameters =\
         "linear.preconditioning.method": "jacobi",
         "nonlinear.verbose": False,
         "linear.preconditioning.iterations": 3}
+# setup scheme
 scheme = solutionScheme([form == 0, bc], space, solver="cg",
                         parameters=solverParameters)
 nextSaveTime = saveInterval

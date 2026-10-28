@@ -24,11 +24,13 @@ def getSpace( gv, order ):
            dgonb( gridView, dimRange=4, order=order )
 class Model:
     gamma = 1.4
+    # helper function
     def toPrim(U):
         v = as_vector( [U[i]/U[0] for i in range(1,3)] )
         kin = dot(v,v) * U[0] / 2
         pressure = (Model.gamma-1)*(U[3]-kin)
         return U[0], v, pressure
+    # interface methods for model
     @classmethod
     def F_c(cls,t,x,U):
         rho, v, p = Model.toPrim(U)
@@ -37,7 +39,9 @@ class Model:
                   [rho*v[0]*v[0] + p, rho*v[0]*v[1]],
                   [rho*v[0]*v[1], rho*v[1]*v[1] + p],
                   [(U[3]+p)*v[0], (U[3]+p)*v[1]] ] )
+    # simple 'outflow' boundary conditions on all boundaries
     boundary = {range(1,5): BndValue(lambda t,x,U: U)}
+    # interface method needed for LLF and time step control
     @classmethod
     def maxWaveSpeed(cls,t,x,U,n):
         rho, v, p = Model.toPrim(U)
@@ -86,6 +90,7 @@ def evolve(space, u_h, limiter="MinMod"):
 domain = (reader.dgf, "triangle.dgf")
 gridView = simplexGrid( domain, dimgrid=2 )
 gridView.plot()
+# fix the order to use and storage structure for results
 res = {}
 order = 1
 space = getSpace( gridView, order )

@@ -17,6 +17,7 @@ dune.fem.threading.use = 4
 order        = 3
 polyGrid = dune.vem.polyGrid( cartesianDomain([0,0],[1,1],[30,30]), cubes=True)
 testSpaces = [ [0], [order-3,order-2], [order-4] ]
+# testSpaces   = [ [0,0],[order-4,order-3], [order-4] ]
 space = dune.vem.vemSpace(polyGrid, order=order, testSpaces=testSpaces)
 t     = dune.ufl.Constant(0,"time")
 tau   = dune.ufl.Constant(0,"dt")
@@ -33,6 +34,7 @@ W     = lambda v: 1/4*(v**2-1)**2
 dW    = lambda v: (v**2-1)*v
 equation = ( u*v + tau*eps*eps*a(u,v) + tau*b(dW(u),v) ) * dx == df_n*v * dx
 dbc = [dune.ufl.DirichletBC(space, 0, i+1) for i in range(4)]
+# energy
 Eint  = lambda v: eps*eps/2*inner(grad(v),grad(v))+W(v)
 biLaplaceCoeff = eps*eps*tau
 diffCoeff      = 2*tau

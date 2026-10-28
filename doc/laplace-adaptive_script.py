@@ -21,8 +21,11 @@ try:
     from ufl import atan2
 except ImportError: # remain compatible with version 2022 of ufl
     from ufl import atan_2 as atan2
+# print can be used in parallel runs as before but will only produce output on rank 0
 print = partial(print, flush=True) if comm.rank == 0 else lambda *args, **kwargs: None
+# set the angle for the corner (0<angle<=360)
 cornerAngle = 320.
+# use a second order space
 order = 2
 def setup():
     vertices = numpy.zeros((8, 2))
@@ -40,10 +43,12 @@ def setup():
     u = TrialFunction(space)
     v = TestFunction(space)
     x = SpatialCoordinate(space)
+    # exact solution for this angle
     Phi = cornerAngle / 180 * pi
     phi = atan2(x[1], x[0]) + conditional(x[1] < 0, 2*pi, 0)
     exact = dot(x, x)**(pi/2/Phi) * sin(pi/Phi * phi)
     a = dot(grad(u), grad(v)) * dx
+    # set up the scheme
     laplace = solutionScheme([a==0, DirichletBC(space, exact, 1)], solver="cg",
                 parameters={"linear.preconditioning.method":"jacobi"})
     uh = space.interpolate([0], name="solution")

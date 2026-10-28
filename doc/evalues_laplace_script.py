@@ -29,6 +29,7 @@ reference_eigvals
 solutions = [space.function(name = "eigenvalue"+str(i)) for i in range(num_sols)]
 for k in range(num_sols):
     solutions[k].as_numpy[:] = eigvecs[:,k].real
+# gridView.writeVTK( "Neumann_Eigenvalues", pointdata = solutions )
 rows, cols = num_sols//3, 3
 fig, axs = plt.subplots(rows, cols, figsize=(10,10))
 for k in range(rows):
@@ -57,6 +58,7 @@ reference_eigvals = [np.pi**2 * pair for pair in pairs[:num_sols] ]
 reference_eigvals
 for k in range(num_sols):
     solutions[k].as_numpy[:] = eigvecs[:,k].real
+# gridView.writeVTK( "Dirichlet_Eigenvalues", pointdata = solutions )
 rows, cols = num_sols//3, 3
 fig, axs = plt.subplots(rows, cols, figsize=(10,10))
 for k in range(rows):

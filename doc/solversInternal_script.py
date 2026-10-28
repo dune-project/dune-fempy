@@ -22,6 +22,7 @@ exact = 1/2*(x[0]**2+x[1]**2) - 1/3*(x[0]**3 - x[1]**3) + 1
 a  = ( inner(grad(u),grad(v)) + (1+u)**2*u*v ) * dx
 bf = (-div(grad(exact)) + (1+exact)**2*exact) * v * dx
 bg = dot(grad(exact),n)*v*ds
+# simple function to show the result of a simulation
 def printResult(method,error,info):
     print(method,"L^2, H^1 error:",'{:0.5e}, {:0.5e}'.format(
                  *[ numpy.sqrt(e) for e in integrate([error**2,inner(grad(error),grad(error))]) ]),
@@ -29,6 +30,7 @@ def printResult(method,error,info):
 scheme = galerkin(a == bf+bg, solver='cg',
                   parameters={"linear.preconditioning.method":"jacobi",
                               "nonlinear.forcing":"eisenstatwalker",
+                              # this is the default for this forcing
                               "linear.errormeasure":"residualreduction",
                               "nonlinear.tolerance":1e-7},
                  )
@@ -41,18 +43,25 @@ class Scheme1:
         self.scheme = scheme
         self.jacobian = scheme.linear(ubar=u0) # obtain a linear operator for the Newton method
     def solve(self, target):
+        # create a copy of target for the residual
         res = target.copy(name="residual")
         dh  = target.copy(name="direction")
         n, linIter = 0,0
         while True:
+            # res = S[u]
+            #     = u - g on boundary
             self.scheme(target, res)
             absF = res.scalarProductDofs(res)
             if absF < 1e-7**2: # this is the same tolerance we set above for the built-in Newton solver
                 break
             self.scheme.jacobian(target,self.jacobian)  # assemble the linearization
+            # dh = DS[u]^{-1}S[u]
+            #    = u - g on boundary
             dh.clear()
             info = self.jacobian.solve(target=dh,rightHandSide=res)
             linIter += info["linear_iterations"]
+            # unew = u - DS[u]^{-1}S[u]
+            #      = u - (u-g) = g on boundary
             target -= dh
             n += 1
         return {"iterations":n, "linear_iterations":linIter}
@@ -63,17 +72,31 @@ printResult("Newton 1",u_h-exact,info)
 class Scheme2:
     def __init__(self, scheme, u0):
         self.scheme = scheme
+        # let's use a `gmres` solver for demonstration purposes
         self.linear = linearized(scheme, ubar=u0,
                       parameters={ "method":"gmres", "gmres.restart":50,
+                               # the scheme uses Eisenstat-Walker forcing
+                               # with 'residual reduction' as error measure
+                               # without the forcing 'absolute' is the default error measure
                                "errormeasure":"absolute",
                             })
     def solve(self, target):
         prev = target.copy()
         n, linIter = 0,0
+        # we are not computing the residual directly so need a different
+        # stopping criteria, i.e., size of the step dh
         while True:
+            # setup L[u] = DS[u^n](u-u^n) + S[u^n]
+            # Then L[u] = 0 leads to
+            # u = (DS[u^n])^{-1} (DS[u^n]u^n-S[u^n])
+            #   = u^n - DS[u^n])^{-1}S[u^n]
+            #   = u^{n+1}
             self.linear.setup(target)
             info = self.linear.solve(target=target)
             linIter += info["linear_iterations"]
+            # We don't have access to the residual so we use |u^{n+1}-u^n|
+            # as stopping criteria.
+            # Subtract the new iterate from the previous one
             prev.sub( target )
             absDiff = prev.scalarProductDofs(prev)
             print(n,absDiff)
@@ -87,6 +110,7 @@ scheme_cls = Scheme2(scheme,u_h)
 info = scheme_cls.solve(target=u_h)
 printResult("Newton 2 (gmres)",u_h-exact,info)
 model = ( inner(grad(u), grad(v)) + (u - conditional(dot(x,x)<0.6,10.,0.))*v ) * dx
+# verbose output for the linear solver is too long so use default `False` setting
 sc  = galerkin(model==0, solver="cg",
                parameters={"linear.verbose":False,"nonlinear.verbose":True}
               )
@@ -103,6 +127,7 @@ op  = galerkin([model==0, *dbcs], space)
 sol = space.interpolate(0, name="u_h")
 lin = op.linear()
 op.setConstraints(sol)
+# setup the right hand side
 rhs = sol.copy()
 op(sol,rhs)
 rhs *= -1
@@ -126,6 +151,7 @@ except ConfigurationError:
     petsc = False
 if petsc:
     spacePetsc = lagrange(gridView, order=2, storage='petsc')
+    # We use an sor preconditioner:
     schemePetsc = galerkin([a == bf+bg, DirichletBC(space,exact,2)],
                            space=spacePetsc, solver="cg",
                            parameters={"linear.preconditioning.method":"hypre"})
@@ -133,6 +159,7 @@ if petsc:
     info = schemePetsc.solve(target=uPetsc_h)
     printResult("PETSc",uPetsc_h-exact,info)
 spaceIstl = lagrange(gridView, order=2, storage='istl')
+# We use an amg preconditioner:
 schemeIstl = galerkin(a == bf+bg, solver=("istl","cg"),
                       parameters={"linear.preconditioning.method":"amg-jacobi"})
 u_h.interpolate(2)

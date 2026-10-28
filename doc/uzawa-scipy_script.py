@@ -51,10 +51,12 @@ if mainOp.model.nu > 0: # same as nu.value>0
     preconOp    = galerkinOperator( (preconModel, DirichletBC(spcP,0)), spcP)
     P = preconOp.linear().as_numpy
     def Pinv(rhs,target): target[:] = linalg.spsolve(P,rhs)
+# discrete functions
 velocity = spcU.interpolate(spcU.dimRange*[0], name="velocity")
 pressure = spcP.interpolate(0, name="pressure")
 sol_u  = velocity.as_numpy
 sol_p  = pressure.as_numpy
+# aux. function
 rhsVelo  = velocity.copy()
 rhsPress = pressure.copy()
 rhs_u  = rhsVelo.as_numpy
@@ -63,6 +65,7 @@ r      = numpy.copy(rhs_p)
 d      = numpy.copy(rhs_p)
 precon = numpy.copy(rhs_p)
 xi     = numpy.copy(rhs_u)
+# right hand side for Shur complement problem
 mainOp(velocity,rhsVelo)
 rhs_u *= -1
 xi[:] = G*sol_p
@@ -77,6 +80,7 @@ if mainOp.model.nu > 0:
     r += mainOp.model.nu*precon
 d[:] = r[:]
 delta = numpy.dot(r,rhs_p)
+# cg type iteration
 for m in range(100):
     xi.fill(0)
     rhs_u[:] = G*d

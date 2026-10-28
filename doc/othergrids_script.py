@@ -15,6 +15,7 @@ import dune.alugrid
 from dune.grid import onedGrid
 
 domain2d = (reader.dgf, "triangle.dgf")
+# specify dimgrid since it cannot be easily extracted from the dgf file
 aluView = leafGridView(domain2d, dimgrid=2)
 aluView.plot(figsize=(5,5))
 waveDomain = (reader.gmsh, "wave_tank.msh")
@@ -49,6 +50,7 @@ scheme3d = solutionScheme((inner(grad(u),grad(v))+inner(u,v))*dx ==
                         solver='cg')
 uh3d = space3d.interpolate([0],name="solution")
 scheme3d.solve(target=uh3d)
+# note: plotting with matplotlib not yet available for 3d grids
 gridView3d.writeVTK('3dexample', pointdata=[uh3d],
                     outputType=OutputType.appendedraw)
 dgf, _,_ = mesh2DGF((points, cells))
@@ -78,8 +80,11 @@ if meshio:
     quadGrid.plot()
 try:
     with pygmsh.occ.Geometry() as geom:
+        # Define domain
         L = 1; H = 1
+        # circles
         c = 0.2; r = 0.05
+        # Grid size function
         def size(dim, tag, x, y, z, lc):
             resolution = 0.1
             d = ((x - c)**2 + (y - c)**2)**0.5
@@ -88,22 +93,30 @@ try:
             d = ((x - (1-c))**2 + (y - (1-c))**2)**0.5
             if d < 3 * r:
                 return 0.4*resolution
+            # default is a coarser mesh
             return resolution
+        # create rectangle and circles
         rectangle = geom.add_rectangle([0, 0, 0], L, H)
         obs1 = geom.add_ball([c, c, 0], r)
         obs2 = geom.add_ball([1-c, 1-c, 0], r)
+        # subtract the two obstacles from the volume to create holes
         geom.boolean_difference(rectangle, [obs1, obs2])
         geom.set_mesh_size_callback(size)
         mesh = geom.generate_mesh(dim=2)
         eps = 0.01 # tolerance
+        # lower left circle min and max
         c1 = [c - r - eps, c + r + eps]
+        # upper right circle min and max
         c2 = [(1-c) - r - eps, (1-c) + r + eps]
+        # dictionary containing id and a list containing the lower left and upper right corner of the bounding box
         bndDomain = {1: [[-1.0 , -1.0 ], [0.0  , H+0.1]], # bounding box inflow
                      2: [[   L , -1.0 ], [L+1.0, H+0.1]], # bounding box outflow
                      4: [[c1[0], c1[0]], [c1[1], c1[1]]], # bounding box lower left circle
                      5: [[c2[0], c2[0]], [c2[1], c2[1]]], # bounding box upper right circle
                      3: "default"  # top and bottom wall,
+                     # which are all other segments not contained in the above bounding boxes
                     }
+        # return dgf string which can be read by DGF parser or written to file for later use
         dgf, _,_ = mesh2DGF((mesh.points, mesh.cells_dict), bndDomain=bndDomain, dim=2)
         domain2d = (reader.dgfString, dgf)
 except ImportError: # pygmsh not installed - use a simple cartesian domain
@@ -115,9 +128,11 @@ fig = pyplot.figure()
 boundaryFunction( gridView2d).plot(gridLines="white",linewidth=2,figure=fig)
 if len( fig.get_axes() ) > 0:
     fig.get_axes()[0].set_facecolor("lightgray")
+# Initialize empty geometry using the build in kernel in GMSH
 with pygmsh.geo.Geometry() as geom:
     L,H = 1, 1
     c,r = 0.2, 0.05
+    # Grid size function
     def size(dim, tag, x, y, z, lc):
         resolution = 0.1
         d = ((x - c)**2 + (y - c)**2)**0.5
@@ -126,21 +141,30 @@ with pygmsh.geo.Geometry() as geom:
         d = ((x - (1-c))**2 + (y - (1-c))**2)**0.5
         if d < 3 * r:
             return 0.4*resolution
+        # default is a coarser mesh
         return resolution
+    # Add obstacle
     obs1 = geom.add_circle([c,c,0], r)
     obs2 = geom.add_circle([1-c,1-c,0], r)
+    # Add points with finer resolution on left side
     points = [
         geom.add_point((0, 0, 0)),
         geom.add_point((L, 0, 0)),
         geom.add_point((L, H, 0)),
         geom.add_point((0, H, 0))
       ]
+    # Add lines between all points creating the rectangle
     rectangle = [
         geom.add_line(points[i], points[i + 1]) for i in range(-1, len(points) - 1)
       ]
+    # Create a line loop and plane surface for meshing
     rect_loop = geom.add_curve_loop(rectangle)
     surface = geom.add_plane_surface(rect_loop, holes=[obs1.curve_loop,obs2.curve_loop])
+    # Call gmsh kernel before add physical entities
     geom.synchronize()
+    # add boundary markers (this autoassigns numbers 0,1,2,)
+    # we need to add the option to renumber the names in the importMesh
+    # function (gmsh.field_data["inflow"][1] = 2 for example)
     geom.add_physical([rectangle[0]], "Inflow")                 # 1
     geom.add_physical([rectangle[2]], "Outflow")                # 2
     geom.add_physical([surface], "Fluid")                       # 3 (will be ignored during import)
@@ -151,6 +175,8 @@ with pygmsh.geo.Geometry() as geom:
     gmsh.model.mesh.recombine()
     with tempfile.NamedTemporaryFile(suffix=".msh") as f:
         gmsh.write(f.name)
+        # import mesh using '3' as default boundary id (for top/bottom) -
+        # if not prescribed then '1' will be used
         gridView = dune.alugrid.aluGrid((reader.meshio,f.name),defaultBndId=3)
 fig = pyplot.figure()
 boundaryFunction(gridView).plot(gridLines="white",linewidth=2, figure=fig)

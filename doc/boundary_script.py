@@ -23,6 +23,7 @@ a  = inner(grad(uVec), grad(vVec)) * dx
 a += ( ( 10*(1-2*uVec[1])+uVec[0] ) * vVec[0] +\
        ( 10*sin(2*pi*x[1]) + (1-2*uVec[0])**2*uVec[1] ) * vVec[1]
      ) * dx
+# Define Dirichlet boundary conditions for first component on all boundaries
 bc = DirichletBC(vecSpace,[sin(2*pi*(x[0]+x[1])),None])
 vecScheme = solutionScheme( [a == 0, bc],
         parameters={"linear.tolerance": 1e-9} )

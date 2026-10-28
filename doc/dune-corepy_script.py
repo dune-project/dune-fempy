@@ -75,8 +75,10 @@ for element in unitSquare.elements:
         print(f" {vertex.geometry.center}")
 for element in unitSquare.elements:
     for isec in unitSquare.intersections( element ):
+        # do something with neighbor
         if isec.outside:
             print(f"outside {isec.outside.geometry.center}")
+        # check if boundary segment
         if isec.boundary:
             print(f"boundary {isec.geometry.center} with normal {isec.centerUnitOuterNormal}")
 @dune.fem.function.gridFunction(aluView, name="cos", order=3)
@@ -101,15 +103,19 @@ for e in aluView.elements:
 print("integral of function 'f':",integral)
 integral = 0
 for e in aluView.elements:
+    # obtain numpy arrays containing the points and weights and then call
+    # required functions using these vectors with requiring a loop
     points, weights = rules(e.type).get()
     ies = e.geometry.integrationElement(points)
     values = f(e,points)
     integral += numpy.sum(values*ies*weights,axis=-1)
 print("integral of function 'f':",integral)
+# an easy case
 dimR = 2
 @dune.fem.function.gridFunction(aluView, name="g", order=3)
 def g(x):
     return [numpy.cos(2.*numpy.pi/(0.3+abs(x[0]*x[1])))]*dimR
+# bit more complex to code
 @dune.fem.function.gridFunction(aluView, name="g", order=3)
 def g(x):
     if type(x[0]) is float:
@@ -118,6 +124,8 @@ def g(x):
         return [numpy.cos(2.*numpy.pi/(0.3+abs(x[0]*x[1]))),[1]*len(x[0])]
 integral = g.dimRange*[0]
 for e in aluView.elements:
+    # obtain numpy arrays containing the points and weights and then call
+    # required functions using these vectors with requiring a loop
     points, weights = rules(e.type).get()
     ies = e.geometry.integrationElement(points)
     values = g(e,points)
@@ -165,6 +173,7 @@ try:
     s = mlab.triangular_mesh(triangulation.x, triangulation.y, z*0.5,
                              triangulation.triangles)
     display( s )
+    # mlab.savefig("mayavi.png", size=(400,300))
     mlab.close(all=True)
 except (ImportError, ModuleNotFoundError):
     print("mayavi module not found so not rendering plot - ignored")

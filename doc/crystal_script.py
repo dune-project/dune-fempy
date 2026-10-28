@@ -73,6 +73,7 @@ maxLevel = 11 if size==1 else 13
 startLevel = 5
 gridView.hierarchicalGrid.globalRefine(startLevel)
 u_h.interpolate(initial)
+# default marking strategy based on indicator values
 marker = GridMarker(indicator,
                     refineTolerance  = 1.4,
                     coarsenTolerance = 1.2,

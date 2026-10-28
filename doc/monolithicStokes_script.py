@@ -21,10 +21,18 @@ import numpy
 gridView = structuredGrid([0, 0], [1, 1], [7, 7])
 dim_space = gridView.dimGrid
 spatial_coordinate = SpatialCoordinate(cell(dim_space))
+# Surface normal on the exterior boundary
 n  = FacetNormal(cell(dim_space))
+# each element facet has sides + | - with normal ne=n('+') pointing
+# from + to - ( meaning + |-> -)
+# in the notation of the paper: superscript "int" == ('+'), "ext" == ('-')
+# see (BDK12) for more details
 ne = n('+')
+# Representative element length for interior facets
 h_int = avg(CellVolume(cell(dim_space))) / FacetArea(cell(dim_space))
+# Representative element length for exterior facets (boundaries)
 h_ext = CellVolume(cell(dim_space)) / FacetArea(cell(dim_space))
+# Penalization of discontinuities / boundary value
 sigma_ip = Constant(1000, name="interior_penalty_parameter")
 def weak_form_stationary_stokes(u,v,p,q, f,mu, dirichlet_velocity=None):
     """
@@ -36,6 +44,8 @@ def weak_form_stationary_stokes(u,v,p,q, f,mu, dirichlet_velocity=None):
     :param p: (scalar) trial function for pressure (in R)
     :param q: (scalar) test function for pressure (in R)
     """
+    # Note: This assumes Dirichlet Velocity BCs everywhere so we don't need
+    # the boundary integrals which are shown here for completeness
     viscous_stress = mu*inner(grad(u), grad(v))*dx # - inner(dot(grad(u),n), v)*ds
     pressure_force = -p*div(v)*dx # + p*dot(v,n)*ds
     continuity = div(u)*q*dx
@@ -107,6 +117,8 @@ solver_parameters ={"nonlinear.tolerance": 1e-10,
                     "linear.preconditioning.method": "ilu",
                     "linear.verbose": False,
                     "linear.maxiterations": 1000}
+# Alternative (commented) version uses weakly imposed boundary conditions:
+# eqns = weak_form_stationary_stokes(u_h, v_h, p_h, q_h, f_exact, mu, as_vector([u_exact, v_exact]))
 eqns =  [weak_form_stationary_stokes(u_h, v_h, p_h, q_h, f_exact, mu), *dirichlet_bcs_exact]
 scheme_taylor_hood_cg = solutionScheme(eqns,
                                        space=taylor_hood_space,
@@ -123,6 +135,10 @@ print("number linear iterations: " + str(output['linear_iterations']))
 fig = pyplot.figure()
 solution_vector_cg.plot(vectors=[0,1], gridLines=None, figure=fig)
 solution_vector_cg[2].plot(figure=fig, gridLines=None)
+# Switch for interior penalty stabilization method
+# -1: symmetric interior penalty (SIP)
+#  1: non-symmetric " " (NIPG)
+#  0: stabilization off
 method_switch_ip = Constant(-1.0, name="switch_interior_penalty_method")
 gamma_grad_div = Constant(0.0, name="grad_div_stab_param")
 """
@@ -166,6 +182,9 @@ def weak_form_stationary_stokes_dg(u,v,p,q,f,mu, is_dirichlet_velocity, dirichle
     :param p: (scalar) trial function for pressure (in R)
     :param q: (scalar) test function for pressure (in R)
     """
+    # Interior penalty stabilization of viscous terms and penalization
+    # of jump discontinuities (also used to weakly enforce Dirichlet BCs in the
+    # last term)
     viscous_stress = inner(grad(u), grad(v))*dx \
                    - dot(avg(grad(u))*ne, jump(v))*dS \
                    - dot(grad(u)*n, v)*is_dirichlet_velocity*ds \
@@ -173,9 +192,12 @@ def weak_form_stationary_stokes_dg(u,v,p,q,f,mu, is_dirichlet_velocity, dirichle
                    + method_switch_ip*dot(grad(v)*n, u  - dirichlet_value_velocity)*is_dirichlet_velocity*ds \
                    + (sigma_ip/h_int)*dot(jump(u),jump(v))*dS \
                    + (sigma_ip/h_ext)*dot(u - dirichlet_value_velocity,v)*is_dirichlet_velocity*ds
+    #2: pressure_force = b_div(v, p)
     pressure_force = - p*div(v)*dx \
                      + avg(p)*dot(jump(v), ne)*dS \
                      + p*dot(v,n)*ds
+    # Optional stabilization terms, can be turned off by setting gamma_grad_div.value = 0, gamma_mass_flux.value = 0
+    # TODO: do we need mu for the stabilization (which one)?
     grad_div_stabilization = gamma_grad_div*div(u)*div(v)*dx
     mass_flux_stabilization = gamma_mass_flux*((1/h_int)*dot(jump(u),ne)*dot(jump(v),ne)*dS \
                                               +(1/h_ext)*dot(u - dirichlet_value_velocity, n)*dot(v, n)*ds )
@@ -206,6 +228,8 @@ def penalty_parameter_shabazi(view, order_discrete_space):
     k = order_discrete_space
     """ approximation space order """
     for element in view.elements:
+        # Iterate all elements and find the max. ratio of area / volume
+        # (or edge length over area in 2D)
         total_surface_area_element = 0
         for face in element.subEntities(1):
             total_surface_area_element += face.geometry.volume
@@ -213,6 +237,7 @@ def penalty_parameter_shabazi(view, order_discrete_space):
         """ the surface area / volume ratio of the current element """
         max_ratio = np.max([ratio_element, max_ratio])
     return ((k+1)*(k+d)/d)*max_ratio
+#########################
 print("\n")
 print("----------------------")
 print("Set up DG Scheme:")
@@ -287,6 +312,8 @@ def convergence_study(scheme, solution_vector, refinement_steps=2, penalty = 20)
     analytical_velocity = as_vector([u_exact, v_exact])
     l2_error_velocity = dot(numerical_velocity - analytical_velocity, numerical_velocity - analytical_velocity)
     h1_error_velocity = inner(grad(numerical_velocity - analytical_velocity), grad(numerical_velocity - analytical_velocity))
+    # Make sure that the mesh is the coarsest refinement level
+    # to begin with
     gridView.hierarchicalGrid.globalRefine(-gridView.hierarchicalGrid.maxLevel)
     for eocLoop in range(refinement_steps):
         element_size = 1.0/sqrt(gridView.size(0))
@@ -304,6 +331,7 @@ def convergence_study(scheme, solution_vector, refinement_steps=2, penalty = 20)
         h1_errors_old = h1_errors
         l2_errors = np.array( [sqrt(e) for e in integrate([l2_error_pressure,l2_error_velocity])] )
         h1_errors = np.array( [sqrt(e) for e in integrate([h1_error_pressure,h1_error_velocity])] )
+        # h1_errors += l2_errors
         error = solution_vector - as_vector( [u_exact, v_exact, p_exact+avg_pressure.value] )
         if eocLoop == 0:
             eocs_l2 = ['-','-']
@@ -339,6 +367,7 @@ method_switch_ip = -1.0
 gamma_grad_div.value = 0.0
 gamma_mass_flux.value = 0.0
 gamma_stab_cburn.value = 0.0
+# Careful with penalty, sigma = 20 works for P3/P2 elements
 convergence_study(scheme=scheme_taylor_hood_dg,
                   solution_vector=solution_vector_dg,
                   refinement_steps=2,
@@ -349,6 +378,10 @@ def dof_count_taylor_hood_quad_mesh(velocity_order=2):
     dim_space = gridView.dimension
     number_velocity_dofs_lagrange_polynomial_per_quad = (velocity_order+1)**2*dim_space
     number_pressure_dofs_lagrange_polynomial_per_quad = (pressure_order+1)**2
+    # Because for DG all DOFs are independent we can just count
+    # number quads * number dofs per quad
+    # where
+    # number dofs per quad = velocity_dofs + pressure_dofs
     return number_elements*(number_velocity_dofs_lagrange_polynomial_per_quad + number_pressure_dofs_lagrange_polynomial_per_quad)
 velocity_order = taylor_hood_space_dg.subSpaces[0].order
 pressure_order = velocity_order - 1

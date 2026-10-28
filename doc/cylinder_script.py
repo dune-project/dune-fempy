@@ -40,6 +40,7 @@ with pygmsh.occ.Geometry() as geom:
     geom.boolean_difference(rectangle, cylinder)
     mesh = geom.generate_mesh()
     points, cells = mesh.points, mesh.cells_dict
+    # extract dictionary for grid construction
     domain = {
         "vertices": points[:, :2].astype(float),
         "simplices": cells["triangle"].astype(int),
@@ -62,10 +63,13 @@ dbc_u_in = DirichletBC(space_u, inflow, x[0] <= 1e-8)
 dbc_u_noflow = DirichletBC(space_u, [0, 0], None)
 dbc_u_out = DirichletBC(space_u, [None,None], 2.2 - x[0] <= 1e-8)
 dbc_p_out = DirichletBC(space_p, 0, 2.2 - x[0] <= 1e-8)
+# Define strain-rate tensor
 def epsilon(u):
     return sym(nabla_grad(u))
+# Define stress tensor
 def sigma(u, p):
     return 2 * mu * epsilon(u) - p * Identity(len(u))
+# Define expressions used in variational forms
 U = 0.5 * (u_h_n + u)
 f = Constant((0, 0), "f")
 E1 = (
@@ -141,6 +145,7 @@ nextstep = 0.
 anim = animation.FuncAnimation(fig, animate, init_func=init, frames=20, interval=100, blit=True)
 try:
     movie = anim.to_html5_video()
+    # save and embed
     anim.save('cylinder.gif', writer=animation.ImageMagickWriter(fps=2))
     from IPython.display import HTML, display
     display( HTML(movie) )

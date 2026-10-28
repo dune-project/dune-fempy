@@ -32,6 +32,7 @@ e_h = u_h-exact
 squaredErrors = integrate([e_h**2,inner(grad(e_h),grad(e_h))])
 print("L^2 and H^1 errors:",[np.sqrt(e) for e in squaredErrors])
 print("average:",integrate(exact,gridView=gridView) )
+# since the integrand is scalar, the following is equivalent:
 print("average:",assemble(exact*dx,gridView=gridView) )
 exact = 1/2*(x[0]**2+x[1]**2) - 1/3*(x[0]**3 - x[1]**3) + 1
 a   = dot(grad(u), grad(v)) * dx

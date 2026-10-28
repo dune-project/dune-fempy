@@ -31,7 +31,9 @@ vh   = space.interpolate( initial_v, name="v" )
 vh_n = vh.copy()
 u   = ufl.TrialFunction(space)
 phi = ufl.TestFunction(space)
+# right hand side (time derivative part
 a_ex = ufl.inner(uh_n, phi) * ufl.dx
+# left hand side (heat equation in first variable + backward Euler in time)
 a_im = (dt * spiral_D * ufl.inner(ufl.grad(u), ufl.grad(phi)) +
         ufl.inner(u,phi)) * ufl.dx
 ustar = (vh_n[0]+spiral_b)/spiral_a
@@ -53,14 +55,17 @@ def init():
 def animate(count):
     global t,stepsize,nextstep
     nextstep += stepsize
+    # print(count,t,stepsize,nextstep)
     while t < nextstep:
         uh_n.assign(uh)
         vh_n.assign(vh)
         info = scheme.solve(target=uh)
         vh.interpolate( ode_update )
+        # print("Computing solution a t = " + str(t + dt), "iterations: " + str(info["linear_iterations"]) )
         t += dt
     data = uh.pointData(1)
     C = plt.tricontourf(triangulation, data[:,0], cmap=plt.cm.rainbow, levels=levels)
+    # gridView.writeVTK("spiral", pointdata=[uh], number=count)
     return C.axes.collections
 fig, ax = plt.subplots()
 ax.set_xlim(( 0, 2.5))
@@ -74,6 +79,7 @@ nextstep = 0.
 anim = animation.FuncAnimation(fig, animate, init_func=init, frames=20, interval=100, blit=True)
 try:
     movie = anim.to_html5_video()
+    # save and embed
     anim.save('spiral.gif', writer=animation.ImageMagickWriter(fps=2))
     from IPython.display import HTML, display
     display( HTML(movie) )

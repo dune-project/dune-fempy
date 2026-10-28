@@ -10,9 +10,13 @@ from ufl import ( TestFunction, TrialFunction, SpatialCoordinate, FacetNormal,
                   as_vector, avg, jump, dS, CellVolume, FacetArea )
 from dune.fem.operator import molGalerkin as molOperator
 
+# from dune.alugrid import aluConformGrid as leafGridView
+# from dune.fem.space import dgonb as dgSpace
+# overlap=1 is needed for parallel computations
 domain   = cartesianDomain([-1, -1], [1, 1], [20, 20], overlap=1)
 gridView = leafGridView(domain)
 space    = dgSpace(gridView, order=2)
+# check if computation is parallel
 parallel = gridView.comm.size > 1
 u    = TrialFunction(space)
 v    = TestFunction(space)
@@ -20,12 +24,18 @@ n    = FacetNormal(space)
 he   = avg( CellVolume(space) ) / FacetArea(space)
 hbnd = CellVolume(space) / FacetArea(space)
 x    = SpatialCoordinate(space)
+# diffusion factor
 eps = Constant(0.1,"eps")
+# transport direction and upwind flux
 b    = as_vector([1,0])
 hatb = (dot(b, n) + abs(dot(b, n)))/2.0
+# boundary values (for left/right boundary)
 dD   = conditional((1+x[0])*(1-x[0])<1e-10,1,0)
 g    = conditional(x[0]<0,atan(10*x[1]),0)
+# penalty parameter (take 1 for p=0)
 beta = 10 * space.order**2 if space.order > 0 else 1
+                # eps*dot(avg(grad(u)),n('+'))*jump(v)*dS -
+                # eps*jump(u)*dot(avg(grad(v)),n('+'))*dS
 dn = lambda u: dot(grad(u),n)
 aInternal     = dot(eps*grad(u) - b*u, grad(v)) * dx
 diffSkeleton  = eps*beta/he*jump(u)*jump(v)*dS -\
@@ -38,6 +48,7 @@ advSkeleton  += ( hatb*u + (dot(b,n)-hatb)*g )*v*dD*ds
 form          = aInternal + diffSkeleton + advSkeleton
 scheme = solutionScheme(form==0, solver="gmres",
             parameters={"linear.preconditioning.method":"jacobi",
+                       # "nonlinear.verbose": True,
                        }
                         )
 uh = space.interpolate(0, name="solution")
@@ -53,8 +64,10 @@ if parallel:
     gridView.writeVTK("u_h", pointdata=[uh])
 else:
     uh.plot()
+# for parallel runs skip 1d part
 if parallel:
     sys.exit(0)
+# remove later, shows same error: from dune.fem.space import dgonb as dgSpace
 N = 200
 domain1d = cartesianDomain([0], [1], [N], overlap=1)
 gridView = leafGridView( domain1d )
@@ -63,11 +76,14 @@ u    = TrialFunction(space)
 v    = TestFunction(space)
 n    = FacetNormal(space)
 x    = SpatialCoordinate(space)
+# transport direction and upwind flux
 speed = 0.5
 b     = as_vector([speed])
 hatb  = (dot(b, n) + abs(dot(b, n)))/2.0
+# boundary values (for left boundary)
 dD    = conditional(x[0]<0.01,1,0)
 g     = 1
+# forms
 advInternal = dot(-b*u, grad(v)) * dx
 advSkeleton = jump(hatb*u)*jump(v) * dS
 advBnd      = ( hatb*u + (dot(b,n)-hatb)*g )*v * dD*ds
@@ -86,6 +102,8 @@ while t<1:
     uh.axpy(-tau,w)   # with numpy backend equivalent to 'uh.as_numpy[:] -= tau*w.as_numpy[:]'
     op(uh, w)
     uh.axpy(-tau,w)   # with numpy backend equivalent to 'uh.as_numpy[:] -= tau*w.as_numpy[:]'
+    # with numpy backend the following is equivalent to
+    # 'uh.as_numpy[:] = 0.5*(uh.as_numpy[:] + un.as_numpy[:])'
     uh *= 0.5
     uh.axpy(0.5,un)
     t += tau

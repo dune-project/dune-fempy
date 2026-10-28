@@ -3,12 +3,15 @@ import jupytext
 import sys
 script = sys.argv[1]
 
+if script[-3:] == ".py": script = script[:-3]
+if "_script" in script: sys.exit(0)
+
 nb = jupytext.read(script+".py")
 lines = [ cell.source for cell in nb.cells if cell.cell_type == "code" ]
 lines = [ line
     for code in lines
     for line in code.splitlines()
-    if line.strip() and not line.lstrip().startswith("#")
+    if line.strip() # and not line.lstrip().startswith("#")   # stripping '#' removes C++ includes from algorithms
 ]
 """
 isMainImport = lambda line: "import " in line and line==line.lstrip()
