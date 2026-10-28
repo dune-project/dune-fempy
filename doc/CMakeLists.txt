@@ -26,7 +26,7 @@ list(APPEND files
 gitlab-formatting.py pandoc-formatting.py svg2pdf.py
 landlab_descr.rst twophaseflow_descr.rst ddfem_descr.rst
 mmesh_descr.rst todo.rst citing.rst index.rst contributions.rst
-corepy.rst installation.rst overview.rst
+corepy.rst installation.rst overview.rst parallel.rst
 stokes.rst furtherexamples.rst nextsteps.rst furthertopics.rst
 inforesources.rst userprojects.rst versions.rst
 gridviews_and_adaptivity.rst cpp.rst developers.rst slurmbatchscript.rst
