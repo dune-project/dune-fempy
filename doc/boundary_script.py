@@ -49,6 +49,15 @@ plotComponents(test, gridLines=None, level=2,
                colorbar={"orientation":"horizontal", "ticks":ticker.MaxNLocator(nbins=4)})
 assert sum([ abs(td-vd) for td,vd in zip(test.dofVector, vec.dofVector)] ) /\
        len(vec.dofVector) < 1e-8
+y = gridFunction(x[1],name="xx",gridView=gridView)
+bcBottom = DirichletBC(vecSpace,bnd,y<1e-10)
+vecScheme = solutionScheme( [a == 0, bc, bcBottom],
+        parameters={"linear.tolerance": 1e-9} )
+vecScheme.solve(target=test)
+plotComponents(test, gridLines=None, level=2,
+               colorbar={"orientation":"horizontal", "ticks":ticker.MaxNLocator(nbins=4)})
+assert sum([ abs(td-vd) for td,vd in zip(test.dofVector, vec.dofVector)] ) /\
+       len(vec.dofVector) < 1e-8
 for i in vecScheme.dirichletIndices():
     vec.dofVector[i] = 0
 plotComponents(vec, gridLines=None, level=2,

@@ -44,6 +44,7 @@ crystal03_3.png  crystal13_3.png  crystal23_3.png  crystal3_3.png
 crystal03_4.png  crystal13_4.png  crystal23_4.png  crystal3_4.png
 crystal03_5.png  crystal13_5.png  crystal23_5.png  crystal3_5.png
 wave_mpi0.png    wave_mpi1.png
+collapsed_source.py
 )
 
 dune_symlink_to_source_files(FILES ${files})

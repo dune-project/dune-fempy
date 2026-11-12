@@ -15,6 +15,7 @@
 
 import sys
 import os
+sys.path.insert(0, os.path.abspath(os.path.dirname(__file__)))
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
@@ -44,6 +45,7 @@ extensions = [
     'nbsphinx',
 #    'sphinxcontrib.apidoc',
     'sphinxcontrib.bibtex',
+    "collapsed_source",
 #    'sphinx.ext.autosectionlabel',
 ]
 bibtex_bibfiles = ['dune-fempy.bib']
@@ -328,47 +330,33 @@ todo_include_todos=True
 nbsphinx_timeout = -1
 nbsphinx_execute = 'never'
 
-
-nbsphinx_prolog = r"""
-
+proepi = r"""
 {% set docBase = env.doc2path(env.docname, base=None).__str__()[:-9] %}
 
 .. only:: html
-
-    .. role:: raw-html(raw)
-        :format: html
 
     .. note::
 
         .. raw:: html
 
-              This document is part of the dune-fem tutorial
-              <a href="https://doi.org/10.5281/zenodo.3706994"><img src="https://zenodo.org/badge/DOI/10.5281/zenodo.3706994.svg" alt="DOI"></a>
+          This document is part of the dune-fem tutorial.
+            <a href="https://doi.org/10.5281/zenodo.3706994">
+              <img src="https://zenodo.org/badge/DOI/10.5281/zenodo.3706994.svg"
+                   alt="DOI">
+            </a>
 
-        | Download *{{ docBase }}* as :download:`Jupyter notebook (_nb.ipynb) <{{ docBase }}_nb.ipynb>` or as :download:`Python script (.py) <{{ docBase }}.py>`
+        | Download *{{ docBase }}* as
+          :download:`Jupyter notebook (.ipynb) <{{ docBase }}_nb.ipynb>`
+          or as
+          :download:`Python script (.py) <{{ docBase }}_script.py>`.
+
+    .. collapsed-source:: View the Python source for this notebook (code only)
+
+        .. literalinclude:: {{ docBase }}_script.py
+            :language: python
+            :linenos:
 """
 
-nbsphinx_epilog = r"""
+nbsphinx_prolog = proepi
 
-{% set docBase = env.doc2path(env.docname, base=None).__str__()[:-9] %}
-
-.. only:: html
-
-    .. role:: raw-html(raw)
-        :format: html
-
-    .. note::
-
-        .. raw:: html
-
-              This document is part of the dune-fem tutorial
-              <a href="https://doi.org/10.5281/zenodo.3706994"><img src="https://zenodo.org/badge/DOI/10.5281/zenodo.3706994.svg" alt="DOI"></a>
-
-        | Download *{{ docBase }}* as :download:`Jupyter notebook (.ipynb) <{{ docBase }}_nb.ipynb>` or as :download:`Python script (.py) <{{ docBase }}.py>`
-
-    .. rubric:: Python source for this notebook (code only)
-
-    .. literalinclude:: {{ docBase }}_script.py
-        :language: python
-        :linenos:
-"""
+nbsphinx_epilog = proepi
