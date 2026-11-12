@@ -354,7 +354,7 @@ proepi = r"""
           or as
           :download:`Python script (with markdown comments) (.py) <{{ docBase }}.py>`.
 
-        .. collapsed-source:: View Python soruce (code only)
+        .. collapsed-source:: View Python source (code only)
 
             Download code only :download:`{{ docBase }}_script.py <{{ docBase }}_script.py>`
 
